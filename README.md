@@ -1,6 +1,12 @@
 # FishTracker
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.8.
+Offline-first Angular PWA for logging fishing sessions, catches, and lake statistics.
+
+## Documentation
+
+Full project documentation: [docs/README.md](./docs/README.md)
+
+AI/repository rules: [AGENTS.md](./AGENTS.md)
 
 ## Development server
 

@@ -1,0 +1,37 @@
+---
+description: Fishing Register PWA project rules for architecture, UI, storage, and testing
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Fishing Register Project Rules
+
+Follow [AGENTS.md](../AGENTS.md) and [docs/development-guidelines.md](../docs/development-guidelines.md).
+
+## Must do
+
+- Use `AppStartupService` for startup navigation decisions
+- Use `DialogService` for Material dialogs
+- Use repositories for IndexedDB access
+- Use design tokens, not hardcoded colors (`#ff6b00`, `#1a1a1a`)
+- Use `expandable-section` for collapsible UI
+- Update `/docs` when changing subsystem behavior
+- Use `MapsService` for external map links; validate coordinates
+- Use `RodService` / event services for rod and bite logic
+- Use `UserOptionService` and `option-combobox` for custom catch dropdowns
+- Use `ResetService` with confirmation for all reset actions
+
+## Must not
+
+- Scatter startup logic across components and guards
+- Use `panelClass: 'dark-dialog'`
+- Access Dexie `db` from feature components
+- Store raw PIN values
+- Create duplicate session or lock state
+- Silently delete rod activity when reducing rod count
+- Full reset without `RESET` confirmation token
+
+## Testing
+
+Add regression tests for bug fixes. Run `ng test` before completing work.
