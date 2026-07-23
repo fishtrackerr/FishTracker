@@ -13,7 +13,7 @@
         <span>{{ 'nav.current' | tr }}</span>
       </a>
     }
-    <a routerLink="/sessions" routerLinkActive="active">
+    <a routerLink="/sessions" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
       <mat-icon>event</mat-icon>
       <span>{{ 'nav.sessions' | tr }}</span>
     </a>

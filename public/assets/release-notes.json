@@ -1,10 +1,15 @@
 {
-  "version": "0.0.22",
+  "version": "0.0.23",
   "date": "2026-07-23",
   "sections": [
     {
       "category": "New Features",
       "items": [
+        {
+          "message": "enhance sessions list and shell components with current session handling",
+          "shortHash": "652e479",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/652e4794928515bd8546f0697db7695162b339fd"
+        },
         {
           "message": "add rod setup callout in session detail with finish button",
           "shortHash": "0741f6f",

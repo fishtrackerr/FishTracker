@@ -127,6 +127,18 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
     input.click();
   }
 
+  async openDetails(): Promise<void> {
+    const s = this.session();
+    if (!s) return;
+    await this.router.navigate(['/sessions', s.id]);
+  }
+
+  async openEdit(): Promise<void> {
+    const s = this.session();
+    if (!s) return;
+    await this.router.navigate(['/sessions', s.id, 'edit']);
+  }
+
   toggleNotes(): void {
     this.showNotes.update((v) => !v);
   }

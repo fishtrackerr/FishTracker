@@ -40,7 +40,7 @@ Legacy sessions without rods show a setup prompt on active session detail.
 - Startup navigates to `/sessions/active` when an active session exists
 - Footer navigation shows a dedicated **Current** tab while an active session exists; it opens `/sessions/active`
 - Dashboard shows **Continue Active Session**
-- Active session page: timer, reactive catch list, Quick Catch, notes, end session
+- Active session page: timer, reactive catch list, Quick Catch, notes, end session, and direct actions for **View session details** and **Edit session**
 - New-session startup flow routes through session detail setup mode first (`/sessions/:id?setupRods=1`), with a finish action that navigates to `/sessions/active?id=:id`
 
 ## Sessions list behavior

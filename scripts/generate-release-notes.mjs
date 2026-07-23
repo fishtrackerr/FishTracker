@@ -54,7 +54,19 @@ function getRepositoryBaseUrl() {
 
 function getCommitsSinceTag() {
   try {
-    const tag = execSync('git describe --tags --abbrev=0', { cwd: root, encoding: 'utf8' }).trim();
+    const tags = execSync('git tag --list', { cwd: root, encoding: 'utf8' }).trim();
+    if (!tags) {
+      return execSync('git log --pretty=format:%h%x09%H%x09%s', { cwd: root, encoding: 'utf8' })
+        .split('\n')
+        .filter(Boolean)
+        .filter((line) => !line.includes('\tMerge '));
+    }
+
+    const tag = execSync('git describe --tags --abbrev=0', {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
     return execSync(`git log ${tag}..HEAD --pretty=format:%h%x09%H%x09%s`, {
       cwd: root,
       encoding: 'utf8',

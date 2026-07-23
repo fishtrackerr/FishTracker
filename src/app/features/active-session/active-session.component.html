@@ -56,6 +56,12 @@
       <button mat-flat-button class="action-btn primary" (click)="quickCatch()">
         🐟 {{ 'activeSession.addCatch' | tr }}
       </button>
+      <button mat-stroked-button class="action-btn" (click)="openDetails()">
+        {{ 'activeSession.viewSessionDetails' | tr }}
+      </button>
+      <button mat-stroked-button class="action-btn" (click)="openEdit()">
+        {{ 'sessionDetail.editSession' | tr }}
+      </button>
       <button mat-flat-button class="action-btn" (click)="quickCamera()">
         📷 {{ 'activeSession.camera' | tr }}
       </button>
