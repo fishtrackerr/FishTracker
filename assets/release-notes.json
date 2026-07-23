@@ -1,10 +1,15 @@
 {
-  "version": "0.0.23",
+  "version": "0.0.24",
   "date": "2026-07-23",
   "sections": [
     {
       "category": "New Features",
       "items": [
+        {
+          "message": "update active session page with direct actions for viewing and editing session details, enhance session navigation, and update version to 0.0.23",
+          "shortHash": "6de58b6",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/6de58b6441a34cc516577005541167e47abfe00e"
+        },
         {
           "message": "enhance sessions list and shell components with current session handling",
           "shortHash": "652e479",
