@@ -1,220 +1,276 @@
 <app-page-title title="common.settings" />
 
 <section class="section app-card">
-  <h2 class="section-title">{{ 'settings.appearance' | tr }}</h2>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.theme' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().themeMode" (ngModelChange)="updateTheme($event)">
-      <mat-option value="dark">{{ 'settings.darkMode' | tr }}</mat-option>
-      <mat-option value="light">{{ 'settings.lightMode' | tr }}</mat-option>
-      <mat-option value="system">{{ 'settings.systemPreference' | tr }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.language' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().language" (ngModelChange)="updateLanguage($event)">
-      @for (language of supportedLanguages; track language) {
-        <mat-option [value]="language">{{ languageLabel(language) }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-  <div class="language-switch" role="group" [attr.aria-label]="'settings.languageSwitch' | tr">
-    <span class="language-switch-label">{{ 'settings.languageSwitch' | tr }}</span>
-    <mat-button-toggle-group
-      [ngModel]="settings().language"
-      (ngModelChange)="updateLanguage($event)"
-      name="language-switch"
-      aria-label="Language switch"
-    >
-      @for (language of supportedLanguages; track language) {
-        <mat-button-toggle [value]="language">{{ languageLabel(language) }}</mat-button-toggle>
-      }
-    </mat-button-toggle-group>
-  </div>
-  <div class="theme-preview" [attr.data-theme]="settings().themeMode === 'system' ? null : settings().themeMode">
-    {{ 'settings.preview' | tr }}
-  </div>
+  <app-expandable-section sectionId="settings-appearance" persistKey="settings-appearance" label="appearance" [defaultExpanded]="true" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.appearance' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.theme' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().themeMode" (ngModelChange)="updateTheme($event)">
+          <mat-option value="dark">{{ 'settings.darkMode' | tr }}</mat-option>
+          <mat-option value="light">{{ 'settings.lightMode' | tr }}</mat-option>
+          <mat-option value="system">{{ 'settings.systemPreference' | tr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.language' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().language" (ngModelChange)="updateLanguage($event)">
+          @for (language of supportedLanguages; track language) {
+            <mat-option [value]="language">{{ languageLabel(language) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <div class="language-switch" role="group" [attr.aria-label]="'settings.languageSwitch' | tr">
+        <span class="language-switch-label">{{ 'settings.languageSwitch' | tr }}</span>
+        <mat-button-toggle-group
+          [ngModel]="settings().language"
+          (ngModelChange)="updateLanguage($event)"
+          name="language-switch"
+          aria-label="Language switch"
+        >
+          @for (language of supportedLanguages; track language) {
+            <mat-button-toggle [value]="language">{{ languageLabel(language) }}</mat-button-toggle>
+          }
+        </mat-button-toggle-group>
+      </div>
+      <div class="theme-preview" [attr.data-theme]="settings().themeMode === 'system' ? null : settings().themeMode">
+        {{ 'settings.preview' | tr }}
+      </div>
+    </div>
+  </app-expandable-section>
 </section>
 
 <section class="section app-card">
-  <h2 class="section-title">{{ 'settings.units' | tr }}</h2>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.weight' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().weightUnit" (ngModelChange)="updateUnits('weightUnit', $event)">
-      <mat-option value="kg">{{ 'settings.kilograms' | tr }}</mat-option>
-      <mat-option value="lbs">{{ 'settings.pounds' | tr }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.length' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().lengthUnit" (ngModelChange)="updateUnits('lengthUnit', $event)">
-      <mat-option value="cm">{{ 'settings.centimeters' | tr }}</mat-option>
-      <mat-option value="inch">{{ 'settings.inches' | tr }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.temperature' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().temperatureUnit" (ngModelChange)="updateUnits('temperatureUnit', $event)">
-      <mat-option value="celsius">{{ 'settings.celsius' | tr }}</mat-option>
-      <mat-option value="fahrenheit">{{ 'settings.fahrenheit' | tr }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.distance' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().distanceUnit" (ngModelChange)="updateUnits('distanceUnit', $event)">
-      <mat-option value="m">{{ 'settings.meters' | tr }}</mat-option>
-      <mat-option value="ft">{{ 'settings.feet' | tr }}</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <app-expandable-section sectionId="settings-units" persistKey="settings-units" label="units" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.units' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.weight' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().weightUnit" (ngModelChange)="updateUnits('weightUnit', $event)">
+          <mat-option value="kg">{{ 'settings.kilograms' | tr }}</mat-option>
+          <mat-option value="lbs">{{ 'settings.pounds' | tr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.length' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().lengthUnit" (ngModelChange)="updateUnits('lengthUnit', $event)">
+          <mat-option value="cm">{{ 'settings.centimeters' | tr }}</mat-option>
+          <mat-option value="inch">{{ 'settings.inches' | tr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.temperature' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().temperatureUnit" (ngModelChange)="updateUnits('temperatureUnit', $event)">
+          <mat-option value="celsius">{{ 'settings.celsius' | tr }}</mat-option>
+          <mat-option value="fahrenheit">{{ 'settings.fahrenheit' | tr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.distance' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().distanceUnit" (ngModelChange)="updateUnits('distanceUnit', $event)">
+          <mat-option value="m">{{ 'settings.meters' | tr }}</mat-option>
+          <mat-option value="ft">{{ 'settings.feet' | tr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </app-expandable-section>
 </section>
 
 <section class="section app-card">
-  <h2 class="section-title">{{ 'settings.security' | tr }}</h2>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.lockAfter' | tr }}</mat-label>
-    <input matInput type="number" [ngModel]="settings().lockTimeoutMinutes" (ngModelChange)="updateLockTimeout(+$event)" />
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.currentPin' | tr }}</mat-label>
-    <input matInput type="password" maxlength="6" [(ngModel)]="oldPin" />
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.newPin' | tr }}</mat-label>
-    <input matInput type="password" maxlength="6" [(ngModel)]="newPin" />
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.confirmPin' | tr }}</mat-label>
-    <input matInput type="password" maxlength="6" [(ngModel)]="confirmPin" />
-  </mat-form-field>
-  <button mat-stroked-button type="button" (click)="changePin()">{{ 'settings.changePin' | tr }}</button>
-  <button mat-stroked-button type="button" (click)="lockNow()">{{ 'settings.lockNow' | tr }}</button>
+  <app-expandable-section sectionId="settings-general" persistKey="settings-general" label="general" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.general' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.defaultLake' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().defaultLakeId" (ngModelChange)="updateSetting('defaultLakeId', $event || undefined)">
+          <mat-option value="">{{ 'common.none' | tr }}</mat-option>
+          @for (lake of lakes(); track lake.id) {
+            <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.maxRods' | tr }}</mat-label>
+        <input matInput type="number" [ngModel]="settings().maxRodCount" (ngModelChange)="updateSetting('maxRodCount', +$event)" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.timeFormat' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().timeFormat" (ngModelChange)="updateSetting('timeFormat', $event)">
+          <mat-option value="24h">{{ 'settings.hour24' | tr }}</mat-option>
+          <mat-option value="12h">{{ 'settings.hour12' | tr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.firstDayWeek' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().firstDayOfWeek" (ngModelChange)="updateSetting('firstDayOfWeek', $event === 0 ? 0 : 1)">
+          <mat-option [value]="0">{{ 'settings.sunday' | tr }}</mat-option>
+          <mat-option [value]="1">{{ 'settings.monday' | tr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </app-expandable-section>
 </section>
 
 <section class="section app-card">
-  <h2 class="section-title">{{ 'settings.weather' | tr }}</h2>
-  <mat-checkbox [ngModel]="settings().detailedWeatherEnabled" (ngModelChange)="updateSetting('detailedWeatherEnabled', $event)">
-    {{ 'settings.enableDetailedWeather' | tr }}
-  </mat-checkbox>
-  <mat-checkbox [ngModel]="settings().autoLoadWeather" (ngModelChange)="updateSetting('autoLoadWeather', $event)">
-    {{ 'settings.autoLoadWeather' | tr }}
-  </mat-checkbox>
-  <mat-checkbox [ngModel]="settings().useGpsForWeather" (ngModelChange)="updateSetting('useGpsForWeather', $event)">
-    {{ 'settings.useGps' | tr }}
-  </mat-checkbox>
-  <mat-checkbox [ngModel]="settings().showWeatherWarnings" (ngModelChange)="updateSetting('showWeatherWarnings', $event)">
-    {{ 'settings.showWarnings' | tr }}
-  </mat-checkbox>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.refreshMinutes' | tr }}</mat-label>
-    <input matInput type="number" [ngModel]="settings().weatherRefreshMinutes" (ngModelChange)="updateSetting('weatherRefreshMinutes', +$event)" />
-  </mat-form-field>
-  <button mat-stroked-button type="button" (click)="clearWeatherCache()">{{ 'settings.deleteCachedWeather' | tr }}</button>
+  <app-expandable-section sectionId="settings-gallery" persistKey="settings-gallery" label="gallery" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.gallery' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.defaultSorting' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().gallerySortDefault" (ngModelChange)="updateSetting('gallerySortDefault', $event)">
+          <mat-option value="newest">{{ 'settings.newest' | tr }}</mat-option>
+          <mat-option value="oldest">{{ 'settings.oldest' | tr }}</mat-option>
+          <mat-option value="favorite">{{ 'settings.favoriteFirst' | tr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.thumbnailSize' | tr }}</mat-label>
+        <mat-select [ngModel]="settings().galleryThumbnailSize" (ngModelChange)="updateSetting('galleryThumbnailSize', $event)">
+          <mat-option value="small">{{ 'settings.small' | tr }}</mat-option>
+          <mat-option value="medium">{{ 'settings.medium' | tr }}</mat-option>
+          <mat-option value="large">{{ 'settings.large' | tr }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-checkbox [ngModel]="settings().galleryFavoritesFirst" (ngModelChange)="updateSetting('galleryFavoritesFirst', $event)">
+        {{ 'settings.showFavoritesFirst' | tr }}
+      </mat-checkbox>
+      <button mat-stroked-button type="button" (click)="clearHomepageImage()">{{ 'settings.clearHomepageImage' | tr }}</button>
+    </div>
+  </app-expandable-section>
 </section>
 
 <section class="section app-card">
-  <h2 class="section-title">{{ 'settings.gallery' | tr }}</h2>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.defaultSorting' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().gallerySortDefault" (ngModelChange)="updateSetting('gallerySortDefault', $event)">
-      <mat-option value="newest">{{ 'settings.newest' | tr }}</mat-option>
-      <mat-option value="oldest">{{ 'settings.oldest' | tr }}</mat-option>
-      <mat-option value="favorite">{{ 'settings.favoriteFirst' | tr }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.thumbnailSize' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().galleryThumbnailSize" (ngModelChange)="updateSetting('galleryThumbnailSize', $event)">
-      <mat-option value="small">{{ 'settings.small' | tr }}</mat-option>
-      <mat-option value="medium">{{ 'settings.medium' | tr }}</mat-option>
-      <mat-option value="large">{{ 'settings.large' | tr }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-checkbox [ngModel]="settings().galleryFavoritesFirst" (ngModelChange)="updateSetting('galleryFavoritesFirst', $event)">
-    {{ 'settings.showFavoritesFirst' | tr }}
-  </mat-checkbox>
-  <button mat-stroked-button type="button" (click)="clearHomepageImage()">{{ 'settings.clearHomepageImage' | tr }}</button>
+  <app-expandable-section sectionId="settings-weather" persistKey="settings-weather" label="weather" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.weather' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <mat-checkbox [ngModel]="settings().detailedWeatherEnabled" (ngModelChange)="updateSetting('detailedWeatherEnabled', $event)">
+        {{ 'settings.enableDetailedWeather' | tr }}
+      </mat-checkbox>
+      <mat-checkbox [ngModel]="settings().autoLoadWeather" (ngModelChange)="updateSetting('autoLoadWeather', $event)">
+        {{ 'settings.autoLoadWeather' | tr }}
+      </mat-checkbox>
+      <mat-checkbox [ngModel]="settings().useGpsForWeather" (ngModelChange)="updateSetting('useGpsForWeather', $event)">
+        {{ 'settings.useGps' | tr }}
+      </mat-checkbox>
+      <mat-checkbox [ngModel]="settings().showWeatherWarnings" (ngModelChange)="updateSetting('showWeatherWarnings', $event)">
+        {{ 'settings.showWarnings' | tr }}
+      </mat-checkbox>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.refreshMinutes' | tr }}</mat-label>
+        <input matInput type="number" [ngModel]="settings().weatherRefreshMinutes" (ngModelChange)="updateSetting('weatherRefreshMinutes', +$event)" />
+      </mat-form-field>
+      <button mat-stroked-button type="button" (click)="clearWeatherCache()">{{ 'settings.deleteCachedWeather' | tr }}</button>
+    </div>
+  </app-expandable-section>
 </section>
 
 <section class="section app-card">
-  <h2 class="section-title">{{ 'settings.general' | tr }}</h2>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.defaultLake' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().defaultLakeId" (ngModelChange)="updateSetting('defaultLakeId', $event || undefined)">
-      <mat-option value="">{{ 'common.none' | tr }}</mat-option>
-      @for (lake of lakes(); track lake.id) {
-        <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.maxRods' | tr }}</mat-label>
-    <input matInput type="number" [ngModel]="settings().maxRodCount" (ngModelChange)="updateSetting('maxRodCount', +$event)" />
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.timeFormat' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().timeFormat" (ngModelChange)="updateSetting('timeFormat', $event)">
-      <mat-option value="24h">{{ 'settings.hour24' | tr }}</mat-option>
-      <mat-option value="12h">{{ 'settings.hour12' | tr }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.firstDayWeek' | tr }}</mat-label>
-    <mat-select [ngModel]="settings().firstDayOfWeek" (ngModelChange)="updateSetting('firstDayOfWeek', $event === 0 ? 0 : 1)">
-      <mat-option [value]="0">{{ 'settings.sunday' | tr }}</mat-option>
-      <mat-option [value]="1">{{ 'settings.monday' | tr }}</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <app-expandable-section sectionId="settings-security" persistKey="settings-security" label="security" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.security' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.lockAfter' | tr }}</mat-label>
+        <input matInput type="number" [ngModel]="settings().lockTimeoutMinutes" (ngModelChange)="updateLockTimeout(+$event)" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.currentPin' | tr }}</mat-label>
+        <input matInput type="password" maxlength="6" [(ngModel)]="oldPin" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.newPin' | tr }}</mat-label>
+        <input matInput type="password" maxlength="6" [(ngModel)]="newPin" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.confirmPin' | tr }}</mat-label>
+        <input matInput type="password" maxlength="6" [(ngModel)]="confirmPin" />
+      </mat-form-field>
+      <div class="action-row">
+        <button mat-stroked-button type="button" (click)="changePin()">{{ 'settings.changePin' | tr }}</button>
+        <button mat-stroked-button type="button" (click)="logout()">{{ 'settings.logout' | tr }}</button>
+      </div>
+    </div>
+  </app-expandable-section>
 </section>
 
 <section class="section app-card">
-  <h2 class="section-title">{{ 'settings.resetSection' | tr }}</h2>
-  <p class="reset-desc">{{ 'settings.resetDesc' | tr }}</p>
-
-  <h3 class="subsection">{{ 'settings.customOptions' | tr }}</h3>
-  <div class="reset-actions">
-    @for (cat of optionCategories; track cat) {
-      <button mat-stroked-button type="button" (click)="resetOptionCategory(cat)">{{ 'common.reset' | tr }} {{ categoryLabel(cat) }}</button>
-    }
-    <button mat-stroked-button type="button" (click)="resetAllCustomOptions()">{{ 'settings.resetAllCustom' | tr }}</button>
-  </div>
-
-  <h3 class="subsection">{{ 'settings.preferences' | tr }}</h3>
-  <div class="reset-actions">
-    <button mat-stroked-button type="button" (click)="resetFilters()">{{ 'settings.resetFilters' | tr }}</button>
-    <button mat-stroked-button type="button" (click)="resetAppearance()">{{ 'settings.resetAppearance' | tr }}</button>
-    <button mat-stroked-button type="button" (click)="resetWeatherSettings()">{{ 'settings.resetWeather' | tr }}</button>
-    <button mat-stroked-button type="button" (click)="resetSecuritySettings()">{{ 'settings.resetSecurity' | tr }}</button>
-    <button mat-stroked-button type="button" (click)="resetAllSettings()">{{ 'settings.resetAllSettings' | tr }}</button>
-  </div>
-
-  <h3 class="subsection danger">{{ 'settings.fullReset' | tr }}</h3>
-  <p class="reset-warning">{{ 'settings.fullResetWarn' | tr }}</p>
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ 'settings.confirmation' | tr }}</mat-label>
-    <input matInput [ngModel]="fullResetInput()" (ngModelChange)="fullResetInput.set($event)" placeholder="RESET" />
-  </mat-form-field>
-  <button mat-stroked-button color="warn" type="button" (click)="resetFullApplication()">{{ 'settings.resetEntire' | tr }}</button>
+  <app-expandable-section sectionId="settings-data" persistKey="settings-data" label="data" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.data' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <button mat-flat-button class="action-btn" type="button" (click)="exportBackup()" [disabled]="exporting()">
+        {{ exporting() ? ('settings.exporting' | tr) : ('settings.exportJson' | tr) }}
+      </button>
+      <label class="import-btn">
+        <input type="file" accept=".json" (change)="importBackup($event)" hidden />
+        <span mat-stroked-button>{{ 'settings.importJson' | tr }}</span>
+      </label>
+    </div>
+  </app-expandable-section>
 </section>
 
 <section class="section app-card">
-  <h2 class="section-title">{{ 'settings.data' | tr }}</h2>
-  <button mat-flat-button class="action-btn" type="button" (click)="exportBackup()" [disabled]="exporting()">
-    {{ exporting() ? ('settings.exporting' | tr) : ('settings.exportJson' | tr) }}
-  </button>
-  <label class="import-btn">
-    <input type="file" accept=".json" (change)="importBackup($event)" hidden />
-    <span mat-stroked-button>{{ 'settings.importJson' | tr }}</span>
-  </label>
+  <app-expandable-section sectionId="settings-reset" persistKey="settings-reset" label="reset" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.resetSection' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <p class="reset-desc">{{ 'settings.resetDesc' | tr }}</p>
+
+      <h3 class="subsection">{{ 'settings.customOptions' | tr }}</h3>
+      <div class="reset-actions">
+        @for (cat of optionCategories; track cat) {
+          <button mat-stroked-button type="button" (click)="resetOptionCategory(cat)">{{ 'common.reset' | tr }} {{ categoryLabel(cat) }}</button>
+        }
+        <button mat-stroked-button type="button" (click)="resetAllCustomOptions()">{{ 'settings.resetAllCustom' | tr }}</button>
+      </div>
+
+      <h3 class="subsection">{{ 'settings.preferences' | tr }}</h3>
+      <div class="reset-actions">
+        <button mat-stroked-button type="button" (click)="resetFilters()">{{ 'settings.resetFilters' | tr }}</button>
+        <button mat-stroked-button type="button" (click)="resetAppearance()">{{ 'settings.resetAppearance' | tr }}</button>
+        <button mat-stroked-button type="button" (click)="resetWeatherSettings()">{{ 'settings.resetWeather' | tr }}</button>
+        <button mat-stroked-button type="button" (click)="resetSecuritySettings()">{{ 'settings.resetSecurity' | tr }}</button>
+        <button mat-stroked-button type="button" (click)="resetAllSettings()">{{ 'settings.resetAllSettings' | tr }}</button>
+      </div>
+
+      <h3 class="subsection danger">{{ 'settings.fullReset' | tr }}</h3>
+      <p class="reset-warning">{{ 'settings.fullResetWarn' | tr }}</p>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.confirmation' | tr }}</mat-label>
+        <input matInput [ngModel]="fullResetInput()" (ngModelChange)="fullResetInput.set($event)" placeholder="RESET" />
+      </mat-form-field>
+      <button mat-stroked-button color="warn" type="button" (click)="resetFullApplication()">{{ 'settings.resetEntire' | tr }}</button>
+    </div>
+  </app-expandable-section>
 </section>
 
 <section class="section app-card about">
-  <h2 class="section-title">{{ 'settings.about' | tr }}</h2>
-  <p>{{ 'settings.aboutText' | tr }}</p>
-  <a routerLink="/profile">{{ 'settings.profile' | tr }}</a>
-  ·
-  <a routerLink="/profile/documents">{{ 'settings.documents' | tr }}</a>
-  ·
-  <a routerLink="/release-notes">{{ 'settings.releaseNotes' | tr }}</a>
+  <app-expandable-section sectionId="settings-about" persistKey="settings-about" label="about" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.about' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <p>{{ 'settings.aboutText' | tr }}</p>
+      <a routerLink="/profile">{{ 'settings.profile' | tr }}</a>
+      ·
+      <a routerLink="/profile/documents">{{ 'settings.documents' | tr }}</a>
+      ·
+      <a routerLink="/release-notes">{{ 'settings.releaseNotes' | tr }}</a>
+    </div>
+  </app-expandable-section>
 </section>
 
 @if (message()) {

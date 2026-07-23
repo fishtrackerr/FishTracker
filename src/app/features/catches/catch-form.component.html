@@ -87,7 +87,16 @@
 
 <mat-checkbox [(ngModel)]="released">{{ 'catchForm.released' | tr }}</mat-checkbox>
 
-<button mat-stroked-button type="button" class="photo-btn" (click)="pickPhoto()">
+<input
+  #photoInput
+  type="file"
+  accept="image/*"
+  capture="environment"
+  hidden
+  (change)="onPhotoSelected($event)"
+/>
+
+<button mat-stroked-button type="button" class="photo-btn" (click)="photoInput.click()">
   {{ photo ? ('catchForm.photoSelected' | tr) : ('catchForm.addPhoto' | tr) }}
 </button>
 

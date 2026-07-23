@@ -22,6 +22,7 @@ import { ResetService } from '../../core/services/reset.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { BackupData, ThemeMode, UserOptionCategory, AppLanguage } from '../../core/models';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
+import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
@@ -38,6 +39,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
     MatSlideToggleModule,
     MatButtonToggleModule,
     PageTitleComponent,
+    ExpandableSectionComponent,
     TranslatePipe,
   ],
   templateUrl: './settings.component.html',
@@ -111,7 +113,7 @@ export class SettingsComponent {
     this.oldPin = this.newPin = this.confirmPin = '';
   }
 
-  lockNow(): void {
+  logout(): void {
     this.pinLock.lock();
   }
 

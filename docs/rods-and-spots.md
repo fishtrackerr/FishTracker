@@ -31,6 +31,8 @@ Historical sessions keep snapshots even if lake spots change later.
 - Each rod has at most one current `sessionSpotId`
 - Multiple rods may share a spot
 - Reducing rod count requires confirmation if removed rods have activity
+- After starting a new session, users are routed to session detail setup mode (`setupRods=1`) to complete rod details right away
+- Immediate setup supports per-rod **bait**, **rig**, **notes**, and **active/inactive** status
 
 ## Bites and fish spotted
 

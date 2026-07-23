@@ -14,6 +14,8 @@
 - Captures GPS/weather/cover optionally
 - Sets status `active`
 
+After creating a brand-new session (no previously active session), the app prompts for rod count, then opens `/sessions/:id?setupRods=1` so users can immediately fill rod details (bait, rig, notes, active/inactive) on rod cards before switching to active-session view.
+
 ## Session editing
 
 Edit via `/sessions/:id/edit` (`SessionEditComponent`): name, lake, session spots, rod count, dates, status, GPS, weather refresh, notes, prebait, tags.
@@ -38,6 +40,7 @@ Legacy sessions without rods show a setup prompt on active session detail.
 - Startup navigates to `/sessions/active` when an active session exists
 - Dashboard shows **Continue Active Session**
 - Active session page: timer, reactive catch list, Quick Catch, notes, end session
+- New-session startup flow routes through session detail setup mode first (`/sessions/:id?setupRods=1`), with a finish action that navigates to `/sessions/active?id=:id`
 
 ## Session statistics
 

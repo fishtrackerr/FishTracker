@@ -137,9 +137,15 @@ export class SessionsListComponent {
       const session = await this.sessionService.start(result);
       if (!hadActive) {
         await this.rodSetupFlow.promptAfterSessionCreate(session);
+        await this.router.navigate(['/sessions', session.id], {
+          queryParams: { setupRods: '1' },
+        });
+      } else {
+        await this.router.navigate(['/sessions/active'], {
+          queryParams: { id: session.id },
+        });
       }
       this.notifications.success(this.i18n.t('sessions.sessionStarted'));
-      await this.router.navigate(['/sessions/active']);
     } catch (error) {
       console.error('[SessionsList] startSession failed', error);
       this.notifications.error(this.i18n.t('sessions.createFailed'));

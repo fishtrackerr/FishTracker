@@ -110,6 +110,8 @@ textarea.mat-mdc-input-element {
 .mat-mdc-dialog-container .mdc-dialog__surface {
   background-color: var(--background-card) !important;
   color: var(--text-primary) !important;
+  border: 2px solid var(--border-active) !important;
+  border-radius: var(--radius-md) !important;
 }
 
 .mat-mdc-dialog-container .mat-mdc-dialog-title {
@@ -150,6 +152,27 @@ textarea.mat-mdc-input-element {
 .cdk-overlay-container.theme-dark .mat-mdc-dialog-container .mat-mdc-button,
 .cdk-overlay-container[data-theme='dark'] .mat-mdc-dialog-container .mat-mdc-button {
   --mdc-text-button-label-text-color: var(--text-secondary);
+}
+
+/* Dialog button styling for all button types */
+.mat-mdc-dialog-container .mat-mdc-button:not(:disabled),
+.mat-mdc-dialog-container .mat-mdc-outlined-button:not(:disabled) {
+  --mdc-text-button-label-text-color: var(--primary);
+  --mdc-outlined-button-label-text-color: var(--primary);
+  --mdc-outlined-button-outline-color: var(--primary);
+}
+
+.mat-mdc-dialog-container .mat-mdc-flat-button:not(:disabled) {
+  --mdc-filled-button-container-color: var(--primary);
+  --mdc-filled-button-label-text-color: var(--text-on-primary);
+}
+
+/* Ensure form fields inside dialogs have proper styling */
+.mat-mdc-dialog-container .mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: var(--border-primary);
+  --mdc-outlined-text-field-focus-outline-color: var(--border-active);
+  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mdc-outlined-text-field-input-text-color: var(--text-primary);
 }
 
 .cdk-overlay-backdrop.themed-backdrop.theme-backdrop-dark,

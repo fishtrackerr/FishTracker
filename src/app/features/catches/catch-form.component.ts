@@ -104,15 +104,9 @@ export class CatchFormComponent {
     this.tagsInput = '';
   }
 
-  pickPhoto(): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
-    input.onchange = () => {
-      this.photo = input.files?.[0];
-    };
-    input.click();
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.photo = input.files?.[0];
   }
 
   onRodChange(rodId: string): void {

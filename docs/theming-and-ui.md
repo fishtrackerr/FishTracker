@@ -31,6 +31,12 @@ Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hard
 - `page-title` — centered titles
 - `filter-panel` — desktop expandable / mobile bottom sheet
 
+## Settings screen
+
+- Settings options are grouped into collapsible submenus using `expandable-section`
+- Expand/collapse state persists per submenu with localStorage-backed keys
+- Security and reset actions remain grouped and reachable on mobile without long scrolling
+
 ## Icons
 
 Material Icons via `@angular/material/icon` only.

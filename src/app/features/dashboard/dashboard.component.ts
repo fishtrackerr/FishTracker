@@ -138,11 +138,15 @@ export class DashboardComponent implements OnInit {
       const session = await this.sessionService.start(options);
       if (!hadActive) {
         await this.rodSetupFlow.promptAfterSessionCreate(session);
+        await this.router.navigate(['/sessions', session.id], {
+          queryParams: { setupRods: '1' },
+        });
+      } else {
+        await this.router.navigate(['/sessions/active'], {
+          queryParams: { id: session.id },
+        });
       }
       this.notifications.success(this.i18n.t('dashboard.sessionStarted'));
-      await this.router.navigate(['/sessions/active'], {
-        queryParams: { id: session.id },
-      });
     } catch (error) {
       console.error('[Dashboard] doStart failed', error);
       this.notifications.error(this.i18n.t('dashboard.createFailed'));

@@ -67,6 +67,22 @@
   font-weight: 600 !important;
 }
 .expand-label { font-weight: 600; color: var(--text-secondary); }
+.rod-setup-callout {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-primary);
+}
+.rod-setup-callout h3 {
+  margin: 0 0 var(--spacing-xs);
+}
+.rod-setup-callout p {
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-secondary);
+}
+.rod-setup-finish {
+  background: var(--primary) !important;
+  color: var(--text-on-primary) !important;
+}
 .rod-stats {
   display: flex;
   flex-wrap: wrap;

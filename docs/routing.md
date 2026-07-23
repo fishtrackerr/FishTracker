@@ -43,6 +43,8 @@ Primary logic in `AppStartupService.resolveInitialRoute()`. Guards complement bu
 
 Paths like `/sessions/:id`, `/settings`, `/lakes/:id` are preserved when unlocked unless the app is locked.
 
+`/sessions/:id` also supports the query `setupRods=1` to enable a first-run rod setup mode after starting a new session.
+
 ## PIN unlock redirect
 
 After unlock, `consumeReturnUrl()` restores the intended destination or falls back to active session / home.

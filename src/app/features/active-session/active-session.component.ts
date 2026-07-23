@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, effect, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { DialogService } from '../../core/services/dialog.service';
@@ -18,6 +18,9 @@ import { FormatWeightPipe } from '../../core/pipes/format-units.pipe';
 import { DatePipe } from '@angular/common';
 import { MapsLinkButtonComponent } from '../../shared/components/maps-link-button/maps-link-button.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { ConfirmService } from '../../core/services/confirm.service';
+import { NotificationService } from '../../core/services/notification.service';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-active-session',
@@ -39,9 +42,13 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 })
 export class ActiveSessionComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly sessionService = inject(SessionService);
   private readonly catchService = inject(CatchService);
   private readonly dialog = inject(DialogService);
+  private readonly confirm = inject(ConfirmService);
+  private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
 
   readonly session = toSignal(
     this.route.paramMap.pipe(
@@ -131,6 +138,23 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
 
   async complete(): Promise<void> {
     const s = this.session();
-    if (s) await this.sessionService.complete(s.id);
+    if (!s) return;
+
+    const confirmed = await this.confirm.confirm({
+      title: this.i18n.t('activeSession.endSession'),
+      message: this.i18n.t('activeSession.endSessionConfirm') || 'End this fishing session?',
+      confirmLabel: this.i18n.t('activeSession.endSession'),
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await this.sessionService.complete(s.id);
+      this.notifications.success(this.i18n.t('activeSession.sessionEnded') || 'Session ended');
+      await this.router.navigate(['/sessions']);
+    } catch (error) {
+      console.error('[ActiveSession] Failed to complete session', error);
+      this.notifications.error(this.i18n.t('activeSession.endFailed') || 'Failed to end session');
+    }
   }
 }

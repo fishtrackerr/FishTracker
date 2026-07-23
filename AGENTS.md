@@ -77,14 +77,22 @@ Rules for AI-assisted changes to this repository.
 
 ## Documentation
 
-- Update relevant files in `/docs` when changing behavior
-- Sync `data-model.md` with model interfaces
-- See [docs/README.md](./docs/README.md) for index
+- **Always** update the relevant `/docs/*.md` file after any behavioral change to a service, component, or feature
+- After any model interface change → sync `docs/data-model.md`
+- After any route added, removed, or renamed → update `docs/routing.md`
+- After any session or catch behavior change → update `docs/sessions.md` or `docs/catches.md`
+- After any storage or DB schema change → update `docs/storage.md`
+- After any UI/theme change → update `docs/theming-and-ui.md`
+- See [docs/README.md](./docs/README.md) for the full index
 
 ## Testing
 
-- Add regression tests in `src/app/core/services/*.spec.ts`
-- Run `ng test` and `ng build` before completing changes
+- **Always** review and update the `.spec.ts` file for every component or service that is changed
+- New `@Input()`, `@Output()`, or public methods on a component require matching test cases in the spec
+- If no `.spec.ts` exists for a changed component, create one alongside it
+- After spec changes, run `ng test` and confirm no regressions before completing the task
+- Run `ng build` before completing any task to catch compile errors
+- Spec files for components live next to the component file; for services under `src/app/core/services/`
 
 ## Key entry points
 

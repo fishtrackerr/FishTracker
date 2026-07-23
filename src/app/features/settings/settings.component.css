@@ -1,6 +1,20 @@
 .section { margin-bottom: var(--spacing-lg); }
 .full { width: 100%; }
 .action-btn, .import-btn { margin-right: var(--spacing-sm); }
+.submenu-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+.section-title {
+  margin: 0;
+  font-size: 1rem;
+}
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
 .theme-preview {
   padding: var(--spacing-md);
   border-radius: var(--radius-sm);
@@ -27,3 +41,17 @@
 .subsection { font-size: 1rem; margin: var(--spacing-md) 0 var(--spacing-sm); color: var(--text-primary); }
 .subsection.danger { color: var(--danger); }
 .reset-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+
+@media (max-width: 768px) {
+  .section {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .action-row button,
+  .reset-actions button,
+  .action-btn,
+  .import-btn {
+    width: 100%;
+    margin-right: 0;
+  }
+}

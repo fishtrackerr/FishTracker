@@ -27,6 +27,11 @@ Guards await startup initialization before evaluating lock state. Return URL sto
 
 `PinLockService.lock()` navigates to `/pin/unlock` and preserves current route for post-unlock restore.
 
+## Settings logout behavior
+
+- The Settings `Logout` action is a lock-only flow that calls `PinLockService.lock()`
+- It does not delete data, clear preferences, or remove the configured PIN
+
 ## Security limitations
 
 - Client-side PIN only; suitable for casual device privacy, not high-security scenarios

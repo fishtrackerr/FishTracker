@@ -33,6 +33,15 @@
   @if (s.rods && s.rods.length > 0) {
     <app-expandable-section sectionId="session-rods" label="sessionDetail.rodsAndSpots" [defaultExpanded]="true">
       <div expandHeader class="expand-label">{{ 'sessionDetail.moreInfoRodsSpots' | tr }}</div>
+      @if (setupRodsMode()) {
+        <section class="rod-setup-callout app-card" aria-live="polite">
+          <h3>{{ 'sessionDetail.rodSetupTitle' | tr }}</h3>
+          <p>{{ 'sessionDetail.rodSetupMessage' | tr }}</p>
+          <button mat-flat-button type="button" class="rod-setup-finish" (click)="finishRodSetup()">
+            {{ 'sessionDetail.finishRodSetup' | tr }}
+          </button>
+        </section>
+      }
       @if (rodSummary; as summary) {
         <div class="rod-stats">
           <span>{{ summary.total }} {{ 'sessionDetail.rods' | tr }}</span>
