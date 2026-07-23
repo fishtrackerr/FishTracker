@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
   standalone: true,
   template: `
     <div class="splash" role="status" aria-live="polite" aria-label="Loading application">
-      <div class="logo">🎣</div>
+      <img class="logo" src="icons/icon-192x192.png" alt="FishTracker logo" />
       <p class="label">Fishing Register</p>
       <div class="spinner" aria-hidden="true"></div>
     </div>
@@ -22,7 +22,10 @@ import { Component } from '@angular/core';
       gap: 12px;
     }
     .logo {
-      font-size: 3rem;
+      width: 84px;
+      height: 84px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
     }
     .label {
       font-size: 1.1rem;

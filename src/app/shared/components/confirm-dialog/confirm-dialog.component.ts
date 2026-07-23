@@ -5,6 +5,7 @@ import {
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export interface ConfirmDialogData {
   title: string;
@@ -16,19 +17,19 @@ export interface ConfirmDialogData {
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule],
+  imports: [MatDialogModule, MatButtonModule, TranslatePipe],
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
     <mat-dialog-content>
       @if (data.itemName) {
-        <p>Are you sure you want to delete "{{ data.itemName }}"?</p>
+        <p>{{ 'confirm.deleteItem' | tr: { item: data.itemName } }}</p>
       }
-      <p>{{ data.message ?? 'This action cannot be undone.' }}</p>
+      <p>{{ data.message ?? ('confirm.cannotUndo' | tr) }}</p>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close type="button">Cancel</button>
+      <button mat-button mat-dialog-close type="button">{{ 'confirm.cancel' | tr }}</button>
       <button mat-flat-button color="warn" type="button" (click)="confirm()">
-        {{ data.confirmLabel ?? 'Delete' }}
+        {{ data.confirmLabel ?? ('confirm.delete' | tr) }}
       </button>
     </mat-dialog-actions>
   `,

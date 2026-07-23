@@ -5,13 +5,13 @@ import { generateId, nowIso } from '../utils';
 import { SettingsService } from './settings.service';
 
 const COVER_IMAGES = [
-  'assets/covers/cover-1.svg',
-  'assets/covers/cover-2.svg',
-  'assets/covers/cover-3.svg',
-  'assets/covers/cover-4.svg',
+  'assets/images/covers/cover-1.svg',
+  'assets/images/covers/cover-2.svg',
+  'assets/images/covers/cover-3.svg',
+  'assets/images/covers/cover-4.svg',
 ];
 
-const PLACEHOLDER = 'assets/covers/cover-1.svg';
+const PLACEHOLDER = 'assets/images/img-not-found.svg';
 
 @Injectable({ providedIn: 'root' })
 export class ImageService {

@@ -3,6 +3,7 @@ export type LengthUnit = 'cm' | 'inch';
 export type TemperatureUnit = 'celsius' | 'fahrenheit';
 export type ThemeMode = 'dark' | 'light' | 'system';
 export type DistanceUnit = 'm' | 'ft';
+export type AppLanguage = 'nl' | 'en' | 'de';
 
 export interface AppSettings {
   weightUnit: WeightUnit;
@@ -27,7 +28,7 @@ export interface AppSettings {
   gallerySortDefault: 'newest' | 'oldest' | 'favorite';
   galleryThumbnailSize: 'small' | 'medium' | 'large';
   galleryFavoritesFirst: boolean;
-  language: string;
+  language: AppLanguage;
   dateFormat: string;
   timeFormat: '12h' | '24h';
   firstDayOfWeek: 0 | 1;
@@ -54,7 +55,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   gallerySortDefault: 'newest',
   galleryThumbnailSize: 'medium',
   galleryFavoritesFirst: false,
-  language: 'en',
+  language: 'nl',
   dateFormat: 'dd/MM/yyyy',
   timeFormat: '24h',
   firstDayOfWeek: 1,

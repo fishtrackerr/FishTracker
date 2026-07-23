@@ -1,28 +1,28 @@
-<h1>Add Catch</h1>
+<h1>{{ 'catchForm.title' | tr }}</h1>
 
-<app-option-combobox category="species" label="Species" [(value)]="species" />
+<app-option-combobox category="species" [label]="'catchForm.species' | tr" [(value)]="species" />
 
 <mat-form-field appearance="outline" class="full">
-  <mat-label>Fish Name (optional)</mat-label>
+  <mat-label>{{ 'catchForm.fishNameOptional' | tr }}</mat-label>
   <input matInput [(ngModel)]="fishName" />
 </mat-form-field>
 
 <div class="row">
   <mat-form-field appearance="outline">
-    <mat-label>Weight (kg)</mat-label>
+    <mat-label>{{ 'catchForm.weightKg' | tr }}</mat-label>
     <input matInput type="number" step="0.1" [(ngModel)]="weightKg" />
   </mat-form-field>
   <mat-form-field appearance="outline">
-    <mat-label>Length (cm)</mat-label>
+    <mat-label>{{ 'catchForm.lengthCm' | tr }}</mat-label>
     <input matInput type="number" [(ngModel)]="lengthCm" />
   </mat-form-field>
 </div>
 
 @if (rods.length > 0) {
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Rod</mat-label>
+    <mat-label>{{ 'catchForm.rod' | tr }}</mat-label>
     <mat-select [(ngModel)]="rodId" (ngModelChange)="onRodChange($event)">
-      <mat-option value="">None</mat-option>
+      <mat-option value="">{{ 'common.none' | tr }}</mat-option>
       @for (rod of rods; track rod.id) {
         <mat-option [value]="rod.id">{{ rod.name }}</mat-option>
       }
@@ -32,9 +32,9 @@
 
 @if (sessionSpots.length > 0) {
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Session Spot</mat-label>
+    <mat-label>{{ 'catchForm.sessionSpot' | tr }}</mat-label>
     <mat-select [(ngModel)]="sessionSpotId">
-      <mat-option value="">None</mat-option>
+      <mat-option value="">{{ 'common.none' | tr }}</mat-option>
       @for (spot of sessionSpots; track spot.id) {
         <mat-option [value]="spot.id">{{ spot.name }}</mat-option>
       }
@@ -42,53 +42,53 @@
   </mat-form-field>
 }
 
-<app-option-combobox category="bait" label="Bait" [(value)]="bait" />
-<app-option-combobox category="baitFlavor" label="Bait Flavor" [(value)]="baitFlavor" />
-<app-option-combobox category="rig" label="Rig" [(value)]="rig" />
+<app-option-combobox category="bait" [label]="'catchForm.bait' | tr" [(value)]="bait" />
+<app-option-combobox category="baitFlavor" [label]="'catchForm.baitFlavor' | tr" [(value)]="baitFlavor" />
+<app-option-combobox category="rig" [label]="'catchForm.rig' | tr" [(value)]="rig" />
 
 <div class="row">
-  <app-option-combobox category="hookSize" label="Hook Size" [(value)]="hookSize" />
-  <app-option-combobox category="lineType" label="Line" [(value)]="line" />
+  <app-option-combobox category="hookSize" [label]="'catchForm.hookSize' | tr" [(value)]="hookSize" />
+  <app-option-combobox category="lineType" [label]="'catchForm.line' | tr" [(value)]="line" />
 </div>
 
-<app-option-combobox category="method" label="Fishing Method" [(value)]="method" />
-<app-option-combobox category="weatherType" label="Weather Type" [(value)]="weatherType" />
+<app-option-combobox category="method" [label]="'catchForm.fishingMethod' | tr" [(value)]="method" />
+<app-option-combobox category="weatherType" [label]="'catchForm.weatherType' | tr" [(value)]="weatherType" />
 
 <div class="row">
   <mat-form-field appearance="outline">
-    <mat-label>Distance (m)</mat-label>
+    <mat-label>{{ 'catchForm.distanceM' | tr }}</mat-label>
     <input matInput type="number" [(ngModel)]="distanceM" />
   </mat-form-field>
   <mat-form-field appearance="outline">
-    <mat-label>Water Depth (m)</mat-label>
+    <mat-label>{{ 'catchForm.waterDepthM' | tr }}</mat-label>
     <input matInput type="number" step="0.1" [(ngModel)]="waterDepthM" />
   </mat-form-field>
 </div>
 
 <mat-form-field appearance="outline" class="full">
-  <mat-label>Water Temp (°C)</mat-label>
+  <mat-label>{{ 'catchForm.waterTempC' | tr }}</mat-label>
   <input matInput type="number" step="0.1" [(ngModel)]="waterTemperatureC" />
 </mat-form-field>
 
 <mat-form-field appearance="outline" class="full">
-  <mat-label>Prebait</mat-label>
+  <mat-label>{{ 'sessionDetail.prebait' | tr }}</mat-label>
   <input matInput [(ngModel)]="prebait" />
 </mat-form-field>
 
 <mat-form-field appearance="outline" class="full">
-  <mat-label>Notes</mat-label>
+  <mat-label>{{ 'common.notes' | tr }}</mat-label>
   <textarea matInput rows="2" [(ngModel)]="notes"></textarea>
 </mat-form-field>
 
 <div class="tags-row">
-  <app-option-combobox category="tag" label="Tag" [(value)]="tagsInput" />
-  <button mat-stroked-button type="button" (click)="addTag()">Add tag</button>
+  <app-option-combobox category="tag" [label]="'catchForm.tag' | tr" [(value)]="tagsInput" />
+  <button mat-stroked-button type="button" (click)="addTag()">{{ 'sessionEdit.addTag' | tr }}</button>
 </div>
 
-<mat-checkbox [(ngModel)]="released">Released</mat-checkbox>
+<mat-checkbox [(ngModel)]="released">{{ 'catchForm.released' | tr }}</mat-checkbox>
 
 <button mat-stroked-button type="button" class="photo-btn" (click)="pickPhoto()">
-  {{ photo ? 'Photo selected' : 'Add Photo' }}
+  {{ photo ? ('catchForm.photoSelected' | tr) : ('catchForm.addPhoto' | tr) }}
 </button>
 
-<button mat-flat-button class="save-btn" [disabled]="!species" (click)="save()">Save Catch</button>
+<button mat-flat-button class="save-btn" [disabled]="!species" (click)="save()">{{ 'catchForm.saveCatch' | tr }}</button>

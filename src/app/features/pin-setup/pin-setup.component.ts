@@ -3,11 +3,13 @@ import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { PinLockService } from '../../core/services/pin-lock.service';
 import { AppStartupService } from '../../core/services/app-startup.service';
+import { I18nService } from '../../core/services/i18n.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-pin-setup',
   standalone: true,
-  imports: [MatButtonModule],
+  imports: [MatButtonModule, TranslatePipe],
   templateUrl: './pin-setup.component.html',
   styleUrl: './pin.component.css',
 })
@@ -15,6 +17,7 @@ export class PinSetupComponent {
   private readonly pinLock = inject(PinLockService);
   private readonly router = inject(Router);
   private readonly startup = inject(AppStartupService);
+  private readonly i18n = inject(I18nService);
 
   readonly pin = signal('');
   readonly confirmPin = signal('');
@@ -46,7 +49,7 @@ export class PinSetupComponent {
     }
     if (this.step() === 'confirm' && this.confirmPin().length === 6) {
       if (this.pin() !== this.confirmPin()) {
-        this.error.set('PINs do not match');
+        this.error.set(this.i18n.t('pin.pinsDoNotMatch'));
         this.confirmPin.set('');
         return;
       }

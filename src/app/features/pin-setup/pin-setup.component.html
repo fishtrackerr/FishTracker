@@ -1,6 +1,6 @@
 <div class="pin-screen">
-  <h1>Set PIN</h1>
-  <p>{{ step() === 'enter' ? 'Choose a 6-digit PIN' : 'Confirm your PIN' }}</p>
+  <h1>{{ 'pin.setPin' | tr }}</h1>
+  <p>{{ step() === 'enter' ? ('pin.choosePin' | tr) : ('pin.confirmPin' | tr) }}</p>
   <div class="dots">
     @for (i of [0,1,2,3,4,5]; track i) {
       <span class="dot" [class.filled]="(step() === 'enter' ? pin() : confirmPin()).length > i"></span>
@@ -19,6 +19,6 @@
     }
   </div>
   @if ((step() === 'enter' && pin().length === 6) || (step() === 'confirm' && confirmPin().length === 6)) {
-    <button mat-flat-button class="cta" (click)="next()">Continue</button>
+    <button mat-flat-button class="cta" (click)="next()">{{ 'common.continue' | tr }}</button>
   }
 </div>

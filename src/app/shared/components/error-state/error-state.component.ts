@@ -1,15 +1,16 @@
 import { Component, Input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-error-state',
   standalone: true,
-  imports: [MatButtonModule],
+  imports: [MatButtonModule, TranslatePipe],
   template: `
     <div class="error-state">
-      <p class="message">{{ message }}</p>
+      <p class="message">{{ message | tr }}</p>
       @if (showRetry) {
-        <button mat-stroked-button type="button" (click)="retry.emit()">Try again</button>
+        <button mat-stroked-button type="button" (click)="retry.emit()">{{ 'common.retry' | tr }}</button>
       }
     </div>
   `,
@@ -28,7 +29,7 @@ import { MatButtonModule } from '@angular/material/button';
   `,
 })
 export class ErrorStateComponent {
-  @Input() message = 'Something went wrong';
+  @Input() message = 'common.errorGeneric';
   @Input() showRetry = true;
   readonly retry = output<void>();
 }

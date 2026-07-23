@@ -1,47 +1,47 @@
-<app-page-title title="Profile Documents" />
+<app-page-title title="profileDocs.title" />
 
-<app-search-bar placeholder="Search documents" (search)="onSearch($event)" />
+<app-search-bar placeholder="profileDocs.searchPlaceholder" (search)="onSearch($event)" />
 
 <mat-form-field appearance="outline" class="full">
-  <mat-label>Filter by type</mat-label>
+  <mat-label>{{ 'profileDocs.filterByType' | tr }}</mat-label>
   <mat-select [ngModel]="typeFilter()" (ngModelChange)="typeFilter.set($event)">
-    <mat-option value="">All types</mat-option>
+    <mat-option value="">{{ 'profileDocs.allTypes' | tr }}</mat-option>
     @for (t of documentTypes; track t) {
-      <mat-option [value]="t">{{ t }}</mat-option>
+      <mat-option [value]="t">{{ ('profileDocs.type.' + t) | tr }}</mat-option>
     }
   </mat-select>
 </mat-form-field>
 
-<button mat-flat-button type="button" (click)="startAdd()">Add document</button>
+<button mat-flat-button type="button" (click)="startAdd()">{{ 'profileDocs.addDocument' | tr }}</button>
 
 @if (editingId(); as editId) {
   <div class="edit-panel app-card">
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Title</mat-label>
+      <mat-label>{{ 'profileDocs.docTitle' | tr }}</mat-label>
       <input matInput [(ngModel)]="title" />
     </mat-form-field>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Type</mat-label>
+      <mat-label>{{ 'profileDocs.docType' | tr }}</mat-label>
       <mat-select [(ngModel)]="type">
         @for (t of documentTypes; track t) {
-          <mat-option [value]="t">{{ t }}</mat-option>
+          <mat-option [value]="t">{{ ('profileDocs.type.' + t) | tr }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Description</mat-label>
+      <mat-label>{{ 'lakes.description' | tr }}</mat-label>
       <textarea matInput rows="2" [(ngModel)]="description"></textarea>
     </mat-form-field>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Expiry date</mat-label>
+      <mat-label>{{ 'profileDocs.expiryDate' | tr }}</mat-label>
       <input matInput type="date" [(ngModel)]="expiryDate" />
     </mat-form-field>
     @if (editId !== 'new') {
       <app-image-picker type="document" [parentId]="editId" (uploaded)="onImageUploaded($event)" />
     }
     <div class="actions">
-      <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
-      <button mat-flat-button type="button" (click)="saveDoc()">Save</button>
+      <button mat-button type="button" (click)="cancelEdit()">{{ 'common.cancel' | tr }}</button>
+      <button mat-flat-button type="button" (click)="saveDoc()">{{ 'common.save' | tr }}</button>
     </div>
   </div>
 }
@@ -49,15 +49,15 @@
 @for (doc of filteredDocs(); track doc.id) {
   <div class="doc-card app-card">
     <h3>{{ doc.title }}</h3>
-    <p class="meta">{{ doc.type }} · {{ doc.imageIds.length }} image(s)</p>
+    <p class="meta">{{ ('profileDocs.type.' + doc.type) | tr }} · {{ doc.imageIds.length }} {{ 'profileDocs.imagesCount' | tr }}</p>
     @if (isExpired(doc.expiryDate)) {
-      <p class="expiry danger">Expired</p>
+      <p class="expiry danger">{{ 'profileDocs.expired' | tr }}</p>
     } @else if (isExpiringSoon(doc.expiryDate)) {
-      <p class="expiry warning">Expiring soon: {{ doc.expiryDate }}</p>
+      <p class="expiry warning">{{ 'profileDocs.expiringSoon' | tr }}: {{ doc.expiryDate }}</p>
     }
     <div class="actions">
-      <button mat-button type="button" (click)="editDoc(doc.id)">Edit</button>
-      <button mat-button color="warn" type="button" (click)="deleteDoc(doc.id, doc.title)">Delete</button>
+      <button mat-button type="button" (click)="editDoc(doc.id)">{{ 'common.edit' | tr }}</button>
+      <button mat-button color="warn" type="button" (click)="deleteDoc(doc.id, doc.title)">{{ 'common.delete' | tr }}</button>
     </div>
   </div>
 }

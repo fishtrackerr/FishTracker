@@ -1,6 +1,6 @@
 <div class="pin-screen">
-  <h1>Unlock</h1>
-  <p>Enter your 6-digit PIN</p>
+  <h1>{{ 'pin.unlock' | tr }}</h1>
+  <p>{{ 'pin.enterPin' | tr }}</p>
   <div class="dots">
     @for (i of [0,1,2,3,4,5]; track i) {
       <span class="dot" [class.filled]="pin().length > i"></span>

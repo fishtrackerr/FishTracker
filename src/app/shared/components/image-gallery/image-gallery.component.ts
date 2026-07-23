@@ -4,7 +4,9 @@ import { ImageService } from '../../../core/services/image.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { StoredImage } from '../../../core/models';
+import { I18nService } from '../../../core/services/i18n.service';
 import { IconButtonComponent } from '../icon-button/icon-button.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export interface GalleryImageItem extends StoredImage {
   url?: string;
@@ -15,40 +17,40 @@ export interface GalleryImageItem extends StoredImage {
 @Component({
   selector: 'app-image-gallery',
   standalone: true,
-  imports: [MatButtonModule, IconButtonComponent],
+  imports: [MatButtonModule, IconButtonComponent, TranslatePipe],
   template: `
     <div class="gallery-grid">
       @for (item of items(); track item.id) {
         <div class="gallery-item" (click)="openViewer(item)">
           @if (item.url) {
-            <img [src]="item.url" [alt]="item.fileName" class="thumb" />
+            <img [src]="item.url" [alt]="item.fileName" class="thumb" (error)="setFallbackForItem(item)" />
           } @else {
-            <div class="placeholder">🎣</div>
+            <img [src]="placeholderUrl" [alt]="'images.fallbackAlt' | tr" class="thumb" />
           }
           @if (item.isFavorite) {
-            <span class="badge favorite" aria-label="Favorite">★</span>
+            <span class="badge favorite" [attr.aria-label]="'gallery.toggleFavorite' | tr">★</span>
           }
           @if (item.isHomepageImage) {
-            <span class="badge homepage" aria-label="Homepage">🏠</span>
+            <span class="badge homepage" [attr.aria-label]="'gallery.setHomepage' | tr">🏠</span>
           }
           <div class="actions" (click)="$event.stopPropagation()">
             <app-icon-button
               icon="star"
-              ariaLabel="Toggle favorite"
-              tooltip="Favorite"
+              [ariaLabel]="'gallery.toggleFavorite' | tr"
+              [tooltip]="'gallery.toggleFavorite' | tr"
               (pressed)="toggleFavorite(item)"
             />
             <app-icon-button
               icon="home"
-              ariaLabel="Set as homepage"
-              tooltip="Homepage"
+              [ariaLabel]="'gallery.setHomepage' | tr"
+              [tooltip]="'gallery.setHomepage' | tr"
               (pressed)="setHomepage(item)"
             />
             @if (allowDelete) {
               <app-icon-button
                 icon="delete"
-                ariaLabel="Delete image"
-                tooltip="Delete"
+                [ariaLabel]="'gallery.deleteImage' | tr"
+                [tooltip]="'gallery.deleteImage' | tr"
                 (pressed)="deleteImage(item)"
               />
             }
@@ -58,12 +60,12 @@ export interface GalleryImageItem extends StoredImage {
     </div>
 
     @if (viewerUrl()) {
-      <div class="viewer" role="dialog" aria-label="Image preview" (click)="closeViewer()">
-        <img [src]="viewerUrl()!" alt="Full size preview" (click)="$event.stopPropagation()" />
+      <div class="viewer" role="dialog" [attr.aria-label]="'gallery.imagePreview' | tr" (click)="closeViewer()">
+        <img [src]="viewerUrl()!" [alt]="'gallery.fullPreview' | tr" (error)="onViewerError()" (click)="$event.stopPropagation()" />
         <div class="viewer-nav" (click)="$event.stopPropagation()">
-          <button mat-stroked-button type="button" (click)="prev()">Previous</button>
-          <button mat-stroked-button type="button" (click)="closeViewer()">Close</button>
-          <button mat-stroked-button type="button" (click)="next()">Next</button>
+          <button mat-stroked-button type="button" (click)="prev()">{{ 'common.previous' | tr }}</button>
+          <button mat-stroked-button type="button" (click)="closeViewer()">{{ 'common.close' | tr }}</button>
+          <button mat-stroked-button type="button" (click)="next()">{{ 'common.next' | tr }}</button>
         </div>
       </div>
     }
@@ -144,6 +146,7 @@ export class ImageGalleryComponent {
   private readonly imageService = inject(ImageService);
   private readonly confirm = inject(ConfirmService);
   private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
 
   @Input() allowDelete = true;
   @Input() set galleryItems(value: GalleryImageItem[]) {
@@ -153,6 +156,7 @@ export class ImageGalleryComponent {
 
   readonly items = signal<GalleryImageItem[]>([]);
   readonly viewerUrl = signal<string | null>(null);
+  readonly placeholderUrl = this.imageService.getPlaceholderUrl();
   private viewerIndex = 0;
 
   setItems(items: GalleryImageItem[]): void {
@@ -169,6 +173,15 @@ export class ImageGalleryComponent {
 
   closeViewer(): void {
     this.viewerUrl.set(null);
+  }
+
+  setFallbackForItem(item: GalleryImageItem): void {
+    item.url = this.placeholderUrl;
+    this.items.update((list) => [...list]);
+  }
+
+  onViewerError(): void {
+    this.viewerUrl.set(this.placeholderUrl);
   }
 
   async prev(): Promise<void> {
@@ -198,16 +211,16 @@ export class ImageGalleryComponent {
     this.items.update((list) =>
       list.map((i) => ({ ...i, isHomepageImage: i.id === item.id })),
     );
-    this.notifications.success('Homepage image updated');
+    this.notifications.success(this.i18n.t('gallery.homepageUpdated'));
     this.changed.emit();
   }
 
   async deleteImage(item: GalleryImageItem): Promise<void> {
-    const ok = await this.confirm.confirmDelete('Delete image?', item.fileName);
+    const ok = await this.confirm.confirmDelete(this.i18n.t('gallery.deleteImage'), item.fileName);
     if (!ok) return;
     await this.imageService.delete(item.id);
     this.items.update((list) => list.filter((i) => i.id !== item.id));
-    this.notifications.success('Image deleted');
+    this.notifications.success(this.i18n.t('gallery.imageDeleted'));
     this.changed.emit();
   }
 }

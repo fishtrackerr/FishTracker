@@ -13,6 +13,8 @@ import { NotificationService } from '../../core/services/notification.service';
 import { UserProfile } from '../../core/models';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { ImageThumbComponent } from '../../shared/components/image-thumb/image-thumb.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-profile',
@@ -26,6 +28,7 @@ import { ImageThumbComponent } from '../../shared/components/image-thumb/image-t
     MatCheckboxModule,
     PageTitleComponent,
     ImageThumbComponent,
+    TranslatePipe,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
@@ -35,6 +38,7 @@ export class ProfileComponent {
   private readonly lakeService = inject(LakeService);
   private readonly settings = inject(SettingsService);
   private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
 
   readonly profile = toSignal(this.profileService.watch(), { initialValue: undefined });
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
@@ -66,17 +70,17 @@ export class ProfileComponent {
     const d = this.draft();
     if (!d) return;
     if (!d.displayName?.trim() && !d.firstName?.trim()) {
-      this.notifications.error('Display name or first name is required');
+      this.notifications.error(this.i18n.t('profile.displayNameOrFirstNameRequired'));
       return;
     }
     this.saving.set(true);
     try {
       await this.profileService.save(d);
-      this.notifications.success('Profile saved');
+      this.notifications.success(this.i18n.t('profile.profileSaved'));
       this.editing.set(false);
       this.draft.set(null);
     } catch {
-      this.notifications.error('Failed to save profile');
+      this.notifications.error(this.i18n.t('profile.saveFailed'));
     } finally {
       this.saving.set(false);
     }
@@ -84,12 +88,12 @@ export class ProfileComponent {
 
   async onPictureUploaded(imageId: string): Promise<void> {
     await this.profileService.save({ profilePictureId: imageId });
-    this.notifications.success('Profile picture updated');
+    this.notifications.success(this.i18n.t('profile.pictureUpdated'));
   }
 
   async removePicture(): Promise<void> {
     await this.profileService.removeProfilePicture();
-    this.notifications.success('Profile picture removed');
+    this.notifications.success(this.i18n.t('profile.pictureRemoved'));
   }
 
   pickProfilePicture(): void {
@@ -100,7 +104,7 @@ export class ProfileComponent {
       const file = input.files?.[0];
       if (file) {
         void this.profileService.uploadProfilePicture(file).then(() => {
-          this.notifications.success('Profile picture updated');
+          this.notifications.success(this.i18n.t('profile.pictureUpdated'));
         });
       }
     };

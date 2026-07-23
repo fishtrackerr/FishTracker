@@ -1,7 +1,7 @@
-<h2 mat-dialog-title>Quick Add Catch</h2>
+<h2 mat-dialog-title>{{ 'quickCatch.title' | tr }}</h2>
 <mat-dialog-content class="quick-catch-content">
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Species</mat-label>
+    <mat-label>{{ 'catchForm.species' | tr }}</mat-label>
     <mat-select [(ngModel)]="species" [panelClass]="selectPanelClass">
       @for (s of speciesList; track s) {
         <mat-option [value]="s">{{ s }}</mat-option>
@@ -10,48 +10,48 @@
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Weight (kg)</mat-label>
+    <mat-label>{{ 'catchForm.weightKg' | tr }}</mat-label>
     <input matInput type="number" step="0.1" [(ngModel)]="weightKg" />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Length (cm)</mat-label>
+    <mat-label>{{ 'catchForm.lengthCm' | tr }}</mat-label>
     <input matInput type="number" [(ngModel)]="lengthCm" />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Bait</mat-label>
+    <mat-label>{{ 'catchForm.bait' | tr }}</mat-label>
     <input matInput [(ngModel)]="bait" />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Rig</mat-label>
+    <mat-label>{{ 'catchForm.rig' | tr }}</mat-label>
     <input matInput [(ngModel)]="rig" />
   </mat-form-field>
 
   <div class="photo-row">
     <button mat-stroked-button type="button" (click)="pickPhoto()">
-      {{ photo ? 'Photo selected' : 'Add Photo' }}
+      {{ photo ? ('catchForm.photoSelected' | tr) : ('catchForm.addPhoto' | tr) }}
     </button>
   </div>
 
   <app-expandable-section
     sectionId="quick-catch-more"
-    label="more details"
+    label="quickCatch.moreDetails"
     persistKey="quick-catch-more"
     [defaultExpanded]="false"
   >
-    <div expandHeader class="more-label">More details</div>
-    <mat-checkbox [(ngModel)]="released">Released</mat-checkbox>
+    <div expandHeader class="more-label">{{ 'quickCatch.moreDetails' | tr }}</div>
+    <mat-checkbox [(ngModel)]="released">{{ 'catchForm.released' | tr }}</mat-checkbox>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Notes</mat-label>
+      <mat-label>{{ 'common.notes' | tr }}</mat-label>
       <textarea matInput rows="2" [(ngModel)]="notes"></textarea>
     </mat-form-field>
   </app-expandable-section>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button mat-dialog-close type="button">Cancel</button>
+  <button mat-button mat-dialog-close type="button">{{ 'common.cancel' | tr }}</button>
   <button
     mat-flat-button
     class="save-btn"
@@ -59,6 +59,6 @@
     [disabled]="!species.trim() || saving()"
     (click)="save()"
   >
-    {{ saving() ? 'Saving...' : 'Save' }}
+    {{ saving() ? ('sessionEdit.saving' | tr) : ('common.save' | tr) }}
   </button>
 </mat-dialog-actions>

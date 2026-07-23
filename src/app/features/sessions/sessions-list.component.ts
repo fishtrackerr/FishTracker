@@ -27,6 +27,8 @@ import {
   SessionCreateResult,
 } from './session-create-dialog.component';
 import { FishingSession } from '../../core/models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-sessions-list',
@@ -42,6 +44,7 @@ import { FishingSession } from '../../core/models';
     SearchBarComponent,
     FilterPanelComponent,
     ExpandableSectionComponent,
+    TranslatePipe,
   ],
   templateUrl: './sessions-list.component.html',
   styleUrl: './sessions-list.component.css',
@@ -51,6 +54,7 @@ export class SessionsListComponent {
   private readonly lakeService = inject(LakeService);
   private readonly settings = inject(SettingsService);
   private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
   private readonly searchService = inject(SearchService);
   private readonly filterService = inject(FilterService);
   private readonly router = inject(Router);
@@ -134,11 +138,11 @@ export class SessionsListComponent {
       if (!hadActive) {
         await this.rodSetupFlow.promptAfterSessionCreate(session);
       }
-      this.notifications.success('Session started');
+      this.notifications.success(this.i18n.t('sessions.sessionStarted'));
       await this.router.navigate(['/sessions/active']);
     } catch (error) {
       console.error('[SessionsList] startSession failed', error);
-      this.notifications.error('Failed to create session. Please try again.');
+      this.notifications.error(this.i18n.t('sessions.createFailed'));
     } finally {
       this.starting.set(false);
     }

@@ -1,7 +1,7 @@
 .title-input {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 1.75rem;
   font-weight: 600;
   width: 100%;
@@ -16,25 +16,25 @@
   align-items: center;
   margin-bottom: 12px;
 }
-.section h2 { margin: 0; font-size: 1rem; color: #888; }
+.section h2 { margin: 0; font-size: 1rem; color: var(--text-muted); }
 .spot-card {
   padding: 12px;
-  background: #1a1a1a;
+  background: var(--background-card);
   border-radius: 8px;
   margin-bottom: 8px;
-  border: 1px solid #333;
+  border: 1px solid var(--border-primary);
 }
 .spot-actions { margin-top: 8px; }
 .spot-edit {
   padding: 16px;
-  background: #111;
+  background: var(--background-secondary);
   border-radius: 12px;
   margin: 16px 0;
-  border: 1px solid #ff6b00;
+  border: 1px solid var(--border-active);
 }
 .save-btn {
   width: 100%;
-  background: #ff6b00 !important;
-  color: #000 !important;
+  background: var(--primary) !important;
+  color: var(--text-on-primary) !important;
 }
 .delete-btn { width: 100%; margin-top: 24px; }

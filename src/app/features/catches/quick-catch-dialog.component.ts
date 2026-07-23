@@ -10,6 +10,7 @@ import { SettingsService } from '../../core/services/settings.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { QuickCatchInput } from '../../core/services/catch.service';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-quick-catch-dialog',
@@ -23,6 +24,7 @@ import { ExpandableSectionComponent } from '../../shared/components/expandable-s
     MatCheckboxModule,
     FormsModule,
     ExpandableSectionComponent,
+    TranslatePipe,
   ],
   templateUrl: './quick-catch-dialog.component.html',
   styleUrl: './quick-catch-dialog.component.css',

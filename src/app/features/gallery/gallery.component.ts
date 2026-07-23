@@ -16,6 +16,7 @@ import {
   GalleryImageItem,
   ImageGalleryComponent,
 } from '../../shared/components/image-gallery/image-gallery.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-gallery',
@@ -28,6 +29,7 @@ import {
     EmptyStateComponent,
     PageTitleComponent,
     ImageGalleryComponent,
+    TranslatePipe,
   ],
   templateUrl: './gallery.component.html',
   styleUrl: './gallery.component.css',

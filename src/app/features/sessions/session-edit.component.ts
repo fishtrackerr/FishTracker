@@ -23,6 +23,8 @@ import { FishingSession, FishingSpot, Lake, SessionSpot, SessionStatus } from '.
 import { fromLocalDatetimeInput, toLocalDatetimeInput } from '../../core/utils';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { MapsLinkButtonComponent } from '../../shared/components/maps-link-button/maps-link-button.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-session-edit',
@@ -38,6 +40,7 @@ import { MapsLinkButtonComponent } from '../../shared/components/maps-link-butto
     MatChipsModule,
     PageTitleComponent,
     MapsLinkButtonComponent,
+    TranslatePipe,
   ],
   templateUrl: './session-edit.component.html',
   styleUrl: './session-edit.component.css',
@@ -51,6 +54,7 @@ export class SessionEditComponent {
   private readonly notify = inject(NotificationService);
   private readonly rodService = inject(RodService);
   private readonly settings = inject(SettingsService);
+  private readonly i18n = inject(I18nService);
 
   readonly session = toSignal(
     this.route.paramMap.pipe(
@@ -118,9 +122,9 @@ export class SessionEditComponent {
   async onLakeChange(newLakeId: string): Promise<void> {
     if (this.previousLakeId && newLakeId !== this.previousLakeId && this.sessionSpots().length > 0) {
       const ok = await this.confirm.confirm({
-        title: 'Change lake?',
-        message: 'Changing the lake will clear selected session spots that belong to the previous lake.',
-        confirmLabel: 'Change lake',
+        title: this.i18n.t('sessionEdit.changeLakeTitle'),
+        message: this.i18n.t('sessionEdit.changeLakeMessage'),
+        confirmLabel: this.i18n.t('sessionEdit.changeLakeConfirm'),
       });
       if (!ok) {
         this.lakeId = this.previousLakeId;
@@ -168,7 +172,7 @@ export class SessionEditComponent {
     if (!this.lakeId) {
       return;
     }
-    const spot = await this.lakeService.addSpot(this.lakeId, { name: 'New Spot' });
+    const spot = await this.lakeService.addSpot(this.lakeId, { name: this.i18n.t('sessionEdit.newSpotDefaultName') });
     if (spot) {
       await this.loadLakeSpots(this.lakeId);
       this.toggleSpot(spot, true);
@@ -208,7 +212,7 @@ export class SessionEditComponent {
     const start = new Date(this.startDateLocal).getTime();
     const end = new Date(this.endDateLocal).getTime();
     if (end < start) {
-      return 'End date cannot be earlier than start date';
+      return this.i18n.t('sessionEdit.endDateBeforeStart');
     }
     return '';
   }
@@ -236,21 +240,21 @@ export class SessionEditComponent {
     };
     try {
       await this.sessionService.updateSession(s.id, options, this.forceRodResize());
-      this.notify.success('Session updated');
+      this.notify.success(this.i18n.t('sessionEdit.sessionUpdated'));
       await this.router.navigate(['/sessions', s.id]);
     } catch (err) {
       if (err instanceof SessionValidationError && err.message.includes('Confirm')) {
         const ok = await this.confirm.confirm({
-          title: 'Reduce rod count?',
-          message: 'Some rods have bites, spotted fish, or catches. Reducing the count will remove those rods but keep their activity data.',
-          confirmLabel: 'Reduce anyway',
+          title: this.i18n.t('sessionEdit.reduceRodCountTitle'),
+          message: this.i18n.t('sessionEdit.reduceRodCountMessage'),
+          confirmLabel: this.i18n.t('sessionEdit.reduceAnyway'),
         });
         if (ok) {
           this.forceRodResize.set(true);
           await this.save();
         }
       } else {
-        const msg = err instanceof SessionValidationError ? err.message : 'Failed to update session';
+        const msg = err instanceof SessionValidationError ? err.message : this.i18n.t('sessionEdit.updateFailed');
         this.notify.error(msg);
       }
     } finally {
@@ -277,7 +281,7 @@ export class SessionEditComponent {
         this.latitude = updated.latitude;
         this.longitude = updated.longitude;
       }
-      this.notify.success('Weather refreshed');
+      this.notify.success(this.i18n.t('sessionEdit.weatherRefreshed'));
     }
   }
 }

@@ -8,7 +8,7 @@
 .save-btn {
   width: 100%;
   height: 48px !important;
-  background: #ff6b00 !important;
-  color: #000 !important;
+  background: var(--primary) !important;
+  color: var(--text-on-primary) !important;
   font-weight: 600 !important;
 }

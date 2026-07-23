@@ -22,6 +22,8 @@ import { RodCardComponent } from '../../shared/components/rod-card/rod-card.comp
 import { SessionTimelineComponent } from '../../shared/components/session-timeline/session-timeline.component';
 import { RodSummaryComponent } from '../../shared/components/rod-summary/rod-summary.component';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-session-detail',
@@ -42,6 +44,7 @@ import { ExpandableSectionComponent } from '../../shared/components/expandable-s
     SessionTimelineComponent,
     RodSummaryComponent,
     ExpandableSectionComponent,
+    TranslatePipe,
   ],
   templateUrl: './session-detail.component.html',
   styleUrl: './session-detail.component.css',
@@ -54,6 +57,7 @@ export class SessionDetailComponent {
   private readonly lakeService = inject(LakeService);
   private readonly confirm = inject(ConfirmService);
   private readonly notify = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
 
   readonly session = toSignal(
     this.route.paramMap.pipe(
@@ -110,7 +114,7 @@ export class SessionDetailComponent {
   async hydrateFromSession(s: FishingSession): Promise<void> {
     if (s.lakeId) {
       const lake = await this.lakeService.getById(s.lakeId);
-      this.lakeName.set(lake?.name ?? 'Unknown');
+      this.lakeName.set(lake?.name ?? this.i18n.t('common.unknown'));
     } else {
       this.lakeName.set('—');
     }
@@ -163,9 +167,10 @@ export class SessionDetailComponent {
   async deleteSession(): Promise<void> {
     const s = this.session();
     if (!s) return;
-    const ok = await this.confirm.confirmDelete('Delete session?', s.name);
+    const ok = await this.confirm.confirmDelete(this.i18n.t('sessionDetail.deleteSessionQuestion'), s.name);
     if (ok) {
       await this.sessionService.delete(s.id);
+      this.notify.success(this.i18n.t('sessionDetail.sessionDeleted'));
       await this.router.navigate(['/sessions']);
     }
   }

@@ -1,56 +1,56 @@
-<app-page-title title="Statistics" />
+<app-page-title title="statistics.title" />
 
 <app-filter-panel [filter]="activeFilter()" (filterChange)="onFilterChange($event)" />
 
 @if (stats(); as s) {
   <section class="section">
-    <h2 class="section-title">General</h2>
+    <h2 class="section-title">{{ 'statistics.general' | tr }}</h2>
     <div class="stats-grid">
-      <app-stat-card label="Total Sessions" [value]="s.totalSessions" />
-      <app-stat-card label="Active" [value]="s.activeSessions ?? 0" />
-      <app-stat-card label="Completed" [value]="s.completedSessions ?? 0" />
-      <app-stat-card label="Planned" [value]="s.plannedSessions ?? 0" />
-      <app-stat-card label="Total Hours" [value]="s.totalHours.toFixed(1)" />
-      <app-stat-card label="Avg Session (hrs)" [value]="(s.averageSessionDurationHours ?? 0).toFixed(1)" />
-      <app-stat-card label="Total Catches" [value]="s.totalCatches" />
-      <app-stat-card label="Catches / Session" [value]="(s.catchesPerSession ?? 0).toFixed(1)" />
-      <app-stat-card label="Catch Rate" [value]="s.catchRate.toFixed(1) + '/hr'" />
-      <app-stat-card label="Blank Sessions" [value]="s.blankSessions" />
+      <app-stat-card [label]="'statistics.totalSessions' | tr" [value]="s.totalSessions" />
+      <app-stat-card [label]="'statistics.active' | tr" [value]="s.activeSessions ?? 0" />
+      <app-stat-card [label]="'statistics.completed' | tr" [value]="s.completedSessions ?? 0" />
+      <app-stat-card [label]="'statistics.planned' | tr" [value]="s.plannedSessions ?? 0" />
+      <app-stat-card [label]="'statistics.totalHours' | tr" [value]="s.totalHours.toFixed(1)" />
+      <app-stat-card [label]="'statistics.avgSessionHours' | tr" [value]="(s.averageSessionDurationHours ?? 0).toFixed(1)" />
+      <app-stat-card [label]="'statistics.totalCatches' | tr" [value]="s.totalCatches" />
+      <app-stat-card [label]="'statistics.catchesPerSession' | tr" [value]="(s.catchesPerSession ?? 0).toFixed(1)" />
+      <app-stat-card [label]="'statistics.catchRate' | tr" [value]="s.catchRate.toFixed(1) + '/hr'" />
+      <app-stat-card [label]="'statistics.blankSessions' | tr" [value]="s.blankSessions" />
     </div>
   </section>
 
   <section class="section">
-    <h2 class="section-title">Catch Statistics</h2>
+    <h2 class="section-title">{{ 'statistics.catchStatistics' | tr }}</h2>
     <div class="stats-grid">
-      <app-stat-card label="Biggest Fish" [value]="s.biggestFishKg ? (s.biggestFishKg | formatWeight) : '—'" />
-      <app-stat-card label="Longest Fish" [value]="s.longestFishCm ? (s.longestFishCm | formatLength) : '—'" />
-      <app-stat-card label="Total Weight" [value]="s.totalCatchWeightKg ? (s.totalCatchWeightKg | formatWeight) : '—'" />
-      <app-stat-card label="Avg Weight" [value]="s.averageWeightKg ? (s.averageWeightKg | formatWeight) : '—'" />
-      <app-stat-card label="Avg Length" [value]="s.averageLengthCm ? (s.averageLengthCm | formatLength) : '—'" />
-      <app-stat-card label="Released" [value]="s.releasedCount ?? 0" />
-      <app-stat-card label="Retained" [value]="s.retainedCount ?? 0" />
+      <app-stat-card [label]="'statistics.biggestFish' | tr" [value]="s.biggestFishKg ? (s.biggestFishKg | formatWeight) : '—'" />
+      <app-stat-card [label]="'statistics.longestFish' | tr" [value]="s.longestFishCm ? (s.longestFishCm | formatLength) : '—'" />
+      <app-stat-card [label]="'statistics.totalWeight' | tr" [value]="s.totalCatchWeightKg ? (s.totalCatchWeightKg | formatWeight) : '—'" />
+      <app-stat-card [label]="'statistics.avgWeight' | tr" [value]="s.averageWeightKg ? (s.averageWeightKg | formatWeight) : '—'" />
+      <app-stat-card [label]="'statistics.avgLength' | tr" [value]="s.averageLengthCm ? (s.averageLengthCm | formatLength) : '—'" />
+      <app-stat-card [label]="'statistics.released' | tr" [value]="s.releasedCount ?? 0" />
+      <app-stat-card [label]="'statistics.retained' | tr" [value]="s.retainedCount ?? 0" />
     </div>
   </section>
 
   <section class="section">
-    <h2 class="section-title">Lake & Tackle</h2>
+    <h2 class="section-title">{{ 'statistics.lakeAndTackle' | tr }}</h2>
     <div class="stats-grid">
-      <app-stat-card label="Favorite Lake" [value]="s.favoriteLake ?? '—'" />
-      <app-stat-card label="Favorite Spot" [value]="s.favoriteSpot ?? '—'" />
-      <app-stat-card label="Best Bait" [value]="s.bestBait ?? '—'" />
-      <app-stat-card label="Best Rig" [value]="s.bestRig ?? '—'" />
-      <app-stat-card label="Best Month" [value]="s.bestMonth ?? '—'" />
-      <app-stat-card label="Best Time" [value]="s.bestTimeOfDay ?? '—'" />
+      <app-stat-card [label]="'statistics.favoriteLake' | tr" [value]="s.favoriteLake ?? '—'" />
+      <app-stat-card [label]="'statistics.favoriteSpot' | tr" [value]="s.favoriteSpot ?? '—'" />
+      <app-stat-card [label]="'statistics.bestBait' | tr" [value]="s.bestBait ?? '—'" />
+      <app-stat-card [label]="'statistics.bestRig' | tr" [value]="s.bestRig ?? '—'" />
+      <app-stat-card [label]="'statistics.bestMonth' | tr" [value]="s.bestMonth ?? '—'" />
+      <app-stat-card [label]="'statistics.bestTime' | tr" [value]="s.bestTimeOfDay ?? '—'" />
     </div>
   </section>
 
   @if (s.speciesBreakdown?.length) {
     <section class="section">
-      <h2 class="section-title">Species</h2>
+      <h2 class="section-title">{{ 'statistics.species' | tr }}</h2>
       @for (sp of s.speciesBreakdown!; track sp.species) {
         <div class="pr-row">
           <strong>{{ sp.species }}</strong>
-          <span>{{ sp.count }} catches · avg {{ sp.avgWeight | formatWeight }}</span>
+          <span>{{ sp.count }} {{ 'statistics.catches' | tr }} · {{ 'statistics.avg' | tr }} {{ sp.avgWeight | formatWeight }}</span>
         </div>
       }
     </section>
@@ -58,11 +58,11 @@
 
   @if (s.lakeBreakdown?.length) {
     <section class="section">
-      <h2 class="section-title">Lakes</h2>
+      <h2 class="section-title">{{ 'nav.lakes' | tr }}</h2>
       @for (lake of s.lakeBreakdown!; track lake.lake) {
         <div class="pr-row">
           <strong>{{ lake.lake }}</strong>
-          <span>{{ lake.sessions }} sessions · {{ lake.catches }} catches</span>
+          <span>{{ lake.sessions }} {{ 'statistics.sessions' | tr }} · {{ lake.catches }} {{ 'statistics.catches' | tr }}</span>
         </div>
       }
     </section>
@@ -70,7 +70,7 @@
 
   @if (s.personalRecords.length > 0) {
     <section class="section">
-      <h2 class="section-title">Personal Records</h2>
+      <h2 class="section-title">{{ 'statistics.personalRecords' | tr }}</h2>
       @for (pr of s.personalRecords; track pr.species) {
         <div class="pr-row">
           <strong>{{ pr.species }}</strong>
@@ -82,7 +82,7 @@
 
   @if (tempCorrelation().length > 0) {
     <section class="section">
-      <h2 class="section-title">Weather — Temperature</h2>
+      <h2 class="section-title">{{ 'statistics.weatherTemperature' | tr }}</h2>
       @for (item of tempCorrelation(); track item.label) {
         <div class="bar-row">
           <span class="bar-label">{{ item.label }}</span>
@@ -97,7 +97,7 @@
 
   @if (pressureCorrelation().length > 0) {
     <section class="section">
-      <h2 class="section-title">Weather — Pressure</h2>
+      <h2 class="section-title">{{ 'statistics.weatherPressure' | tr }}</h2>
       @for (item of pressureCorrelation(); track item.label) {
         <div class="bar-row">
           <span class="bar-label">{{ item.label }}</span>
@@ -112,7 +112,7 @@
 
   @if (moonCorrelation().length > 0) {
     <section class="section">
-      <h2 class="section-title">Weather — Moon Phase</h2>
+      <h2 class="section-title">{{ 'statistics.weatherMoonPhase' | tr }}</h2>
       @for (item of moonCorrelation(); track item.label) {
         <div class="bar-row">
           <span class="bar-label">{{ item.label }}</span>

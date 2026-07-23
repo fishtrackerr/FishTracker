@@ -7,11 +7,11 @@ import { ImageService } from '../../../core/services/image.service';
   template: `
     <div class="thumb-wrap">
       @if (url()) {
-        <img [src]="url()" [alt]="alt" class="thumb" />
+        <img [src]="url()" [alt]="alt" class="thumb" (error)="onImageError()" />
       } @else if (loading()) {
         <div class="placeholder loading" aria-hidden="true"></div>
       } @else {
-        <div class="placeholder">{{ placeholder }}</div>
+        <img [src]="fallbackUrl" [alt]="alt" class="thumb" />
       }
       @if (showFavorite && isFavorite) {
         <span class="fav-badge" aria-label="Favorite">★</span>
@@ -70,6 +70,7 @@ export class ImageThumbComponent implements OnInit {
 
   readonly url = signal<string | null>(null);
   readonly loading = signal(true);
+  readonly fallbackUrl = this.imageService.getPlaceholderUrl();
 
   async ngOnInit(): Promise<void> {
     if (this.imageId) {
@@ -83,5 +84,9 @@ export class ImageThumbComponent implements OnInit {
       this.url.set(this.imageService.getPlaceholderUrl());
     }
     this.loading.set(false);
+  }
+
+  onImageError(): void {
+    this.url.set(this.fallbackUrl);
   }
 }

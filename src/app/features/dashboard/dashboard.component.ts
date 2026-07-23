@@ -12,6 +12,7 @@ import { LakeService } from '../../core/services/lake.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ImageService } from '../../core/services/image.service';
+import { I18nService } from '../../core/services/i18n.service';
 import { WeatherSnapshot } from '../../core/models';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import { SessionCardComponent } from '../../shared/components/session-card/session-card.component';
@@ -21,6 +22,7 @@ import { PageTitleComponent } from '../../shared/components/page-title/page-titl
 import { FormatWeightPipe } from '../../core/pipes/format-units.pipe';
 import { DialogService } from '../../core/services/dialog.service';
 import { RodSetupFlowService } from '../../core/services/rod-setup-flow.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import {
   SessionCreateDialogComponent,
   SessionCreateResult,
@@ -38,6 +40,7 @@ import {
     ErrorStateComponent,
     PageTitleComponent,
     FormatWeightPipe,
+    TranslatePipe,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
@@ -50,6 +53,7 @@ export class DashboardComponent implements OnInit {
   private readonly lakeService = inject(LakeService);
   readonly settings = inject(SettingsService);
   private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
   private readonly imageService = inject(ImageService);
   private readonly router = inject(Router);
   private readonly dialog = inject(DialogService);
@@ -93,7 +97,7 @@ export class DashboardComponent implements OnInit {
       }
       this.homepageUrl.set(await this.imageService.getHomepageUrl());
     } catch {
-      this.loadError.set('Could not load dashboard data. Please try again.');
+      this.loadError.set('dashboard.loadError');
     } finally {
       this.loading.set(false);
     }
@@ -123,7 +127,7 @@ export class DashboardComponent implements OnInit {
       }
     } catch (error) {
       console.error('[Dashboard] startSession failed', error);
-      this.notifications.error('Could not start session. Please try again.');
+      this.notifications.error(this.i18n.t('dashboard.startFailed'));
     }
   }
 
@@ -135,13 +139,13 @@ export class DashboardComponent implements OnInit {
       if (!hadActive) {
         await this.rodSetupFlow.promptAfterSessionCreate(session);
       }
-      this.notifications.success('Session started');
+      this.notifications.success(this.i18n.t('dashboard.sessionStarted'));
       await this.router.navigate(['/sessions/active'], {
         queryParams: { id: session.id },
       });
     } catch (error) {
       console.error('[Dashboard] doStart failed', error);
-      this.notifications.error('Failed to create session. Please try again.');
+      this.notifications.error(this.i18n.t('dashboard.createFailed'));
     } finally {
       this.starting.set(false);
     }

@@ -6,6 +6,7 @@ import { StatCardComponent } from '../../shared/components/stat-card/stat-card.c
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { FilterPanelComponent } from '../../shared/components/filter-panel/filter-panel.component';
 import { FormatWeightPipe, FormatLengthPipe } from '../../core/pipes/format-units.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-statistics',
@@ -16,6 +17,7 @@ import { FormatWeightPipe, FormatLengthPipe } from '../../core/pipes/format-unit
     FilterPanelComponent,
     FormatWeightPipe,
     FormatLengthPipe,
+    TranslatePipe,
   ],
   templateUrl: './statistics.component.html',
   styleUrl: './statistics.component.css',

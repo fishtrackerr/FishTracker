@@ -6,22 +6,22 @@
   >
     <div expandHeader class="rod-header">
       <strong>{{ rod.name }}</strong>
-      <span class="status" [class.inactive]="!rod.isActive">{{ rod.isActive ? 'Active' : 'Inactive' }}</span>
+      <span class="status" [class.inactive]="!rod.isActive">{{ rod.isActive ? ('rod.active' | tr) : ('rod.inactive' | tr) }}</span>
     </div>
 
-    <p class="row">Spot: {{ spotName }}</p>
-    @if (rod.bait) { <p class="row">Bait: {{ rod.bait }}</p> }
-    @if (rod.rig) { <p class="row">Rig: {{ rod.rig }}</p> }
-    <p class="row">Bites: {{ rod.biteCount }}</p>
-    <p class="row">Fish spotted: {{ rod.fishSpottedCount }}</p>
-    <p class="row">Catches: {{ catchCount }}</p>
+    <p class="row">{{ 'rod.spot' | tr }}: {{ spotName || ('rod.unassigned' | tr) }}</p>
+    @if (rod.bait) { <p class="row">{{ 'rod.bait' | tr }}: {{ rod.bait }}</p> }
+    @if (rod.rig) { <p class="row">{{ 'rod.rig' | tr }}: {{ rod.rig }}</p> }
+    <p class="row">{{ 'rod.bites' | tr }}: {{ rod.biteCount }}</p>
+    <p class="row">{{ 'rod.fishSpotted' | tr }}: {{ rod.fishSpottedCount }}</p>
+    <p class="row">{{ 'rod.catches' | tr }}: {{ catchCount }}</p>
 
-    <div class="bite-controls" aria-label="Bite controls for {{ rod.name }}">
+    <div class="bite-controls" [attr.aria-label]="('rod.biteControls' | tr) + ' ' + rod.name">
       <button
         mat-stroked-button
         type="button"
         class="bite-btn"
-        aria-label="Remove bite"
+        [attr.aria-label]="'rod.removeBite' | tr"
         [disabled]="rod.biteCount <= 0"
         (click)="removeBite()"
       >
@@ -32,7 +32,7 @@
         mat-stroked-button
         type="button"
         class="bite-btn"
-        aria-label="Add bite"
+        [attr.aria-label]="'rod.addBite' | tr"
         (click)="addBite()"
       >
         <mat-icon>add</mat-icon>
@@ -41,41 +41,41 @@
 
     @if (editing) {
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Rod name</mat-label>
+        <mat-label>{{ 'rod.rodName' | tr }}</mat-label>
         <input matInput [(ngModel)]="editName" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Spot</mat-label>
+        <mat-label>{{ 'rod.spot' | tr }}</mat-label>
         <mat-select [(ngModel)]="editSpotId">
-          <mat-option value="">Unassigned</mat-option>
+          <mat-option value="">{{ 'rod.unassigned' | tr }}</mat-option>
           @for (spot of sessionSpots; track spot.id) {
             <mat-option [value]="spot.id">{{ spot.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Bait</mat-label>
+        <mat-label>{{ 'rod.bait' | tr }}</mat-label>
         <input matInput [(ngModel)]="editBait" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Rig</mat-label>
+        <mat-label>{{ 'rod.rig' | tr }}</mat-label>
         <input matInput [(ngModel)]="editRig" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Notes</mat-label>
+        <mat-label>{{ 'common.notes' | tr }}</mat-label>
         <textarea matInput rows="2" [(ngModel)]="editNotes"></textarea>
       </mat-form-field>
-      <button mat-flat-button type="button" (click)="saveEdit()">Save rod</button>
+      <button mat-flat-button type="button" (click)="saveEdit()">{{ 'rod.saveRod' | tr }}</button>
     }
 
     <div class="actions">
-      <button mat-stroked-button type="button" (click)="startEdit()">Edit rod</button>
-      <button mat-stroked-button type="button" (click)="markFishSpotted()" aria-label="Mark fish spotted">
-        <mat-icon>visibility</mat-icon> Spotted
+      <button mat-stroked-button type="button" (click)="startEdit()">{{ 'rod.editRod' | tr }}</button>
+      <button mat-stroked-button type="button" (click)="markFishSpotted()" [attr.aria-label]="'rod.markFishSpotted' | tr">
+        <mat-icon>visibility</mat-icon> {{ 'rod.spotted' | tr }}
       </button>
-      <button mat-stroked-button type="button" (click)="addCatch()">Add catch</button>
+      <button mat-stroked-button type="button" (click)="addCatch()">{{ 'rod.addCatch' | tr }}</button>
       <button mat-stroked-button type="button" (click)="toggleActive()">
-        {{ rod.isActive ? 'Deactivate' : 'Activate' }}
+        {{ rod.isActive ? ('rod.deactivate' | tr) : ('rod.activate' | tr) }}
       </button>
     </div>
   </app-expandable-section>

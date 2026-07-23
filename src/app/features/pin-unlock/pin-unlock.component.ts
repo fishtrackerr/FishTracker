@@ -3,11 +3,13 @@ import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { PinLockService } from '../../core/services/pin-lock.service';
 import { AppStartupService } from '../../core/services/app-startup.service';
+import { I18nService } from '../../core/services/i18n.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-pin-unlock',
   standalone: true,
-  imports: [MatButtonModule],
+  imports: [MatButtonModule, TranslatePipe],
   templateUrl: './pin-unlock.component.html',
   styleUrl: '../pin-setup/pin.component.css',
 })
@@ -15,6 +17,7 @@ export class PinUnlockComponent {
   private readonly pinLock = inject(PinLockService);
   private readonly router = inject(Router);
   private readonly startup = inject(AppStartupService);
+  private readonly i18n = inject(I18nService);
 
   readonly pin = signal('');
   readonly error = signal('');
@@ -41,7 +44,7 @@ export class PinUnlockComponent {
       const target = await this.startup.resolveInitialRoute(returnUrl);
       await this.router.navigateByUrl(target);
     } else {
-      this.error.set('Incorrect PIN');
+      this.error.set(this.i18n.t('pin.incorrectPin'));
       this.pin.set('');
     }
   }

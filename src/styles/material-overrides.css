@@ -152,8 +152,17 @@ textarea.mat-mdc-input-element {
   --mdc-text-button-label-text-color: var(--text-secondary);
 }
 
-.cdk-overlay-dark-backdrop {
+.cdk-overlay-backdrop.themed-backdrop.theme-backdrop-dark,
+.cdk-overlay-backdrop.cdk-overlay-dark-backdrop {
   background: rgba(0, 0, 0, 0.78);
+}
+
+.cdk-overlay-backdrop.themed-backdrop.theme-backdrop-light {
+  background: rgba(23, 33, 43, 0.26);
+}
+
+.cdk-overlay-container[data-theme='light'] .cdk-overlay-backdrop:not(.theme-backdrop-dark) {
+  background: rgba(23, 33, 43, 0.26);
 }
 
 .mat-mdc-button,

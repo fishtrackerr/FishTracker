@@ -1,95 +1,95 @@
-<app-page-title title="Profile" />
+<app-page-title title="profile.title" />
 
 @if (profile(); as p) {
   <div class="profile-header">
     <div class="avatar">
       <app-image-thumb
         [imageId]="p.profilePictureId"
-        alt="Profile picture"
+        [alt]="'profile.pictureAlt' | tr"
         placeholder="👤"
       />
     </div>
     @if (!editing()) {
-      <button mat-stroked-button type="button" (click)="pickProfilePicture()">Change photo</button>
+      <button mat-stroked-button type="button" (click)="pickProfilePicture()">{{ 'profile.changePhoto' | tr }}</button>
       @if (p.profilePictureId) {
-        <button mat-button type="button" (click)="removePicture()">Remove photo</button>
+        <button mat-button type="button" (click)="removePicture()">{{ 'profile.removePhoto' | tr }}</button>
       }
     }
   </div>
 
   @if (!editing()) {
     <div class="view-mode">
-      <p><strong>Name:</strong> {{ p.displayName || ((p.firstName ?? '') + ' ' + (p.lastName ?? '')).trim() || '—' }}</p>
-      <p><strong>Email:</strong> {{ p.email || '—' }}</p>
-      <p><strong>Phone:</strong> {{ p.phoneNumber || '—' }}</p>
-      <p><strong>Location:</strong> {{ p.city || '—' }}{{ p.country ? ', ' + p.country : '' }}</p>
-      <p><strong>License:</strong> {{ p.fishingLicenseNumber || '—' }}</p>
-      <p><strong>Notes:</strong> {{ p.notes || '—' }}</p>
-      <button mat-flat-button type="button" (click)="startEdit()">Edit Profile</button>
+      <p><strong>{{ 'profile.name' | tr }}:</strong> {{ p.displayName || ((p.firstName ?? '') + ' ' + (p.lastName ?? '')).trim() || '—' }}</p>
+      <p><strong>{{ 'profile.email' | tr }}:</strong> {{ p.email || '—' }}</p>
+      <p><strong>{{ 'profile.phone' | tr }}:</strong> {{ p.phoneNumber || '—' }}</p>
+      <p><strong>{{ 'profile.location' | tr }}:</strong> {{ p.city || '—' }}{{ p.country ? ', ' + p.country : '' }}</p>
+      <p><strong>{{ 'profile.license' | tr }}:</strong> {{ p.fishingLicenseNumber || '—' }}</p>
+      <p><strong>{{ 'common.notes' | tr }}:</strong> {{ p.notes || '—' }}</p>
+      <button mat-flat-button type="button" (click)="startEdit()">{{ 'profile.editProfile' | tr }}</button>
     </div>
   } @else if (draft(); as d) {
     <div class="edit-mode">
       <mat-form-field appearance="outline" class="full">
-        <mat-label>First name</mat-label>
+        <mat-label>{{ 'profile.firstName' | tr }}</mat-label>
         <input matInput [ngModel]="d.firstName" (ngModelChange)="updateDraft('firstName', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Last name</mat-label>
+        <mat-label>{{ 'profile.lastName' | tr }}</mat-label>
         <input matInput [ngModel]="d.lastName" (ngModelChange)="updateDraft('lastName', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Display name</mat-label>
+        <mat-label>{{ 'profile.displayName' | tr }}</mat-label>
         <input matInput [ngModel]="d.displayName" (ngModelChange)="updateDraft('displayName', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Email</mat-label>
+        <mat-label>{{ 'profile.email' | tr }}</mat-label>
         <input matInput type="email" [ngModel]="d.email" (ngModelChange)="updateDraft('email', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Phone</mat-label>
+        <mat-label>{{ 'profile.phone' | tr }}</mat-label>
         <input matInput [ngModel]="d.phoneNumber" (ngModelChange)="updateDraft('phoneNumber', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Date of birth</mat-label>
+        <mat-label>{{ 'profile.dateOfBirth' | tr }}</mat-label>
         <input matInput type="date" [ngModel]="d.dateOfBirth" (ngModelChange)="updateDraft('dateOfBirth', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Country</mat-label>
+        <mat-label>{{ 'profile.country' | tr }}</mat-label>
         <input matInput [ngModel]="d.country" (ngModelChange)="updateDraft('country', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>City</mat-label>
+        <mat-label>{{ 'profile.city' | tr }}</mat-label>
         <input matInput [ngModel]="d.city" (ngModelChange)="updateDraft('city', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Address</mat-label>
+        <mat-label>{{ 'lakes.address' | tr }}</mat-label>
         <input matInput [ngModel]="d.address" (ngModelChange)="updateDraft('address', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Postal code</mat-label>
+        <mat-label>{{ 'profile.postalCode' | tr }}</mat-label>
         <input matInput [ngModel]="d.postalCode" (ngModelChange)="updateDraft('postalCode', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Fishing license</mat-label>
+        <mat-label>{{ 'profile.fishingLicense' | tr }}</mat-label>
         <input matInput [ngModel]="d.fishingLicenseNumber" (ngModelChange)="updateDraft('fishingLicenseNumber', $event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Favorite lake</mat-label>
+        <mat-label>{{ 'profile.favoriteLake' | tr }}</mat-label>
         <mat-select [ngModel]="d.favoriteLakeId" (ngModelChange)="updateDraft('favoriteLakeId', $event)">
-          <mat-option value="">None</mat-option>
+          <mat-option value="">{{ 'common.none' | tr }}</mat-option>
           @for (lake of lakes(); track lake.id) {
             <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Notes</mat-label>
+        <mat-label>{{ 'common.notes' | tr }}</mat-label>
         <textarea matInput rows="3" [ngModel]="d.notes" (ngModelChange)="updateDraft('notes', $event)"></textarea>
       </mat-form-field>
       <div class="actions">
-        <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+        <button mat-button type="button" (click)="cancelEdit()">{{ 'common.cancel' | tr }}</button>
         <button mat-flat-button type="button" [disabled]="saving()" (click)="save()">
-          {{ saving() ? 'Saving...' : 'Save' }}
+          {{ saving() ? ('sessionEdit.saving' | tr) : ('common.save' | tr) }}
         </button>
       </div>
     </div>

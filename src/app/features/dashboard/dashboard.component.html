@@ -1,8 +1,8 @@
-<app-page-title title="Dashboard" />
+<app-page-title title="common.dashboard" />
 
 @if (homepageUrl(); as hero) {
   <div class="homepage-hero">
-    <img [src]="hero" alt="Homepage" />
+    <img [src]="hero" [alt]="'dashboard.homepageAlt' | tr" />
   </div>
 }
 
@@ -10,26 +10,26 @@
   <app-error-state [message]="err" (retry)="loadDashboard()" />
 } @else {
   <button mat-flat-button class="start-btn" (click)="startSession()" [disabled]="starting() || loading()">
-    {{ starting() ? 'Starting...' : 'Start Fishing Session' }}
+    {{ starting() ? ('dashboard.starting' | tr) : ('dashboard.startSession' | tr) }}
   </button>
 
   @if (activeSession(); as active) {
     <button mat-stroked-button class="continue-btn" (click)="continueSession()">
-      Continue Active Session — {{ active.catchCount }} catches
+      {{ 'dashboard.continueActive' | tr: { count: active.catchCount } }}
     </button>
   }
 
   @if (stats(); as s) {
     <div class="stats-grid">
-      <app-stat-card label="Sessions" [value]="s.totalSessions" />
-      <app-stat-card label="Catches" [value]="s.totalCatches" />
-      <app-stat-card label="Biggest Fish" [value]="s.biggestFishKg ? (s.biggestFishKg | formatWeight) : '—'" />
-      <app-stat-card label="Favorite Lake" [value]="s.favoriteLake ?? '—'" />
+      <app-stat-card [label]="'dashboard.sessions' | tr" [value]="s.totalSessions" />
+      <app-stat-card [label]="'dashboard.catches' | tr" [value]="s.totalCatches" />
+      <app-stat-card [label]="'dashboard.biggestFish' | tr" [value]="s.biggestFishKg ? (s.biggestFishKg | formatWeight) : '—'" />
+      <app-stat-card [label]="'dashboard.favoriteLake' | tr" [value]="s.favoriteLake ?? '—'" />
     </div>
   }
 
   <section class="section">
-    <h2 class="section-title">Current Weather</h2>
+    <h2 class="section-title">{{ 'dashboard.currentWeather' | tr }}</h2>
     <app-weather-card
       [weather]="weather() ?? undefined"
       [detailed]="settings.get().detailedWeatherEnabled"
@@ -39,7 +39,7 @@
 
   @if (recentSessions.length > 0) {
     <section class="section">
-      <h2 class="section-title">Recent Sessions</h2>
+      <h2 class="section-title">{{ 'dashboard.recentSessions' | tr }}</h2>
       @for (session of recentSessions; track session.id) {
         <app-session-card [session]="session" />
       }

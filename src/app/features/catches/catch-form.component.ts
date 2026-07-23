@@ -10,6 +10,7 @@ import { CatchService } from '../../core/services/catch.service';
 import { SessionService } from '../../core/services/session.service';
 import { OptionComboboxComponent } from '../../shared/components/option-combobox/option-combobox.component';
 import { FishingSession } from '../../core/models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-catch-form',
@@ -22,6 +23,7 @@ import { FishingSession } from '../../core/models';
     MatCheckboxModule,
     FormsModule,
     OptionComboboxComponent,
+    TranslatePipe,
   ],
   templateUrl: './catch-form.component.html',
   styleUrl: './catch-form.component.css',

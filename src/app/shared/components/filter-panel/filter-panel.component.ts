@@ -7,6 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FilterService, StatisticsFilter } from '../../../core/services/filter.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { I18nService } from '../../../core/services/i18n.service';
 
 @Component({
   selector: 'app-filter-panel',
@@ -90,6 +91,7 @@ export class FilterPanelComponent implements OnInit {
   private readonly filterService = inject(FilterService);
   private readonly confirm = inject(ConfirmService);
   private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
 
   @Input() filter: StatisticsFilter = {};
   @Input() compact = false;
@@ -116,11 +118,11 @@ export class FilterPanelComponent implements OnInit {
   }
 
   savePreset(): void {
-    const name = prompt('Preset name');
+    const name = prompt(this.i18n.t('filters.presetNamePrompt'));
     if (!name?.trim()) return;
     this.filterService.savePreset(name.trim(), this.filter);
     this.presets.set(this.filterService.getPresets());
-    this.notifications.success('Filter preset saved');
+    this.notifications.success(this.i18n.t('filters.presetSaved'));
   }
 
   applyPreset(filter: StatisticsFilter): void {
@@ -129,7 +131,7 @@ export class FilterPanelComponent implements OnInit {
   }
 
   async deletePreset(id: string, name: string): Promise<void> {
-    const ok = await this.confirm.confirmDelete('Delete filter preset?', name);
+    const ok = await this.confirm.confirmDelete(this.i18n.t('filters.deletePresetQuestion'), name);
     if (ok) {
       this.filterService.deletePreset(id);
       this.presets.set(this.filterService.getPresets());

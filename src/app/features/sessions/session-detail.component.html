@@ -1,7 +1,7 @@
 @if (session(); as s) {
   <h1>{{ s.name }}</h1>
   <p class="meta">{{ lakeName() }} · {{ s.startDate | date:'medium' }} · {{ durationText() }}</p>
-  <p class="status" [class]="s.status">{{ s.status }}</p>
+  <p class="status" [class]="s.status">{{ ('sessionStatus.' + s.status) | tr }}</p>
 
   @if (s.weather) {
     <app-weather-card [weather]="s.weather" />
@@ -9,11 +9,11 @@
 
   <div class="fields">
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Prebait</mat-label>
+      <mat-label>{{ 'sessionDetail.prebait' | tr }}</mat-label>
       <input matInput [(ngModel)]="prebait" (blur)="saveNotes()" />
     </mat-form-field>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Notes</mat-label>
+      <mat-label>{{ 'common.notes' | tr }}</mat-label>
       <textarea matInput rows="3" [(ngModel)]="notes" (blur)="saveNotes()"></textarea>
     </mat-form-field>
   </div>
@@ -31,14 +31,14 @@
   }
 
   @if (s.rods && s.rods.length > 0) {
-    <app-expandable-section sectionId="session-rods" label="Rods and spots" [defaultExpanded]="true">
-      <div expandHeader class="expand-label">More info — Rods & Spots</div>
+    <app-expandable-section sectionId="session-rods" label="sessionDetail.rodsAndSpots" [defaultExpanded]="true">
+      <div expandHeader class="expand-label">{{ 'sessionDetail.moreInfoRodsSpots' | tr }}</div>
       @if (rodSummary; as summary) {
         <div class="rod-stats">
-          <span>{{ summary.total }} rods</span>
-          <span>{{ summary.active }} active</span>
-          <span>{{ summary.bites }} bites</span>
-          <span>{{ summary.spotted }} spotted</span>
+          <span>{{ summary.total }} {{ 'sessionDetail.rods' | tr }}</span>
+          <span>{{ summary.active }} {{ 'sessionDetail.active' | tr }}</span>
+          <span>{{ summary.bites }} {{ 'sessionDetail.bites' | tr }}</span>
+          <span>{{ summary.spotted }} {{ 'sessionDetail.spotted' | tr }}</span>
         </div>
       }
       @for (rod of s.rods; track rod.id) {
@@ -58,8 +58,8 @@
 
   <section class="section">
     <div class="section-header">
-      <h2>Catches ({{ catches().length }})</h2>
-      <a mat-button [routerLink]="['/sessions', s.id, 'catches', 'new']">Add Catch</a>
+      <h2>{{ 'sessionDetail.catches' | tr }} ({{ catches().length }})</h2>
+      <a mat-button [routerLink]="['/sessions', s.id, 'catches', 'new']">{{ 'sessionDetail.addCatch' | tr }}</a>
     </div>
     @for (c of catches(); track c.id) {
       <div class="catch-row">
@@ -70,7 +70,7 @@
           <div class="catch-header">
             <div class="catch-title">
               <strong>{{ c.species }}</strong>
-              @if (c.isPersonalRecord) { <span class="pr">PR</span> }
+              @if (c.isPersonalRecord) { <span class="pr">{{ 'sessionDetail.pr' | tr }}</span> }
             </div>
             @if (c.latitude != null && c.longitude != null) {
               <app-maps-link-button
@@ -91,14 +91,14 @@
   </section>
 
   <div class="actions">
-    <button mat-stroked-button (click)="editSession()">Edit Session</button>
+    <button mat-stroked-button (click)="editSession()">{{ 'sessionDetail.editSession' | tr }}</button>
     @if (s.status === 'active') {
-      <button mat-flat-button class="cta" (click)="complete()">Complete Session</button>
+      <button mat-flat-button class="cta" (click)="complete()">{{ 'sessionDetail.completeSession' | tr }}</button>
     }
-    <button mat-stroked-button color="warn" (click)="deleteSession()">Delete</button>
+    <button mat-stroked-button color="warn" (click)="deleteSession()">{{ 'common.delete' | tr }}</button>
   </div>
 } @else {
-  <h1>Session not found</h1>
-  <p class="error-msg">This session could not be loaded.</p>
-  <a mat-stroked-button routerLink="/sessions">Back to sessions</a>
+  <h1>{{ 'sessionDetail.notFoundTitle' | tr }}</h1>
+  <p class="error-msg">{{ 'sessionDetail.notFoundMessage' | tr }}</p>
+  <a mat-stroked-button routerLink="/sessions">{{ 'sessionDetail.backToSessions' | tr }}</a>
 }

@@ -4,15 +4,15 @@
   </h1>
 
   <mat-checkbox [ngModel]="l.isFavorite" (ngModelChange)="updateField('isFavorite', $event); saveLake()">
-    Favorite
+    {{ 'lakes.favorite' | tr }}
   </mat-checkbox>
 
   <section class="section images-section">
-    <h2 class="section-title">Lake Images</h2>
+    <h2 class="section-title">{{ 'lakes.images' | tr }}</h2>
     <div class="cover-preview">
       <app-image-thumb
         [imageId]="l.coverImageId ?? l.photoIds[0]"
-        [alt]="l.name + ' cover'"
+        [alt]="l.name + ' ' + ('lakes.cover' | tr)"
         placeholder="🏞"
       />
     </div>
@@ -27,22 +27,22 @@
   </section>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Description</mat-label>
+    <mat-label>{{ 'lakes.description' | tr }}</mat-label>
     <textarea matInput rows="2" [ngModel]="l.description" (ngModelChange)="updateField('description', $event)" (blur)="saveLake()"></textarea>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Address</mat-label>
+    <mat-label>{{ 'lakes.address' | tr }}</mat-label>
     <input matInput [ngModel]="l.address" (ngModelChange)="updateField('address', $event)" (blur)="saveLake()" />
   </mat-form-field>
 
   <div class="row">
     <mat-form-field appearance="outline">
-      <mat-label>Latitude</mat-label>
+      <mat-label>{{ 'sessionEdit.latitude' | tr }}</mat-label>
       <input matInput type="number" step="any" [ngModel]="l.latitude" (ngModelChange)="updateField('latitude', $event)" (blur)="saveLake()" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Longitude</mat-label>
+      <mat-label>{{ 'sessionEdit.longitude' | tr }}</mat-label>
       <input matInput type="number" step="any" [ngModel]="l.longitude" (ngModelChange)="updateField('longitude', $event)" (blur)="saveLake()" />
     </mat-form-field>
     <app-maps-link-button
@@ -54,29 +54,29 @@
   </div>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Rules</mat-label>
+    <mat-label>{{ 'lakes.rules' | tr }}</mat-label>
     <textarea matInput rows="2" [ngModel]="l.rules" (ngModelChange)="updateField('rules', $event)" (blur)="saveLake()"></textarea>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Permit Information</mat-label>
+    <mat-label>{{ 'lakes.permitInformation' | tr }}</mat-label>
     <textarea matInput rows="2" [ngModel]="l.permitInformation" (ngModelChange)="updateField('permitInformation', $event)" (blur)="saveLake()"></textarea>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Notes</mat-label>
+    <mat-label>{{ 'common.notes' | tr }}</mat-label>
     <textarea matInput rows="2" [ngModel]="l.notes" (ngModelChange)="updateField('notes', $event)" (blur)="saveLake()"></textarea>
   </mat-form-field>
 
   <section class="section">
     <div class="section-header">
-      <h2>Fishing Spots</h2>
-      <button mat-button (click)="addSpot()">Add Spot</button>
+      <h2>{{ 'lakes.fishingSpots' | tr }}</h2>
+      <button mat-button (click)="addSpot()">{{ 'lakes.addSpot' | tr }}</button>
     </div>
     @for (spot of l.spots; track spot.id) {
       <div class="spot-card">
         <strong>{{ spot.name }}</strong>
-        @if (spot.waterDepthM) { <span> · {{ spot.waterDepthM }}m deep</span> }
+        @if (spot.waterDepthM) { <span> · {{ spot.waterDepthM }}m {{ 'lakes.deep' | tr }}</span> }
         <app-maps-link-button
           [latitude]="spot.latitude"
           [longitude]="spot.longitude"
@@ -84,8 +84,8 @@
           [showDirections]="true"
         />
         <div class="spot-actions">
-          <button mat-button (click)="editSpot(spot)">Edit</button>
-          <button mat-button color="warn" (click)="deleteSpot(spot.id)">Delete</button>
+          <button mat-button (click)="editSpot(spot)">{{ 'common.edit' | tr }}</button>
+          <button mat-button color="warn" (click)="deleteSpot(spot.id)">{{ 'common.delete' | tr }}</button>
         </div>
       </div>
     }
@@ -93,30 +93,30 @@
 
   @if (editingSpot()) {
     <div class="spot-edit">
-      <h3>Edit Spot</h3>
+      <h3>{{ 'lakes.editSpot' | tr }}</h3>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Name</mat-label>
+        <mat-label>{{ 'common.name' | tr }}</mat-label>
         <input matInput [(ngModel)]="spotName" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Depth (m)</mat-label>
+        <mat-label>{{ 'lakes.depthM' | tr }}</mat-label>
         <input matInput type="number" step="0.1" [(ngModel)]="spotDepth" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Bottom Type</mat-label>
+        <mat-label>{{ 'lakes.bottomType' | tr }}</mat-label>
         <input matInput [(ngModel)]="spotBottom" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Recommended Bait</mat-label>
+        <mat-label>{{ 'lakes.recommendedBait' | tr }}</mat-label>
         <input matInput [(ngModel)]="spotBait" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Notes</mat-label>
+        <mat-label>{{ 'common.notes' | tr }}</mat-label>
         <textarea matInput rows="2" [(ngModel)]="spotNotes"></textarea>
       </mat-form-field>
-      <button mat-flat-button class="save-btn" (click)="saveSpot()">Save Spot</button>
+      <button mat-flat-button class="save-btn" (click)="saveSpot()">{{ 'lakes.saveSpot' | tr }}</button>
     </div>
   }
 
-  <button mat-stroked-button color="warn" class="delete-btn" (click)="deleteLake()">Delete Lake</button>
+  <button mat-stroked-button color="warn" class="delete-btn" (click)="deleteLake()">{{ 'lakes.deleteLake' | tr }}</button>
 }

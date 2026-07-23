@@ -17,6 +17,7 @@ import { formatDuration } from '../../core/utils';
 import { FormatWeightPipe } from '../../core/pipes/format-units.pipe';
 import { DatePipe } from '@angular/common';
 import { MapsLinkButtonComponent } from '../../shared/components/maps-link-button/maps-link-button.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-active-session',
@@ -31,6 +32,7 @@ import { MapsLinkButtonComponent } from '../../shared/components/maps-link-butto
     WeatherCardComponent,
     FormatWeightPipe,
     MapsLinkButtonComponent,
+    TranslatePipe,
   ],
   templateUrl: './active-session.component.html',
   styleUrl: './active-session.component.css',

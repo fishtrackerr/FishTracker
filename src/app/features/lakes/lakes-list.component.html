@@ -1,10 +1,10 @@
-<app-page-title title="Lakes" />
-<button mat-flat-button class="add-btn" (click)="addLake()">Add Lake</button>
+<app-page-title title="lakes.title" />
+<button mat-flat-button class="add-btn" (click)="addLake()">{{ 'lakes.addLake' | tr }}</button>
 
 @if (sortedLakes.length === 0) {
   <app-empty-state
-    title="No lakes saved"
-    message="Add your favorite fishing lakes to get started."
+    title="lakes.emptyTitle"
+    message="lakes.emptyMessage"
   />
 } @else {
   @for (lake of sortedLakes; track lake.id) {
@@ -18,9 +18,9 @@
       </div>
       <div class="info">
         <span class="name">{{ lake.name }}</span>
-        <span class="spots">{{ lake.spots.length }} spots</span>
+        <span class="spots">{{ lake.spots.length }} {{ 'lakes.spots' | tr }}</span>
       </div>
-      <button mat-icon-button (click)="toggleFavorite($event, lake.id)" aria-label="Toggle favorite">
+      <button mat-icon-button (click)="toggleFavorite($event, lake.id)" [attr.aria-label]="'lakes.toggleFavorite' | tr">
         <mat-icon>{{ lake.isFavorite ? 'star' : 'star_border' }}</mat-icon>
       </button>
     </a>

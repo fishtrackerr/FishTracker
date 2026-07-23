@@ -19,6 +19,8 @@ import {
   ImageGalleryComponent,
 } from '../../shared/components/image-gallery/image-gallery.component';
 import { MapsLinkButtonComponent } from '../../shared/components/maps-link-button/maps-link-button.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-lake-detail',
@@ -33,6 +35,7 @@ import { MapsLinkButtonComponent } from '../../shared/components/maps-link-butto
     ImagePickerComponent,
     ImageGalleryComponent,
     MapsLinkButtonComponent,
+    TranslatePipe,
   ],
   templateUrl: './lake-detail.component.html',
   styleUrl: './lake-detail.component.css',
@@ -43,6 +46,7 @@ export class LakeDetailComponent {
   private readonly confirm = inject(ConfirmService);
   private readonly imageRepo = inject(ImageRepository);
   private readonly imageService = inject(ImageService);
+  private readonly i18n = inject(I18nService);
 
   readonly lake = toSignal(
     this.route.paramMap.pipe(
@@ -127,7 +131,7 @@ export class LakeDetailComponent {
   async addSpot(): Promise<void> {
     const l = this.lake();
     if (!l) return;
-    await this.lakeService.addSpot(l.id, { name: 'New Spot' });
+    await this.lakeService.addSpot(l.id, { name: this.i18n.t('lakes.newSpotDefaultName') });
   }
 
   editSpot(spot: FishingSpot): void {
@@ -157,7 +161,7 @@ export class LakeDetailComponent {
     const l = this.lake();
     if (!l) return;
     const spot = l.spots.find((s) => s.id === spotId);
-    const ok = await this.confirm.confirmDelete('Delete fishing spot?', spot?.name);
+    const ok = await this.confirm.confirmDelete(this.i18n.t('lakes.deleteSpotQuestion'), spot?.name);
     if (ok) {
       await this.lakeService.deleteSpot(l.id, spotId);
     }
@@ -166,7 +170,7 @@ export class LakeDetailComponent {
   async deleteLake(): Promise<void> {
     const l = this.lake();
     if (!l) return;
-    const ok = await this.confirm.confirmDelete('Delete lake?', l.name);
+    const ok = await this.confirm.confirmDelete(this.i18n.t('lakes.deleteLakeQuestion'), l.name);
     if (ok) {
       await this.lakeService.delete(l.id);
       history.back();

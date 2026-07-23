@@ -11,6 +11,7 @@ import { BiteEventService } from '../../../core/services/bite-event.service';
 import { FishSpottedEventService } from '../../../core/services/fish-spotted-event.service';
 import { RodService } from '../../../core/services/rod.service';
 import { ExpandableSectionComponent } from '../expandable-section/expandable-section.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-rod-card',
@@ -23,6 +24,7 @@ import { ExpandableSectionComponent } from '../expandable-section/expandable-sec
     MatInputModule,
     MatSelectModule,
     ExpandableSectionComponent,
+    TranslatePipe,
   ],
   templateUrl: './rod-card.component.html',
   styleUrl: './rod-card.component.css',
@@ -49,7 +51,7 @@ export class RodCardComponent {
 
   get spotName(): string {
     const spot = this.sessionSpots.find((s) => s.id === this.rod.sessionSpotId);
-    return spot?.name ?? 'Unassigned';
+    return spot?.name ?? '—';
   }
 
   get catchCount(): number {

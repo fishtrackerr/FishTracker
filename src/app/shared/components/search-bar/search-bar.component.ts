@@ -3,20 +3,21 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
+  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, TranslatePipe],
   template: `
     <mat-form-field appearance="outline" class="search-field">
-      <mat-label>{{ placeholder }}</mat-label>
+      <mat-label>{{ placeholder | tr }}</mat-label>
       <mat-icon matPrefix>search</mat-icon>
       <input
         matInput
         [ngModel]="query()"
         (ngModelChange)="onInput($event)"
-        [attr.aria-label]="placeholder"
+        [attr.aria-label]="placeholder | tr"
       />
     </mat-form-field>
   `,
@@ -25,7 +26,7 @@ import { MatInputModule } from '@angular/material/input';
   `,
 })
 export class SearchBarComponent implements OnDestroy {
-  @Input() placeholder = 'Search';
+  @Input() placeholder = 'common.search';
   @Input() debounceMs = 300;
   readonly search = output<string>();
 

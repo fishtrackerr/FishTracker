@@ -82,19 +82,19 @@
 .catch-count {
   text-align: center;
   font-size: 1.25rem;
-  color: #aaa;
+  color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .refresh {
   align-self: center;
-  color: #888 !important;
+  color: var(--text-muted) !important;
 }
 
 .gps {
   text-align: center;
   font-size: 0.85rem;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .full { width: 100%; }
@@ -118,6 +118,6 @@
 }
 
 .action-btn.end {
-  color: #888 !important;
-  border-color: #444 !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-primary) !important;
 }

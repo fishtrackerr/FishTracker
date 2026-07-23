@@ -5,27 +5,27 @@
   <nav class="bottom-nav">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
       <mat-icon>home</mat-icon>
-      <span>Home</span>
+      <span>{{ 'nav.home' | tr }}</span>
     </a>
     <a routerLink="/sessions" routerLinkActive="active">
       <mat-icon>event</mat-icon>
-      <span>Sessions</span>
+      <span>{{ 'nav.sessions' | tr }}</span>
     </a>
     <a routerLink="/lakes" routerLinkActive="active">
       <mat-icon>water</mat-icon>
-      <span>Lakes</span>
+      <span>{{ 'nav.lakes' | tr }}</span>
     </a>
     <a routerLink="/gallery" routerLinkActive="active">
       <mat-icon>photo_library</mat-icon>
-      <span>Gallery</span>
+      <span>{{ 'nav.gallery' | tr }}</span>
     </a>
     <a routerLink="/statistics" routerLinkActive="active">
       <mat-icon>bar_chart</mat-icon>
-      <span>Stats</span>
+      <span>{{ 'nav.stats' | tr }}</span>
     </a>
     <a routerLink="/settings" routerLinkActive="active">
       <mat-icon>settings</mat-icon>
-      <span>Settings</span>
+      <span>{{ 'nav.settings' | tr }}</span>
     </a>
   </nav>
 </div>

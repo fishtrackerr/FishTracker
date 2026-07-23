@@ -3,18 +3,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { ImageService } from '../../../core/services/image.service';
 import { ImageType } from '../../../core/models';
 import { NotificationService } from '../../../core/services/notification.service';
+import { I18nService } from '../../../core/services/i18n.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-image-picker',
   standalone: true,
-  imports: [MatButtonModule],
+  imports: [MatButtonModule, TranslatePipe],
   template: `
     <div class="picker">
       <button mat-stroked-button type="button" (click)="pickFile(false)">
-        Upload
+        {{ 'images.upload' | tr }}
       </button>
       <button mat-stroked-button type="button" (click)="pickFile(true)">
-        Camera
+        {{ 'images.camera' | tr }}
       </button>
     </div>
   `,
@@ -29,6 +31,7 @@ import { NotificationService } from '../../../core/services/notification.service
 export class ImagePickerComponent {
   private readonly imageService = inject(ImageService);
   private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
 
   @Input({ required: true }) type!: ImageType;
   @Input() parentId?: string;
@@ -52,9 +55,9 @@ export class ImagePickerComponent {
     try {
       const id = await this.imageService.processFile(file, this.type, this.parentId);
       this.uploaded.emit(id);
-      this.notifications.success('Image uploaded');
+      this.notifications.success(this.i18n.t('images.uploaded'));
     } catch {
-      this.notifications.error('Failed to upload image');
+      this.notifications.error(this.i18n.t('images.uploadFailed'));
     }
   }
 }

@@ -11,6 +11,8 @@ import { NotificationService } from '../../core/services/notification.service';
 import { ImagePickerComponent } from '../../shared/components/image-picker/image-picker.component';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { SearchBarComponent } from '../../shared/components/search-bar/search-bar.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-profile-documents',
@@ -24,6 +26,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
     PageTitleComponent,
     SearchBarComponent,
     ImagePickerComponent,
+    TranslatePipe,
   ],
   templateUrl: './profile-documents.component.html',
   styleUrl: './profile-documents.component.css',
@@ -32,6 +35,7 @@ export class ProfileDocumentsComponent {
   private readonly docRepo = inject(ProfileDocumentRepository);
   private readonly confirm = inject(ConfirmService);
   private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
 
   readonly documents = toSignal(this.docRepo.watchAll(), { initialValue: [] });
   readonly searchQuery = signal('');
@@ -113,7 +117,7 @@ export class ProfileDocumentsComponent {
 
   async saveDoc(): Promise<void> {
     if (!this.title.trim()) {
-      this.notifications.error('Title is required');
+      this.notifications.error(this.i18n.t('profileDocs.titleRequired'));
       return;
     }
     const id = this.editingId();
@@ -137,22 +141,22 @@ export class ProfileDocumentsComponent {
         });
       }
     }
-    this.notifications.success('Document saved');
+    this.notifications.success(this.i18n.t('profileDocs.documentSaved'));
     this.editingId.set(null);
   }
 
   async deleteDoc(id: string, title: string): Promise<void> {
-    const ok = await this.confirm.confirmDelete('Delete document?', title);
+    const ok = await this.confirm.confirmDelete(this.i18n.t('profileDocs.deleteDocumentQuestion'), title);
     if (ok) {
       await this.docRepo.delete(id);
-      this.notifications.success('Document deleted');
+      this.notifications.success(this.i18n.t('profileDocs.documentDeleted'));
     }
   }
 
   async onImageUploaded(imageId: string): Promise<void> {
     const docId = this.activeDocId || this.editingId();
     if (!docId || docId === 'new') {
-      this.notifications.error('Save the document first');
+      this.notifications.error(this.i18n.t('profileDocs.saveDocumentFirst'));
       return;
     }
     const doc = await this.docRepo.getById(docId);
@@ -162,7 +166,7 @@ export class ProfileDocumentsComponent {
         imageIds: [...doc.imageIds, imageId],
         updatedAt: new Date().toISOString(),
       });
-      this.notifications.success('Image added to document');
+      this.notifications.success(this.i18n.t('profileDocs.imageAdded'));
     }
   }
 }

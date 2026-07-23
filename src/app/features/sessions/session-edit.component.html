@@ -1,18 +1,18 @@
 @if (isLoading()) {
-  <app-page-title title="Edit Session" />
-  <p class="loading-msg">Loading session…</p>
+  <app-page-title title="sessionEdit.title" />
+  <p class="loading-msg">{{ 'sessionEdit.loading' | tr }}</p>
 } @else if (session(); as s) {
-  <app-page-title title="Edit Session" />
+  <app-page-title title="sessionEdit.title" />
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Session name</mat-label>
+    <mat-label>{{ 'sessionEdit.sessionName' | tr }}</mat-label>
     <input matInput [(ngModel)]="name" required />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Lake</mat-label>
+    <mat-label>{{ 'sessionEdit.lake' | tr }}</mat-label>
     <mat-select [(ngModel)]="lakeId" (ngModelChange)="onLakeChange($event)">
-      <mat-option value="">None</mat-option>
+      <mat-option value="">{{ 'common.none' | tr }}</mat-option>
       @for (lake of lakes(); track lake.id) {
         <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
       }
@@ -21,7 +21,7 @@
 
   @if (lakeId && availableLakeSpots().length > 0) {
     <section class="section app-card">
-      <h2 class="section-title">Session Spots</h2>
+      <h2 class="section-title">{{ 'sessionEdit.sessionSpots' | tr }}</h2>
       @for (spot of availableLakeSpots(); track spot.id) {
         <mat-checkbox
           [ngModel]="isSpotSelected(spot)"
@@ -30,31 +30,31 @@
           {{ spot.name }}
         </mat-checkbox>
       }
-      <button mat-stroked-button type="button" (click)="addNewLakeSpot()">Add new spot</button>
+      <button mat-stroked-button type="button" (click)="addNewLakeSpot()">{{ 'sessionEdit.addNewSpot' | tr }}</button>
     </section>
   }
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Number of rods</mat-label>
+    <mat-label>{{ 'sessionEdit.numberOfRods' | tr }}</mat-label>
     <input matInput type="number" [(ngModel)]="rodCount" [min]="1" [max]="maxRodCount()" />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Status</mat-label>
+    <mat-label>{{ 'sessionEdit.status' | tr }}</mat-label>
     <mat-select [(ngModel)]="status">
       @for (st of statuses; track st) {
-        <mat-option [value]="st">{{ st }}</mat-option>
+        <mat-option [value]="st">{{ ('sessionStatus.' + st) | tr }}</mat-option>
       }
     </mat-select>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Start date & time</mat-label>
+    <mat-label>{{ 'sessionEdit.startDateTime' | tr }}</mat-label>
     <input matInput type="datetime-local" [(ngModel)]="startDateLocal" required />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>End date & time (optional)</mat-label>
+    <mat-label>{{ 'sessionEdit.endDateTimeOptional' | tr }}</mat-label>
     <input matInput type="datetime-local" [(ngModel)]="endDateLocal" />
   </mat-form-field>
   @if (dateErrorMessage) {
@@ -63,39 +63,39 @@
 
   <div class="row">
     <mat-form-field appearance="outline">
-      <mat-label>Latitude</mat-label>
+      <mat-label>{{ 'sessionEdit.latitude' | tr }}</mat-label>
       <input matInput type="number" step="any" [(ngModel)]="latitude" />
     </mat-form-field>
     <mat-form-field appearance="outline">
-      <mat-label>Longitude</mat-label>
+      <mat-label>{{ 'sessionEdit.longitude' | tr }}</mat-label>
       <input matInput type="number" step="any" [(ngModel)]="longitude" />
     </mat-form-field>
     <app-maps-link-button [latitude]="latitude" [longitude]="longitude" label="session" [showDirections]="true" />
   </div>
 
-  <button mat-stroked-button type="button" (click)="refreshWeather()">Refresh weather & GPS</button>
+  <button mat-stroked-button type="button" (click)="refreshWeather()">{{ 'sessionEdit.refreshWeatherGps' | tr }}</button>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Water temperature (°C)</mat-label>
+    <mat-label>{{ 'sessionEdit.waterTemperatureC' | tr }}</mat-label>
     <input matInput type="number" step="0.1" [(ngModel)]="waterTemperatureC" />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Prebait</mat-label>
+    <mat-label>{{ 'sessionDetail.prebait' | tr }}</mat-label>
     <input matInput [(ngModel)]="prebait" />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Notes</mat-label>
+    <mat-label>{{ 'common.notes' | tr }}</mat-label>
     <textarea matInput rows="3" [(ngModel)]="notes"></textarea>
   </mat-form-field>
 
   <div class="tags-row">
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Tags</mat-label>
+      <mat-label>{{ 'sessionEdit.tags' | tr }}</mat-label>
       <input matInput [(ngModel)]="tagsInput" (keyup.enter)="addTag()" />
     </mat-form-field>
-    <button mat-stroked-button type="button" (click)="addTag()">Add tag</button>
+    <button mat-stroked-button type="button" (click)="addTag()">{{ 'sessionEdit.addTag' | tr }}</button>
   </div>
   @if (tags.length > 0) {
     <div class="tag-list">
@@ -106,13 +106,13 @@
   }
 
   <div class="actions">
-    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-button type="button" (click)="cancel()">{{ 'common.cancel' | tr }}</button>
     <button mat-flat-button type="button" [disabled]="!canSave() || saving()" (click)="save()">
-      {{ saving() ? 'Saving...' : 'Save' }}
+      {{ saving() ? ('sessionEdit.saving' | tr) : ('common.save' | tr) }}
     </button>
   </div>
 } @else {
-  <app-page-title title="Session not found" />
-  <p class="error-msg">This session could not be loaded. It may have been deleted.</p>
-  <a mat-stroked-button routerLink="/sessions">Back to sessions</a>
+  <app-page-title title="sessionDetail.notFoundTitle" />
+  <p class="error-msg">{{ 'sessionEdit.notFoundMessage' | tr }}</p>
+  <a mat-stroked-button routerLink="/sessions">{{ 'sessionDetail.backToSessions' | tr }}</a>
 }
