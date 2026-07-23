@@ -1,1 +1,169 @@
-/* You can add global styles to this file, and also import other style files */
+@import './styles/tokens.css';
+@import './styles/material-overrides.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--background-primary);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  color: var(--text-primary);
+}
+
+a {
+  color: var(--primary);
+}
+
+.app-title {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.section-title {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.app-card {
+  background: var(--background-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.app-card:hover {
+  border-color: var(--border-active);
+}
+
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  min-height: var(--button-height);
+  padding: 0 var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.app-btn-primary {
+  background: var(--primary);
+  color: var(--text-on-primary);
+}
+
+.app-btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.app-btn-primary:active:not(:disabled) {
+  background: var(--primary-active);
+}
+
+.app-btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.app-btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.app-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.snack-success {
+  --mdc-snackbar-container-color: var(--success);
+  --mdc-snackbar-supporting-text-color: #fff;
+}
+
+.snack-error {
+  --mdc-snackbar-container-color: var(--danger);
+  --mdc-snackbar-supporting-text-color: #fff;
+}
+
+.cdk-overlay-container .mat-mdc-snack-bar-container {
+  margin-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
+.app-snackbar.mat-mdc-snack-bar-container {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-active);
+}
+
+.app-snackbar .mdc-snackbar__surface {
+  background: var(--snackbar-bg, var(--background-card));
+  color: var(--snackbar-text, var(--text-primary));
+}
+
+.app-snackbar .mdc-snackbar__label {
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+.app-snackbar .mdc-snackbar__actions .mdc-button {
+  color: var(--snackbar-action, var(--primary)) !important;
+  font-weight: 600;
+  min-width: 48px;
+}
+
+[data-theme='dark'] .app-snackbar {
+  --snackbar-bg: #1c1c1c;
+  --snackbar-text: #ff9a3d;
+  --snackbar-border: #ff7a00;
+  --snackbar-action: #ffb36a;
+}
+
+[data-theme='light'] .app-snackbar {
+  --snackbar-bg: #ffffff;
+  --snackbar-text: #17212b;
+  --snackbar-border: #2474b5;
+  --snackbar-action: #2474b5;
+}
+
+.app-snackbar {
+  border-color: var(--snackbar-border, var(--border-active));
+}
+
+.app-snackbar--success {
+  --snackbar-bg: color-mix(in srgb, var(--success) 18%, var(--background-card));
+  --snackbar-border: var(--success);
+}
+
+.app-snackbar--error {
+  --snackbar-bg: color-mix(in srgb, var(--danger) 18%, var(--background-card));
+  --snackbar-border: var(--danger);
+}
+
+.app-snackbar--warning,
+.app-snackbar--weather {
+  --snackbar-bg: color-mix(in srgb, var(--warning) 18%, var(--background-card));
+  --snackbar-border: var(--warning);
+}
+
+.app-snackbar--offline {
+  --snackbar-text: var(--text-muted);
+  --snackbar-border: var(--border-primary);
+}

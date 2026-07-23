@@ -1,0 +1,59 @@
+<app-page-title title="Sessions" />
+
+<div class="toolbar">
+  <app-search-bar class="toolbar-search" placeholder="Search sessions" (search)="onSearch($event)" />
+  <button
+    mat-stroked-button
+    type="button"
+    class="filter-btn mobile-only"
+    (click)="openMobileFilters()"
+  >
+    Filter @if (filterCount() > 0) { ({{ filterCount() }}) }
+  </button>
+  <mat-form-field appearance="outline" class="sort-field">
+    <mat-label>Sort</mat-label>
+    <mat-select [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+      <mat-option value="newest">Newest</mat-option>
+      <mat-option value="oldest">Oldest</mat-option>
+      <mat-option value="name-asc">Name A–Z</mat-option>
+      <mat-option value="name-desc">Name Z–A</mat-option>
+      <mat-option value="most-catches">Most catches</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<p class="result-count">{{ sessions().length }} session(s)</p>
+
+<div class="desktop-filters">
+  <app-expandable-section
+    sectionId="sessions-filters"
+    label="filters"
+    persistKey="sessions-list-filters"
+    [defaultExpanded]="false"
+  >
+    <div expandHeader class="filter-header">
+      Filters @if (filterCount() > 0) { ({{ filterCount() }}) }
+    </div>
+    <app-filter-panel [filter]="activeFilter()" (filterChange)="onFilterChange($event)" />
+  </app-expandable-section>
+</div>
+
+<button mat-flat-button class="start-btn" type="button" (click)="startSession()" [disabled]="starting()">
+  {{ starting() ? 'Starting...' : 'Start Session' }}
+</button>
+
+@if (sessions().length === 0) {
+  <app-empty-state
+    title="No sessions yet"
+    message="Start your first fishing session to begin tracking."
+  />
+} @else {
+  @for (session of sessions(); track session.id; let i = $index) {
+    <app-session-card
+      [session]="session"
+      [lakeName]="getLakeName(session.lakeId)"
+      [defaultExpanded]="i === 0"
+      (editSession)="editSession($event)"
+    />
+  }
+}

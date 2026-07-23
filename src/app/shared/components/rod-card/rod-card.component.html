@@ -1,0 +1,82 @@
+<article class="rod-card app-card">
+  <app-expandable-section
+    [sectionId]="'rod-' + rod.id"
+    [label]="rod.name"
+    [defaultExpanded]="false"
+  >
+    <div expandHeader class="rod-header">
+      <strong>{{ rod.name }}</strong>
+      <span class="status" [class.inactive]="!rod.isActive">{{ rod.isActive ? 'Active' : 'Inactive' }}</span>
+    </div>
+
+    <p class="row">Spot: {{ spotName }}</p>
+    @if (rod.bait) { <p class="row">Bait: {{ rod.bait }}</p> }
+    @if (rod.rig) { <p class="row">Rig: {{ rod.rig }}</p> }
+    <p class="row">Bites: {{ rod.biteCount }}</p>
+    <p class="row">Fish spotted: {{ rod.fishSpottedCount }}</p>
+    <p class="row">Catches: {{ catchCount }}</p>
+
+    <div class="bite-controls" aria-label="Bite controls for {{ rod.name }}">
+      <button
+        mat-stroked-button
+        type="button"
+        class="bite-btn"
+        aria-label="Remove bite"
+        [disabled]="rod.biteCount <= 0"
+        (click)="removeBite()"
+      >
+        <mat-icon>remove</mat-icon>
+      </button>
+      <span class="bite-count">{{ rod.biteCount }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        class="bite-btn"
+        aria-label="Add bite"
+        (click)="addBite()"
+      >
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+    @if (editing) {
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Rod name</mat-label>
+        <input matInput [(ngModel)]="editName" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Spot</mat-label>
+        <mat-select [(ngModel)]="editSpotId">
+          <mat-option value="">Unassigned</mat-option>
+          @for (spot of sessionSpots; track spot.id) {
+            <mat-option [value]="spot.id">{{ spot.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Bait</mat-label>
+        <input matInput [(ngModel)]="editBait" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Rig</mat-label>
+        <input matInput [(ngModel)]="editRig" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Notes</mat-label>
+        <textarea matInput rows="2" [(ngModel)]="editNotes"></textarea>
+      </mat-form-field>
+      <button mat-flat-button type="button" (click)="saveEdit()">Save rod</button>
+    }
+
+    <div class="actions">
+      <button mat-stroked-button type="button" (click)="startEdit()">Edit rod</button>
+      <button mat-stroked-button type="button" (click)="markFishSpotted()" aria-label="Mark fish spotted">
+        <mat-icon>visibility</mat-icon> Spotted
+      </button>
+      <button mat-stroked-button type="button" (click)="addCatch()">Add catch</button>
+      <button mat-stroked-button type="button" (click)="toggleActive()">
+        {{ rod.isActive ? 'Deactivate' : 'Activate' }}
+      </button>
+    </div>
+  </app-expandable-section>
+</article>

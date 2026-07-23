@@ -1,0 +1,21 @@
+.rod-card { margin-bottom: var(--spacing-md); }
+.rod-header { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-sm); }
+.status { font-size: 0.75rem; color: var(--primary); font-weight: 600; }
+.status.inactive { color: var(--text-muted); }
+.row { margin: 0 0 var(--spacing-xs); font-size: 0.9rem; color: var(--text-secondary); }
+.bite-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+.bite-btn {
+  min-width: 48px;
+  min-height: 48px;
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+.bite-count { font-size: 1.25rem; font-weight: 600; min-width: 2rem; text-align: center; }
+.actions { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }
+.full { width: 100%; }

@@ -1,0 +1,118 @@
+@if (isLoading()) {
+  <app-page-title title="Edit Session" />
+  <p class="loading-msg">Loading session…</p>
+} @else if (session(); as s) {
+  <app-page-title title="Edit Session" />
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Session name</mat-label>
+    <input matInput [(ngModel)]="name" required />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Lake</mat-label>
+    <mat-select [(ngModel)]="lakeId" (ngModelChange)="onLakeChange($event)">
+      <mat-option value="">None</mat-option>
+      @for (lake of lakes(); track lake.id) {
+        <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (lakeId && availableLakeSpots().length > 0) {
+    <section class="section app-card">
+      <h2 class="section-title">Session Spots</h2>
+      @for (spot of availableLakeSpots(); track spot.id) {
+        <mat-checkbox
+          [ngModel]="isSpotSelected(spot)"
+          (ngModelChange)="toggleSpot(spot, $event)"
+        >
+          {{ spot.name }}
+        </mat-checkbox>
+      }
+      <button mat-stroked-button type="button" (click)="addNewLakeSpot()">Add new spot</button>
+    </section>
+  }
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Number of rods</mat-label>
+    <input matInput type="number" [(ngModel)]="rodCount" [min]="1" [max]="maxRodCount()" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Status</mat-label>
+    <mat-select [(ngModel)]="status">
+      @for (st of statuses; track st) {
+        <mat-option [value]="st">{{ st }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Start date & time</mat-label>
+    <input matInput type="datetime-local" [(ngModel)]="startDateLocal" required />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>End date & time (optional)</mat-label>
+    <input matInput type="datetime-local" [(ngModel)]="endDateLocal" />
+  </mat-form-field>
+  @if (dateErrorMessage) {
+    <p class="field-error">{{ dateErrorMessage }}</p>
+  }
+
+  <div class="row">
+    <mat-form-field appearance="outline">
+      <mat-label>Latitude</mat-label>
+      <input matInput type="number" step="any" [(ngModel)]="latitude" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Longitude</mat-label>
+      <input matInput type="number" step="any" [(ngModel)]="longitude" />
+    </mat-form-field>
+    <app-maps-link-button [latitude]="latitude" [longitude]="longitude" label="session" [showDirections]="true" />
+  </div>
+
+  <button mat-stroked-button type="button" (click)="refreshWeather()">Refresh weather & GPS</button>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Water temperature (°C)</mat-label>
+    <input matInput type="number" step="0.1" [(ngModel)]="waterTemperatureC" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Prebait</mat-label>
+    <input matInput [(ngModel)]="prebait" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Notes</mat-label>
+    <textarea matInput rows="3" [(ngModel)]="notes"></textarea>
+  </mat-form-field>
+
+  <div class="tags-row">
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Tags</mat-label>
+      <input matInput [(ngModel)]="tagsInput" (keyup.enter)="addTag()" />
+    </mat-form-field>
+    <button mat-stroked-button type="button" (click)="addTag()">Add tag</button>
+  </div>
+  @if (tags.length > 0) {
+    <div class="tag-list">
+      @for (tag of tags; track tag) {
+        <span class="tag-chip">{{ tag }} <button type="button" (click)="removeTag(tag)">×</button></span>
+      }
+    </div>
+  }
+
+  <div class="actions">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-flat-button type="button" [disabled]="!canSave() || saving()" (click)="save()">
+      {{ saving() ? 'Saving...' : 'Save' }}
+    </button>
+  </div>
+} @else {
+  <app-page-title title="Session not found" />
+  <p class="error-msg">This session could not be loaded. It may have been deleted.</p>
+  <a mat-stroked-button routerLink="/sessions">Back to sessions</a>
+}

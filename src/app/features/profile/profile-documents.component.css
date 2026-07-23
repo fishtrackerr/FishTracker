@@ -1,0 +1,7 @@
+.full { width: 100%; }
+.edit-panel { margin: var(--spacing-md) 0; }
+.doc-card h3 { margin: 0; color: var(--text-primary); }
+.meta { color: var(--text-muted); font-size: 0.85rem; }
+.expiry.warning { color: var(--warning); }
+.expiry.danger { color: var(--danger); }
+.actions { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }

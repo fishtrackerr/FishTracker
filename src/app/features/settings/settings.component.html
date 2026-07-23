@@ -1,0 +1,201 @@
+<app-page-title title="Settings" />
+
+<section class="section app-card">
+  <h2 class="section-title">Appearance</h2>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Theme</mat-label>
+    <mat-select [ngModel]="settings().themeMode" (ngModelChange)="updateTheme($event)">
+      <mat-option value="dark">Dark mode</mat-option>
+      <mat-option value="light">Light mode</mat-option>
+      <mat-option value="system">System preference</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div class="theme-preview" [attr.data-theme]="settings().themeMode === 'system' ? null : settings().themeMode">
+    Preview
+  </div>
+</section>
+
+<section class="section app-card">
+  <h2 class="section-title">Units</h2>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Weight</mat-label>
+    <mat-select [ngModel]="settings().weightUnit" (ngModelChange)="updateUnits('weightUnit', $event)">
+      <mat-option value="kg">Kilograms (kg)</mat-option>
+      <mat-option value="lbs">Pounds (lbs)</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Length</mat-label>
+    <mat-select [ngModel]="settings().lengthUnit" (ngModelChange)="updateUnits('lengthUnit', $event)">
+      <mat-option value="cm">Centimeters (cm)</mat-option>
+      <mat-option value="inch">Inches (inch)</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Temperature</mat-label>
+    <mat-select [ngModel]="settings().temperatureUnit" (ngModelChange)="updateUnits('temperatureUnit', $event)">
+      <mat-option value="celsius">Celsius</mat-option>
+      <mat-option value="fahrenheit">Fahrenheit</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Distance</mat-label>
+    <mat-select [ngModel]="settings().distanceUnit" (ngModelChange)="updateUnits('distanceUnit', $event)">
+      <mat-option value="m">Meters</mat-option>
+      <mat-option value="ft">Feet</mat-option>
+    </mat-select>
+  </mat-form-field>
+</section>
+
+<section class="section app-card">
+  <h2 class="section-title">Security</h2>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Lock after (minutes)</mat-label>
+    <input matInput type="number" [ngModel]="settings().lockTimeoutMinutes" (ngModelChange)="updateLockTimeout(+$event)" />
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Current PIN</mat-label>
+    <input matInput type="password" maxlength="6" [(ngModel)]="oldPin" />
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>New PIN</mat-label>
+    <input matInput type="password" maxlength="6" [(ngModel)]="newPin" />
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Confirm PIN</mat-label>
+    <input matInput type="password" maxlength="6" [(ngModel)]="confirmPin" />
+  </mat-form-field>
+  <button mat-stroked-button type="button" (click)="changePin()">Change PIN</button>
+  <button mat-stroked-button type="button" (click)="lockNow()">Lock application now</button>
+</section>
+
+<section class="section app-card">
+  <h2 class="section-title">Weather</h2>
+  <mat-checkbox [ngModel]="settings().detailedWeatherEnabled" (ngModelChange)="updateSetting('detailedWeatherEnabled', $event)">
+    Enable detailed weather
+  </mat-checkbox>
+  <mat-checkbox [ngModel]="settings().autoLoadWeather" (ngModelChange)="updateSetting('autoLoadWeather', $event)">
+    Auto-load weather
+  </mat-checkbox>
+  <mat-checkbox [ngModel]="settings().useGpsForWeather" (ngModelChange)="updateSetting('useGpsForWeather', $event)">
+    Use GPS location
+  </mat-checkbox>
+  <mat-checkbox [ngModel]="settings().showWeatherWarnings" (ngModelChange)="updateSetting('showWeatherWarnings', $event)">
+    Show weather warnings
+  </mat-checkbox>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Refresh interval (minutes)</mat-label>
+    <input matInput type="number" [ngModel]="settings().weatherRefreshMinutes" (ngModelChange)="updateSetting('weatherRefreshMinutes', +$event)" />
+  </mat-form-field>
+  <button mat-stroked-button type="button" (click)="clearWeatherCache()">Delete cached weather</button>
+</section>
+
+<section class="section app-card">
+  <h2 class="section-title">Gallery</h2>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Default sorting</mat-label>
+    <mat-select [ngModel]="settings().gallerySortDefault" (ngModelChange)="updateSetting('gallerySortDefault', $event)">
+      <mat-option value="newest">Newest</mat-option>
+      <mat-option value="oldest">Oldest</mat-option>
+      <mat-option value="favorite">Favorite first</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Thumbnail size</mat-label>
+    <mat-select [ngModel]="settings().galleryThumbnailSize" (ngModelChange)="updateSetting('galleryThumbnailSize', $event)">
+      <mat-option value="small">Small</mat-option>
+      <mat-option value="medium">Medium</mat-option>
+      <mat-option value="large">Large</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-checkbox [ngModel]="settings().galleryFavoritesFirst" (ngModelChange)="updateSetting('galleryFavoritesFirst', $event)">
+    Show favorites first
+  </mat-checkbox>
+  <button mat-stroked-button type="button" (click)="clearHomepageImage()">Clear homepage image</button>
+</section>
+
+<section class="section app-card">
+  <h2 class="section-title">General</h2>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Default lake</mat-label>
+    <mat-select [ngModel]="settings().defaultLakeId" (ngModelChange)="updateSetting('defaultLakeId', $event || undefined)">
+      <mat-option value="">None</mat-option>
+      @for (lake of lakes(); track lake.id) {
+        <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Max rods per session</mat-label>
+    <input matInput type="number" [ngModel]="settings().maxRodCount" (ngModelChange)="updateSetting('maxRodCount', +$event)" />
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Time format</mat-label>
+    <mat-select [ngModel]="settings().timeFormat" (ngModelChange)="updateSetting('timeFormat', $event)">
+      <mat-option value="24h">24 hour</mat-option>
+      <mat-option value="12h">12 hour</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>First day of week</mat-label>
+    <mat-select [ngModel]="settings().firstDayOfWeek" (ngModelChange)="updateSetting('firstDayOfWeek', $event === 0 ? 0 : 1)">
+      <mat-option [value]="0">Sunday</mat-option>
+      <mat-option [value]="1">Monday</mat-option>
+    </mat-select>
+  </mat-form-field>
+</section>
+
+<section class="section app-card">
+  <h2 class="section-title">Reset</h2>
+  <p class="reset-desc">Every reset requires confirmation. Settings resets do not delete fishing records.</p>
+
+  <h3 class="subsection">Custom options</h3>
+  <div class="reset-actions">
+    @for (cat of optionCategories; track cat) {
+      <button mat-stroked-button type="button" (click)="resetOptionCategory(cat)">Reset {{ cat }}</button>
+    }
+    <button mat-stroked-button type="button" (click)="resetAllCustomOptions()">Reset all custom options</button>
+  </div>
+
+  <h3 class="subsection">Preferences</h3>
+  <div class="reset-actions">
+    <button mat-stroked-button type="button" (click)="resetFilters()">Reset filters</button>
+    <button mat-stroked-button type="button" (click)="resetAppearance()">Reset appearance</button>
+    <button mat-stroked-button type="button" (click)="resetWeatherSettings()">Reset weather</button>
+    <button mat-stroked-button type="button" (click)="resetSecuritySettings()">Reset security</button>
+    <button mat-stroked-button type="button" (click)="resetAllSettings()">Reset all settings</button>
+  </div>
+
+  <h3 class="subsection danger">Full application reset</h3>
+  <p class="reset-warning">Permanently removes all locally stored data. Type RESET to continue.</p>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Confirmation</mat-label>
+    <input matInput [ngModel]="fullResetInput()" (ngModelChange)="fullResetInput.set($event)" placeholder="RESET" />
+  </mat-form-field>
+  <button mat-stroked-button color="warn" type="button" (click)="resetFullApplication()">Reset entire application</button>
+</section>
+
+<section class="section app-card">
+  <h2 class="section-title">Data</h2>
+  <button mat-flat-button class="action-btn" type="button" (click)="exportBackup()" [disabled]="exporting()">
+    {{ exporting() ? 'Exporting...' : 'Export JSON Backup' }}
+  </button>
+  <label class="import-btn">
+    <input type="file" accept=".json" (change)="importBackup($event)" hidden />
+    <span mat-stroked-button>Import JSON Backup</span>
+  </label>
+</section>
+
+<section class="section app-card about">
+  <h2 class="section-title">About</h2>
+  <p>Fish Tracker — offline-first fishing register.</p>
+  <a routerLink="/profile">Profile</a>
+  ·
+  <a routerLink="/profile/documents">Documents</a>
+  ·
+  <a routerLink="/release-notes">Release Notes</a>
+</section>
+
+@if (message()) {
+  <p class="message">{{ message() }}</p>
+}

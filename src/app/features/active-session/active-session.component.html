@@ -1,0 +1,70 @@
+@if (session(); as s) {
+  <div class="active">
+    <div class="timer">{{ timer() }}</div>
+
+    <div class="stats-row">
+      <span>{{ catches().length }} catches</span>
+      @if (s.totalCatchWeightKg > 0) {
+        <span>· {{ s.totalCatchWeightKg | formatWeight }}</span>
+      }
+      @if (s.biggestFishKg) {
+        <span>· Best: {{ s.biggestFishKg | formatWeight }}</span>
+      }
+    </div>
+
+    @if (catches().length > 0) {
+      <section class="catch-list">
+        <h3>Recent catches</h3>
+        <ul>
+          @for (c of catches(); track c.id) {
+            <li>
+              <span class="species">{{ c.species }}</span>
+              @if (c.weightKg) {
+                <span class="weight">{{ c.weightKg | formatWeight }}</span>
+              }
+              <span class="time">{{ c.caughtAt | date:'shortTime' }}</span>
+            </li>
+          }
+        </ul>
+        <a [routerLink]="['/sessions', s.id]" class="view-all">View session details</a>
+      </section>
+    }
+
+    <app-weather-card [weather]="s.weather" />
+    <button mat-button class="refresh" (click)="refreshWeather()">Refresh weather & GPS</button>
+
+    @if (s.latitude != null && s.longitude != null) {
+      <p class="gps">
+        📍 {{ s.latitude.toFixed(5) }}, {{ s.longitude.toFixed(5) }}
+        <app-maps-link-button
+          [latitude]="s.latitude"
+          [longitude]="s.longitude"
+          label="current session"
+          [showDirections]="true"
+        />
+      </p>
+    }
+
+    @if (showNotes()) {
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Notes</mat-label>
+        <textarea matInput rows="3" [(ngModel)]="notes" (blur)="saveNotes()"></textarea>
+      </mat-form-field>
+    }
+
+    <div class="actions">
+      <button mat-flat-button class="action-btn primary" (click)="quickCatch()">
+        🐟 Add Catch
+      </button>
+      <button mat-flat-button class="action-btn" (click)="quickCamera()">
+        📷 Camera
+      </button>
+      <button mat-flat-button class="action-btn" (click)="toggleNotes()">
+        📝 Notes
+      </button>
+      <button mat-stroked-button class="action-btn end" (click)="complete()">
+        End Session
+      </button>
+    </div>
+  </div>
+}

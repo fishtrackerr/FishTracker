@@ -1,0 +1,104 @@
+@if (session(); as s) {
+  <h1>{{ s.name }}</h1>
+  <p class="meta">{{ lakeName() }} · {{ s.startDate | date:'medium' }} · {{ durationText() }}</p>
+  <p class="status" [class]="s.status">{{ s.status }}</p>
+
+  @if (s.weather) {
+    <app-weather-card [weather]="s.weather" />
+  }
+
+  <div class="fields">
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Prebait</mat-label>
+      <input matInput [(ngModel)]="prebait" (blur)="saveNotes()" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Notes</mat-label>
+      <textarea matInput rows="3" [(ngModel)]="notes" (blur)="saveNotes()"></textarea>
+    </mat-form-field>
+  </div>
+
+  @if (s.latitude != null && s.longitude != null) {
+    <p class="gps">
+      📍 {{ s.latitude.toFixed(5) }}, {{ s.longitude.toFixed(5) }}
+      <app-maps-link-button
+        [latitude]="s.latitude"
+        [longitude]="s.longitude"
+        label="session location"
+        [showDirections]="true"
+      />
+    </p>
+  }
+
+  @if (s.rods && s.rods.length > 0) {
+    <app-expandable-section sectionId="session-rods" label="Rods and spots" [defaultExpanded]="true">
+      <div expandHeader class="expand-label">More info — Rods & Spots</div>
+      @if (rodSummary; as summary) {
+        <div class="rod-stats">
+          <span>{{ summary.total }} rods</span>
+          <span>{{ summary.active }} active</span>
+          <span>{{ summary.bites }} bites</span>
+          <span>{{ summary.spotted }} spotted</span>
+        </div>
+      }
+      @for (rod of s.rods; track rod.id) {
+        <app-rod-card
+          [session]="s"
+          [rod]="rod"
+          [catches]="catches()"
+          [sessionSpots]="s.sessionSpots ?? []"
+          (changed)="onRodChanged()"
+        />
+      }
+    </app-expandable-section>
+    <app-rod-summary [session]="s" [catches]="catches()" />
+  }
+
+  <app-session-timeline [sessionId]="s.id" />
+
+  <section class="section">
+    <div class="section-header">
+      <h2>Catches ({{ catches().length }})</h2>
+      <a mat-button [routerLink]="['/sessions', s.id, 'catches', 'new']">Add Catch</a>
+    </div>
+    @for (c of catches(); track c.id) {
+      <div class="catch-row">
+        @if (c.photoId) {
+          <div class="catch-photo"><app-image-thumb [imageId]="c.photoId" /></div>
+        }
+        <div class="catch-info">
+          <div class="catch-header">
+            <div class="catch-title">
+              <strong>{{ c.species }}</strong>
+              @if (c.isPersonalRecord) { <span class="pr">PR</span> }
+            </div>
+            @if (c.latitude != null && c.longitude != null) {
+              <app-maps-link-button
+                [latitude]="c.latitude"
+                [longitude]="c.longitude"
+                label="catch location"
+              />
+            }
+          </div>
+          <div class="catch-meta">
+            {{ c.weightKg | formatWeight }} · {{ c.lengthCm | formatLength }}
+            · {{ c.caughtAt | date:'short' }}
+            @if (c.sessionSpotId) { · {{ spotName(c.sessionSpotId) }} }
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+
+  <div class="actions">
+    <button mat-stroked-button (click)="editSession()">Edit Session</button>
+    @if (s.status === 'active') {
+      <button mat-flat-button class="cta" (click)="complete()">Complete Session</button>
+    }
+    <button mat-stroked-button color="warn" (click)="deleteSession()">Delete</button>
+  </div>
+} @else {
+  <h1>Session not found</h1>
+  <p class="error-msg">This session could not be loaded.</p>
+  <a mat-stroked-button routerLink="/sessions">Back to sessions</a>
+}

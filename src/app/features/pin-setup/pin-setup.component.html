@@ -1,0 +1,24 @@
+<div class="pin-screen">
+  <h1>Set PIN</h1>
+  <p>{{ step() === 'enter' ? 'Choose a 6-digit PIN' : 'Confirm your PIN' }}</p>
+  <div class="dots">
+    @for (i of [0,1,2,3,4,5]; track i) {
+      <span class="dot" [class.filled]="(step() === 'enter' ? pin() : confirmPin()).length > i"></span>
+    }
+  </div>
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+  <div class="numpad">
+    @for (d of ['1','2','3','4','5','6','7','8','9','','0','⌫']; track $index) {
+      @if (d) {
+        <button type="button" class="key" (click)="d === '⌫' ? removeDigit() : addDigit(d)">{{ d }}</button>
+      } @else {
+        <span></span>
+      }
+    }
+  </div>
+  @if ((step() === 'enter' && pin().length === 6) || (step() === 'confirm' && confirmPin().length === 6)) {
+    <button mat-flat-button class="cta" (click)="next()">Continue</button>
+  }
+</div>

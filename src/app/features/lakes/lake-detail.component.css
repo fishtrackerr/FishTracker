@@ -1,0 +1,40 @@
+.title-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.75rem;
+  font-weight: 600;
+  width: 100%;
+  outline: none;
+}
+.full { width: 100%; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.section { margin: 24px 0; }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.section h2 { margin: 0; font-size: 1rem; color: #888; }
+.spot-card {
+  padding: 12px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #333;
+}
+.spot-actions { margin-top: 8px; }
+.spot-edit {
+  padding: 16px;
+  background: #111;
+  border-radius: 12px;
+  margin: 16px 0;
+  border: 1px solid #ff6b00;
+}
+.save-btn {
+  width: 100%;
+  background: #ff6b00 !important;
+  color: #000 !important;
+}
+.delete-btn { width: 100%; margin-top: 24px; }

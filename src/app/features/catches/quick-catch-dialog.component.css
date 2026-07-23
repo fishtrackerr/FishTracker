@@ -1,0 +1,45 @@
+.quick-catch-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: 0;
+  color: var(--text-primary);
+  background: var(--background-card);
+}
+
+:host {
+  display: block;
+  color: var(--text-primary);
+  background: var(--background-card);
+}
+
+:host ::ng-deep h2.mat-mdc-dialog-title {
+  color: var(--primary) !important;
+  background: var(--background-card);
+}
+
+.full {
+  width: 100%;
+}
+
+.photo-row {
+  margin: var(--spacing-xs) 0;
+}
+
+.more-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.dialog-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--background-card);
+  padding-top: var(--spacing-sm);
+}
+
+.save-btn {
+  background: var(--primary) !important;
+  color: var(--text-on-primary) !important;
+}

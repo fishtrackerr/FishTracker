@@ -1,0 +1,31 @@
+<div class="shell">
+  <main class="content">
+    <router-outlet />
+  </main>
+  <nav class="bottom-nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <mat-icon>home</mat-icon>
+      <span>Home</span>
+    </a>
+    <a routerLink="/sessions" routerLinkActive="active">
+      <mat-icon>event</mat-icon>
+      <span>Sessions</span>
+    </a>
+    <a routerLink="/lakes" routerLinkActive="active">
+      <mat-icon>water</mat-icon>
+      <span>Lakes</span>
+    </a>
+    <a routerLink="/gallery" routerLinkActive="active">
+      <mat-icon>photo_library</mat-icon>
+      <span>Gallery</span>
+    </a>
+    <a routerLink="/statistics" routerLinkActive="active">
+      <mat-icon>bar_chart</mat-icon>
+      <span>Stats</span>
+    </a>
+    <a routerLink="/settings" routerLinkActive="active">
+      <mat-icon>settings</mat-icon>
+      <span>Settings</span>
+    </a>
+  </nav>
+</div>

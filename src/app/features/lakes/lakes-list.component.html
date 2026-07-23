@@ -1,0 +1,28 @@
+<app-page-title title="Lakes" />
+<button mat-flat-button class="add-btn" (click)="addLake()">Add Lake</button>
+
+@if (sortedLakes.length === 0) {
+  <app-empty-state
+    title="No lakes saved"
+    message="Add your favorite fishing lakes to get started."
+  />
+} @else {
+  @for (lake of sortedLakes; track lake.id) {
+    <a [routerLink]="['/lakes', lake.id]" class="lake-card">
+      <div class="cover">
+        <app-image-thumb
+          [imageId]="lake.coverImageId ?? lake.photoIds[0]"
+          [alt]="lake.name"
+          placeholder="🏞"
+        />
+      </div>
+      <div class="info">
+        <span class="name">{{ lake.name }}</span>
+        <span class="spots">{{ lake.spots.length }} spots</span>
+      </div>
+      <button mat-icon-button (click)="toggleFavorite($event, lake.id)" aria-label="Toggle favorite">
+        <mat-icon>{{ lake.isFavorite ? 'star' : 'star_border' }}</mat-icon>
+      </button>
+    </a>
+  }
+}

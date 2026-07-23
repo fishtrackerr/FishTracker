@@ -1,0 +1,36 @@
+import { WeatherSnapshot } from './weather-snapshot.model';
+
+export interface Catch {
+  id: string;
+  sessionId: string;
+  rodId?: string;
+  sessionSpotId?: string;
+  species: string;
+  fishName?: string;
+  caughtAt: string;
+  weightKg?: number;
+  lengthCm?: number;
+  bait?: string;
+  baitFlavor?: string;
+  rig?: string;
+  hookSize?: string;
+  line?: string;
+  method?: string;
+  weatherType?: string;
+  tags?: string[];
+  /** @deprecated Use sessionSpotId — kept for lake spot backward compat */
+  spotId?: string;
+  latitude?: number;
+  longitude?: number;
+  distanceM?: number;
+  waterDepthM?: number;
+  waterTemperatureC?: number;
+  photoId?: string;
+  notes?: string;
+  released?: boolean;
+  isPersonalRecord?: boolean;
+  prebait?: string;
+  weather?: WeatherSnapshot;
+  createdAt: string;
+  updatedAt: string;
+}

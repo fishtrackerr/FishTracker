@@ -1,0 +1,36 @@
+<app-page-title title="Gallery" />
+
+<div class="filters">
+  <mat-form-field appearance="outline">
+    <mat-label>Lake</mat-label>
+    <mat-select [(ngModel)]="selectedLake" (ngModelChange)="onFilterChange()">
+      <mat-option value="">All</mat-option>
+      @for (lake of lakes; track lake.id) {
+        <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Species</mat-label>
+    <mat-select [(ngModel)]="selectedSpecies" (ngModelChange)="onFilterChange()">
+      <mat-option value="">All</mat-option>
+      @for (s of species; track s) {
+        <mat-option [value]="s">{{ s }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <label class="filter-check">
+    <input type="checkbox" [ngModel]="favoritesOnly()" (ngModelChange)="favoritesOnly.set($event); onFilterChange()" />
+    Favorites
+  </label>
+  <label class="filter-check">
+    <input type="checkbox" [ngModel]="personalOnly()" (ngModelChange)="personalOnly.set($event); onFilterChange()" />
+    Personal Records
+  </label>
+</div>
+
+@if (items().length === 0) {
+  <app-empty-state title="No photos" message="Add catch or session photos while fishing." />
+} @else {
+  <app-image-gallery [galleryItems]="items()" [allowDelete]="true" (changed)="buildItems()" />
+}

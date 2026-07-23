@@ -1,0 +1,22 @@
+.loading-msg { color: var(--text-secondary); text-align: center; padding: var(--spacing-lg); }
+.row { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); align-items: center; }
+.section { margin: var(--spacing-md) 0; }
+.field-error { color: var(--danger); font-size: 0.85rem; }
+.error-msg { color: var(--text-secondary); margin-bottom: var(--spacing-md); }
+.actions { display: flex; gap: var(--spacing-sm); justify-content: flex-end; margin-top: var(--spacing-lg); }
+.tags-row { display: flex; gap: var(--spacing-sm); align-items: flex-start; }
+.tag-list { display: flex; flex-wrap: wrap; gap: var(--spacing-xs); margin-bottom: var(--spacing-md); }
+.tag-chip {
+  background: var(--background-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  font-size: 0.85rem;
+}
+.tag-chip button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-left: 4px;
+}

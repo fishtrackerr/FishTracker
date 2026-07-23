@@ -1,0 +1,48 @@
+<app-page-title title="Dashboard" />
+
+@if (homepageUrl(); as hero) {
+  <div class="homepage-hero">
+    <img [src]="hero" alt="Homepage" />
+  </div>
+}
+
+@if (loadError(); as err) {
+  <app-error-state [message]="err" (retry)="loadDashboard()" />
+} @else {
+  <button mat-flat-button class="start-btn" (click)="startSession()" [disabled]="starting() || loading()">
+    {{ starting() ? 'Starting...' : 'Start Fishing Session' }}
+  </button>
+
+  @if (activeSession(); as active) {
+    <button mat-stroked-button class="continue-btn" (click)="continueSession()">
+      Continue Active Session — {{ active.catchCount }} catches
+    </button>
+  }
+
+  @if (stats(); as s) {
+    <div class="stats-grid">
+      <app-stat-card label="Sessions" [value]="s.totalSessions" />
+      <app-stat-card label="Catches" [value]="s.totalCatches" />
+      <app-stat-card label="Biggest Fish" [value]="s.biggestFishKg ? (s.biggestFishKg | formatWeight) : '—'" />
+      <app-stat-card label="Favorite Lake" [value]="s.favoriteLake ?? '—'" />
+    </div>
+  }
+
+  <section class="section">
+    <h2 class="section-title">Current Weather</h2>
+    <app-weather-card
+      [weather]="weather() ?? undefined"
+      [detailed]="settings.get().detailedWeatherEnabled"
+      [showRefresh]="true"
+    />
+  </section>
+
+  @if (recentSessions.length > 0) {
+    <section class="section">
+      <h2 class="section-title">Recent Sessions</h2>
+      @for (session of recentSessions; track session.id) {
+        <app-session-card [session]="session" />
+      }
+    </section>
+  }
+}
