@@ -45,7 +45,6 @@
     "systemPreference": "System preference",
     "preview": "Preview",
     "language": "Language",
-    "languageSwitch": "Language switch",
     "units": "Units",
     "weight": "Weight",
     "length": "Length",
@@ -116,7 +115,10 @@
     "aboutText": "Fish Tracker — offline-first fishing register.",
     "profile": "Profile",
     "documents": "Documents",
-    "releaseNotes": "Release Notes"
+    "releaseNotes": "Release Notes",
+    "changelog": "Changelog",
+    "changelogDesc": "Review release history generated from commit messages.",
+    "openChangelog": "Open changelog"
     ,"homepageImageCleared": "Homepage image cleared",
     "resetAllCustomTitle": "Reset all custom options?",
     "resetAllCustomMessage": "All custom dropdown options will be removed. Favorites are kept where possible.",
@@ -180,6 +182,7 @@
   },
   "nav": {
     "home": "Home",
+    "current": "Current",
     "sessions": "Sessions",
     "lakes": "Lakes",
     "gallery": "Gallery",
@@ -201,6 +204,8 @@
   },
   "sessions": {
     "title": "Sessions",
+    "currentSection": "Current Session",
+    "historySection": "Session History",
     "searchPlaceholder": "Search sessions",
     "filter": "Filter",
     "filters": "Filters",
@@ -312,6 +317,13 @@
     "cover": "cover",
     "description": "Description",
     "address": "Address",
+    "lookupCoordinates": "Find coordinates from address",
+    "lookupLoading": "Looking up coordinates...",
+    "lookupNeedsAddress": "Enter a lake name or address first.",
+    "lookupSuccess": "Coordinates found and saved.",
+    "lookupOffline": "No internet connection. Enter coordinates manually or try again online.",
+    "lookupNotFound": "No coordinates found for this location.",
+    "lookupFailed": "Could not look up coordinates right now.",
     "rules": "Rules",
     "permitInformation": "Permit Information",
     "fishingSpots": "Fishing Spots",
@@ -481,5 +493,11 @@
     "appVersion": "App version",
     "checkForUpdates": "Check for updates",
     "checkingForUpdates": "Checking for updates..."
+  },
+  "releaseNotes": {
+    "title": "Changelog",
+    "loading": "Loading changelog...",
+    "version": "Version",
+    "empty": "No changelog available."
   }
 }
