@@ -1,1 +1,0 @@
-import{Ib as o,Jb as a,Ua as n,dc as p,ec as l,hb as i}from"./chunk-EDKRMITB.js";var s=class t{title;static \u0275fac=function(e){return new(e||t)};static \u0275cmp=i({type:t,selectors:[["app-page-title"]],inputs:{title:"title"},decls:2,vars:1,consts:[[1,"app-title"]],template:function(e,c){e&1&&(o(0,"h1",0),p(1),a()),e&2&&(n(),l(c.title))},encapsulation:2})};export{s as a};
