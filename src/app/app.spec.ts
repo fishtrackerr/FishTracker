@@ -2,6 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { App } from './app';
 import { AppStartupService } from './core/services/app-startup.service';
+import { ThemeService } from './core/services/theme.service';
+import { I18nService } from './core/services/i18n.service';
+import { SwUpdateService } from './core/services/sw-update.service';
+import { VersionCheckService } from './core/services/version-check.service';
 import { signal } from '@angular/core';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
@@ -17,6 +21,22 @@ describe('App', () => {
             isReady: signal(true).asReadonly(),
             performInitialNavigation: vi.fn(),
           },
+        },
+        {
+          provide: ThemeService,
+          useValue: {},
+        },
+        {
+          provide: I18nService,
+          useValue: {},
+        },
+        {
+          provide: SwUpdateService,
+          useValue: {},
+        },
+        {
+          provide: VersionCheckService,
+          useValue: {},
         },
       ],
     }).compileComponents();

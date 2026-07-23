@@ -470,6 +470,9 @@
     "pinsDoNotMatch": "Pincodes komen niet overeen",
     "unlock": "Ontgrendelen",
     "enterPin": "Voer je pincode van 6 cijfers in",
-    "incorrectPin": "Onjuiste pincode"
+    "incorrectPin": "Onjuiste pincode",
+    "appVersion": "App-versie",
+    "checkForUpdates": "Controleren op updates",
+    "checkingForUpdates": "Bezig met controleren op updates..."
   }
 }

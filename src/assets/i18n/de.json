@@ -470,6 +470,9 @@
     "pinsDoNotMatch": "PINs stimmen nicht überein",
     "unlock": "Entsperren",
     "enterPin": "Gib deine 6-stellige PIN ein",
-    "incorrectPin": "Falsche PIN"
+    "incorrectPin": "Falsche PIN",
+    "appVersion": "App-Version",
+    "checkForUpdates": "Nach Updates suchen",
+    "checkingForUpdates": "Suche nach Updates..."
   }
 }

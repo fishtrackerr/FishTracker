@@ -1,0 +1,113 @@
+import { PLATFORM_ID, signal } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { PinUnlockComponent } from './pin-unlock.component';
+import { AppStartupService } from '../../core/services/app-startup.service';
+import { I18nService } from '../../core/services/i18n.service';
+import { PinLockService } from '../../core/services/pin-lock.service';
+import { Router } from '@angular/router';
+import { SwUpdateService } from '../../core/services/sw-update.service';
+
+describe('PinUnlockComponent', () => {
+  const translations: Record<string, string> = {
+    'pin.unlock': 'Unlock',
+    'pin.enterPin': 'Enter your 6-digit PIN',
+    'pin.appVersion': 'App version',
+    'pin.checkForUpdates': 'Check for updates',
+    'pin.checkingForUpdates': 'Checking for updates...',
+    'pin.incorrectPin': 'Incorrect PIN',
+  };
+
+  let swUpdateService: { checkForUpdatesNow: ReturnType<typeof vi.fn> };
+
+  beforeEach(async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue({ version: '2.3.4' }),
+      }),
+    );
+
+    swUpdateService = {
+      checkForUpdatesNow: vi.fn(),
+    };
+
+    await TestBed.configureTestingModule({
+      imports: [PinUnlockComponent],
+      providers: [
+        {
+          provide: PLATFORM_ID,
+          useValue: 'browser',
+        },
+        {
+          provide: Router,
+          useValue: {
+            navigateByUrl: vi.fn().mockResolvedValue(true),
+          },
+        },
+        {
+          provide: PinLockService,
+          useValue: {
+            verifyPin: vi.fn().mockResolvedValue(true),
+            hasPinConfigured: vi.fn(),
+            isAppLocked: vi.fn(),
+          },
+        },
+        {
+          provide: AppStartupService,
+          useValue: {
+            consumeReturnUrl: vi.fn().mockReturnValue('/'),
+            resolveInitialRoute: vi.fn().mockResolvedValue('/'),
+          },
+        },
+        {
+          provide: I18nService,
+          useValue: {
+            language: signal('en'),
+            dictionary: signal({}),
+            t: (key: string) => translations[key] ?? key,
+          },
+        },
+        {
+          provide: SwUpdateService,
+          useValue: swUpdateService,
+        },
+      ],
+    }).compileComponents();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('shows the current version after a manual refresh', async () => {
+    const fixture = TestBed.createComponent(PinUnlockComponent);
+    fixture.detectChanges();
+
+    await fixture.componentInstance.checkForUpdates();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.version').textContent).toContain('v2.3.4');
+
+    const button = fixture.nativeElement.querySelector('button.cta') as HTMLButtonElement;
+    expect(button.textContent).toContain('Check for updates');
+
+    expect(swUpdateService.checkForUpdatesNow).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('invokes the update check when the button is pressed', async () => {
+    const fixture = TestBed.createComponent(PinUnlockComponent);
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('button.cta') as HTMLButtonElement;
+    const refreshSpy = vi
+      .spyOn(fixture.componentInstance, 'checkForUpdates')
+      .mockResolvedValue(undefined);
+
+    button.click();
+
+    expect(refreshSpy).toHaveBeenCalledTimes(1);
+  });
+});
