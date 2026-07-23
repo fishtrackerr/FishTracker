@@ -45,7 +45,6 @@
     "systemPreference": "Systemeinstellung",
     "preview": "Vorschau",
     "language": "Sprache",
-    "languageSwitch": "Sprachumschalter",
     "units": "Einheiten",
     "weight": "Gewicht",
     "length": "Länge",
@@ -116,7 +115,10 @@
     "aboutText": "Fish Tracker — Offline-First Fangregister.",
     "profile": "Profil",
     "documents": "Dokumente",
-    "releaseNotes": "Release Notes"
+    "releaseNotes": "Release Notes",
+    "changelog": "Änderungsprotokoll",
+    "changelogDesc": "Sieh dir den Versionsverlauf an, der aus Commit-Nachrichten erzeugt wird.",
+    "openChangelog": "Änderungsprotokoll öffnen"
     ,"homepageImageCleared": "Startseitenbild gelöscht",
     "resetAllCustomTitle": "Alle benutzerdefinierten Optionen zurücksetzen?",
     "resetAllCustomMessage": "Alle benutzerdefinierten Dropdown-Optionen werden entfernt. Favoriten bleiben nach Möglichkeit erhalten.",
@@ -180,6 +182,7 @@
   },
   "nav": {
     "home": "Start",
+    "current": "Aktuell",
     "sessions": "Sitzungen",
     "lakes": "Seen",
     "gallery": "Galerie",
@@ -201,6 +204,8 @@
   },
   "sessions": {
     "title": "Sitzungen",
+    "currentSection": "Aktive Sitzung",
+    "historySection": "Sitzungsverlauf",
     "searchPlaceholder": "Sitzungen suchen",
     "filter": "Filter",
     "filters": "Filter",
@@ -312,6 +317,13 @@
     "cover": "Titelbild",
     "description": "Beschreibung",
     "address": "Adresse",
+    "lookupCoordinates": "Koordinaten aus Adresse finden",
+    "lookupLoading": "Koordinaten werden gesucht...",
+    "lookupNeedsAddress": "Bitte zuerst Seenamen oder Adresse eingeben.",
+    "lookupSuccess": "Koordinaten gefunden und gespeichert.",
+    "lookupOffline": "Keine Internetverbindung. Koordinaten manuell eingeben oder online erneut versuchen.",
+    "lookupNotFound": "Für diesen Ort wurden keine Koordinaten gefunden.",
+    "lookupFailed": "Koordinaten konnten derzeit nicht ermittelt werden.",
     "rules": "Regeln",
     "permitInformation": "Genehmigungsinformationen",
     "fishingSpots": "Angelplätze",
@@ -481,5 +493,11 @@
     "appVersion": "App-Version",
     "checkForUpdates": "Nach Updates suchen",
     "checkingForUpdates": "Suche nach Updates..."
+  },
+  "releaseNotes": {
+    "title": "Änderungsprotokoll",
+    "loading": "Änderungsprotokoll wird geladen...",
+    "version": "Version",
+    "empty": "Kein Änderungsprotokoll verfügbar."
   }
 }

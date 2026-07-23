@@ -1,16 +1,18 @@
 <div class="pin-screen">
+  <button
+    type="button"
+    mat-icon-button
+    class="update-refresh"
+    [disabled]="checkingForUpdates()"
+    [attr.aria-label]="checkingForUpdates() ? ('pin.checkingForUpdates' | tr) : ('pin.checkForUpdates' | tr)"
+    [attr.title]="checkingForUpdates() ? ('pin.checkingForUpdates' | tr) : ('pin.checkForUpdates' | tr)"
+    (click)="checkForUpdates()"
+  >
+    <mat-icon aria-hidden="true">refresh</mat-icon>
+  </button>
   <h1>{{ 'pin.unlock' | tr }}</h1>
   <p>{{ 'pin.enterPin' | tr }}</p>
   <p class="version">{{ 'pin.appVersion' | tr }} v{{ version() }}</p>
-  <button
-    type="button"
-    mat-flat-button
-    class="cta"
-    [disabled]="checkingForUpdates()"
-    (click)="checkForUpdates()"
-  >
-    {{ checkingForUpdates() ? ('pin.checkingForUpdates' | tr) : ('pin.checkForUpdates' | tr) }}
-  </button>
   <div class="dots">
     @for (i of [0,1,2,3,4,5]; track i) {
       <span class="dot" [class.filled]="pin().length > i"></span>

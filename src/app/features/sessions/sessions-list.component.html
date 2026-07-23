@@ -22,7 +22,7 @@
   </mat-form-field>
 </div>
 
-<p class="result-count">{{ sessions().length }} {{ 'sessions.sessionCount' | tr }}</p>
+<p class="result-count">{{ visibleSessionCount() }} {{ 'sessions.sessionCount' | tr }}</p>
 
 <div class="desktop-filters">
   <app-expandable-section
@@ -42,18 +42,35 @@
   {{ starting() ? ('sessions.starting' | tr) : ('sessions.startSession' | tr) }}
 </button>
 
-@if (sessions().length === 0) {
+@if (!showCurrentSession() && historySessions().length === 0) {
   <app-empty-state
     title="sessions.emptyTitle"
     message="sessions.emptyMessage"
   />
 } @else {
-  @for (session of sessions(); track session.id; let i = $index) {
-    <app-session-card
-      [session]="session"
-      [lakeName]="getLakeName(session.lakeId)"
-      [defaultExpanded]="i === 0"
-      (editSession)="editSession($event)"
-    />
+  @if (showCurrentSession() && currentSession(); as current) {
+    <section class="session-section">
+      <h2 class="section-title">{{ 'sessions.currentSection' | tr }}</h2>
+      <app-session-card
+        [session]="current"
+        [lakeName]="getLakeName(current.lakeId)"
+        [defaultExpanded]="true"
+        (editSession)="editSession($event)"
+      />
+    </section>
+  }
+
+  @if (historySessions().length > 0) {
+    <section class="session-section">
+      <h2 class="section-title">{{ 'sessions.historySection' | tr }}</h2>
+      @for (session of historySessions(); track session.id; let i = $index) {
+        <app-session-card
+          [session]="session"
+          [lakeName]="getLakeName(session.lakeId)"
+          [defaultExpanded]="!showCurrentSession() && i === 0"
+          (editSession)="editSession($event)"
+        />
+      }
+    </section>
   }
 }

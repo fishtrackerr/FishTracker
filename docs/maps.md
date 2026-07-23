@@ -14,6 +14,8 @@ FishTracker opens locations in Google Maps via external URLs. There is no embedd
 
 URLs open with `window.open(url, '_blank', 'noopener,noreferrer')`.
 
+Coordinate lookup for lakes is handled by `LakeGeocodingService` (`src/app/core/services/lake-geocoding.service.ts`), which queries OpenStreetMap Nominatim when internet is available.
+
 ## UI
 
 `app-maps-link-button` is shown when coordinates are valid. Used on:
@@ -37,3 +39,5 @@ Tooltips and `aria-label` describe the action. Directions mode requests current 
 ## Missing coordinates
 
 When latitude/longitude are missing or invalid, the maps button is hidden.
+
+When geocoding is unavailable (offline/error/not found), users can still enter coordinates manually.

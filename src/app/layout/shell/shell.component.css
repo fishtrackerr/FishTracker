@@ -13,6 +13,11 @@
   padding-bottom: calc(72px + env(safe-area-inset-bottom));
 }
 
+.content:focus-visible {
+  outline: 2px solid var(--border-active);
+  outline-offset: -2px;
+}
+
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -50,4 +55,18 @@
   font-size: 22px;
   width: 22px;
   height: 22px;
+}
+
+.bottom-nav.with-current a {
+  min-width: 40px;
+  padding: 4px 4px;
+  font-size: 0.6rem;
+}
+
+@media (min-width: 769px) {
+  .bottom-nav.with-current a {
+    min-width: 48px;
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
 }

@@ -90,8 +90,8 @@ describe('PinUnlockComponent', () => {
 
     expect(fixture.nativeElement.querySelector('.version').textContent).toContain('v2.3.4');
 
-    const button = fixture.nativeElement.querySelector('button.cta') as HTMLButtonElement;
-    expect(button.textContent).toContain('Check for updates');
+    const button = fixture.nativeElement.querySelector('button.update-refresh') as HTMLButtonElement;
+    expect(button.getAttribute('aria-label')).toBe('Check for updates');
 
     expect(swUpdateService.checkForUpdatesNow).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledTimes(2);
@@ -101,7 +101,7 @@ describe('PinUnlockComponent', () => {
     const fixture = TestBed.createComponent(PinUnlockComponent);
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('button.cta') as HTMLButtonElement;
+    const button = fixture.nativeElement.querySelector('button.update-refresh') as HTMLButtonElement;
     const refreshSpy = vi
       .spyOn(fixture.componentInstance, 'checkForUpdates')
       .mockResolvedValue(undefined);

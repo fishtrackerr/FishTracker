@@ -11,6 +11,8 @@ import { LakeService } from '../../core/services/lake.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { ImageRepository } from '../../core/services/image.repository';
 import { ImageService } from '../../core/services/image.service';
+import { NotificationService } from '../../core/services/notification.service';
+import { LakeGeocodingService } from '../../core/services/lake-geocoding.service';
 import { FishingSpot } from '../../core/models';
 import { ImageThumbComponent } from '../../shared/components/image-thumb/image-thumb.component';
 import { ImagePickerComponent } from '../../shared/components/image-picker/image-picker.component';
@@ -46,6 +48,8 @@ export class LakeDetailComponent {
   private readonly confirm = inject(ConfirmService);
   private readonly imageRepo = inject(ImageRepository);
   private readonly imageService = inject(ImageService);
+  private readonly geocoding = inject(LakeGeocodingService);
+  private readonly notifications = inject(NotificationService);
   private readonly i18n = inject(I18nService);
 
   readonly lake = toSignal(
@@ -56,6 +60,7 @@ export class LakeDetailComponent {
 
   readonly lakeImages = signal<GalleryImageItem[]>([]);
   readonly editingSpot = signal<FishingSpot | null>(null);
+  readonly lookingUpCoordinates = signal(false);
   spotName = '';
   spotDepth?: number;
   spotBottom = '';
@@ -119,6 +124,41 @@ export class LakeDetailComponent {
       coverImageId: l.coverImageId,
       photoIds: l.photoIds,
     });
+  }
+
+  async lookupCoordinates(): Promise<void> {
+    const l = this.lake();
+    if (!l) return;
+
+    const query = (l.address?.trim() || l.name?.trim() || '');
+    if (!query) {
+      this.notifications.info(this.i18n.t('lakes.lookupNeedsAddress'));
+      return;
+    }
+
+    this.lookingUpCoordinates.set(true);
+    const result = await this.geocoding.lookupCoordinates(query);
+    this.lookingUpCoordinates.set(false);
+
+    if (result.status === 'success') {
+      this.updateField('latitude', result.latitude);
+      this.updateField('longitude', result.longitude);
+      await this.saveLake();
+      this.notifications.success(this.i18n.t('lakes.lookupSuccess'));
+      return;
+    }
+
+    if (result.status === 'offline') {
+      this.notifications.offline(this.i18n.t('lakes.lookupOffline'));
+      return;
+    }
+
+    if (result.status === 'not-found') {
+      this.notifications.warning(this.i18n.t('lakes.lookupNotFound'));
+      return;
+    }
+
+    this.notifications.error(this.i18n.t('lakes.lookupFailed'));
   }
 
   updateField(field: string, value: unknown): void {

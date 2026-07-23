@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, PLATFORM_ID, inject, signal } from 
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { PinLockService } from '../../core/services/pin-lock.service';
 import { AppStartupService } from '../../core/services/app-startup.service';
 import { I18nService } from '../../core/services/i18n.service';
@@ -11,7 +12,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 @Component({
   selector: 'app-pin-unlock',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatButtonModule, TranslatePipe],
+  imports: [MatButtonModule, MatIconModule, TranslatePipe],
   templateUrl: './pin-unlock.component.html',
   styleUrl: '../pin-setup/pin.component.css',
 })

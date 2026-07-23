@@ -65,7 +65,7 @@ export interface SessionCreateDialogData {
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close type="button">Cancel</button>
+      <button mat-stroked-button mat-dialog-close type="button" class="cancel-btn">Cancel</button>
       <button
         mat-flat-button
         type="button"
@@ -85,6 +85,20 @@ export interface SessionCreateDialogData {
     .dialog-title { text-align: center; width: 100%; }
     .full { width: 100%; }
     .field-error { color: var(--danger, #d64545); font-size: 0.85rem; margin: -8px 0 8px; }
+    mat-dialog-content {
+      color: var(--primary);
+    }
+    mat-dialog-content .mat-mdc-form-field {
+      --mdc-outlined-text-field-outline-color: var(--border-active);
+      --mdc-outlined-text-field-hover-outline-color: var(--border-active);
+      --mdc-outlined-text-field-focus-outline-color: var(--border-active);
+      --mdc-outlined-text-field-label-text-color: var(--primary);
+      --mdc-outlined-text-field-input-text-color: var(--text-primary);
+    }
+    .cancel-btn {
+      border-color: var(--border-active) !important;
+      color: var(--primary) !important;
+    }
     button[mat-flat-button] {
       background: var(--primary) !important;
       color: var(--text-on-primary) !important;

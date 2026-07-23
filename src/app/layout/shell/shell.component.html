@@ -1,12 +1,18 @@
 <div class="shell">
-  <main class="content">
+  <main #content class="content" tabindex="-1">
     <router-outlet />
   </main>
-  <nav class="bottom-nav">
+  <nav class="bottom-nav" [class.with-current]="!!activeSession()">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
       <mat-icon>home</mat-icon>
       <span>{{ 'nav.home' | tr }}</span>
     </a>
+    @if (activeSession()) {
+      <a routerLink="/sessions/active" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon>play_circle</mat-icon>
+        <span>{{ 'nav.current' | tr }}</span>
+      </a>
+    }
     <a routerLink="/sessions" routerLinkActive="active">
       <mat-icon>event</mat-icon>
       <span>{{ 'nav.sessions' | tr }}</span>

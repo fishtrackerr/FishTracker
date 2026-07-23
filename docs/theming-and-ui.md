@@ -24,6 +24,11 @@ Overrides in `src/styles/material-overrides.css`:
 
 Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hardcode `dark-dialog`.
 
+- Dialog surfaces use a `2px` active orange border (`--border-active`) in both themes
+- Start Session dialog fields use orange outlined borders and orange labels for all three inputs
+- Dialog cancel actions use stroked orange buttons; primary/confirm actions use orange filled buttons
+- End Session confirm dialog body text is themed orange to match dialog emphasis
+
 ## Shared components
 
 - `app-card`, `session-card`, `stat-card`, `weather-card`
@@ -36,6 +41,13 @@ Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hard
 - Settings options are grouped into collapsible submenus using `expandable-section`
 - Expand/collapse state persists per submenu with localStorage-backed keys
 - Security and reset actions remain grouped and reachable on mobile without long scrolling
+- Appearance uses a single language selector (dropdown) to avoid duplicate controls
+- A dedicated **Changelog** submenu links to `/release-notes`
+
+## Navigation focus behavior
+
+- Shell route transitions reset the scroll position of the main content container to the top
+- After each navigation, focus moves to the top content region for consistent keyboard/screen-reader flow
 
 ## Icons
 
@@ -53,3 +65,4 @@ Material Icons via `@angular/material/icon` only.
 - Primary: filled, `--primary` background
 - Stroked: outline for secondary actions
 - Delete: warn + confirmation dialog
+- PIN unlock update check: small `mat-icon-button` with `refresh` icon in the top-right corner

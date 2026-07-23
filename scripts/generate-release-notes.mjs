@@ -25,37 +25,77 @@ function getVersion() {
   return pkg.version ?? '0.0.0';
 }
 
-function getCommitsSinceTag() {
+function getRepositoryBaseUrl() {
   try {
-    const tag = execSync('git describe --tags --abbrev=0', { cwd: root, encoding: 'utf8' }).trim();
-    return execSync(`git log ${tag}..HEAD --pretty=format:%s`, { cwd: root, encoding: 'utf8' })
-      .split('\n')
-      .filter(Boolean)
-      .filter((line) => !line.startsWith('Merge '));
+    const remote = execSync('git config --get remote.origin.url', {
+      cwd: root,
+      encoding: 'utf8',
+    }).trim();
+
+    if (!remote) {
+      return undefined;
+    }
+
+    const sshMatch = remote.match(/^git@github\.com:(.+?)(?:\.git)?$/);
+    if (sshMatch) {
+      return `https://github.com/${sshMatch[1]}`;
+    }
+
+    const httpsMatch = remote.match(/^https:\/\/github\.com\/(.+?)(?:\.git)?$/);
+    if (httpsMatch) {
+      return `https://github.com/${httpsMatch[1]}`;
+    }
+
+    return undefined;
   } catch {
-    return execSync('git log --pretty=format:%s', { cwd: root, encoding: 'utf8' })
-      .split('\n')
-      .filter(Boolean)
-      .filter((line) => !line.startsWith('Merge '));
+    return undefined;
   }
 }
 
-function categorize(commits) {
+function getCommitsSinceTag() {
+  try {
+    const tag = execSync('git describe --tags --abbrev=0', { cwd: root, encoding: 'utf8' }).trim();
+    return execSync(`git log ${tag}..HEAD --pretty=format:%h%x09%H%x09%s`, {
+      cwd: root,
+      encoding: 'utf8',
+    })
+      .split('\n')
+      .filter(Boolean)
+      .filter((line) => !line.includes('\tMerge '));
+  } catch {
+    return execSync('git log --pretty=format:%h%x09%H%x09%s', { cwd: root, encoding: 'utf8' })
+      .split('\n')
+      .filter(Boolean)
+      .filter((line) => !line.includes('\tMerge '));
+  }
+}
+
+function categorize(commits, repositoryBaseUrl) {
   const sections = new Map();
   for (const commit of commits) {
-    const match = commit.match(/^(\w+)(?:\([^)]+\))?!?:\s*(.+)$/);
+    const [shortHash, fullHash, subject] = commit.split('\t');
+    if (!shortHash || !fullHash || !subject) {
+      continue;
+    }
+
+    const match = subject.match(/^(\w+)(?:\([^)]+\))?!?:\s*(.+)$/);
     if (!match) continue;
     const [, type, message] = match;
     const category = CATEGORY_MAP[type] ?? 'Other';
     if (!sections.has(category)) sections.set(category, []);
-    sections.get(category).push(message);
+    sections.get(category).push({
+      message,
+      shortHash,
+      commitUrl: repositoryBaseUrl ? `${repositoryBaseUrl}/commit/${fullHash}` : undefined,
+    });
   }
   return [...sections.entries()].map(([category, items]) => ({ category, items }));
 }
 
 const version = getVersion();
+const repositoryBaseUrl = getRepositoryBaseUrl();
 const commits = getCommitsSinceTag();
-const sections = categorize(commits);
+const sections = categorize(commits, repositoryBaseUrl);
 
 const output = {
   version,

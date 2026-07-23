@@ -39,11 +39,15 @@ Safety net: redirects to `/` if no active session exists.
 
 Primary logic in `AppStartupService.resolveInitialRoute()`. Guards complement but do not duplicate startup navigation.
 
+When an active session exists, startup may route `/` to `/sessions/active`. The shell footer also exposes a dedicated **Current** tab (conditional), while **Sessions** continues to point to `/sessions` for list/history access.
+
 ## Deep links
 
 Paths like `/sessions/:id`, `/settings`, `/lakes/:id` are preserved when unlocked unless the app is locked.
 
 `/sessions/:id` also supports the query `setupRods=1` to enable a first-run rod setup mode after starting a new session.
+
+`/sessions` displays current/history sections when active data exists; `/sessions/active` remains the focused live-session screen.
 
 ## PIN unlock redirect
 

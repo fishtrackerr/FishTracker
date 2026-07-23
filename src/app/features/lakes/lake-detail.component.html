@@ -36,6 +36,16 @@
     <input matInput [ngModel]="l.address" (ngModelChange)="updateField('address', $event)" (blur)="saveLake()" />
   </mat-form-field>
 
+  <button
+    mat-stroked-button
+    type="button"
+    class="lookup-btn"
+    [disabled]="lookingUpCoordinates()"
+    (click)="lookupCoordinates()"
+  >
+    {{ lookingUpCoordinates() ? ('lakes.lookupLoading' | tr) : ('lakes.lookupCoordinates' | tr) }}
+  </button>
+
   <div class="row">
     <mat-form-field appearance="outline">
       <mat-label>{{ 'sessionEdit.latitude' | tr }}</mat-label>

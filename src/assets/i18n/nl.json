@@ -45,7 +45,6 @@
     "systemPreference": "Systeemvoorkeur",
     "preview": "Voorbeeld",
     "language": "Taal",
-    "languageSwitch": "Taalschakelaar",
     "units": "Eenheden",
     "weight": "Gewicht",
     "length": "Lengte",
@@ -116,7 +115,10 @@
     "aboutText": "Fish Tracker — offline-first visregistratie.",
     "profile": "Profiel",
     "documents": "Documenten",
-    "releaseNotes": "Release-opmerkingen"
+    "releaseNotes": "Release-opmerkingen",
+    "changelog": "Wijzigingslog",
+    "changelogDesc": "Bekijk de releasegeschiedenis op basis van commitberichten.",
+    "openChangelog": "Wijzigingslog openen"
     ,"homepageImageCleared": "Startpagina-afbeelding gewist",
     "resetAllCustomTitle": "Alle aangepaste opties resetten?",
     "resetAllCustomMessage": "Alle aangepaste keuzelijstopties worden verwijderd. Favorieten blijven waar mogelijk behouden.",
@@ -180,6 +182,7 @@
   },
   "nav": {
     "home": "Home",
+    "current": "Actief",
     "sessions": "Sessies",
     "lakes": "Meren",
     "gallery": "Galerij",
@@ -201,6 +204,8 @@
   },
   "sessions": {
     "title": "Sessies",
+    "currentSection": "Actieve sessie",
+    "historySection": "Sessiegeschiedenis",
     "searchPlaceholder": "Sessies zoeken",
     "filter": "Filter",
     "filters": "Filters",
@@ -312,6 +317,13 @@
     "cover": "cover",
     "description": "Beschrijving",
     "address": "Adres",
+    "lookupCoordinates": "Coordinaten zoeken op adres",
+    "lookupLoading": "Coordinaten worden opgezocht...",
+    "lookupNeedsAddress": "Vul eerst een meernaam of adres in.",
+    "lookupSuccess": "Coordinaten gevonden en opgeslagen.",
+    "lookupOffline": "Geen internetverbinding. Vul coordinaten handmatig in of probeer later opnieuw.",
+    "lookupNotFound": "Geen coordinaten gevonden voor deze locatie.",
+    "lookupFailed": "Coordinaten kunnen nu niet worden opgehaald.",
     "rules": "Regels",
     "permitInformation": "Vergunningsinformatie",
     "fishingSpots": "Visstekken",
@@ -481,5 +493,11 @@
     "appVersion": "App-versie",
     "checkForUpdates": "Controleren op updates",
     "checkingForUpdates": "Bezig met controleren op updates..."
+  },
+  "releaseNotes": {
+    "title": "Wijzigingslog",
+    "loading": "Wijzigingslog laden...",
+    "version": "Versie",
+    "empty": "Geen wijzigingslog beschikbaar."
   }
 }

@@ -8,6 +8,10 @@
   outline: none;
 }
 .full { width: 100%; }
+.lookup-btn {
+  width: 100%;
+  margin: 8px 0;
+}
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .section { margin: 24px 0; }
 .section-header {

@@ -1,35 +1,42 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
-
-interface ReleaseNotesData {
-  version: string;
-  date: string;
-  sections: { category: string; items: string[] }[];
-}
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import {
+  ReleaseNoteItem,
+  ReleaseNotesData,
+  ReleaseNotesService,
+} from '../../core/services/release-notes.service';
 
 @Component({
   selector: 'app-release-notes',
   standalone: true,
-  imports: [PageTitleComponent],
+  imports: [PageTitleComponent, TranslatePipe],
   template: `
-    <app-page-title title="Release Notes" />
+    <app-page-title title="releaseNotes.title" />
     @if (loading()) {
-      <p>Loading release notes...</p>
+      <p>{{ 'releaseNotes.loading' | tr }}</p>
     } @else if (notes(); as n) {
       <div class="release-notes app-card">
-        <h2>Version {{ n.version }}</h2>
+        <h2>{{ 'releaseNotes.version' | tr }} {{ n.version }}</h2>
         <p class="date">{{ n.date }}</p>
         @for (section of n.sections; track section.category) {
           <h3>{{ section.category }}</h3>
           <ul>
             @for (item of section.items; track item) {
-              <li>{{ item }}</li>
+              <li>
+                {{ noteMessage(item) }}
+                @if (noteCommitUrl(item); as url) {
+                  <a class="commit-link" [href]="url" target="_blank" rel="noopener noreferrer">
+                    ({{ noteCommitLabel(item) }})
+                  </a>
+                }
+              </li>
             }
           </ul>
         }
       </div>
     } @else {
-      <p>No release notes available.</p>
+      <p>{{ 'releaseNotes.empty' | tr }}</p>
     }
   `,
   styles: `
@@ -37,17 +44,35 @@ interface ReleaseNotesData {
     .date { text-align: center; color: var(--text-muted); }
     h3 { color: var(--text-primary); margin-top: var(--spacing-md); }
     li { color: var(--text-secondary); margin-bottom: var(--spacing-xs); }
+    .commit-link { margin-left: 6px; color: var(--primary); text-decoration: underline; }
   `,
 })
 export class ReleaseNotesComponent implements OnInit {
+  private readonly releaseNotesService = inject(ReleaseNotesService);
+
   readonly notes = signal<ReleaseNotesData | null>(null);
   readonly loading = signal(true);
 
-  ngOnInit(): void {
-    fetch('assets/release-notes.json')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: ReleaseNotesData | null) => this.notes.set(data))
-      .catch(() => this.notes.set(null))
-      .finally(() => this.loading.set(false));
+  async ngOnInit(): Promise<void> {
+    this.notes.set(await this.releaseNotesService.getReleaseNotes());
+    this.loading.set(false);
+  }
+
+  noteMessage(item: string | ReleaseNoteItem): string {
+    return typeof item === 'string' ? item : item.message;
+  }
+
+  noteCommitUrl(item: string | ReleaseNoteItem): string | undefined {
+    if (typeof item === 'string') {
+      return undefined;
+    }
+    return item.commitUrl;
+  }
+
+  noteCommitLabel(item: string | ReleaseNoteItem): string {
+    if (typeof item === 'string') {
+      return '';
+    }
+    return item.shortHash ?? 'commit';
   }
 }

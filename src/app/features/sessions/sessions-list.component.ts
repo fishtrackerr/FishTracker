@@ -69,12 +69,36 @@ export class SessionsListComponent {
   readonly sortBy = signal<'newest' | 'oldest' | 'name-asc' | 'name-desc' | 'most-catches'>('newest');
   readonly activeFilter = signal<StatisticsFilter>({});
 
-  readonly sessions = computed(() => {
+  readonly filteredSessions = computed(() => {
     let list = this.allSessions();
     list = this.filterService.applyToSessions(list, this.activeFilter());
     list = this.searchService.searchSessions(list, this.searchQuery(), this.lakes());
     return this.searchService.sortSessions(list, this.sortBy());
   });
+
+  readonly currentSession = computed(() =>
+    this.allSessions().find((session) => session.status === 'active'),
+  );
+
+  readonly showCurrentSession = computed(() => {
+    const current = this.currentSession();
+    if (!current) {
+      return false;
+    }
+    const statusFilter = this.activeFilter().sessionStatus;
+    return !statusFilter || statusFilter === 'active';
+  });
+
+  readonly historySessions = computed(() => {
+    const currentId = this.currentSession()?.id;
+    return this.filteredSessions().filter(
+      (session) => session.status !== 'active' && session.id !== currentId,
+    );
+  });
+
+  readonly visibleSessionCount = computed(
+    () => this.historySessions().length + (this.showCurrentSession() ? 1 : 0),
+  );
 
   readonly filterCount = computed(() =>
     this.filterService.countActive(this.activeFilter()),

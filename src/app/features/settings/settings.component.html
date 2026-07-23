@@ -22,19 +22,6 @@
           }
         </mat-select>
       </mat-form-field>
-      <div class="language-switch" role="group" [attr.aria-label]="'settings.languageSwitch' | tr">
-        <span class="language-switch-label">{{ 'settings.languageSwitch' | tr }}</span>
-        <mat-button-toggle-group
-          [ngModel]="settings().language"
-          (ngModelChange)="updateLanguage($event)"
-          name="language-switch"
-          aria-label="Language switch"
-        >
-          @for (language of supportedLanguages; track language) {
-            <mat-button-toggle [value]="language">{{ languageLabel(language) }}</mat-button-toggle>
-          }
-        </mat-button-toggle-group>
-      </div>
       <div class="theme-preview" [attr.data-theme]="settings().themeMode === 'system' ? null : settings().themeMode">
         {{ 'settings.preview' | tr }}
       </div>
@@ -267,8 +254,18 @@
       <a routerLink="/profile">{{ 'settings.profile' | tr }}</a>
       ·
       <a routerLink="/profile/documents">{{ 'settings.documents' | tr }}</a>
-      ·
-      <a routerLink="/release-notes">{{ 'settings.releaseNotes' | tr }}</a>
+    </div>
+  </app-expandable-section>
+</section>
+
+<section class="section app-card">
+  <app-expandable-section sectionId="settings-changelog" persistKey="settings-changelog" label="changelog" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.changelog' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <p>{{ 'settings.changelogDesc' | tr }}</p>
+      <a mat-stroked-button routerLink="/release-notes">{{ 'settings.openChangelog' | tr }}</a>
     </div>
   </app-expandable-section>
 </section>
