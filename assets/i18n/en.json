@@ -65,6 +65,7 @@
     "newPin": "New PIN",
     "confirmPin": "Confirm PIN",
     "changePin": "Change PIN",
+    "logout": "Logout",
     "lockNow": "Lock application now",
     "weather": "Weather",
     "enableDetailedWeather": "Enable detailed weather",
@@ -193,7 +194,10 @@
     "refreshWeatherGps": "Refresh weather & GPS",
     "addCatch": "Add Catch",
     "camera": "Camera",
-    "endSession": "End Session"
+    "endSession": "End Session",
+    "endSessionConfirm": "End this fishing session?",
+    "sessionEnded": "Session ended",
+    "endFailed": "Failed to end session"
   },
   "sessions": {
     "title": "Sessions",
@@ -218,6 +222,9 @@
     "prebait": "Prebait",
     "rodsAndSpots": "Rods and spots",
     "moreInfoRodsSpots": "More info - Rods & Spots",
+    "rodSetupTitle": "Set up rod details",
+    "rodSetupMessage": "Add bait, rig, notes, and active status for each rod before switching to the active session view.",
+    "finishRodSetup": "Finish rod setup",
     "rods": "rods",
     "active": "active",
     "bites": "bites",

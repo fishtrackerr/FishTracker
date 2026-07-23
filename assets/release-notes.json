@@ -5,6 +5,7 @@
     {
       "category": "New Features",
       "items": [
+        "add rod setup callout in session detail with finish button",
         "enhance app functionality with version check and update services",
         "update version to 0.0.22, enhance pin lock service, and improve initial route resolution logic",
         "update version to 0.0.20, enhance i18n service with fallback language, and improve version display in pin setup",

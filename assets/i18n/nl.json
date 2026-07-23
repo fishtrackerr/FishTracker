@@ -65,6 +65,7 @@
     "newPin": "Nieuwe pincode",
     "confirmPin": "Bevestig pincode",
     "changePin": "Pincode wijzigen",
+    "logout": "Uitloggen",
     "lockNow": "App nu vergrendelen",
     "weather": "Weer",
     "enableDetailedWeather": "Gedetailleerd weer inschakelen",
@@ -193,7 +194,10 @@
     "refreshWeatherGps": "Weer en GPS verversen",
     "addCatch": "Vangst toevoegen",
     "camera": "Camera",
-    "endSession": "Sessie beëindigen"
+    "endSession": "Sessie beëindigen",
+    "endSessionConfirm": "Sessie beëindigen?",
+    "sessionEnded": "Sessie beëindigd",
+    "endFailed": "Fout bij beëindigen sessie"
   },
   "sessions": {
     "title": "Sessies",
@@ -218,6 +222,9 @@
     "prebait": "Voorvoeren",
     "rodsAndSpots": "Hengels en stekken",
     "moreInfoRodsSpots": "Meer info - Hengels en stekken",
+    "rodSetupTitle": "Hengeldetails instellen",
+    "rodSetupMessage": "Vul aas, rig, notities en actieve status per hengel in voordat je naar de actieve sessieweergave gaat.",
+    "finishRodSetup": "Hengelsetup afronden",
     "rods": "hengels",
     "active": "actief",
     "bites": "beten",

@@ -65,6 +65,7 @@
     "newPin": "Neue PIN",
     "confirmPin": "PIN bestätigen",
     "changePin": "PIN ändern",
+    "logout": "Abmelden",
     "lockNow": "Anwendung jetzt sperren",
     "weather": "Wetter",
     "enableDetailedWeather": "Detailliertes Wetter aktivieren",
@@ -193,7 +194,10 @@
     "refreshWeatherGps": "Wetter und GPS aktualisieren",
     "addCatch": "Fang hinzufügen",
     "camera": "Kamera",
-    "endSession": "Sitzung beenden"
+    "endSession": "Sitzung beenden",
+    "endSessionConfirm": "Sitzung beenden?",
+    "sessionEnded": "Sitzung beendet",
+    "endFailed": "Fehler beim Beenden der Sitzung"
   },
   "sessions": {
     "title": "Sitzungen",
@@ -218,6 +222,9 @@
     "prebait": "Vorfüttern",
     "rodsAndSpots": "Ruten und Plätze",
     "moreInfoRodsSpots": "Mehr Infos - Ruten und Plätze",
+    "rodSetupTitle": "Rutendetails einrichten",
+    "rodSetupMessage": "Ergänze Köder, Rig, Notizen und Aktiv-Status pro Rute, bevor du zur aktiven Sitzungsansicht wechselst.",
+    "finishRodSetup": "Ruten-Setup abschließen",
     "rods": "Ruten",
     "active": "aktiv",
     "bites": "Bisse",
