@@ -22,6 +22,13 @@ p {
   text-align: center;
 }
 
+.version {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  margin: -10px 0 var(--spacing-md);
+  text-align: center;
+}
+
 .dots {
   display: flex;
   gap: var(--spacing-md);

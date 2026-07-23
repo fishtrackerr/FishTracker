@@ -8,6 +8,7 @@ type Dictionary = Record<string, unknown>;
 export class I18nService {
   private readonly settings = inject(SettingsService);
   private readonly cache = new Map<AppLanguage, Dictionary>();
+  private readonly fallbackLanguage: AppLanguage = 'nl';
 
   readonly supportedLanguages: readonly AppLanguage[] = ['nl', 'en', 'de'];
   readonly language = signal<AppLanguage>('nl');
@@ -17,6 +18,7 @@ export class I18nService {
   constructor() {
     const fromSettings = this.normalizeLanguage(this.settings.get().language);
     this.language.set(fromSettings);
+    void this.loadLanguage(this.fallbackLanguage);
     void this.loadLanguage(fromSettings);
   }
 
@@ -28,8 +30,20 @@ export class I18nService {
   }
 
   t(key: string, params?: Record<string, string | number>): string {
-    const raw = this.getByPath(this.dictionary(), key);
-    const base = typeof raw === 'string' ? raw : key;
+    const fromActive = this.getByPath(this.dictionary(), key);
+    let base = typeof fromActive === 'string' ? fromActive : '';
+
+    if (!base && this.language() !== this.fallbackLanguage) {
+      const fallbackDictionary = this.cache.get(this.fallbackLanguage);
+      const fromFallback = fallbackDictionary
+        ? this.getByPath(fallbackDictionary, key)
+        : undefined;
+      base = typeof fromFallback === 'string' ? fromFallback : '';
+    }
+
+    if (!base) {
+      base = key;
+    }
 
     if (!params) {
       return base;
@@ -47,7 +61,7 @@ export class I18nService {
     }
 
     try {
-      const response = await fetch(`assets/i18n/${language}.json`, {
+      const response = await fetch(`assets/i18n/${language}.json?ngsw-bypass=true&t=${Date.now()}`, {
         cache: 'no-store',
       });
       if (!response.ok) {
