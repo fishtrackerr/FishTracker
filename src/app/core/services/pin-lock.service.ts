@@ -127,6 +127,7 @@ export class PinLockService {
     this.settings.update({
       pinHash: this.toBase64(hash),
       pinSalt: this.toBase64(salt),
+      pinEnabled: true,
     });
     this.unlock();
   }

@@ -1,18 +1,20 @@
 {
-  "version": "0.0.17",
+  "version": "0.0.22",
   "date": "2026-07-23",
   "sections": [
+    {
+      "category": "New Features",
+      "items": [
+        "update version to 0.0.20, enhance i18n service with fallback language, and improve version display in pin setup",
+        "update version to 0.0.17 and add language switch feature in settings",
+        "add new components for search bar, session card, timeline, splash screen, stat card, and weather card",
+        "initialize Angular application with routing and SSR support"
+      ]
+    },
     {
       "category": "Maintenance",
       "items": [
         "bump version to 0.0.2 and add version management scripts"
-      ]
-    },
-    {
-      "category": "New Features",
-      "items": [
-        "add new components for search bar, session card, timeline, splash screen, stat card, and weather card",
-        "initialize Angular application with routing and SSR support"
       ]
     }
   ]

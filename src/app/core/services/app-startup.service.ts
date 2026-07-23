@@ -53,15 +53,30 @@ export class AppStartupService {
   async resolveInitialRoute(intendedUrl?: string): Promise<string> {
     const path = intendedUrl ?? '/';
 
+    const hasPin = this.pinLock.hasPinConfigured();
+    const isLocked = this.pinLock.isAppLocked();
+
     if (path.startsWith('/pin/')) {
-      return path;
+      if (path.startsWith('/pin/setup')) {
+        if (!hasPin) {
+          return '/pin/setup';
+        }
+        return isLocked ? '/pin/unlock' : '/';
+      }
+
+      if (path.startsWith('/pin/unlock')) {
+        if (!hasPin) {
+          return '/pin/setup';
+        }
+        return isLocked ? '/pin/unlock' : '/';
+      }
     }
 
-    if (!this.pinLock.hasPinConfigured()) {
+    if (!hasPin) {
       return '/pin/setup';
     }
 
-    if (this.pinLock.isAppLocked()) {
+    if (isLocked) {
       this.storeReturnUrl(path);
       return '/pin/unlock';
     }
