@@ -2,6 +2,8 @@ import { Component, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeService } from './core/services/theme.service';
 import { AppStartupService } from './core/services/app-startup.service';
+import { SwUpdateService } from './core/services/sw-update.service';
+import { VersionCheckService } from './core/services/version-check.service';
 import { StartupSplashComponent } from './shared/components/startup-splash/startup-splash.component';
 
 @Component({
@@ -21,6 +23,8 @@ export class App {
 
   constructor() {
     inject(ThemeService);
+    inject(SwUpdateService);
+    inject(VersionCheckService);
     effect(() => {
       if (this.startup.isReady()) {
         void this.startup.performInitialNavigation();

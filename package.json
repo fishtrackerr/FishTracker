@@ -1,13 +1,16 @@
 {
   "name": "fish-tracker",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "scripts": {
     "ng": "ng",
+    "set-version": "node ./set-version.js",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "npm run set-version && ng build",
+    "build-prod": "npm run set-version && ng build --configuration production --output-hashing=all",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "release-notes": "node scripts/generate-release-notes.mjs"
+    "release-notes": "node scripts/generate-release-notes.mjs",
+    "deploy": "npm run set-version && npm run release-notes && ng build --configuration production --base-href=/FishTracker/ && npx angular-cli-ghpages --dir=dist/FishTracker/browser"
   },
   "private": true,
   "packageManager": "npm@11.11.0",
@@ -35,6 +38,7 @@
     "@angular/compiler-cli": "^21.2.0",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
+    "angular-cli-ghpages": "^3.1.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",

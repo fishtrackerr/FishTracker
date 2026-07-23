@@ -1,32 +1,12 @@
 {
-  "version": "1.0.0",
-  "date": "2026-07-15",
+  "version": "0.0.2",
+  "date": "2026-07-23",
   "sections": [
     {
       "category": "New Features",
       "items": [
-        "Unified design system with dark and light themes",
-        "Profile page and document storage",
-        "Image favorites and homepage image",
-        "Lake image galleries",
-        "Detailed weather with storm warnings",
-        "Expanded statistics and advanced filters",
-        "Session create dialog with optional lake"
-      ]
-    },
-    {
-      "category": "Bug Fixes",
-      "items": [
-        "Fixed dashboard runtime error on load",
-        "Fixed session creation when cover image or lake is unavailable"
-      ]
-    },
-    {
-      "category": "Improvements",
-      "items": [
-        "Consistent delete confirmation dialogs",
-        "Global error handling with snackbar notifications",
-        "Offline weather cache fallback"
+        "add new components for search bar, session card, timeline, splash screen, stat card, and weather card",
+        "initialize Angular application with routing and SSR support"
       ]
     }
   ]
