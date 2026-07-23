@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="FishTracker logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b0f14"/>
+      <stop offset="100%" stop-color="#142230"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff9f43"/>
+      <stop offset="100%" stop-color="#ff6b00"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#bg)"/>
+
+  <path d="M356 168c-65 0-119 34-146 88-14 1-28 4-42 9-11 4-20 9-27 15 12 13 31 23 54 29 5 15 12 29 22 41 30 38 74 62 129 62 29 0 56-7 79-20-12-18-19-40-19-63 0-18 4-36 12-51-17-12-39-19-62-19z" fill="url(#accent)"/>
+  <path d="M308 227c38 0 67 18 82 48-31-8-68-5-99 9-31 14-54 37-66 63-16-30-17-63-3-91 16-32 48-53 86-53z" fill="#0b0f14" opacity="0.22"/>
+  <circle cx="343" cy="250" r="9" fill="#fff6e8"/>
+  <circle cx="344" cy="249" r="4" fill="#1d232b"/>
+
+  <path d="M96 358c45-27 86-40 122-40" fill="none" stroke="#ffb36b" stroke-width="18" stroke-linecap="round"/>
+  <path d="M98 360l12 24 14-20" fill="none" stroke="#ffb36b" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
