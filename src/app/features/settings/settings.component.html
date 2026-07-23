@@ -18,6 +18,19 @@
       }
     </mat-select>
   </mat-form-field>
+  <div class="language-switch" role="group" [attr.aria-label]="'settings.languageSwitch' | tr">
+    <span class="language-switch-label">{{ 'settings.languageSwitch' | tr }}</span>
+    <mat-button-toggle-group
+      [ngModel]="settings().language"
+      (ngModelChange)="updateLanguage($event)"
+      name="language-switch"
+      aria-label="Language switch"
+    >
+      @for (language of supportedLanguages; track language) {
+        <mat-button-toggle [value]="language">{{ languageLabel(language) }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+  </div>
   <div class="theme-preview" [attr.data-theme]="settings().themeMode === 'system' ? null : settings().themeMode">
     {{ 'settings.preview' | tr }}
   </div>

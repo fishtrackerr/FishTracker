@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { SettingsService } from '../../core/services/settings.service';
 import { BackupService } from '../../core/services/backup.service';
 import { PinLockService } from '../../core/services/pin-lock.service';
@@ -35,6 +36,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
     MatInputModule,
     MatCheckboxModule,
     MatSlideToggleModule,
+    MatButtonToggleModule,
     PageTitleComponent,
     TranslatePipe,
   ],

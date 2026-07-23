@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, PLATFORM_ID, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-startup-splash',
@@ -7,6 +8,7 @@ import { Component } from '@angular/core';
     <div class="splash" role="status" aria-live="polite" aria-label="Loading application">
       <img class="logo" src="icons/icon-192x192.png" alt="FishTracker logo" />
       <p class="label">Fishing Register</p>
+      <p class="version">v{{ version() }}</p>
       <div class="spinner" aria-hidden="true"></div>
     </div>
   `,
@@ -33,6 +35,12 @@ import { Component } from '@angular/core';
       color: var(--primary, #ff6b00);
       margin: 0;
     }
+    .version {
+      font-size: 0.8rem;
+      color: var(--text-secondary, #bbb);
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
     .spinner {
       width: 32px;
       height: 32px;
@@ -47,4 +55,31 @@ import { Component } from '@angular/core';
     }
   `,
 })
-export class StartupSplashComponent {}
+export class StartupSplashComponent {
+  private readonly platformId = inject(PLATFORM_ID);
+
+  readonly version = signal('0.0.0');
+
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      void this.loadVersion();
+    }
+  }
+
+  private async loadVersion(): Promise<void> {
+    try {
+      const response = await fetch('assets/version.json', {
+        cache: 'no-store',
+      });
+      if (!response.ok) {
+        return;
+      }
+      const payload = (await response.json()) as { version?: unknown };
+      if (typeof payload.version === 'string' && payload.version.trim()) {
+        this.version.set(payload.version);
+      }
+    } catch {
+      // Keep default fallback when version file is unavailable.
+    }
+  }
+}

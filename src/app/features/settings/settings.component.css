@@ -9,6 +9,16 @@
   text-align: center;
   color: var(--text-primary);
 }
+.language-switch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin: 0 0 var(--spacing-sm);
+}
+.language-switch-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
 .message {
   margin-top: var(--spacing-md);
   color: var(--primary);

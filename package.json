@@ -1,6 +1,6 @@
 {
   "name": "fish-tracker",
-  "version": "0.0.15",
+  "version": "0.0.17",
   "scripts": {
     "ng": "ng",
     "set-version": "node ./set-version.js",
