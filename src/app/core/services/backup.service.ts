@@ -22,6 +22,13 @@ import { SessionRepository } from './session.repository';
 import { SessionWeatherRepository } from './session-weather.repository';
 import { UserOptionRepository } from './user-option.repository';
 
+const MAX_BACKUP_IMAGES = 5000;
+const ALLOWED_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+function hasStringId(entry: unknown): boolean {
+  return !!entry && typeof entry === 'object' && typeof (entry as { id?: unknown }).id === 'string';
+}
+
 @Injectable({ providedIn: 'root' })
 export class BackupService {
   private readonly profileRepo = inject(ProfileRepository);
@@ -115,6 +122,9 @@ export class BackupService {
     if (backup.images !== undefined && !Array.isArray(backup.images)) {
       throw new Error('Invalid backup file: images must be an array');
     }
+    if ((backup.images?.length ?? 0) > MAX_BACKUP_IMAGES) {
+      throw new Error(`Invalid backup file: too many images (max ${MAX_BACKUP_IMAGES})`);
+    }
     for (const optional of [
       'biteEvents',
       'fishSpottedEvents',
@@ -133,8 +143,27 @@ export class BackupService {
       }
     }
     for (const session of backup.sessions) {
-      if (!session || typeof session !== 'object' || typeof (session as { id?: unknown }).id !== 'string') {
+      if (!hasStringId(session)) {
         throw new Error('Invalid backup file: session entries must have an id');
+      }
+    }
+    for (const catchRecord of backup.catches) {
+      if (!hasStringId(catchRecord)) {
+        throw new Error('Invalid backup file: catch entries must have an id');
+      }
+    }
+    for (const lake of backup.lakes) {
+      if (!hasStringId(lake)) {
+        throw new Error('Invalid backup file: lake entries must have an id');
+      }
+    }
+    for (const img of backup.images ?? []) {
+      if (!hasStringId(img)) {
+        throw new Error('Invalid backup file: image entries must have an id');
+      }
+      const mime = (img as { mimeType?: unknown }).mimeType;
+      if (typeof mime === 'string' && mime && !ALLOWED_IMAGE_MIME.has(mime)) {
+        throw new Error('Invalid backup file: unsupported image mime type');
       }
     }
 
@@ -211,14 +240,18 @@ export class BackupService {
           if (typeof img.data !== 'string' || typeof img.thumbnail !== 'string') {
             throw new Error('Invalid backup file: image entries require data and thumbnail');
           }
+          const mimeType =
+            typeof img.mimeType === 'string' && ALLOWED_IMAGE_MIME.has(img.mimeType)
+              ? img.mimeType
+              : 'image/jpeg';
           await this.imageRepo.put({
             id: img.id,
             type: img.type as StoredImage['type'],
             parentId: img.parentId,
             fileName: img.fileName ?? `${img.id}.jpg`,
-            blob: base64ToBlob(img.data, img.mimeType),
-            thumbnailBlob: base64ToBlob(img.thumbnail, img.mimeType),
-            mimeType: img.mimeType,
+            blob: base64ToBlob(img.data, mimeType),
+            thumbnailBlob: base64ToBlob(img.thumbnail, mimeType),
+            mimeType,
             createdAt: img.createdAt,
             isFavorite: img.isFavorite ?? false,
             isHomepageImage: img.isHomepageImage ?? false,
@@ -281,14 +314,15 @@ export class BackupService {
     return preview;
   }
 
-  downloadJson(data: BackupData): void {
+  downloadJson(data: BackupData, filename?: string): void {
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `fish-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download =
+      filename ?? `fish-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }

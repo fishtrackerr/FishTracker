@@ -7,7 +7,9 @@ describe('UserOptionService', () => {
     getByCategory: ReturnType<typeof vi.fn>;
     put: ReturnType<typeof vi.fn>;
     getAll: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
   };
+  let sync: { onOptionRenamed: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     repo = {
@@ -16,8 +18,10 @@ describe('UserOptionService', () => {
       ]),
       put: vi.fn(),
       getAll: vi.fn().mockResolvedValue([]),
+      delete: vi.fn(),
     };
-    service = new UserOptionService(repo as never);
+    sync = { onOptionRenamed: vi.fn().mockResolvedValue(undefined) };
+    service = new UserOptionService(repo as never, sync as never);
   });
 
   it('prevents duplicate options case-insensitively', async () => {
@@ -29,5 +33,40 @@ describe('UserOptionService', () => {
   it('saves new custom option trimmed', async () => {
     await service.saveOption('bait', '  Tiger Nut  ');
     expect(repo.put).toHaveBeenCalledWith(expect.objectContaining({ value: 'Tiger Nut' }));
+  });
+
+  it('renames an option and cascades string rewrite', async () => {
+    repo.getAll.mockResolvedValue([
+      { id: '1', category: 'bait', value: 'Corn', isFavorite: false, isDefault: true },
+    ]);
+    repo.getByCategory.mockResolvedValue([
+      { id: '1', category: 'bait', value: 'Corn', isFavorite: false, isDefault: true },
+    ]);
+
+    const result = await service.rename('1', 'Maize');
+
+    expect(result?.value).toBe('Maize');
+    expect(repo.put).toHaveBeenCalledWith(expect.objectContaining({ id: '1', value: 'Maize' }));
+    expect(sync.onOptionRenamed).toHaveBeenCalledWith('bait', 'Corn', 'Maize');
+  });
+
+  it('merges into an existing option when renaming to a duplicate', async () => {
+    repo.getAll.mockResolvedValue([
+      { id: '1', category: 'bait', value: 'Corn', isFavorite: true, isDefault: false },
+      { id: '2', category: 'bait', value: 'Maize', isFavorite: false, isDefault: true },
+    ]);
+    repo.getByCategory.mockResolvedValue([
+      { id: '1', category: 'bait', value: 'Corn', isFavorite: true, isDefault: false },
+      { id: '2', category: 'bait', value: 'Maize', isFavorite: false, isDefault: true },
+    ]);
+
+    const result = await service.rename('1', 'maize');
+
+    expect(result?.id).toBe('2');
+    expect(repo.delete).toHaveBeenCalledWith('1');
+    expect(repo.put).toHaveBeenCalledWith(
+      expect.objectContaining({ id: '2', isFavorite: true, value: 'Maize' }),
+    );
+    expect(sync.onOptionRenamed).toHaveBeenCalledWith('bait', 'Corn', 'Maize');
   });
 });

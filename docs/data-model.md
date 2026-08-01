@@ -63,7 +63,7 @@ See [rods-and-spots.md](./rods-and-spots.md) and model files in `src/app/core/mo
 
 ## AppSettings
 
-Stored in localStorage: theme, units, favorite species, PIN hash/salt, lock timeout, weather preferences, optional AI chat (`aiChatEnabled`, `aiApiKey`, `aiBaseUrl`, `aiModel`).
+Stored in localStorage: theme, units, favorite species, PIN hash/salt, lock timeout, weather preferences, optional AI chat (`aiChatEnabled`, `aiApiKeyEncrypted` / `aiApiKeyIv` / `aiKeySalt`, `aiBaseUrl`, `aiModel`). Plaintext `aiApiKey` is legacy-only and stripped once ciphertext exists.
 
 ## ChatThread / ChatMessage
 
@@ -87,3 +87,15 @@ interface AppLockState {
 - One session has many catches (`catch.sessionId`).
 - One lake may be referenced by many sessions (`session.lakeId`).
 - Images reference parent via `type` and `parentId`.
+
+## Rename / related-data sync
+
+`RelatedDataSyncService` keeps denormalized copies in sync:
+
+| Change | Cascades to |
+|--------|-------------|
+| Lake name | Matching default session titles for that `lakeId` |
+| Lake spot fields | `SessionSpot` rows with matching `lakeSpotId` |
+| `UserOption` rename | Catch / rod / lake-spot bait / settings favorites / filter presets (exact string match) |
+
+Timeline `SessionEvent.description` strings are not rewritten (audit trail).

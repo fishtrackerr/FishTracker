@@ -31,8 +31,11 @@
         <h3>{{ 'activeSession.recentCatches' | tr }}</h3>
         <ul>
           @for (c of catches(); track c.id) {
-            <li>
+            <li class="catch-row-btn" role="button" tabindex="0" (click)="openCatch(c.id)" (keydown.enter)="openCatch(c.id)">
               <span class="species">{{ c.species }}</span>
+              @if (c.detailsPending) {
+                <span class="pending-badge">{{ 'activeSession.detailsPending' | tr }}</span>
+              }
               @if (c.weightKg) {
                 <span class="weight">{{ c.weightKg | formatWeight }}</span>
               }
@@ -80,7 +83,10 @@
     }
 
     <div class="actions">
-      <button mat-flat-button class="action-btn primary" (click)="quickCatch()">
+      <button mat-flat-button class="action-btn primary" (click)="instantCatch()">
+        <mat-icon>bolt</mat-icon> {{ 'activeSession.instantCatch' | tr }}
+      </button>
+      <button mat-stroked-button class="action-btn" (click)="quickCatch()">
         🐟 {{ 'activeSession.addCatch' | tr }}
       </button>
       @if (hasRods) {

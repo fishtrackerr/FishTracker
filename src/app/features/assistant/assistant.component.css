@@ -83,12 +83,20 @@
   border-style: dashed;
 }
 
-.threads-panel {
+.recent-chats {
   margin-bottom: var(--spacing-lg);
+}
+
+.threads-panel,
+.recent-chats {
   padding: var(--spacing-md);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-md);
   background: var(--background-secondary);
+}
+
+.threads-panel {
+  margin-bottom: var(--spacing-lg);
 }
 
 .thread-list {
@@ -100,10 +108,18 @@
   gap: var(--spacing-xs);
 }
 
+.thread-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-xs);
+}
+
 .thread-item {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid transparent;
@@ -111,10 +127,19 @@
   background: var(--background-card);
   color: var(--text-primary);
   cursor: pointer;
+  text-align: left;
 }
 
 .thread-item.active {
   border-color: var(--border-active);
+}
+
+.thread-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
 }
 
 .thread-title {
@@ -124,10 +149,45 @@
   white-space: nowrap;
 }
 
+.thread-preview {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .thread-date {
   flex-shrink: 0;
   color: var(--text-muted);
   font-size: 0.8rem;
+  padding-top: 2px;
+}
+
+.thread-delete {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.thread-delete:hover,
+.thread-delete:focus-visible {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--background-card);
+}
+
+.thread-delete mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .empty {

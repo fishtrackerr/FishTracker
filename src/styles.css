@@ -64,7 +64,7 @@ a {
   gap: var(--spacing-sm);
   min-height: var(--button-height);
   padding: 0 var(--spacing-md);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-weight: 500;
   cursor: pointer;
   border: none;

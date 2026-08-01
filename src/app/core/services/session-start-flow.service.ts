@@ -1,6 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { BackupService } from './backup.service';
+import { ConfirmService } from './confirm.service';
 import { DialogService } from './dialog.service';
 import { I18nService } from './i18n.service';
 import { LakeService } from './lake.service';
@@ -26,6 +28,8 @@ export class SessionStartFlowService {
   private readonly router = inject(Router);
   private readonly dialog = inject(DialogService);
   private readonly rodSetupFlow = inject(RodSetupFlowService);
+  private readonly backupService = inject(BackupService);
+  private readonly confirm = inject(ConfirmService);
 
   readonly starting = signal(false);
 
@@ -57,6 +61,13 @@ export class SessionStartFlowService {
 
       this.starting.set(true);
       const hadActive = !!(await this.sessionService.getActive());
+      if (!hadActive) {
+        const mayContinue = await this.exportPreSessionBackup();
+        if (!mayContinue) {
+          return false;
+        }
+      }
+
       const session = await this.sessionService.start(result);
       if (!hadActive) {
         await this.rodSetupFlow.promptAfterSessionCreate(session);
@@ -76,6 +87,28 @@ export class SessionStartFlowService {
       return false;
     } finally {
       this.starting.set(false);
+    }
+  }
+
+  /**
+   * Downloads a full JSON backup before creating a new session.
+   * Returns false if export failed and the user chose not to skip.
+   */
+  private async exportPreSessionBackup(): Promise<boolean> {
+    this.notifications.info(this.i18n.t('sessions.backingUp'));
+    try {
+      const data = await this.backupService.export();
+      const date = new Date().toISOString().slice(0, 10);
+      this.backupService.downloadJson(data, `fish-tracker-pre-session-${date}.json`);
+      this.notifications.success(this.i18n.t('sessions.backupSaved'));
+      return true;
+    } catch (error) {
+      console.error('[SessionStartFlow] pre-session backup failed', error);
+      return this.confirm.confirm({
+        title: this.i18n.t('sessions.backupFailedTitle'),
+        message: this.i18n.t('sessions.backupFailedMessage'),
+        confirmLabel: this.i18n.t('sessions.startWithoutBackup'),
+      });
     }
   }
 }

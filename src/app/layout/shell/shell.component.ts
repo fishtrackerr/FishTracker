@@ -16,7 +16,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { filter, startWith } from 'rxjs';
 import { ConnectivityService } from '../../core/services/connectivity.service';
+import { FeedbackPromptService } from '../../core/services/feedback-prompt.service';
 import { SessionService } from '../../core/services/session.service';
+import { ShareService } from '../../core/services/share.service';
+import { WhatsNewService } from '../../core/services/whats-new.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
@@ -39,6 +42,9 @@ export class ShellComponent implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly sessionService = inject(SessionService);
   private readonly connectivity = inject(ConnectivityService);
+  private readonly share = inject(ShareService);
+  private readonly whatsNew = inject(WhatsNewService);
+  private readonly feedbackPrompt = inject(FeedbackPromptService);
 
   @ViewChild('content', { static: true })
   private contentRef?: ElementRef<HTMLElement>;
@@ -59,10 +65,15 @@ export class ShellComponent implements AfterViewInit {
         this.bannerDismissed.set(false);
       }
     });
+    void this.whatsNew.maybeShow().then(() => this.feedbackPrompt.maybeShow());
   }
 
   dismissOfflineBanner(): void {
     this.bannerDismissed.set(true);
+  }
+
+  shareViaWhatsApp(): void {
+    this.share.shareAppViaWhatsApp();
   }
 
   isMoreRouteActive(): boolean {
@@ -73,7 +84,8 @@ export class ShellComponent implements AfterViewInit {
       url.startsWith('/settings') ||
       url.startsWith('/assistant') ||
       url.startsWith('/profile') ||
-      url.startsWith('/release-notes')
+      url.startsWith('/release-notes') ||
+      url.startsWith('/privacy')
     );
   }
 

@@ -27,8 +27,28 @@ jobs:
       - name: Unit tests
         run: npm test -- --watch=false
 
+      - name: Generate PWA icons
+        run: npm run icons
+
       - name: Production build
         run: npm run build-prod
 
-      - name: Generate PWA icons
-        run: npm run icons
+  android-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Android web build + Capacitor sync
+        run: npm run build-android
+
+      - name: Generate store listing assets
+        run: npm run store-assets

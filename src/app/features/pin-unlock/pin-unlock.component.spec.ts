@@ -49,7 +49,8 @@ describe('PinUnlockComponent', () => {
         {
           provide: PinLockService,
           useValue: {
-            verifyPin: vi.fn().mockResolvedValue(true),
+            verifyPin: vi.fn().mockResolvedValue({ ok: true }),
+            getLockoutRemainingMs: vi.fn().mockReturnValue(0),
             hasPinConfigured: vi.fn(),
             isAppLocked: vi.fn(),
           },

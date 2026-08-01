@@ -23,6 +23,27 @@ export class NotificationService {
     this.show(message, 'Dismiss', 'warning', 6000);
   }
 
+  /**
+   * Shows a snackbar with an action. Invokes `onAction` when the user clicks the action button.
+   * Use `duration` 0 to keep it open until dismissed or acted on.
+   */
+  withAction(
+    message: string,
+    action: string,
+    onAction: () => void,
+    variant: SnackbarVariant = 'info',
+    duration = 0,
+  ): void {
+    const config: MatSnackBarConfig = {
+      duration,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: ['app-snackbar', `app-snackbar--${variant}`],
+    };
+    const ref = this.snackBar.open(message, action, config);
+    ref.onAction().subscribe(() => onAction());
+  }
+
   offline(message: string): void {
     this.show(message, 'OK', 'offline', 5000);
   }

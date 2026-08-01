@@ -18,7 +18,7 @@ Categorize changes:
 
 ## Versioning
 
-Follow semver in `package.json` for releases.
+Follow semver in `package.json` for releases. `npm run deploy` creates an annotated `v{version}` tag after generating notes so the next run’s `git log <tag>..HEAD` range stays accurate. Push tags with `git push --tags` after committing the release files.
 
 ## Generated output
 
@@ -37,6 +37,8 @@ Legacy string-only items are still supported.
 Release notes are loaded from `/assets/release-notes.json` at runtime and shown as **Changelog** in Settings.
 
 When commit metadata is present, the changelog shows a clickable hash next to each item.
+
+After unlock, `WhatsNewService` compares the notes version to `fish-tracker-last-seen-version` in `localStorage`. If the version changed, a one-time What’s New dialog shows the same generated notes. First visit seeds the key without showing the dialog.
 
 ## User-visible changes
 

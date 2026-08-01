@@ -18,6 +18,7 @@
     "unknown": "Unbekannt",
     "import": "Importieren",
     "reset": "Zurücksetzen",
+    "rename": "Umbenennen",
     "retry": "Erneut versuchen",
     "loading": "Wird geladen...",
     "errorGeneric": "Etwas ist schiefgelaufen"
@@ -119,6 +120,10 @@
     "resetSection": "Zurücksetzen",
     "resetDesc": "Jede Rücksetzung erfordert eine Bestätigung. Einstellungen löschen keine Angeldaten.",
     "customOptions": "Benutzerdefinierte Optionen",
+    "manageOptions": "Optionen verwalten",
+    "manageOptionsDesc": "Benenne eine Option um, um sie überall in Fängen, Ruten, Filtern und Favoriten zu aktualisieren.",
+    "renameOptionPrompt": "Neuer Name für \"{{value}}\"",
+    "optionRenamed": "Option umbenannt",
     "resetAllCustom": "Alle benutzerdefinierten Optionen zurücksetzen",
     "preferences": "Voreinstellungen",
     "resetFilters": "Filter zurücksetzen",
@@ -136,8 +141,17 @@
     "importJson": "JSON-Backup importieren",
     "about": "Über",
     "aboutText": "Fish Tracker — Offline-First Fangregister.",
+    "sendFeedback": "Feedback senden",
+    "feedbackSubject": "Fish Tracker Feedback",
+    "installApp": "App installieren",
+    "shareWhatsApp": "Per WhatsApp teilen",
+    "shareWhatsAppText": "Schau dir Fish Tracker an: {{url}}",
+    "iosInstallHint": "Auf iPhone/iPad: Teilen tippen, dann Zum Home-Bildschirm.",
     "profile": "Profil",
     "documents": "Dokumente",
+    "privacy": "Datenschutz",
+    "privacyDesc": "Wie deine Angeldaten auf diesem Gerät gespeichert und verarbeitet werden.",
+    "openPrivacy": "Datenschutzrichtlinie öffnen",
     "releaseNotes": "Release Notes",
     "changelog": "Änderungsprotokoll",
     "changelogDesc": "Sieh dir den Versionsverlauf an, der aus Commit-Nachrichten erzeugt wird.",
@@ -213,7 +227,8 @@
     "stats": "Statistik",
     "settings": "Einstellungen",
     "more": "Mehr",
-    "assistant": "Assistent"
+    "assistant": "Assistent",
+    "shareWhatsApp": "Per WhatsApp teilen"
   },
   "activeSession": {
     "catches": "Fänge",
@@ -221,6 +236,12 @@
     "recentCatches": "Letzte Fänge",
     "viewSessionDetails": "Sitzungsdetails anzeigen",
     "refreshWeatherGps": "Wetter und GPS aktualisieren",
+    "instantCatch": "Sofortfang",
+    "instantCatchLogged": "Fang gespeichert — Details später ergänzen",
+    "instantCatchFailed": "Fang konnte nicht gespeichert werden",
+    "instantCatchEvent": "Schneller Fang gespeichert",
+    "addDetails": "Details hinzufügen",
+    "detailsPending": "Details offen",
     "addCatch": "Fang hinzufügen",
     "recast": "Neu auswerfen",
     "camera": "Kamera",
@@ -251,7 +272,12 @@
     "emptyTitle": "Noch keine Sitzungen",
     "emptyMessage": "Starte deine erste Angelsitzung, um mit der Erfassung zu beginnen.",
     "sessionStarted": "Sitzung gestartet",
-    "createFailed": "Sitzung konnte nicht erstellt werden. Bitte erneut versuchen."
+    "createFailed": "Sitzung konnte nicht erstellt werden. Bitte erneut versuchen.",
+    "backingUp": "Sicherung wird vor dem Start gespeichert…",
+    "backupSaved": "Sicherung auf dem Gerät gespeichert",
+    "backupFailedTitle": "Sicherung fehlgeschlagen",
+    "backupFailedMessage": "Die Sicherung konnte nicht auf diesem Gerät gespeichert werden. Sitzung ohne Sicherung starten? Wiederherstellen ist weiterhin unter Einstellungen → Import möglich, wenn du eine frühere Datei hast.",
+    "startWithoutBackup": "Ohne Sicherung starten"
   },
   "sessionDetail": {
     "prebait": "Vorfüttern",
@@ -334,8 +360,11 @@
     "tag": "Tag",
     "released": "Zurückgesetzt",
     "photoSelected": "Foto ausgewählt",
+    "photoAttached": "Foto vorhanden",
     "addPhoto": "Foto hinzufügen",
-    "saveCatch": "Fang speichern"
+    "saveCatch": "Fang speichern",
+    "saveChanges": "Änderungen speichern",
+    "editTitle": "Fang bearbeiten"
   },
   "quickCatch": {
     "title": "Schnellen Fang hinzufügen",
@@ -593,6 +622,23 @@
     "appName": "Angelregister",
     "logoAlt": "FishTracker-Logo"
   },
+  "dbRecovery": {
+    "title": "Lokale Datenbank konnte nicht geöffnet werden",
+    "versionMismatch": "Dieser App-Build ist älter als die bereits in diesem Browser gespeicherte Datenbank. Deine Angeldaten sind noch vorhanden.",
+    "upgradeFailed": "Die Aktualisierung des Datenbankschemas ist fehlgeschlagen. Deine Daten wurden nicht gelöscht; du kannst den Versuch sicher wiederholen.",
+    "unknown": "Die lokale Datenbank konnte nicht geöffnet werden. Deine Daten wurden nicht gelöscht.",
+    "dataSafe": "Aktualisiere oder lade eine passende App-Version neu, um fortzufahren. Lösche keine Website-Daten, es sei denn, du hast ein Backup.",
+    "checkForUpdates": "Nach Updates suchen",
+    "checkingUpdates": "Suche nach Updates...",
+    "retry": "Erneut versuchen",
+    "retrying": "Wird erneut versucht...",
+    "reload": "Neu laden"
+  },
+  "pwa": {
+    "updateAvailable": "Eine neue Version ist verfügbar.",
+    "updateNow": "Jetzt aktualisieren",
+    "updateFailed": "App-Update konnte nicht installiert werden. Bitte manuell aktualisieren."
+  },
   "pin": {
     "setPin": "PIN festlegen",
     "choosePin": "Wähle eine 6-stellige PIN",
@@ -601,6 +647,7 @@
     "unlock": "Entsperren",
     "enterPin": "Gib deine 6-stellige PIN ein",
     "incorrectPin": "Falsche PIN",
+    "lockout": "Zu viele Versuche. Erneut in {{seconds}}s versuchen",
     "appVersion": "App-Version",
     "checkForUpdates": "Nach Updates suchen",
     "checkingForUpdates": "Suche nach Updates...",
@@ -612,12 +659,48 @@
     "version": "Version",
     "empty": "Kein Änderungsprotokoll verfügbar."
   },
+  "whatsNew": {
+    "title": "Neu in v{{version}}",
+    "gotIt": "Verstanden",
+    "viewChangelog": "Vollständiges Änderungsprotokoll"
+  },
+  "feedbackPrompt": {
+    "title": "Feedback & Funktionen",
+    "message": "Hast du Feedback oder Funktionsideen? Schick sie per E-Mail — so verbessern wir Fish Tracker.",
+    "send": "Feedback senden",
+    "notNow": "Nicht jetzt"
+  },
+  "privacy": {
+    "title": "Datenschutz & Daten",
+    "summaryTitle": "Zusammenfassung",
+    "summaryBody": "Fish Tracker ist ein Offline-First Angel-Logbuch. Es gibt keine Benutzerkonten und keine Cloud-Datenbank für deine Fänge. Deine Angeldaten bleiben auf diesem Gerät, es sei denn, du exportierst ein Backup oder nutzt eine optionale Online-Funktion.",
+    "storedTitle": "Was gespeichert wird",
+    "storedBody": "Die App kann Sessions, Fänge, Seen und Spots, Fotos, optionale Profil- und Lizenzdaten, Einstellungen sowie Assistenten-Chatverläufe speichern. Alles bleibt lokal in deinem Browser.",
+    "storageTitle": "Wo es liegt",
+    "storageBody": "Angeldaten werden in diesem Browser über IndexedDB und localStorage gespeichert. Die App selbst kann als statische Website gehostet werden, aber dieser Host speichert dein Angel-Logbuch nicht.",
+    "thirdPartiesTitle": "Was das Gerät verlässt",
+    "thirdPartiesIntro": "Standardmäßig wird nichts hochgeladen. Daten werden nur gesendet, wenn du eine Funktion nutzt, die Netzwerk braucht:",
+    "thirdPartyWeather": "Wetter: Standortkoordinaten gehen an Open-Meteo für Vorhersagen.",
+    "thirdPartyGeocode": "Ortssuche: Suchtext oder Koordinaten gehen an OpenStreetMap Nominatim.",
+    "thirdPartyMaps": "Karten: Ein Kartenlink öffnet Google Maps in deinem Browser mit Koordinaten.",
+    "thirdPartyAi": "Optionale KI: Wenn du Online-KI aktivierst, geht eine Zusammenfassung der Angelstatistiken (keine Fotos) an den von dir konfigurierten Anbieter.",
+    "photosTitle": "Fotos",
+    "photosBody": "Fotos bleiben auf diesem Gerät in lokalem Speicher. Sie werden nicht auf einen Server hochgeladen. Sie sind nur enthalten, wenn du selbst eine Backup-Datei exportierst.",
+    "pinTitle": "PIN-Sperre",
+    "pinBody": "Die optionale PIN ist eine einfache Bildschirmsperre. Sie wird als Hash gespeichert, nicht im Klartext. Sie verschlüsselt deine Angeldaten nicht — wer Zugriff auf dieses Gerät oder Browser-Tools hat, kann sie weiterhin lesen.",
+    "backupsTitle": "Backups",
+    "backupsBody": "Export erstellt eine JSON-Datei auf deinem Gerät, die GPS-Verlauf, Fänge, Profildaten und Fotos enthalten kann. Bewahre Backup-Dateien sicher auf. Import ersetzt die aktuell in diesem Browser gespeicherten Daten.",
+    "controlTitle": "Deine Kontrolle",
+    "controlBody": "Du kannst alles mit einem vollständigen Reset in den Einstellungen oder durch Löschen der Website-Daten im Browser entfernen. Fish Tracker nutzt keine Analytics- oder Werbe-SDKs."
+  },
   "assistant": {
     "title": "Frag deine Daten",
     "subtitle": "Einblick-Prompts funktionieren offline. Online-KI braucht einen Schlüssel in den Einstellungen.",
     "newChat": "Neuer Chat",
     "starterTitle": "Vorgeschlagene Fragen",
     "threads": "Chats",
+    "recentChats": "Letzte Chats",
+    "noPreview": "Noch keine Nachrichten",
     "emptyThreads": "Noch keine Chats. Wähle einen Prompt oder starte einen neuen Chat.",
     "composerPlaceholder": "Frage zu Seen, Zeiten, Ködern…",
     "send": "Senden",

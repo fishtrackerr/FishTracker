@@ -66,7 +66,23 @@ export class ReleaseNotesComponent implements OnInit {
     if (typeof item === 'string') {
       return undefined;
     }
-    return item.commitUrl;
+    const url = item.commitUrl;
+    if (!url || typeof url !== 'string') {
+      return undefined;
+    }
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'https:') {
+        return undefined;
+      }
+      const host = parsed.hostname.toLowerCase();
+      if (host !== 'github.com' && host !== 'www.github.com') {
+        return undefined;
+      }
+      return url;
+    } catch {
+      return undefined;
+    }
   }
 
   noteCommitLabel(item: string | ReleaseNoteItem): string {

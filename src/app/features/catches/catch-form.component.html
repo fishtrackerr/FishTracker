@@ -1,4 +1,4 @@
-<h1>{{ 'catchForm.title' | tr }}</h1>
+<h1>{{ (isEdit ? 'catchForm.editTitle' : 'catchForm.title') | tr }}</h1>
 
 <app-option-combobox category="species" [label]="'catchForm.species' | tr" [(value)]="species" />
 
@@ -90,6 +90,8 @@
 <div class="photo-row">
   @if (photo) {
     <span class="photo-status">{{ 'catchForm.photoSelected' | tr }}</span>
+  } @else if (existingPhotoId) {
+    <span class="photo-status">{{ 'catchForm.photoAttached' | tr }}</span>
   }
   <button mat-stroked-button type="button" class="photo-btn" (click)="pickPhoto(true)">
     {{ 'images.camera' | tr }}
@@ -99,4 +101,11 @@
   </button>
 </div>
 
-<button mat-flat-button class="save-btn" [disabled]="!species" (click)="save()">{{ 'catchForm.saveCatch' | tr }}</button>
+<button
+  mat-flat-button
+  class="save-btn"
+  [disabled]="!species.trim() || saving()"
+  (click)="save()"
+>
+  {{ (saving() ? 'sessionEdit.saving' : (isEdit ? 'catchForm.saveChanges' : 'catchForm.saveCatch')) | tr }}
+</button>

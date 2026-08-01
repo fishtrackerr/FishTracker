@@ -64,6 +64,32 @@ describe('ReleaseNotesComponent', () => {
     expect(commitLink.textContent).toContain('abc1234');
   });
 
+  it('suppresses non-github commit URLs', async () => {
+    getReleaseNotes.mockResolvedValue({
+      version: '0.0.22',
+      date: '2026-07-23',
+      sections: [
+        {
+          category: 'Notes',
+          items: [
+            {
+              message: 'bad link',
+              shortHash: 'abc',
+              commitUrl: 'javascript:alert(1)',
+            },
+          ],
+        },
+      ],
+    } as ReleaseNotesData);
+
+    const fixture = TestBed.createComponent(ReleaseNotesComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('a.commit-link')).toBeNull();
+  });
+
   it('shows plain message text for legacy string-based notes', async () => {
     getReleaseNotes.mockResolvedValue({
       version: '0.0.22',

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ThemeService } from '../../core/services/theme.service';
 import { SessionCreateDialogComponent } from './session-create-dialog.component';
 
 describe('SessionCreateDialogComponent', () => {
@@ -24,6 +25,12 @@ describe('SessionCreateDialogComponent', () => {
           provide: MatDialogRef,
           useValue: {
             close,
+          },
+        },
+        {
+          provide: ThemeService,
+          useValue: {
+            getSelectPanelClass: () => 'theme-dark-select-panel',
           },
         },
       ],

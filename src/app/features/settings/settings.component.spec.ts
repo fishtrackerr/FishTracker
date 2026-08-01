@@ -14,6 +14,9 @@ import { LakeService } from '../../core/services/lake.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ResetService } from '../../core/services/reset.service';
 import { I18nService } from '../../core/services/i18n.service';
+import { PwaInstallService } from '../../core/services/pwa-install.service';
+import { ShareService } from '../../core/services/share.service';
+import { SecretVaultService } from '../../core/services/secret-vault.service';
 
 const settingsState = signal({
   themeMode: 'dark',
@@ -44,6 +47,7 @@ describe('SettingsComponent', () => {
   const lock = vi.fn();
   const changePin = vi.fn<PinLockService['changePin']>().mockResolvedValue(true);
   const update = vi.fn<SettingsService['update']>();
+  const shareAppViaWhatsApp = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -131,6 +135,29 @@ describe('SettingsComponent', () => {
             t: (key: string) => key,
           },
         },
+        {
+          provide: PwaInstallService,
+          useValue: {
+            canInstall: signal(false).asReadonly(),
+            showIosHint: signal(false).asReadonly(),
+            promptInstall: vi.fn(),
+          },
+        },
+        {
+          provide: ShareService,
+          useValue: {
+            shareAppViaWhatsApp,
+          },
+        },
+        {
+          provide: SecretVaultService,
+          useValue: {
+            aiApiKey: signal('').asReadonly(),
+            getAiApiKey: () => '',
+            setAiApiKey: vi.fn().mockResolvedValue(undefined),
+            clearAiApiKey: vi.fn().mockResolvedValue(undefined),
+          },
+        },
       ],
     });
   });
@@ -160,5 +187,28 @@ describe('SettingsComponent', () => {
     component.updateLockTimeout(25);
 
     expect(update).toHaveBeenCalledWith({ lockTimeoutMinutes: 25 });
+  });
+
+  it('opens mailto link for feedback', () => {
+    const open = vi.fn();
+    vi.stubGlobal('open', open);
+    const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+
+    component.sendFeedback();
+
+    expect(open).toHaveBeenCalledWith(
+      `mailto:erwin.torrenga@live.nl?subject=${encodeURIComponent('settings.feedbackSubject')}`,
+      '_self',
+    );
+
+    vi.unstubAllGlobals();
+  });
+
+  it('shares the app via WhatsApp', () => {
+    const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+
+    component.shareViaWhatsApp();
+
+    expect(shareAppViaWhatsApp).toHaveBeenCalledTimes(1);
   });
 });

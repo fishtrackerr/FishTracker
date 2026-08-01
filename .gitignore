@@ -42,3 +42,11 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Android / Capacitor signing (never commit keystores or passwords)
+android/keystore.properties
+android/*.jks
+android/*.keystore
+*.jks
+*.keystore
+!android/app/debug.keystore

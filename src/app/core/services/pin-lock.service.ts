@@ -1,13 +1,22 @@
 import { Injectable, inject, signal, isDevMode } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppLockState, DEFAULT_LOCK_STATE } from '../models/app-lock-state.model';
+import {
+  AppLockState,
+  DEFAULT_LOCK_STATE,
+  PIN_INITIAL_LOCKOUT_MS,
+  PIN_MAX_ATTEMPTS,
+  PIN_MAX_LOCKOUT_MS,
+  PinVerifyResult,
+} from '../models/app-lock-state.model';
 import { SettingsService } from './settings.service';
+import { SecretVaultService } from './secret-vault.service';
 import { LOCK_STATE_KEY, UNLOCK_SESSION_KEY } from '../constants/storage-keys';
 import { persistReturnUrl } from '../utils/return-url';
 
 @Injectable({ providedIn: 'root' })
 export class PinLockService {
   private readonly settings = inject(SettingsService);
+  private readonly vault = inject(SecretVaultService);
   private readonly router = inject(Router);
 
   private readonly lockedSignal = signal(true);
@@ -37,6 +46,7 @@ export class PinLockService {
     // Cold start or no verified unlock session → always lock (do not trust localStorage isLocked alone).
     if (!hasUnlockSession) {
       this.lockState.isLocked = true;
+      this.vault.lock();
       this.persistLockState();
       this.lockedSignal.set(true);
       if (isDevMode()) {
@@ -50,6 +60,7 @@ export class PinLockService {
       if (elapsed > timeoutMs) {
         this.lockState.isLocked = true;
         this.clearUnlockSession();
+        this.vault.lock();
         this.persistLockState();
         this.lockedSignal.set(true);
         if (isDevMode()) {
@@ -62,6 +73,9 @@ export class PinLockService {
     this.lockedSignal.set(this.lockState.isLocked);
     if (this.lockState.isLocked) {
       this.clearUnlockSession();
+      this.vault.lock();
+    } else {
+      this.vault.restoreFromSession();
     }
     if (isDevMode()) {
       console.debug('[PinLock] initialized from storage', { isLocked: this.lockState.isLocked });
@@ -84,12 +98,25 @@ export class PinLockService {
     return this.lockedSignal();
   }
 
+  /** Remaining lockout ms, or 0 if not locked out. */
+  getLockoutRemainingMs(): number {
+    const until = this.lockState.lockoutUntil;
+    if (!until) {
+      return 0;
+    }
+    return Math.max(0, until - Date.now());
+  }
+
   unlock(): void {
     this.lockedSignal.set(false);
     this.lockState = {
+      ...this.lockState,
       isLocked: false,
       unlockedAt: new Date().toISOString(),
       lastActivityAt: new Date().toISOString(),
+      failedAttempts: 0,
+      lockoutCount: 0,
+      lockoutUntil: undefined,
     };
     this.setUnlockSession();
     this.persistLockState();
@@ -108,6 +135,7 @@ export class PinLockService {
       isLocked: true,
     };
     this.clearUnlockSession();
+    this.vault.lock();
     this.persistLockState();
     if (isDevMode()) {
       console.debug('[PinLock] locked');
@@ -150,19 +178,25 @@ export class PinLockService {
       pinSalt: this.toBase64(salt),
       pinEnabled: true,
     });
+    await this.vault.unlockWithPin(pin);
     this.unlock();
   }
 
-  async verifyPin(pin: string): Promise<boolean> {
+  async verifyPin(pin: string): Promise<PinVerifyResult> {
+    const remaining = this.getLockoutRemainingMs();
+    if (remaining > 0) {
+      return { ok: false, reason: 'lockout', lockoutRemainingMs: remaining };
+    }
+
     const s = this.settings.get();
     if (!s.pinHash || !s.pinSalt) {
-      return false;
+      return { ok: false, reason: 'incorrect' };
     }
     const salt = this.fromBase64(s.pinSalt);
     const hash = await this.hashPin(pin, salt);
     const stored = this.fromBase64(s.pinHash);
     if (hash.length !== stored.length) {
-      return false;
+      return this.recordFailedAttempt();
     }
     let match = true;
     for (let i = 0; i < hash.length; i++) {
@@ -170,19 +204,54 @@ export class PinLockService {
         match = false;
       }
     }
-    if (match) {
-      this.unlock();
+    if (!match) {
+      return this.recordFailedAttempt();
     }
-    return match;
+
+    await this.vault.unlockWithPin(pin);
+    this.unlock();
+    return { ok: true };
   }
 
   async changePin(oldPin: string, newPin: string): Promise<boolean> {
-    const valid = await this.verifyPin(oldPin);
-    if (!valid) {
+    const result = await this.verifyPin(oldPin);
+    if (!result.ok) {
       return false;
     }
-    await this.setupPin(newPin);
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const hash = await this.hashPin(newPin, salt);
+    this.settings.update({
+      pinHash: this.toBase64(hash),
+      pinSalt: this.toBase64(salt),
+      pinEnabled: true,
+    });
+    await this.vault.rewrapWithPin(newPin);
     return true;
+  }
+
+  private recordFailedAttempt(): PinVerifyResult {
+    const attempts = (this.lockState.failedAttempts ?? 0) + 1;
+    this.lockState.failedAttempts = attempts;
+
+    if (attempts >= PIN_MAX_ATTEMPTS) {
+      const lockoutCount = this.lockState.lockoutCount ?? 0;
+      const lockoutMs = Math.min(
+        PIN_INITIAL_LOCKOUT_MS * Math.pow(2, lockoutCount),
+        PIN_MAX_LOCKOUT_MS,
+      );
+      this.lockState.lockoutUntil = Date.now() + lockoutMs;
+      this.lockState.lockoutCount = lockoutCount + 1;
+      this.lockState.failedAttempts = 0;
+      this.persistLockState();
+      return {
+        ok: false,
+        reason: 'lockout',
+        lockoutRemainingMs: lockoutMs,
+      };
+    }
+
+    this.persistLockState();
+    return { ok: false, reason: 'incorrect' };
   }
 
   private ensureActivityListener(): void {

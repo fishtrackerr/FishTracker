@@ -5,6 +5,7 @@ import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
 import { FishSpottedRepository } from './fish-spotted.repository';
 import { GeolocationService } from './geolocation.service';
+import { I18nService } from './i18n.service';
 import { ImageService } from './image.service';
 import { LakeRepository } from './lake.repository';
 import { RodSpotHistoryRepository } from './rod-spot-history.repository';
@@ -64,6 +65,7 @@ export class SessionService {
     private readonly rodSpotHistoryRepo: RodSpotHistoryRepository,
     private readonly sessionEventRepo: SessionEventRepository,
     private readonly sessionWeather: SessionWeatherService,
+    private readonly i18n: I18nService,
   ) {}
 
   watchAll() {
@@ -133,7 +135,11 @@ export class SessionService {
 
     const session: FishingSession = {
       id: sessionId,
-      name: name.trim() || (lake ? `Session at ${lake.name}` : 'Fishing Session'),
+      name:
+        name.trim() ||
+        (lake
+          ? this.i18n.t('sessions.defaultNameAtLake', { lake: lake.name })
+          : this.i18n.t('sessions.defaultName')),
       lakeId,
       status: 'active',
       startDate,

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Catch, FishingSession, Lake } from '../models';
+import { Catch, FishingSession, UserOptionCategory } from '../models';
 
 export interface StatisticsFilter {
   dateFrom?: string;
@@ -79,6 +79,48 @@ export class FilterService {
   deletePreset(id: string): void {
     const presets = this.getPresets().filter((p) => p.id !== id);
     localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+  }
+
+  /** Rewrite free-text option values in active filter and saved presets. */
+  rewriteOptionValue(
+    category: UserOptionCategory,
+    oldValue: string,
+    newValue: string,
+  ): void {
+    const field = this.filterFieldFor(category);
+    if (!field) {
+      return;
+    }
+
+    const active = this.activeFilter.value;
+    if (active[field] === oldValue) {
+      this.activeFilter.value = { ...active, [field]: newValue };
+    }
+
+    const presets = this.getPresets();
+    let changed = false;
+    const next = presets.map((preset) => {
+      if (preset.filter[field] !== oldValue) {
+        return preset;
+      }
+      changed = true;
+      return {
+        ...preset,
+        filter: { ...preset.filter, [field]: newValue },
+      };
+    });
+    if (changed) {
+      localStorage.setItem(PRESETS_KEY, JSON.stringify(next));
+    }
+  }
+
+  private filterFieldFor(
+    category: UserOptionCategory,
+  ): 'species' | 'bait' | 'rig' | undefined {
+    if (category === 'species' || category === 'bait' || category === 'rig') {
+      return category;
+    }
+    return undefined;
   }
 
   private matchesSession(s: FishingSession, f: StatisticsFilter): boolean {

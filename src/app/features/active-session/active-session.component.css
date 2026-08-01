@@ -82,8 +82,29 @@
   border-bottom: 1px solid var(--border-primary, #333);
 }
 
+.catch-list li.catch-row-btn {
+  cursor: pointer;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.catch-list li.catch-row-btn:focus-visible {
+  outline: 2px solid var(--primary, #ff6b00);
+  outline-offset: 2px;
+}
+
 .catch-list li:last-child {
   border-bottom: none;
+}
+
+.pending-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm, 4px);
+  background: rgba(255, 176, 32, 0.2);
+  color: var(--warning, #ffb020);
 }
 
 .catch-list .species {

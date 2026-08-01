@@ -12,6 +12,7 @@ import { RodSpotHistoryRepository } from './rod-spot-history.repository';
 import { SessionEventRepository } from './session-event.repository';
 import { SessionRepository } from './session.repository';
 import { SessionWeatherRepository } from './session-weather.repository';
+import { SecretVaultService } from './secret-vault.service';
 import { SettingsService } from './settings.service';
 import { ThemeService } from './theme.service';
 import { UserOptionRepository } from './user-option.repository';
@@ -25,6 +26,7 @@ const LOCK_STATE_KEY = 'fish-tracker-lock-state';
 @Injectable({ providedIn: 'root' })
 export class ResetService {
   private readonly settings = inject(SettingsService);
+  private readonly vault = inject(SecretVaultService);
   private readonly theme = inject(ThemeService);
   private readonly filterService = inject(FilterService);
   private readonly userOptions = inject(UserOptionService);
@@ -93,8 +95,9 @@ export class ResetService {
     const pinHash = this.settings.get().pinHash;
     const pinSalt = this.settings.get().pinSalt;
     const pinEnabled = this.settings.get().pinEnabled;
-    // replace() so optional secrets (aiApiKey) are cleared, not left via merge.
+    // replace() so optional secrets (aiApiKey / ciphertext) are cleared, not left via merge.
     this.settings.replace({ ...DEFAULT_SETTINGS, pinHash, pinSalt, pinEnabled });
+    await this.vault.clearAiApiKey();
     this.resetFilters();
     await this.resetAppearance();
     this.resetWeather();
@@ -147,6 +150,7 @@ export class ResetService {
     this.clearExpandStates();
     // replace() clears aiApiKey and other optional secrets omitted from defaults.
     this.settings.replace({ ...DEFAULT_SETTINGS });
+    this.vault.lock();
     await this.userOptions.restoreDefaults();
   }
 

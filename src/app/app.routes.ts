@@ -52,6 +52,11 @@ export const routes: Routes = [
           import('./features/catches/catch-form.component').then((m) => m.CatchFormComponent),
       },
       {
+        path: 'sessions/:id/catches/:catchId/edit',
+        loadComponent: () =>
+          import('./features/catches/catch-form.component').then((m) => m.CatchFormComponent),
+      },
+      {
         path: 'sessions/:id',
         loadComponent: () =>
           import('./features/sessions/session-detail.component').then((m) => m.SessionDetailComponent),
@@ -105,7 +110,13 @@ export const routes: Routes = [
             (m) => m.ReleaseNotesComponent,
           ),
       },
+      {
+        path: 'privacy',
+        loadComponent: () =>
+          import('./features/privacy/privacy.component').then((m) => m.PrivacyComponent),
+      },
     ],
   },
+
   { path: '**', redirectTo: '' },
 ];

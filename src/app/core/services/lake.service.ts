@@ -2,10 +2,14 @@ import { Injectable } from '@angular/core';
 import { FishingSpot, Lake } from '../models';
 import { generateId, nowIso } from '../utils';
 import { LakeRepository } from './lake.repository';
+import { RelatedDataSyncService } from './related-data-sync.service';
 
 @Injectable({ providedIn: 'root' })
 export class LakeService {
-  constructor(private readonly lakeRepo: LakeRepository) {}
+  constructor(
+    private readonly lakeRepo: LakeRepository,
+    private readonly sync: RelatedDataSyncService,
+  ) {}
 
   watchAll() {
     return this.lakeRepo.watchAll();
@@ -58,6 +62,9 @@ export class LakeService {
     }
     const updated: Lake = { ...existing, ...data, id, updatedAt: nowIso() };
     await this.lakeRepo.put(updated);
+    if (data.name !== undefined && data.name !== existing.name) {
+      await this.sync.onLakeRenamed(id, existing.name, data.name);
+    }
     return updated;
   }
 
@@ -109,6 +116,17 @@ export class LakeService {
       s.id === spotId ? { ...s, ...data, id: spotId } : s,
     );
     await this.update(lakeId, { spots: lake.spots });
+    const updated = lake.spots.find((s) => s.id === spotId);
+    if (updated) {
+      await this.sync.onLakeSpotUpdated(lakeId, spotId, {
+        name: updated.name,
+        latitude: updated.latitude,
+        longitude: updated.longitude,
+        depth: updated.waterDepthM,
+        bottomType: updated.bottomType,
+        notes: updated.notes,
+      });
+    }
   }
 
   async deleteSpot(lakeId: string, spotId: string): Promise<void> {

@@ -15,6 +15,7 @@ import { RodService } from '../../core/services/rod.service';
 import { SessionService } from '../../core/services/session.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { LakeService } from '../../core/services/lake.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 export interface LegacyRodSetupData {
@@ -45,7 +46,7 @@ export interface LegacyRodSetupData {
       @if (sessionSpots.length > 0) {
         <mat-form-field appearance="outline" class="full">
           <mat-label>{{ 'rodSetup.defaultSpotOptional' | tr }}</mat-label>
-          <mat-select [(ngModel)]="defaultSpotId">
+          <mat-select [(ngModel)]="defaultSpotId" [panelClass]="selectPanelClass">
             <mat-option value="">{{ 'common.none' | tr }}</mat-option>
             @for (spot of sessionSpots; track spot.id) {
               <mat-option [value]="spot.id">{{ spot.name }}</mat-option>
@@ -78,11 +79,13 @@ export class LegacyRodSetupDialogComponent implements OnInit {
   private readonly settings = inject(SettingsService);
   private readonly lakeService = inject(LakeService);
   private readonly i18n = inject(I18nService);
+  private readonly theme = inject(ThemeService);
 
   rodCount = Math.max(1, this.data.session.rods?.length ?? 1);
   defaultSpotId = '';
   maxRodCount = this.settings.get().maxRodCount ?? 10;
   sessionSpots: SessionSpot[] = this.data.session.sessionSpots ?? [];
+  readonly selectPanelClass = this.theme.getSelectPanelClass();
 
   get introText(): string {
     return this.data.isNewSession

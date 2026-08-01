@@ -22,7 +22,7 @@ When a lake is selected during session create/edit:
 4. Changing lake clears spots after confirmation
 5. New spots can be added to the lake inline and immediately selected
 
-Historical sessions keep snapshots even if lake spots change later.
+Linked session spots (`lakeSpotId` set) follow later lake spot edits (name, coordinates, depth, bottom, notes). Detached snapshots (no `lakeSpotId`) and spots whose lake spot was deleted keep their copied values.
 
 ## Rods
 

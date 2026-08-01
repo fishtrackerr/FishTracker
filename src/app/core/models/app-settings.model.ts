@@ -35,7 +35,14 @@ export interface AppSettings {
   defaultLakeId?: string;
   maxRodCount: number;
   aiChatEnabled: boolean;
+  /** @deprecated Plaintext — migrated to encrypted fields on unlock; never persist. */
   aiApiKey?: string;
+  /** AES-GCM ciphertext (base64) for the AI API key. */
+  aiApiKeyEncrypted?: string;
+  /** AES-GCM IV (base64). */
+  aiApiKeyIv?: string;
+  /** Salt for PIN-derived AI key wrapping key (base64). */
+  aiKeySalt?: string;
   aiBaseUrl?: string;
   aiModel?: string;
 }

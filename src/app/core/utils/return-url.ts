@@ -5,14 +5,35 @@ function isHomeUrl(url: string): boolean {
   return base === '/' || base === '';
 }
 
+/**
+ * Accept only same-app relative paths for post-unlock navigation.
+ * Rejects protocol-relative (`//…`), absolute URLs, and PIN routes.
+ */
+export function isSafeAppReturnUrl(url: string): boolean {
+  if (!url || typeof url !== 'string') {
+    return false;
+  }
+  if (!url.startsWith('/') || url.startsWith('//')) {
+    return false;
+  }
+  if (url.includes('://')) {
+    return false;
+  }
+  const path = url.split('?')[0].split('#')[0];
+  if (path.startsWith('/pin/')) {
+    return false;
+  }
+  return true;
+}
+
 /** Persist post-unlock destination. Never clobber a deep link with bare `/`. */
 export function persistReturnUrl(url: string): void {
-  if (!url || url.startsWith('/pin/')) {
+  if (!isSafeAppReturnUrl(url)) {
     return;
   }
 
   const existing = sessionStorage.getItem(RETURN_URL_KEY);
-  if (existing && !isHomeUrl(existing) && isHomeUrl(url)) {
+  if (existing && isSafeAppReturnUrl(existing) && !isHomeUrl(existing) && isHomeUrl(url)) {
     return;
   }
 
@@ -20,7 +41,11 @@ export function persistReturnUrl(url: string): void {
 }
 
 export function readReturnUrl(): string {
-  return sessionStorage.getItem(RETURN_URL_KEY) ?? '/';
+  const raw = sessionStorage.getItem(RETURN_URL_KEY);
+  if (raw && isSafeAppReturnUrl(raw)) {
+    return raw;
+  }
+  return '/';
 }
 
 export function clearReturnUrl(): void {

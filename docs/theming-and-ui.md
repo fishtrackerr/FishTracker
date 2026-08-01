@@ -24,10 +24,11 @@ Overrides in `src/styles/material-overrides.css`:
 
 Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hardcode `dark-dialog`.
 
-- Dialog surfaces use a `2px` active orange border (`--border-active`) in both themes
-- Start Session dialog fields use orange outlined borders and orange labels for all three inputs
-- Dialog cancel actions use stroked orange buttons; primary/confirm actions use orange filled buttons
-- End Session confirm dialog body text is themed orange to match dialog emphasis
+- Dialog surfaces use a `2px` border with `--border-active` (orange in dark, blue in light)
+- Dialog body text uses `--text-primary`; titles use `--primary`
+- Form fields inside dialogs use shared Material overrides (`--border-primary` outline, `--text-secondary` labels)
+- Cancel actions use stroked buttons; primary/confirm actions use filled buttons — both follow `--primary`
+- Bottom sheets (e.g. mobile filters) should include `themed-bottom-sheet` plus `theme-dark|theme-light` and a themed backdrop class, matching `DialogService`
 
 ## Shared components
 

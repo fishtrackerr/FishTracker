@@ -54,6 +54,24 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/FishTracker/",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "600kB",
+                  "maximumError": "1.5MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
+            },
+            "android": {
+              "baseHref": "/",
               "budgets": [
                 {
                   "type": "initial",
@@ -91,6 +109,13 @@
         },
         "test": {
           "builder": "@angular/build:unit-test"
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {
+            "baseHref": "/FishTracker/",
+            "buildTarget": "FishTracker:build:production"
+          }
         }
       }
     }

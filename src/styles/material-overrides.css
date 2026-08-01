@@ -162,29 +162,6 @@ textarea.mat-mdc-input-element {
   padding-top: var(--spacing-sm);
 }
 
-.cdk-overlay-container.theme-dark .mat-mdc-dialog-container .mdc-dialog__surface,
-.cdk-overlay-container[data-theme='dark'] .mat-mdc-dialog-container .mdc-dialog__surface,
-.theme-dark.themed-dialog .mat-mdc-dialog-container .mdc-dialog__surface {
-  background-color: var(--background-card) !important;
-  color: var(--text-primary) !important;
-}
-
-.cdk-overlay-container.theme-dark .mat-mdc-dialog-container .mat-mdc-dialog-title,
-.cdk-overlay-container[data-theme='dark'] .mat-mdc-dialog-container .mat-mdc-dialog-title {
-  color: var(--primary) !important;
-}
-
-.cdk-overlay-container.theme-dark .mat-mdc-dialog-container .mat-mdc-flat-button:not(:disabled),
-.cdk-overlay-container[data-theme='dark'] .mat-mdc-dialog-container .mat-mdc-flat-button:not(:disabled) {
-  --mdc-filled-button-container-color: var(--primary);
-  --mdc-filled-button-label-text-color: var(--text-on-primary);
-}
-
-.cdk-overlay-container.theme-dark .mat-mdc-dialog-container .mat-mdc-button,
-.cdk-overlay-container[data-theme='dark'] .mat-mdc-dialog-container .mat-mdc-button {
-  --mdc-text-button-label-text-color: var(--text-secondary);
-}
-
 /* Dialog button styling for all button types */
 .mat-mdc-dialog-container .mat-mdc-button:not(:disabled),
 .mat-mdc-dialog-container .mat-mdc-outlined-button:not(:disabled) {
@@ -224,10 +201,20 @@ textarea.mat-mdc-input-element {
 .mat-mdc-unelevated-button,
 .mat-mdc-raised-button,
 .mat-mdc-flat-button {
-  --mdc-text-button-container-shape: var(--radius-sm);
-  --mdc-outlined-button-container-shape: var(--radius-sm);
-  --mdc-filled-button-container-shape: var(--radius-sm);
-  --mdc-protected-button-container-shape: var(--radius-sm);
+  --mat-button-text-container-shape: var(--radius-md);
+  --mat-button-filled-container-shape: var(--radius-md);
+  --mat-button-protected-container-shape: var(--radius-md);
+  --mat-button-outlined-container-shape: var(--radius-md);
+  --mat-button-tonal-container-shape: var(--radius-md);
+  border-radius: var(--radius-md);
+}
+
+.mat-mdc-button .mdc-button__ripple,
+.mat-mdc-outlined-button .mdc-button__ripple,
+.mat-mdc-unelevated-button .mdc-button__ripple,
+.mat-mdc-raised-button .mdc-button__ripple,
+.mat-mdc-flat-button .mdc-button__ripple {
+  border-radius: var(--radius-md);
 }
 
 .mat-mdc-button,
@@ -251,7 +238,8 @@ textarea.mat-mdc-input-element {
 
 .mat-mdc-fab,
 .mat-mdc-mini-fab {
-  --mdc-fab-container-shape: var(--radius-sm);
+  --mat-fab-container-shape: var(--radius-md);
+  border-radius: var(--radius-md);
 }
 
 .mat-mdc-tab-group,

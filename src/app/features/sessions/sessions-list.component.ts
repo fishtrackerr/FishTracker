@@ -11,6 +11,7 @@ import { LakeService } from '../../core/services/lake.service';
 import { SearchService } from '../../core/services/search.service';
 import { FilterService, StatisticsFilter } from '../../core/services/filter.service';
 import { SessionStartFlowService } from '../../core/services/session-start-flow.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { SessionCardComponent } from '../../shared/components/session-card/session-card.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
@@ -49,6 +50,7 @@ export class SessionsListComponent {
   private readonly router = inject(Router);
   private readonly sessionStartFlow = inject(SessionStartFlowService);
   private readonly bottomSheet = inject(MatBottomSheet);
+  private readonly theme = inject(ThemeService);
 
   readonly allSessions = toSignal(this.sessionService.watchAll(), { initialValue: [] });
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
@@ -106,9 +108,13 @@ export class SessionsListComponent {
   }
 
   openMobileFilters(): void {
+    const themeClass = this.theme.resolvedTheme() === 'dark' ? 'theme-dark' : 'theme-light';
+    const backdropThemeClass =
+      this.theme.resolvedTheme() === 'dark' ? 'theme-backdrop-dark' : 'theme-backdrop-light';
     const ref = this.bottomSheet.open(FilterSheetComponent, {
       data: { filter: this.activeFilter() },
-      panelClass: 'themed-bottom-sheet',
+      panelClass: ['themed-bottom-sheet', themeClass],
+      backdropClass: `themed-backdrop ${backdropThemeClass}`,
     });
     ref.afterDismissed().subscribe((result: StatisticsFilter | undefined) => {
       if (result) {

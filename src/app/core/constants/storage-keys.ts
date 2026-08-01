@@ -6,3 +6,7 @@ export const UNLOCK_SESSION_KEY = 'fish-tracker-unlock-session';
 export const WEATHER_CACHE_KEY = 'fish-tracker-weather-cache';
 /** Forward + reverse Nominatim geocode cache. */
 export const GEOCODE_CACHE_KEY = 'fish-tracker-geocode-cache';
+/** Last app version for which the What's New dialog was shown (or seeded). */
+export const LAST_SEEN_VERSION_KEY = 'fish-tracker-last-seen-version';
+/** Local calendar date (YYYY-MM-DD) when the feedback prompt was last shown. */
+export const FEEDBACK_PROMPT_DATE_KEY = 'fish-tracker-feedback-prompt-date';

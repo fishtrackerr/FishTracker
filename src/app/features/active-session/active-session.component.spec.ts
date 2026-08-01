@@ -64,6 +64,7 @@ describe('ActiveSessionComponent', () => {
           useValue: {
             watchBySession: vi.fn().mockReturnValue(of([])),
             createQuick: vi.fn(),
+            createInstant: vi.fn(),
           },
         },
         {
@@ -101,6 +102,7 @@ describe('ActiveSessionComponent', () => {
           useValue: {
             success: vi.fn(),
             error: vi.fn(),
+            withAction: vi.fn(),
           },
         },
         {

@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Lake } from '../../core/models';
 import { I18nService } from '../../core/services/i18n.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { nowIso } from '../../core/utils';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
@@ -56,7 +57,7 @@ export interface SessionCreateDialogData {
 
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'sessionEdit.lakeOptional' | tr }}</mat-label>
-        <mat-select [(ngModel)]="lakeId">
+        <mat-select [(ngModel)]="lakeId" [panelClass]="selectPanelClass">
           <mat-option value="">{{ 'common.none' | tr }}</mat-option>
           @for (lake of data.lakes; track lake.id) {
             <mat-option [value]="lake.id">
@@ -89,14 +90,7 @@ export interface SessionCreateDialogData {
     .full { width: 100%; }
     .field-error { color: var(--danger, #d64545); font-size: 0.85rem; margin: -8px 0 8px; }
     mat-dialog-content {
-      color: var(--primary);
-    }
-    mat-dialog-content .mat-mdc-form-field {
-      --mdc-outlined-text-field-outline-color: var(--border-active);
-      --mdc-outlined-text-field-hover-outline-color: var(--border-active);
-      --mdc-outlined-text-field-focus-outline-color: var(--border-active);
-      --mdc-outlined-text-field-label-text-color: var(--primary);
-      --mdc-outlined-text-field-input-text-color: var(--text-primary);
+      color: var(--text-primary);
     }
   `,
 })
@@ -104,6 +98,9 @@ export class SessionCreateDialogComponent {
   readonly data = inject<SessionCreateDialogData>(MAT_DIALOG_DATA);
   private readonly ref = inject(MatDialogRef<SessionCreateDialogComponent, SessionCreateResult | undefined>);
   private readonly i18n = inject(I18nService);
+  private readonly theme = inject(ThemeService);
+
+  readonly selectPanelClass = this.theme.getSelectPanelClass();
 
   name = this.data.defaultName ?? this.i18n.t('sessionEdit.defaultName');
   startDateLocal = toLocalDatetimeInput(nowIso());

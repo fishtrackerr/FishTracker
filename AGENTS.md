@@ -71,9 +71,13 @@ Rules for AI-assisted changes to this repository.
 
 ## Security
 
-- Never store or log PIN or PIN hash
+- Never store or log the raw PIN (PBKDF2 hash + salt in settings is expected)
+- PIN unlock has attempt lockout / exponential backoff
+- AI API key is PIN-wrapped at rest (`SecretVaultService`); plaintext only while unlocked
 - `PinLockService` persists lock state; guards await startup init
-- Preserve return URL after unlock
+- Preserve return URL after unlock (same-app relative paths only)
+- Backup import validates size, ids, and image mime types
+- Static CSP meta in `index.html` for GitHub Pages hosting
 
 ## Documentation
 

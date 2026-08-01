@@ -2,11 +2,15 @@ import { Injectable } from '@angular/core';
 import { UserOption, UserOptionCategory } from '../models';
 import { generateId, nowIso } from '../utils';
 import { DEFAULT_SETTINGS } from '../models/app-settings.model';
+import { RelatedDataSyncService } from './related-data-sync.service';
 import { UserOptionRepository } from './user-option.repository';
 
 @Injectable({ providedIn: 'root' })
 export class UserOptionService {
-  constructor(private readonly repo: UserOptionRepository) {}
+  constructor(
+    private readonly repo: UserOptionRepository,
+    private readonly sync: RelatedDataSyncService,
+  ) {}
 
   watchByCategory(category: UserOptionCategory) {
     return this.repo.watchByCategory(category);
@@ -73,6 +77,47 @@ export class UserOptionService {
       isFavorite: !option.isFavorite,
       updatedAt: nowIso(),
     });
+  }
+
+  /**
+   * Rename an option and rewrite matching free-text usages (catches, rods, filters, settings).
+   * If the target value already exists in the same category, merges into that option.
+   */
+  async rename(id: string, newValue: string): Promise<UserOption | undefined> {
+    const all = await this.repo.getAll();
+    const option = all.find((o) => o.id === id);
+    if (!option) {
+      return undefined;
+    }
+
+    const trimmed = this.normalize(newValue);
+    if (!trimmed) {
+      throw new Error('Option value cannot be empty');
+    }
+
+    const oldValue = option.value;
+    if (oldValue === trimmed) {
+      return option;
+    }
+
+    const conflict = await this.findByValue(option.category, trimmed);
+    let survivor: UserOption;
+
+    if (conflict && conflict.id !== option.id) {
+      if (option.isFavorite && !conflict.isFavorite) {
+        survivor = { ...conflict, isFavorite: true, updatedAt: nowIso() };
+        await this.repo.put(survivor);
+      } else {
+        survivor = conflict;
+      }
+      await this.repo.delete(option.id);
+    } else {
+      survivor = { ...option, value: trimmed, updatedAt: nowIso() };
+      await this.repo.put(survivor);
+    }
+
+    await this.sync.onOptionRenamed(option.category, oldValue, survivor.value);
+    return survivor;
   }
 
   async resetCategory(category: UserOptionCategory, keepFavorites = true): Promise<void> {

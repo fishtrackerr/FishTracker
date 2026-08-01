@@ -48,6 +48,13 @@ describe('SessionService.start', () => {
     };
     image = { createCoverImage: vi.fn().mockResolvedValue(undefined) };
     settings = { update: vi.fn(), get: vi.fn().mockReturnValue({ maxRodCount: 10 }) };
+    const i18n = {
+      t: vi.fn((key: string, params?: Record<string, string>) => {
+        if (key === 'sessions.defaultNameAtLake') return `Session at ${params?.['lake']}`;
+        if (key === 'sessions.defaultName') return 'Fishing Session';
+        return key;
+      }),
+    };
 
     service = new SessionService(
       sessionRepo as never,
@@ -64,6 +71,7 @@ describe('SessionService.start', () => {
       emptyDeps.rodSpotHistoryRepo as never,
       emptyDeps.sessionEventRepo as never,
       emptyDeps.sessionWeather as never,
+      i18n as never,
     );
   });
 
@@ -200,6 +208,7 @@ describe('SessionService.updateSession', () => {
       { deleteByRod: vi.fn() } as never,
       { deleteBySession: vi.fn() } as never,
       { record: vi.fn(), deleteBySession: vi.fn() } as never,
+      { t: vi.fn((key: string) => key) } as never,
     );
   });
 

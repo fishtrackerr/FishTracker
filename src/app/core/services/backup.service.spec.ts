@@ -1,6 +1,10 @@
+import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { BackupService } from './backup.service';
 import { BACKUP_EXPORT_VERSION, SUPPORTED_BACKUP_VERSIONS } from '../models';
+import { LlmError, LlmService } from './llm.service';
+import { SecretVaultService } from './secret-vault.service';
+import { SettingsService } from './settings.service';
 
 describe('BackupService.validate', () => {
   let service: BackupService;
@@ -54,18 +58,60 @@ describe('BackupService.validate', () => {
       }),
     ).toThrow(/session entries must have an id/);
   });
+
+  it('rejects catches and lakes without id', () => {
+    expect(() =>
+      service.validate({
+        version: SUPPORTED_BACKUP_VERSIONS[0],
+        sessions: [{ id: 's1' }],
+        catches: [{}],
+        lakes: [],
+      }),
+    ).toThrow(/catch entries must have an id/);
+
+    expect(() =>
+      service.validate({
+        version: SUPPORTED_BACKUP_VERSIONS[0],
+        sessions: [{ id: 's1' }],
+        catches: [],
+        lakes: [{}],
+      }),
+    ).toThrow(/lake entries must have an id/);
+  });
+
+  it('rejects unsupported image mime types', () => {
+    expect(() =>
+      service.validate({
+        version: SUPPORTED_BACKUP_VERSIONS[0],
+        sessions: [],
+        catches: [],
+        lakes: [],
+        images: [{ id: 'i1', mimeType: 'image/svg+xml' }],
+      }),
+    ).toThrow(/unsupported image mime type/);
+  });
 });
 
 describe('LlmService.resolveBaseUrl', () => {
-  it('allowlists openai and openrouter hosts', async () => {
-    const { LlmService, LlmError } = await import('./llm.service');
-    const llm = new LlmService({
-      get: () => ({}),
-    } as never);
+  let llm: LlmService;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        LlmService,
+        { provide: SettingsService, useValue: { get: () => ({}) } },
+        { provide: SecretVaultService, useValue: { getAiApiKey: () => undefined } },
+      ],
+    });
+    llm = TestBed.inject(LlmService);
+  });
+
+  it('allowlists exact openai and openrouter hosts only', () => {
     expect(llm.resolveBaseUrl('https://api.openai.com/v1')).toBe('https://api.openai.com/v1');
     expect(llm.resolveBaseUrl('https://openrouter.ai/api/v1')).toBe('https://openrouter.ai/api/v1');
     expect(() => llm.resolveBaseUrl('http://api.openai.com/v1')).toThrow(LlmError);
     expect(() => llm.resolveBaseUrl('https://evil.example/v1')).toThrow(LlmError);
+    expect(() => llm.resolveBaseUrl('https://evil.api.openai.com/v1')).toThrow(LlmError);
+    expect(() => llm.resolveBaseUrl('https://user:pass@api.openai.com/v1')).toThrow(LlmError);
   });
 });

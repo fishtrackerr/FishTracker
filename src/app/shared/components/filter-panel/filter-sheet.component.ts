@@ -30,14 +30,25 @@ export interface FilterSheetData {
     </div>
   `,
   styles: `
-    .sheet { padding: var(--spacing-md); max-height: 80vh; overflow-y: auto; }
+    .sheet {
+      padding: var(--spacing-md);
+      max-height: 80vh;
+      overflow-y: auto;
+      color: var(--text-primary);
+      background: var(--background-card);
+    }
     .sheet-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: var(--spacing-md);
     }
-    .sheet-header h3 { margin: 0; text-align: center; flex: 1; }
+    .sheet-header h3 {
+      margin: 0;
+      text-align: center;
+      flex: 1;
+      color: var(--primary);
+    }
     .sheet-actions { margin-top: var(--spacing-md); }
     .sheet-actions button { width: 100%; }
   `,

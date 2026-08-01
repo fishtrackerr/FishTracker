@@ -13,6 +13,7 @@ import { RodSetupFlowService } from '../../core/services/rod-setup-flow.service'
 import { SearchService } from '../../core/services/search.service';
 import { SessionService } from '../../core/services/session.service';
 import { SettingsService } from '../../core/services/settings.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { SessionsListComponent } from './sessions-list.component';
 
 describe('SessionsListComponent', () => {
@@ -85,6 +86,13 @@ describe('SessionsListComponent', () => {
           provide: MatBottomSheet,
           useValue: {
             open: vi.fn(),
+          },
+        },
+        {
+          provide: ThemeService,
+          useValue: {
+            resolvedTheme: () => 'dark',
+            getSelectPanelClass: () => 'theme-dark-select-panel',
           },
         },
         {

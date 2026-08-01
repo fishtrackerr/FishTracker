@@ -1,5 +1,10 @@
 # Backup and Restore
 
+## When backups are created
+
+- **Settings → Export JSON Backup** — manual download (`fish-tracker-backup-YYYY-MM-DD.json`).
+- **Start Session** — before creating a new fishing session (when none is active), the app downloads a full backup as `fish-tracker-pre-session-YYYY-MM-DD.json`. If export fails, the user can skip and start anyway, or cancel. Restore remains **Settings → Import JSON Backup**.
+
 ## Export format
 
 JSON file via `BackupService.export()`:
@@ -31,7 +36,9 @@ interface BackupData {
 
 - `version` must be in `SUPPORTED_BACKUP_VERSIONS` (4, 5, 6)
 - `sessions`, `catches`, `lakes` must be arrays; optional collections must be arrays when present
-- Session entries must include an `id`
+- Session, catch, lake, and image entries must include a string `id`
+- Image count capped at 5000; mime types limited to `image/jpeg`, `image/png`, `image/webp`
+- Settings import rejects files larger than ~50 MB before parsing
 - Returns a `BackupPreview` (counts) for the Settings confirm dialog
 
 `BackupService.import()` calls `validate()` then fully replaces IndexedDB data (including profiles/documents).

@@ -88,6 +88,10 @@
         <mat-icon>bar_chart</mat-icon>
         <span>{{ 'nav.stats' | tr }}</span>
       </a>
+      <button mat-menu-item type="button" (click)="shareViaWhatsApp()">
+        <mat-icon>share</mat-icon>
+        <span>{{ 'nav.shareWhatsApp' | tr }}</span>
+      </button>
       <a mat-menu-item routerLink="/settings">
         <mat-icon>settings</mat-icon>
         <span>{{ 'nav.settings' | tr }}</span>

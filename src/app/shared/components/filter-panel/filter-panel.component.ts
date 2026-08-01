@@ -8,6 +8,7 @@ import { FilterService, StatisticsFilter } from '../../../core/services/filter.s
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { I18nService } from '../../../core/services/i18n.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
@@ -35,7 +36,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         </mat-form-field>
         <mat-form-field appearance="outline" class="full">
           <mat-label>{{ 'filters.sessionStatus' | tr }}</mat-label>
-          <mat-select [(ngModel)]="filter.sessionStatus" (ngModelChange)="emitChange()">
+          <mat-select [(ngModel)]="filter.sessionStatus" [panelClass]="selectPanelClass" (ngModelChange)="emitChange()">
             <mat-option [value]="undefined">{{ 'filters.any' | tr }}</mat-option>
             <mat-option value="active">{{ 'sessionStatus.active' | tr }}</mat-option>
             <mat-option value="completed">{{ 'sessionStatus.completed' | tr }}</mat-option>
@@ -93,10 +94,12 @@ export class FilterPanelComponent implements OnInit {
   private readonly confirm = inject(ConfirmService);
   private readonly notifications = inject(NotificationService);
   private readonly i18n = inject(I18nService);
+  private readonly theme = inject(ThemeService);
 
   @Input() filter: StatisticsFilter = {};
   @Input() compact = false;
   readonly filterChange = output<StatisticsFilter>();
+  readonly selectPanelClass = this.theme.getSelectPanelClass();
 
   readonly presets = signal(this.filterService.getPresets());
   readonly activeCount = signal(0);

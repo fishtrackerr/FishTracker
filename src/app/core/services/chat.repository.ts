@@ -34,6 +34,14 @@ export class ChatRepository {
     return db.chatMessages.where('threadId').equals(threadId).sortBy('createdAt');
   }
 
+  async getLatestMessage(threadId: string): Promise<ChatMessage | undefined> {
+    const messages = await db.chatMessages
+      .where('threadId')
+      .equals(threadId)
+      .sortBy('createdAt');
+    return messages.at(-1);
+  }
+
   async putThread(thread: ChatThread): Promise<void> {
     await db.chatThreads.put(thread);
   }

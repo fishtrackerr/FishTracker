@@ -29,7 +29,8 @@ flowchart TD
 | Service | Role |
 |---------|------|
 | `AppStartupService` | DB init, startup navigation, return URL |
-| `PinLockService` | PIN hash, lock state, inactivity |
+| `PinLockService` | PIN hash, lock state, inactivity, attempt lockout |
+| `SecretVaultService` | PIN-wrapped AI API key (memory while unlocked) |
 | `SessionService` | Session CRUD, start/complete/edit |
 | `CatchService` | Catch CRUD, session stats update |
 | `LakeService` | Lake and spot management |

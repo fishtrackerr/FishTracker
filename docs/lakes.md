@@ -31,3 +31,9 @@ Derived from sessions and catches linked via `session.lakeId`.
 ## Session integration
 
 Sessions optionally reference `lakeId`. Last used lake stored in settings as `lastLakeId` for new session defaults.
+
+## Rename cascade
+
+When a lake is renamed via `LakeService.update`, matching auto-generated session titles (`sessions.defaultNameAtLake` in all locales, plus legacy `Session at …`) for that `lakeId` are rewritten to the current language’s default title. Custom session names are left unchanged.
+
+When a lake spot is updated via `LakeService.updateSpot`, linked `SessionSpot` snapshots (`lakeSpotId` match) sync name, coordinates, depth, bottom type, and notes. Detached session spots (no `lakeSpotId`) are unchanged.

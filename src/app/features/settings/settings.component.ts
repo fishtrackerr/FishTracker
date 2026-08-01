@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -11,6 +11,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SettingsService } from '../../core/services/settings.service';
 import { BackupService } from '../../core/services/backup.service';
 import { PinLockService } from '../../core/services/pin-lock.service';
+import { SecretVaultService } from '../../core/services/secret-vault.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { ImageService } from '../../core/services/image.service';
@@ -19,10 +20,17 @@ import { LakeService } from '../../core/services/lake.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ResetService } from '../../core/services/reset.service';
 import { I18nService } from '../../core/services/i18n.service';
-import { BackupData, ThemeMode, UserOptionCategory, AppLanguage } from '../../core/models';
+import { PwaInstallService } from '../../core/services/pwa-install.service';
+import { ShareService } from '../../core/services/share.service';
+import { UserOptionService } from '../../core/services/user-option.service';
+import { BackupData, ThemeMode, UserOption, UserOptionCategory, AppLanguage } from '../../core/models';
+import { openFeedbackMailto } from '../../core/constants/feedback';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+
+/** Reject backup files larger than this before parsing. */
+const MAX_BACKUP_FILE_BYTES = 50 * 1024 * 1024;
 
 @Component({
   selector: 'app-settings',
@@ -43,10 +51,11 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css',
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
   private readonly settingsService = inject(SettingsService);
   private readonly backupService = inject(BackupService);
   private readonly pinLock = inject(PinLockService);
+  private readonly vault = inject(SecretVaultService);
   private readonly confirm = inject(ConfirmService);
   private readonly theme = inject(ThemeService);
   private readonly imageService = inject(ImageService);
@@ -55,13 +64,28 @@ export class SettingsComponent {
   private readonly notifications = inject(NotificationService);
   private readonly resetService = inject(ResetService);
   private readonly i18n = inject(I18nService);
+  readonly pwaInstall = inject(PwaInstallService);
+  private readonly share = inject(ShareService);
+  private readonly userOptions = inject(UserOptionService);
 
   readonly settings = this.settingsService.settings;
+  readonly aiApiKey = this.vault.aiApiKey;
   readonly supportedLanguages = this.i18n.supportedLanguages;
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
   readonly message = signal('');
   readonly exporting = signal(false);
   readonly fullResetInput = signal('');
+  readonly managedOptions = signal<Record<UserOptionCategory, UserOption[]>>({
+    species: [],
+    bait: [],
+    baitFlavor: [],
+    rig: [],
+    hookSize: [],
+    lineType: [],
+    method: [],
+    weatherType: [],
+    tag: [],
+  });
   readonly optionCategories: UserOptionCategory[] = [
     'species',
     'bait',
@@ -78,6 +102,10 @@ export class SettingsComponent {
   newPin = '';
   confirmPin = '';
 
+  ngOnInit(): void {
+    void this.reloadManagedOptions();
+  }
+
   updateUnits(field: 'weightUnit' | 'lengthUnit' | 'temperatureUnit' | 'distanceUnit', value: string): void {
     this.settingsService.update({ [field]: value });
   }
@@ -88,6 +116,18 @@ export class SettingsComponent {
 
   updateLanguage(language: AppLanguage): void {
     void this.i18n.setLanguage(language);
+  }
+
+  async installApp(): Promise<void> {
+    await this.pwaInstall.promptInstall();
+  }
+
+  sendFeedback(): void {
+    openFeedbackMailto(this.i18n.t('settings.feedbackSubject'));
+  }
+
+  shareViaWhatsApp(): void {
+    this.share.shareAppViaWhatsApp();
   }
 
   updateSetting<K extends keyof ReturnType<SettingsService['get']>>(
@@ -133,6 +173,9 @@ export class SettingsComponent {
     const file = input.files?.[0];
     if (!file) return;
     try {
+      if (file.size > MAX_BACKUP_FILE_BYTES) {
+        throw new Error('Backup file is too large');
+      }
       const text = await file.text();
       const raw = JSON.parse(text) as unknown;
       const preview = this.backupService.validate(raw);
@@ -164,9 +207,14 @@ export class SettingsComponent {
     this.notifications.success(this.i18n.t('messages.weatherCacheCleared'));
   }
 
+  updateAiApiKey(value: string): void {
+    void this.vault.setAiApiKey(value || undefined);
+  }
+
   clearAiKey(): void {
-    this.settingsService.update({ aiApiKey: undefined });
-    this.notifications.success(this.i18n.t('settings.aiKeyCleared'));
+    void this.vault.clearAiApiKey().then(() => {
+      this.notifications.success(this.i18n.t('settings.aiKeyCleared'));
+    });
   }
 
   async clearHomepageImage(): Promise<void> {
@@ -183,6 +231,7 @@ export class SettingsComponent {
     });
     if (!ok) return;
     await this.resetService.resetCustomOptionsCategory(category, true);
+    await this.reloadManagedOptions();
     this.notifications.success(`${categoryLabel} ${this.i18n.t('common.reset')}`);
   }
 
@@ -194,7 +243,38 @@ export class SettingsComponent {
     });
     if (!ok) return;
     await this.resetService.resetAllCustomOptions(true);
+    await this.reloadManagedOptions();
     this.notifications.success(this.i18n.t('settings.customOptionsReset'));
+  }
+
+  async renameOption(option: UserOption): Promise<void> {
+    const next = window.prompt(
+      this.i18n.t('settings.renameOptionPrompt', { value: option.value }),
+      option.value,
+    );
+    if (next == null) {
+      return;
+    }
+    const trimmed = next.trim();
+    if (!trimmed || trimmed === option.value) {
+      return;
+    }
+    try {
+      await this.userOptions.rename(option.id, trimmed);
+      await this.reloadManagedOptions();
+      this.notifications.success(this.i18n.t('settings.optionRenamed'));
+    } catch (error) {
+      console.error('[Settings] rename option failed', error);
+      this.notifications.error(this.i18n.t('common.errorGeneric'));
+    }
+  }
+
+  private async reloadManagedOptions(): Promise<void> {
+    const next = { ...this.managedOptions() };
+    for (const category of this.optionCategories) {
+      next[category] = await this.userOptions.getSortedOptions(category);
+    }
+    this.managedOptions.set(next);
   }
 
   async resetFilters(): Promise<void> {

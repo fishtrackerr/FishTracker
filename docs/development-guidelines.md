@@ -40,7 +40,7 @@
 
 ## Security
 
-- Never store or log raw PIN or PIN hash
+- Never store or log the raw PIN (PBKDF2 hash storage is expected)
 - Guards wait for startup initialization
 - Auto-lock must be deterministic
 - Preserve intended route after unlock via return URL

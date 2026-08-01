@@ -7,6 +7,90 @@ import { SessionRepository } from './session.repository';
 import { SessionWeatherMonitorService } from './session-weather-monitor.service';
 import { FishingSession } from '../models';
 import { RETURN_URL_KEY } from '../constants/storage-keys';
+import { db } from '../db/fish-db';
+
+describe('AppStartupService.initialize', () => {
+  let service: AppStartupService;
+  let pinLock: {
+    initializeFromStorage: ReturnType<typeof vi.fn>;
+    subscribeToLockChanges: ReturnType<typeof vi.fn>;
+  };
+  let weatherMonitor: { start: ReturnType<typeof vi.fn> };
+  let openSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    openSpy = vi.spyOn(db, 'open');
+    pinLock = {
+      initializeFromStorage: vi.fn(),
+      subscribeToLockChanges: vi.fn(),
+    };
+    weatherMonitor = { start: vi.fn() };
+
+    TestBed.configureTestingModule({
+      providers: [
+        AppStartupService,
+        { provide: PinLockService, useValue: pinLock },
+        { provide: SessionRepository, useValue: { getAllActive: vi.fn().mockResolvedValue([]) } },
+        { provide: SessionWeatherMonitorService, useValue: weatherMonitor },
+        { provide: Router, useValue: { url: '/', navigate: vi.fn(), navigateByUrl: vi.fn() } },
+      ],
+    });
+
+    service = TestBed.inject(AppStartupService);
+  });
+
+  afterEach(() => {
+    openSpy.mockRestore();
+  });
+
+  it('marks ready after successful open', async () => {
+    openSpy.mockResolvedValue(db as never);
+    await service.initialize();
+    expect(service.isReady()).toBe(true);
+    expect(service.dbRecoveryKind()).toBeNull();
+    expect(pinLock.initializeFromStorage).toHaveBeenCalled();
+    expect(weatherMonitor.start).toHaveBeenCalled();
+  });
+
+  it('records versionMismatch without becoming ready', async () => {
+    const err = new Error('Version mismatch');
+    err.name = 'VersionError';
+    openSpy.mockRejectedValue(err);
+
+    await service.initialize();
+
+    expect(service.isReady()).toBe(false);
+    expect(service.dbRecoveryKind()).toBe('versionMismatch');
+    expect(service.dbOpenError()).toContain('Version mismatch');
+    expect(pinLock.initializeFromStorage).not.toHaveBeenCalled();
+  });
+
+  it('records upgradeFailed for UpgradeError', async () => {
+    const err = new Error('Upgrade failed');
+    err.name = 'UpgradeError';
+    openSpy.mockRejectedValue(err);
+
+    await service.initialize();
+
+    expect(service.dbRecoveryKind()).toBe('upgradeFailed');
+    expect(service.isReady()).toBe(false);
+  });
+
+  it('retryOpenDb finishes init after a previous failure', async () => {
+    const err = new Error('Upgrade failed');
+    err.name = 'UpgradeError';
+    openSpy.mockRejectedValueOnce(err).mockResolvedValueOnce(db as never);
+
+    await service.initialize();
+    expect(service.isReady()).toBe(false);
+
+    const ok = await service.retryOpenDb();
+    expect(ok).toBe(true);
+    expect(service.isReady()).toBe(true);
+    expect(service.dbRecoveryKind()).toBeNull();
+    expect(pinLock.initializeFromStorage).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe('AppStartupService.resolveInitialRoute', () => {
   let service: AppStartupService;

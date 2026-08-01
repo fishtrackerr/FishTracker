@@ -6,6 +6,8 @@ import { SessionRepository } from './session.repository';
 import { SessionWeatherMonitorService } from './session-weather-monitor.service';
 import { consumePersistedReturnUrl, persistReturnUrl } from '../utils/return-url';
 
+export type DbRecoveryKind = 'versionMismatch' | 'upgradeFailed' | 'unknown';
+
 @Injectable({ providedIn: 'root' })
 export class AppStartupService {
   private readonly pinLock = inject(PinLockService);
@@ -14,14 +16,84 @@ export class AppStartupService {
   private readonly router = inject(Router);
 
   private readonly readySignal = signal(false);
+  private readonly dbOpenErrorSignal = signal<string | null>(null);
+  private readonly dbRecoveryKindSignal = signal<DbRecoveryKind | null>(null);
+  private readonly dbRetryingSignal = signal(false);
   private initialNavigationDone = false;
+  private postOpenInitDone = false;
   /** Shared across guard + startup so return URL is only consumed once. */
   private pinScreenRedirect?: Promise<string>;
 
   readonly isReady = this.readySignal.asReadonly();
+  readonly dbOpenError = this.dbOpenErrorSignal.asReadonly();
+  readonly dbRecoveryKind = this.dbRecoveryKindSignal.asReadonly();
+  readonly dbRetrying = this.dbRetryingSignal.asReadonly();
 
+  /**
+   * Opens IndexedDB and finishes startup. On open failure, records recovery state and
+   * resolves without throwing so the app can still bootstrap and show recovery UI.
+   */
   async initialize(): Promise<void> {
-    await db.open();
+    const opened = await this.tryOpenDb();
+    if (!opened) {
+      return;
+    }
+    this.finishPostOpenInit();
+  }
+
+  /** Retries IndexedDB open after a previous failure. Returns true when ready. */
+  async retryOpenDb(): Promise<boolean> {
+    if (this.readySignal()) {
+      return true;
+    }
+    this.dbRetryingSignal.set(true);
+    try {
+      const opened = await this.tryOpenDb();
+      if (!opened) {
+        return false;
+      }
+      this.finishPostOpenInit();
+      return true;
+    } finally {
+      this.dbRetryingSignal.set(false);
+    }
+  }
+
+  private async tryOpenDb(): Promise<boolean> {
+    try {
+      await db.open();
+      this.dbOpenErrorSignal.set(null);
+      this.dbRecoveryKindSignal.set(null);
+      return true;
+    } catch (err) {
+      const kind = this.classifyDbOpenError(err);
+      const message = err instanceof Error ? err.message : String(err);
+      this.dbRecoveryKindSignal.set(kind);
+      this.dbOpenErrorSignal.set(message);
+      if (isDevMode()) {
+        console.error('[AppStartup] db.open failed', kind, err);
+      }
+      return false;
+    }
+  }
+
+  private classifyDbOpenError(err: unknown): DbRecoveryKind {
+    const name = err instanceof Error ? err.name : '';
+    if (name === 'VersionError') {
+      return 'versionMismatch';
+    }
+    if (name === 'UpgradeError') {
+      return 'upgradeFailed';
+    }
+    return 'unknown';
+  }
+
+  private finishPostOpenInit(): void {
+    if (this.postOpenInitDone) {
+      this.readySignal.set(true);
+      return;
+    }
+    this.postOpenInitDone = true;
     this.pinLock.initializeFromStorage();
     this.weatherMonitor.start();
     // Navigation on lock is handled by PinLockService.lock(); only reset redirect cache here.
@@ -169,6 +241,7 @@ export class AppStartupService {
       '/settings',
       '/profile',
       '/release-notes',
+      '/privacy',
     ];
     if (shellRoutes.some((r) => base === r || base.startsWith(r + '/'))) {
       return true;

@@ -32,7 +32,19 @@ Database name: `FishTrackerDb`. Schema in `src/app/core/db/fish-db.ts`.
 - **v5**: Session weather history table; seeds from existing `session.weather`
 - **v6**: Chat threads and messages for Ask-your-data assistant
 
-Migrations run in `.upgrade()` handlers; always add migrations for schema changes.
+Migrations run in `.upgrade()` handlers; always add migrations for schema changes. Upgrades preserve existing data.
+
+### Open failure recovery
+
+`AppStartupService` opens IndexedDB on startup. If `db.open()` fails:
+
+| Case | Recovery UI | Data |
+|------|-------------|------|
+| Older DB + newer app | Silent Dexie upgrade on open | Kept |
+| Newer DB + older app (`VersionError`) | Splash: check for updates / reload | Kept in browser |
+| Upgrade / other open error | Splash: retry / reload | Not wiped |
+
+Do not clear site data or use Settings full reset unless you have a backup — wipe is a last resort only.
 
 ## localStorage keys
 
@@ -59,4 +71,4 @@ Weather snapshots cached by coordinates in `WeatherService` (multi-slot). Geocod
 
 ## Error handling
 
-Repository failures propagate to services; UI shows notifications via `NotificationService`.
+Repository failures propagate to services; UI shows notifications via `NotificationService`. IndexedDB open failures are handled separately at startup (see recovery section above).

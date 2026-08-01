@@ -29,15 +29,22 @@ export class PinUnlockComponent {
   readonly error = signal('');
   readonly version = signal('0.0.0');
   readonly checkingForUpdates = signal(false);
+  readonly lockoutActive = signal(false);
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       void this.loadVersion();
+      this.refreshLockoutMessage();
     }
   }
 
   addDigit(d: string): void {
+    if (this.pinLock.getLockoutRemainingMs() > 0) {
+      this.refreshLockoutMessage();
+      return;
+    }
     this.error.set('');
+    this.lockoutActive.set(false);
     if (this.pin().length < 6) {
       this.pin.update((p) => p + d);
       if (this.pin().length === 6) {
@@ -47,6 +54,9 @@ export class PinUnlockComponent {
   }
 
   removeDigit(): void {
+    if (this.pinLock.getLockoutRemainingMs() > 0) {
+      return;
+    }
     this.error.set('');
     this.pin.update((p) => p.slice(0, -1));
   }
@@ -63,14 +73,37 @@ export class PinUnlockComponent {
   }
 
   async verify(): Promise<void> {
-    const valid = await this.pinLock.verifyPin(this.pin());
-    if (valid) {
+    const result = await this.pinLock.verifyPin(this.pin());
+    if (result.ok) {
       const returnUrl = this.startup.consumeReturnUrl();
       const target = await this.startup.resolveInitialRoute(returnUrl);
       await this.router.navigateByUrl(target);
-    } else {
-      this.error.set(this.i18n.t('pin.incorrectPin'));
-      this.pin.set('');
+      return;
+    }
+
+    this.pin.set('');
+    if (result.reason === 'lockout') {
+      this.lockoutActive.set(true);
+      this.error.set(
+        this.i18n.t('pin.lockout', {
+          seconds: String(Math.ceil((result.lockoutRemainingMs ?? 0) / 1000)),
+        }),
+      );
+      return;
+    }
+    this.lockoutActive.set(false);
+    this.error.set(this.i18n.t('pin.incorrectPin'));
+  }
+
+  private refreshLockoutMessage(): void {
+    const remaining = this.pinLock.getLockoutRemainingMs();
+    if (remaining > 0) {
+      this.lockoutActive.set(true);
+      this.error.set(
+        this.i18n.t('pin.lockout', {
+          seconds: String(Math.ceil(remaining / 1000)),
+        }),
+      );
     }
   }
 

@@ -13,9 +13,18 @@ PBKDF2-SHA256, 100,000 iterations, 256-bit derived key, random 16-byte salt.
 `AppLockState` persisted in localStorage:
 
 - `isLocked`, `unlockedAt`, `lastActivityAt`
+- `failedAttempts`, `lockoutUntil`, `lockoutCount` for brute-force backoff
 - A separate `fish-tracker-unlock-session` flag in **sessionStorage** proves a successful PIN unlock in this browser tab
 - Cold start (no unlock session) always requires PIN — localStorage `isLocked: false` alone is not trusted
 - Expired sessions auto-lock based on `lockTimeoutMinutes`
+
+## Attempt lockout
+
+After **5** consecutive failed unlock attempts, a lockout is applied starting at **30 seconds**, doubling with each subsequent lockout up to **5 minutes**. Successful unlock resets the counters. While locked out, further guesses are rejected without hashing.
+
+## Unlock state and secrets
+
+On successful unlock, `SecretVaultService.unlockWithPin()` derives an AES-GCM wrapping key from the PIN and decrypts the AI API key into memory (and a tab-scoped sessionStorage copy for in-tab refresh). `lock()` clears both.
 
 ## Auto-lock
 
@@ -23,7 +32,7 @@ Inactivity checked every 30 seconds. Activity tracked on pointer and keyboard ev
 
 ## Route guard behavior
 
-Guards await startup initialization before evaluating lock state. Return URL stored in sessionStorage when redirecting to unlock.
+Guards await startup initialization before evaluating lock state. Return URL stored in sessionStorage when redirecting to unlock. Only same-app relative paths are accepted (`/…`, not `//…` or absolute URLs).
 
 ## Lock navigation
 
@@ -39,6 +48,7 @@ Guards await startup initialization before evaluating lock state. Return URL sto
 - Client-side PIN only; suitable for casual shoulder-surfing privacy, **not** high-security scenarios
 - IndexedDB fishing data is **not encrypted**; device/DevTools access can read catches, GPS, and photos without the PIN
 - PIN hash in localStorage — device access implies offline attack surface
+- AI API key is encrypted at rest with the PIN; plaintext exists only while unlocked (memory + tab sessionStorage)
 - In-app copy on PIN setup and Settings explains these limits
 
 ## Development logging

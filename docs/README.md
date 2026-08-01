@@ -27,6 +27,8 @@ Offline-first Angular PWA for logging fishing sessions, catches, lakes, and stat
 | [maps.md](./maps.md) | Google Maps URLs and geolocation |
 | [rods-and-spots.md](./rods-and-spots.md) | Rods, session spots, bites, timeline |
 | [assistant.md](./assistant.md) | Ask-your-data chat (local insights + optional AI) |
+| [google-play.md](./google-play.md) | Capacitor Android + Google Play prep (signing, Data safety, listing) |
+| [google-play-remaining.md](./google-play-remaining.md) | Checklist of Play steps still left (Pages deploy still works) |
 
 ## Main architecture decisions
 

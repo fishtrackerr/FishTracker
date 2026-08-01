@@ -16,6 +16,9 @@ import { LlmService } from '../../core/services/llm.service';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
+const ACTIVE_THREAD_KEY = 'ft.assistant.activeThreadId';
+const PREVIEW_MAX_LEN = 80;
+
 @Component({
   selector: 'app-assistant',
   standalone: true,
@@ -48,10 +51,13 @@ export class AssistantComponent {
   readonly draft = signal('');
   readonly sending = signal(false);
   readonly showThreads = signal(false);
+  readonly previews = signal<Record<string, string>>({});
 
   readonly aiReady = signal(this.llm.isConfigured());
 
   constructor() {
+    void this.resumeLastThread();
+
     effect((onCleanup) => {
       const threadId = this.activeThreadId();
       if (!threadId) {
@@ -64,6 +70,28 @@ export class AssistantComponent {
       });
       onCleanup(() => sub.unsubscribe());
     });
+
+    effect((onCleanup) => {
+      const list = this.threads();
+      let cancelled = false;
+      onCleanup(() => {
+        cancelled = true;
+      });
+      void (async () => {
+        const next: Record<string, string> = {};
+        await Promise.all(
+          list.map(async (thread) => {
+            const msg = await this.chatService.getLatestMessage(thread.id);
+            if (msg?.content) {
+              next[thread.id] = this.previewText(msg.content);
+            }
+          }),
+        );
+        if (!cancelled) {
+          this.previews.set(next);
+        }
+      })();
+    });
   }
 
   async startPrompt(promptId: InsightPromptId): Promise<void> {
@@ -73,7 +101,7 @@ export class AssistantComponent {
     this.sending.set(true);
     try {
       const thread = await this.chatService.startPromptThread(promptId);
-      this.activeThreadId.set(thread.id);
+      this.setActiveThread(thread.id);
       this.showThreads.set(false);
     } finally {
       this.sending.set(false);
@@ -86,17 +114,18 @@ export class AssistantComponent {
       return;
     }
     const thread = await this.chatService.createBlankThread();
-    this.activeThreadId.set(thread.id);
+    this.setActiveThread(thread.id);
     this.showThreads.set(false);
   }
 
   selectThread(threadId: string): void {
-    this.activeThreadId.set(threadId);
+    this.setActiveThread(threadId);
     this.showThreads.set(false);
   }
 
   clearActive(): void {
-    this.activeThreadId.set(null);
+    this.setActiveThread(null);
+    this.showThreads.set(false);
   }
 
   async send(): Promise<void> {
@@ -120,6 +149,12 @@ export class AssistantComponent {
     if (!threadId) {
       return;
     }
+    await this.deleteThread(threadId);
+  }
+
+  async deleteThread(threadId: string, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    event?.preventDefault();
     const ok = await this.confirm.confirm({
       title: this.i18n.t('assistant.deleteConfirmTitle'),
       message: this.i18n.t('assistant.deleteConfirmMessage'),
@@ -129,7 +164,14 @@ export class AssistantComponent {
       return;
     }
     await this.chatService.deleteThread(threadId);
-    this.activeThreadId.set(null);
+    if (this.activeThreadId() === threadId) {
+      this.setActiveThread(null);
+      this.showThreads.set(false);
+    }
+  }
+
+  threadPreview(threadId: string): string {
+    return this.previews()[threadId] ?? this.i18n.t('assistant.noPreview');
   }
 
   onComposerKeydown(event: KeyboardEvent): void {
@@ -137,6 +179,36 @@ export class AssistantComponent {
       event.preventDefault();
       void this.send();
     }
+  }
+
+  private async resumeLastThread(): Promise<void> {
+    const stored = localStorage.getItem(ACTIVE_THREAD_KEY);
+    if (!stored) {
+      return;
+    }
+    const thread = await this.chatService.getThread(stored);
+    if (thread) {
+      this.activeThreadId.set(thread.id);
+    } else {
+      localStorage.removeItem(ACTIVE_THREAD_KEY);
+    }
+  }
+
+  private setActiveThread(id: string | null): void {
+    this.activeThreadId.set(id);
+    if (id) {
+      localStorage.setItem(ACTIVE_THREAD_KEY, id);
+    } else {
+      localStorage.removeItem(ACTIVE_THREAD_KEY);
+    }
+  }
+
+  private previewText(content: string): string {
+    const oneLine = content.replace(/\s+/g, ' ').trim();
+    if (oneLine.length <= PREVIEW_MAX_LEN) {
+      return oneLine;
+    }
+    return `${oneLine.slice(0, PREVIEW_MAX_LEN)}…`;
   }
 
   private scrollToBottom(): void {

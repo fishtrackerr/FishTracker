@@ -187,6 +187,37 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
     }
   }
 
+  private instantSaving = false;
+
+  async instantCatch(): Promise<void> {
+    const s = this.session();
+    if (!s || this.instantSaving) return;
+    this.instantSaving = true;
+    try {
+      const created = await this.catchService.createInstant(s.id);
+      this.notifications.withAction(
+        this.i18n.t('activeSession.instantCatchLogged'),
+        this.i18n.t('activeSession.addDetails'),
+        () => {
+          void this.router.navigate(['/sessions', s.id, 'catches', created.id, 'edit']);
+        },
+        'success',
+        5000,
+      );
+    } catch (error) {
+      console.error('[ActiveSession] Failed to log instant catch', error);
+      this.notifications.error(this.i18n.t('activeSession.instantCatchFailed'));
+    } finally {
+      this.instantSaving = false;
+    }
+  }
+
+  openCatch(catchId: string): void {
+    const s = this.session();
+    if (!s) return;
+    void this.router.navigate(['/sessions', s.id, 'catches', catchId, 'edit']);
+  }
+
   get hasRods(): boolean {
     return (this.session()?.rods?.length ?? 0) > 0;
   }

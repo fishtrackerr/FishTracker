@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const { execSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -20,12 +21,38 @@ function writeJson(filePath, content) {
   fs.writeFileSync(filePath, JSON.stringify(content, null, 2) + '\n', 'utf8');
 }
 
+function createAnnotatedTag(root, version) {
+  const tag = `v${version}`;
+  const existing = execSync('git tag --list', { cwd: root, encoding: 'utf8' })
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (existing.includes(tag)) {
+    console.log(`Tag ${tag} already exists; skipping`);
+    return;
+  }
+
+  execSync(`git tag -a ${tag} -m "Release ${tag}"`, {
+    cwd: root,
+    stdio: 'inherit'
+  });
+  console.log(`Created annotated tag ${tag}`);
+}
+
 function main() {
   const root = __dirname;
   const packageJsonPath = path.join(root, 'package.json');
   const versionAssetPath = path.join(root, 'public', 'assets', 'version.json');
+  const tagOnly = process.argv.includes('--tag');
 
   const pkg = readJson(packageJsonPath);
+
+  if (tagOnly) {
+    createAnnotatedTag(root, pkg.version);
+    return;
+  }
+
   const nextVersion = incrementPatch(pkg.version);
   pkg.version = nextVersion;
   writeJson(packageJsonPath, pkg);

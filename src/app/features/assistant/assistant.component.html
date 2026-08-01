@@ -3,10 +3,12 @@
 <p class="subtitle">{{ 'assistant.subtitle' | tr }}</p>
 
 <div class="toolbar">
-  <button mat-stroked-button type="button" (click)="showThreads.set(!showThreads())">
-    <mat-icon>forum</mat-icon>
-    {{ 'assistant.threads' | tr }}
-  </button>
+  @if (activeThreadId()) {
+    <button mat-stroked-button type="button" (click)="showThreads.set(!showThreads())">
+      <mat-icon>forum</mat-icon>
+      {{ 'assistant.threads' | tr }}
+    </button>
+  }
   <button mat-stroked-button type="button" (click)="startBlankChat()" [disabled]="sending()">
     <mat-icon>add</mat-icon>
     {{ 'assistant.newChat' | tr }}
@@ -29,7 +31,7 @@
   </p>
 }
 
-@if (showThreads()) {
+@if (activeThreadId() && showThreads()) {
   <section class="threads-panel">
     <h2 class="section-title">{{ 'assistant.threads' | tr }}</h2>
     @if (threads().length === 0) {
@@ -37,15 +39,26 @@
     } @else {
       <ul class="thread-list">
         @for (thread of threads(); track thread.id) {
-          <li>
+          <li class="thread-row">
             <button
               type="button"
               class="thread-item"
               [class.active]="thread.id === activeThreadId()"
               (click)="selectThread(thread.id)"
             >
-              <span class="thread-title">{{ thread.title }}</span>
+              <span class="thread-main">
+                <span class="thread-title">{{ thread.title }}</span>
+                <span class="thread-preview">{{ threadPreview(thread.id) }}</span>
+              </span>
               <span class="thread-date">{{ thread.updatedAt | date: 'short' }}</span>
+            </button>
+            <button
+              type="button"
+              class="thread-delete"
+              [attr.aria-label]="'assistant.deleteThread' | tr"
+              (click)="deleteThread(thread.id, $event)"
+            >
+              <mat-icon>delete</mat-icon>
             </button>
           </li>
         }
@@ -55,6 +68,39 @@
 }
 
 @if (!activeThreadId()) {
+  <section class="recent-chats" data-testid="recent-chats">
+    <h2 class="section-title">{{ 'assistant.recentChats' | tr }}</h2>
+    @if (threads().length === 0) {
+      <p class="empty">{{ 'assistant.emptyThreads' | tr }}</p>
+    } @else {
+      <ul class="thread-list">
+        @for (thread of threads(); track thread.id) {
+          <li class="thread-row">
+            <button
+              type="button"
+              class="thread-item"
+              (click)="selectThread(thread.id)"
+            >
+              <span class="thread-main">
+                <span class="thread-title">{{ thread.title }}</span>
+                <span class="thread-preview">{{ threadPreview(thread.id) }}</span>
+              </span>
+              <span class="thread-date">{{ thread.updatedAt | date: 'short' }}</span>
+            </button>
+            <button
+              type="button"
+              class="thread-delete"
+              [attr.aria-label]="'assistant.deleteThread' | tr"
+              (click)="deleteThread(thread.id, $event)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
   <section class="starters">
     <h2 class="section-title">{{ 'assistant.starterTitle' | tr }}</h2>
     <div class="prompt-grid">

@@ -31,6 +31,8 @@ export interface Catch {
   isPersonalRecord?: boolean;
   prebait?: string;
   weather?: WeatherSnapshot;
+  /** True when logged instantly; details still need to be filled in. */
+  detailsPending?: boolean;
   createdAt: string;
   updatedAt: string;
 }

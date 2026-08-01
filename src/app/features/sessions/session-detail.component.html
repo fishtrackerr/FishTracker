@@ -91,7 +91,13 @@
       <a mat-button [routerLink]="['/sessions', s.id, 'catches', 'new']">{{ 'sessionDetail.addCatch' | tr }}</a>
     </div>
     @for (c of catches(); track c.id) {
-      <div class="catch-row">
+      <div
+        class="catch-row catch-row-link"
+        role="link"
+        tabindex="0"
+        (click)="editCatch(c.id)"
+        (keydown.enter)="editCatch(c.id)"
+      >
         @if (c.photoId) {
           <div class="catch-photo"><app-image-thumb [imageId]="c.photoId" /></div>
         }
@@ -99,6 +105,9 @@
           <div class="catch-header">
             <div class="catch-title">
               <strong>{{ c.species }}</strong>
+              @if (c.detailsPending) {
+                <span class="pending-badge">{{ 'activeSession.detailsPending' | tr }}</span>
+              }
               @if (c.isPersonalRecord) { <span class="pr">{{ 'sessionDetail.pr' | tr }}</span> }
             </div>
             @if (c.latitude != null && c.longitude != null) {
@@ -106,6 +115,7 @@
                 [latitude]="c.latitude"
                 [longitude]="c.longitude"
                 label="catch location"
+                (click)="$event.stopPropagation()"
               />
             }
           </div>

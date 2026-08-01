@@ -28,6 +28,14 @@ export class ChatService {
     return this.chatRepo.watchMessages(threadId);
   }
 
+  async getThread(id: string): Promise<ChatThread | undefined> {
+    return this.chatRepo.getThread(id);
+  }
+
+  async getLatestMessage(threadId: string): Promise<ChatMessage | undefined> {
+    return this.chatRepo.getLatestMessage(threadId);
+  }
+
   async createBlankThread(): Promise<ChatThread> {
     const now = nowIso();
     const thread: ChatThread = {

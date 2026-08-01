@@ -237,6 +237,12 @@ export class SessionDetailComponent {
     void this.router.navigate(['/sessions', s.id, 'edit']);
   }
 
+  editCatch(catchId: string): void {
+    const s = this.session();
+    if (!s) return;
+    void this.router.navigate(['/sessions', s.id, 'catches', catchId, 'edit']);
+  }
+
   async complete(): Promise<void> {
     const s = this.session();
     if (s) {

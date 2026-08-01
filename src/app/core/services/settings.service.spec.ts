@@ -59,10 +59,41 @@ describe('SettingsService', () => {
     const service = new SettingsService();
     service.update({ aiApiKey: 'secret' });
     expect(service.get().aiApiKey).toBe('secret');
+    // Legacy plaintext may remain on disk until vault migrates to ciphertext.
+    expect(JSON.parse(localStorage.getItem('fish-tracker-settings')!)).toHaveProperty(
+      'aiApiKey',
+      'secret',
+    );
 
     service.update({ aiApiKey: undefined });
     expect(service.get().aiApiKey).toBeUndefined();
     expect(JSON.parse(localStorage.getItem('fish-tracker-settings')!)).not.toHaveProperty('aiApiKey');
+  });
+
+  it('does not persist plaintext aiApiKey once ciphertext exists', () => {
+    const service = new SettingsService();
+    service.update({
+      aiApiKey: 'secret',
+      aiApiKeyEncrypted: 'cipher',
+      aiApiKeyIv: 'iv',
+    });
+    const stored = JSON.parse(localStorage.getItem('fish-tracker-settings')!);
+    expect(stored).not.toHaveProperty('aiApiKey');
+    expect(stored.aiApiKeyEncrypted).toBe('cipher');
+  });
+
+  it('ignores unknown keys when loading from storage', () => {
+    localStorage.setItem(
+      'fish-tracker-settings',
+      JSON.stringify({
+        themeMode: 'light',
+        __proto__: { polluted: true },
+        evilKey: 'nope',
+      }),
+    );
+    const service = new SettingsService();
+    expect(service.get().themeMode).toBe('light');
+    expect((service.get() as unknown as Record<string, unknown>)['evilKey']).toBeUndefined();
   });
 
   it('replace clears secrets omitted from the payload', () => {

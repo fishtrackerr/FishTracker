@@ -44,7 +44,7 @@ export interface ConfirmDialogData {
       text-align: center;
     }
     mat-dialog-content {
-      color: var(--primary);
+      color: var(--text-primary);
     }
   `,
 })

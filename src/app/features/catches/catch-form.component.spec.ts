@@ -4,8 +4,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CatchFormComponent } from './catch-form.component';
 import { CatchService } from '../../core/services/catch.service';
 import { SessionService } from '../../core/services/session.service';
+import { ImageService } from '../../core/services/image.service';
 import { PhotoPickService } from '../../core/services/photo-pick.service';
-import type { FishingSession } from '../../core/models';
+import type { Catch, FishingSession } from '../../core/models';
 
 function createParamMap(values: Record<string, string | undefined>) {
   return {
@@ -68,8 +69,14 @@ describe('CatchFormComponent', () => {
     async (..._args: Parameters<CatchService['create']>) =>
       ({ id: 'catch-1' } as Awaited<ReturnType<CatchService['create']>>),
   );
+  const updateCatch = vi.fn(
+    async (..._args: Parameters<CatchService['update']>) =>
+      ({ id: 'catch-1' } as Awaited<ReturnType<CatchService['update']>>),
+  );
+  const getCatchById = vi.fn<CatchService['getById']>();
   const getById = vi.fn<SessionService['getById']>().mockResolvedValue(createSession());
   const pickImage = vi.fn<PhotoPickService['pickImage']>();
+  const processFile = vi.fn<ImageService['processFile']>();
 
   const routeStub = {
     snapshot: {
@@ -80,6 +87,7 @@ describe('CatchFormComponent', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    routeStub.snapshot.paramMap = createParamMap({ id: 'session-1' });
     routeStub.snapshot.queryParamMap = createParamMap({ rodId: 'rod-1', sessionSpotId: 'spot-2' });
 
     TestBed.configureTestingModule({
@@ -98,12 +106,20 @@ describe('CatchFormComponent', () => {
           provide: CatchService,
           useValue: {
             create: createCatch,
+            update: updateCatch,
+            getById: getCatchById,
           },
         },
         {
           provide: SessionService,
           useValue: {
             getById,
+          },
+        },
+        {
+          provide: ImageService,
+          useValue: {
+            processFile,
           },
         },
         {
@@ -237,5 +253,56 @@ describe('CatchFormComponent', () => {
     await component.pickPhoto(false);
 
     expect(component.photo).toBeUndefined();
+  });
+
+  it('loads existing catch and clears detailsPending on edit save', async () => {
+    const existing: Catch = {
+      id: 'catch-99',
+      sessionId: 'session-1',
+      species: 'Unknown',
+      caughtAt: '2026-07-15T10:00:00.000Z',
+      weightKg: undefined,
+      detailsPending: true,
+      weather: {
+        description: 'Sunny',
+        temperatureC: 22,
+        windSpeedKmh: 5,
+        windDirection: 90,
+        airPressureHpa: 1012,
+        humidity: 50,
+        cloudCoverage: 10,
+        rain: false,
+        sunrise: '',
+        sunset: '',
+        moonPhase: 'Waxing',
+        capturedAt: '2026-07-15T10:00:00.000Z',
+      },
+      createdAt: '2026-07-15T10:00:00.000Z',
+      updatedAt: '2026-07-15T10:00:00.000Z',
+    };
+    routeStub.snapshot.paramMap = createParamMap({ id: 'session-1', catchId: 'catch-99' });
+    getCatchById.mockResolvedValue(existing);
+
+    const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
+    await component.load();
+
+    expect(component.isEdit).toBe(true);
+    expect(component.species).toBe('Unknown');
+    expect(getCatchById).toHaveBeenCalledWith('catch-99');
+
+    component.species = 'Carp';
+    component.weightKg = 3.5;
+    await component.save();
+
+    expect(updateCatch).toHaveBeenCalledWith(
+      'catch-99',
+      expect.objectContaining({
+        species: 'Carp',
+        weightKg: 3.5,
+        detailsPending: false,
+      }),
+    );
+    expect(createCatch).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1']);
   });
 });

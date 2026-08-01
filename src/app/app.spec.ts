@@ -6,6 +6,7 @@ import { ThemeService } from './core/services/theme.service';
 import { I18nService } from './core/services/i18n.service';
 import { SwUpdateService } from './core/services/sw-update.service';
 import { VersionCheckService } from './core/services/version-check.service';
+import { PwaInstallService } from './core/services/pwa-install.service';
 import { signal } from '@angular/core';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
@@ -19,7 +20,11 @@ describe('App', () => {
           provide: AppStartupService,
           useValue: {
             isReady: signal(true).asReadonly(),
+            dbRecoveryKind: signal(null).asReadonly(),
+            dbOpenError: signal(null).asReadonly(),
+            dbRetrying: signal(false).asReadonly(),
             performInitialNavigation: vi.fn(),
+            retryOpenDb: vi.fn(),
           },
         },
         {
@@ -32,11 +37,19 @@ describe('App', () => {
         },
         {
           provide: SwUpdateService,
-          useValue: {},
+          useValue: { checkForUpdatesNow: vi.fn() },
         },
         {
           provide: VersionCheckService,
           useValue: {},
+        },
+        {
+          provide: PwaInstallService,
+          useValue: {
+            canInstall: signal(false).asReadonly(),
+            showIosHint: signal(false).asReadonly(),
+            promptInstall: vi.fn(),
+          },
         },
       ],
     }).compileComponents();
