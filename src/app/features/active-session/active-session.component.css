@@ -5,6 +5,36 @@
   padding-bottom: 24px;
 }
 
+.weather-alert-banner {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--warning, #ffb020);
+  background: rgba(255, 176, 32, 0.18);
+  backdrop-filter: blur(6px);
+}
+
+.weather-alert-banner.has-danger {
+  border-color: var(--danger, #d64545);
+  background: rgba(214, 69, 69, 0.2);
+}
+
+.weather-alert-item {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+}
+
+.weather-alert-item.danger {
+  color: var(--danger, #ff8a8a);
+}
+
 .timer {
   font-size: 3rem;
   font-weight: 700;
@@ -98,6 +128,48 @@
 }
 
 .full { width: 100%; }
+
+.photo-strip {
+  background: var(--background-card, #1a1a1a);
+  border: 1px solid var(--border-primary, #333);
+  border-radius: var(--radius-md, 12px);
+  padding: 12px 16px;
+}
+
+.photo-strip h3 {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #aaa);
+}
+
+.photo-strip-gallery {
+  display: block;
+}
+
+.photo-strip-gallery ::ng-deep .gallery-grid {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
+}
+
+.photo-strip-gallery ::ng-deep .gallery-item {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 96px;
+  scroll-snap-align: start;
+}
+
+.photo-strip-gallery ::ng-deep .gallery-item .thumb {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+}
+
+.photo-strip-gallery ::ng-deep .actions {
+  opacity: 1;
+}
 
 .actions {
   display: flex;

@@ -27,6 +27,14 @@
   min-height: var(--button-height) !important;
   color: var(--primary) !important;
   border-color: var(--primary) !important;
+  margin-bottom: var(--spacing-sm);
+}
+
+.assistant-btn {
+  width: 100%;
+  min-height: var(--button-height) !important;
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
   margin-bottom: var(--spacing-lg);
 }
 

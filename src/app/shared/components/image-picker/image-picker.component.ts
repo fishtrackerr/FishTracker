@@ -13,7 +13,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   template: `
     <div class="picker">
       <button mat-stroked-button type="button" (click)="pickFile(false)">
-        {{ 'images.upload' | tr }}
+        {{ 'images.gallery' | tr }}
       </button>
       <button mat-stroked-button type="button" (click)="pickFile(true)">
         {{ 'images.camera' | tr }}

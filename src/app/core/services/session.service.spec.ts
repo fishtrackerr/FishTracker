@@ -7,10 +7,14 @@ describe('SessionService.start', () => {
   let sessionRepo: {
     getActive: ReturnType<typeof vi.fn>;
     put: ReturnType<typeof vi.fn>;
+    getById: ReturnType<typeof vi.fn>;
   };
   let lakeRepo: { getById: ReturnType<typeof vi.fn> };
   let geo: { getCurrentPosition: ReturnType<typeof vi.fn> };
-  let weather: { getSnapshot: ReturnType<typeof vi.fn> };
+  let weather: {
+    getSnapshot: ReturnType<typeof vi.fn>;
+    getCachedSnapshotFor: ReturnType<typeof vi.fn>;
+  };
   let image: { createCoverImage: ReturnType<typeof vi.fn> };
   let settings: { update: ReturnType<typeof vi.fn>; get: ReturnType<typeof vi.fn> };
   const emptyDeps = {
@@ -23,16 +27,25 @@ describe('SessionService.start', () => {
     fishSpottedRepo: { deleteBySession: vi.fn() },
     rodSpotHistoryRepo: { deleteByRod: vi.fn() },
     sessionEventRepo: { deleteBySession: vi.fn() },
+    sessionWeather: { record: vi.fn(), deleteBySession: vi.fn() },
   };
 
   beforeEach(() => {
     sessionRepo = {
       getActive: vi.fn().mockResolvedValue(undefined),
       put: vi.fn().mockResolvedValue(undefined),
+      getById: vi.fn().mockImplementation(async (id: string) => ({
+        id,
+        latitude: 52.1,
+        longitude: 5.1,
+      })),
     };
     lakeRepo = { getById: vi.fn().mockResolvedValue({ id: 'lake-1', name: 'Lake A' }) };
     geo = { getCurrentPosition: vi.fn().mockResolvedValue(null) };
-    weather = { getSnapshot: vi.fn().mockResolvedValue(null) };
+    weather = {
+      getSnapshot: vi.fn().mockResolvedValue(null),
+      getCachedSnapshotFor: vi.fn().mockReturnValue(null),
+    };
     image = { createCoverImage: vi.fn().mockResolvedValue(undefined) };
     settings = { update: vi.fn(), get: vi.fn().mockReturnValue({ maxRodCount: 10 }) };
 
@@ -50,6 +63,7 @@ describe('SessionService.start', () => {
       emptyDeps.fishSpottedRepo as never,
       emptyDeps.rodSpotHistoryRepo as never,
       emptyDeps.sessionEventRepo as never,
+      emptyDeps.sessionWeather as never,
     );
   });
 
@@ -105,6 +119,42 @@ describe('SessionService.start', () => {
     expect(session.coverImageId).toBeUndefined();
     expect(sessionRepo.put).toHaveBeenCalled();
   });
+
+  it('uses cached weather at start and refreshes live weather asynchronously', async () => {
+    emptyDeps.sessionWeather.record.mockClear();
+    const snapshot = {
+      description: 'Clear',
+      temperatureC: 18,
+      windSpeedKmh: 10,
+      windDirection: 90,
+      airPressureHpa: 1013,
+      humidity: 50,
+      cloudCoverage: 10,
+      rain: false,
+      sunrise: '2026-07-15T04:00:00.000Z',
+      sunset: '2026-07-15T20:00:00.000Z',
+      moonPhase: 'Waxing Crescent',
+      capturedAt: '2026-07-15T08:00:00.000Z',
+    };
+    geo.getCurrentPosition.mockResolvedValue({ latitude: 52.1, longitude: 5.1 });
+    weather.getCachedSnapshotFor.mockReturnValue(snapshot);
+    weather.getSnapshot.mockResolvedValue(snapshot);
+    settings.get.mockReturnValue({ maxRodCount: 10, useGpsForWeather: false });
+
+    const session = await service.start({
+      name: 'With Weather',
+      startDate: '2026-07-15T08:00:00.000Z',
+    });
+
+    expect(session.weather).toEqual(snapshot);
+    expect(weather.getCachedSnapshotFor).toHaveBeenCalledWith(52.1, 5.1);
+    expect(emptyDeps.sessionWeather.record).toHaveBeenCalledWith(session.id, snapshot);
+
+    // Async enrichment: refreshWeather uses getSnapshot after persist.
+    await vi.waitFor(() => {
+      expect(weather.getSnapshot).toHaveBeenCalledWith(52.1, 5.1);
+    });
+  });
 });
 
 describe('SessionService.updateSession', () => {
@@ -149,6 +199,7 @@ describe('SessionService.updateSession', () => {
       { deleteBySession: vi.fn() } as never,
       { deleteByRod: vi.fn() } as never,
       { deleteBySession: vi.fn() } as never,
+      { record: vi.fn(), deleteBySession: vi.fn() } as never,
     );
   });
 

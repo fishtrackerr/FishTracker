@@ -6,10 +6,18 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { Catch, FishingSession, SessionRod, SessionSpot } from '../../../core/models';
 import { BiteEventService } from '../../../core/services/bite-event.service';
+import { DialogService } from '../../../core/services/dialog.service';
 import { FishSpottedEventService } from '../../../core/services/fish-spotted-event.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { I18nService } from '../../../core/services/i18n.service';
 import { RodService } from '../../../core/services/rod.service';
+import {
+  RecastRodDialogComponent,
+  RecastRodDialogResult,
+} from '../recast-rod-dialog/recast-rod-dialog.component';
 import { ExpandableSectionComponent } from '../expandable-section/expandable-section.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -33,6 +41,9 @@ export class RodCardComponent {
   private readonly biteService = inject(BiteEventService);
   private readonly fishSpottedService = inject(FishSpottedEventService);
   private readonly rodService = inject(RodService);
+  private readonly dialog = inject(DialogService);
+  private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
 
   @Input({ required: true }) session!: FishingSession;
@@ -48,6 +59,10 @@ export class RodCardComponent {
   editRig = '';
   editNotes = '';
   editSpotId = '';
+
+  get canRecast(): boolean {
+    return this.session.status === 'active';
+  }
 
   get spotName(): string {
     const spot = this.sessionSpots.find((s) => s.id === this.rod.sessionSpotId);
@@ -111,6 +126,31 @@ export class RodCardComponent {
     await this.router.navigate(['/sessions', this.session.id, 'catches', 'new'], {
       queryParams,
     });
+  }
+
+  async recast(): Promise<void> {
+    if (!this.canRecast) {
+      return;
+    }
+    const ref = this.dialog.open(RecastRodDialogComponent, {
+      width: '100%',
+      maxWidth: '480px',
+      data: { session: this.session, rodId: this.rod.id },
+    });
+    const result = (await firstValueFrom(ref.afterClosed())) as
+      | RecastRodDialogResult
+      | undefined;
+    if (!result?.rodId) {
+      return;
+    }
+    try {
+      await this.rodService.recast(this.session, result.rodId, result.sessionSpotId);
+      this.notifications.success(this.i18n.t('rod.recastSuccess'));
+      this.changed.emit();
+    } catch (error) {
+      console.error('[RodCard] Failed to recast rod', error);
+      this.notifications.error(this.i18n.t('rod.recastFailed'));
+    }
   }
 
   async toggleActive(): Promise<void> {

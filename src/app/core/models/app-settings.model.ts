@@ -34,6 +34,10 @@ export interface AppSettings {
   firstDayOfWeek: 0 | 1;
   defaultLakeId?: string;
   maxRodCount: number;
+  aiChatEnabled: boolean;
+  aiApiKey?: string;
+  aiBaseUrl?: string;
+  aiModel?: string;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -60,4 +64,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   timeFormat: '24h',
   firstDayOfWeek: 1,
   maxRodCount: 10,
+  aiChatEnabled: false,
+  aiBaseUrl: 'https://api.openai.com/v1',
+  aiModel: 'gpt-4o-mini',
 };

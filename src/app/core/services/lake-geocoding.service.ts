@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { fetchWithTimeout } from '../utils';
 
 export interface LakeGeocodeSuccess {
   status: 'success';
@@ -37,7 +38,7 @@ export class LakeGeocodingService {
       url.searchParams.set('format', 'jsonv2');
       url.searchParams.set('limit', '1');
 
-      const response = await fetch(url.toString(), {
+      const response = await fetchWithTimeout(url.toString(), {
         headers: {
           Accept: 'application/json',
         },

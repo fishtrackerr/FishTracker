@@ -201,7 +201,7 @@ describe('CatchFormComponent', () => {
     expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1']);
   });
 
-  it('stores selected photo from file input change event', () => {
+  it('stores selected photo when user picks from camera', () => {
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
     const file = new File(['image'], 'photo.jpg', { type: 'image/jpeg' });
     const fakeInput = document.createElement('input');
@@ -209,10 +209,33 @@ describe('CatchFormComponent', () => {
       value: [file],
       configurable: true,
     });
+    const clickSpy = vi.spyOn(fakeInput, 'click').mockImplementation(() => undefined);
+    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(fakeInput);
 
-    component.onPhotoSelected({ target: fakeInput } as unknown as Event);
+    component.pickPhoto(true);
+    if (fakeInput.onchange) {
+      fakeInput.onchange(new Event('change'));
+    }
 
+    expect(fakeInput.capture).toBe('environment');
+    expect(clickSpy).toHaveBeenCalled();
     expect(component.photo).toBe(file);
+    clickSpy.mockRestore();
+    createElementSpy.mockRestore();
+  });
+
+  it('opens gallery picker without camera capture', () => {
+    const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
+    const fakeInput = document.createElement('input');
+    const clickSpy = vi.spyOn(fakeInput, 'click').mockImplementation(() => undefined);
+    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(fakeInput);
+
+    component.pickPhoto(false);
+
+    expect(fakeInput.capture).toBe('');
+    expect(clickSpy).toHaveBeenCalled();
+    clickSpy.mockRestore();
+    createElementSpy.mockRestore();
   });
 
   it('clears selected photo when no file is chosen', () => {
@@ -222,10 +245,17 @@ describe('CatchFormComponent', () => {
       value: [],
       configurable: true,
     });
+    const clickSpy = vi.spyOn(fakeInput, 'click').mockImplementation(() => undefined);
+    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(fakeInput);
 
     component.photo = new File(['old'], 'old.jpg', { type: 'image/jpeg' });
-    component.onPhotoSelected({ target: fakeInput } as unknown as Event);
+    component.pickPhoto(false);
+    if (fakeInput.onchange) {
+      fakeInput.onchange(new Event('change'));
+    }
 
     expect(component.photo).toBeUndefined();
+    clickSpy.mockRestore();
+    createElementSpy.mockRestore();
   });
 });

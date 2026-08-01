@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { UserOptionCategory } from '../../../core/models';
 import { UserOptionService } from '../../../core/services/user-option.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-option-combobox',
@@ -16,10 +17,11 @@ import { UserOptionService } from '../../../core/services/user-option.service';
     MatInputModule,
     MatAutocompleteModule,
     MatButtonModule,
+    TranslatePipe,
   ],
   template: `
     <mat-form-field appearance="outline" class="full">
-      <mat-label>{{ label }}</mat-label>
+      <mat-label>{{ label || ('options.defaultLabel' | tr) }}</mat-label>
       <input
         matInput
         [(ngModel)]="value"
@@ -38,9 +40,9 @@ import { UserOptionService } from '../../../core/services/user-option.service';
 
     @if (showCustomPrompt()) {
       <div class="custom-prompt app-card">
-        <p>No match for "{{ pendingCustom() }}"</p>
-        <button mat-stroked-button type="button" (click)="useOnce()">Use once</button>
-        <button mat-flat-button type="button" (click)="saveAsOption()">Save as option</button>
+        <p>{{ 'options.noMatch' | tr: { value: pendingCustom() } }}</p>
+        <button mat-stroked-button type="button" (click)="useOnce()">{{ 'options.useOnce' | tr }}</button>
+        <button mat-flat-button type="button" (click)="saveAsOption()">{{ 'options.saveAsOption' | tr }}</button>
       </div>
     }
   `,
@@ -61,7 +63,7 @@ export class OptionComboboxComponent {
   private readonly userOptions = inject(UserOptionService);
 
   @Input({ required: true }) category!: UserOptionCategory;
-  @Input() label = 'Option';
+  @Input() label = '';
   @Input() value = '';
   @Output() valueChange = new EventEmitter<string>();
 

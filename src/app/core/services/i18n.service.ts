@@ -1,14 +1,27 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { SettingsService } from './settings.service';
 import { AppLanguage } from '../models';
+import de from '../../../assets/i18n/de.json';
+import en from '../../../assets/i18n/en.json';
+import nl from '../../../assets/i18n/nl.json';
 
 type Dictionary = Record<string, unknown>;
+
+/** Bundled dictionaries — always available offline (no network fetch). */
+const BUNDLED: Record<AppLanguage, Dictionary> = {
+  nl: nl as Dictionary,
+  en: en as Dictionary,
+  de: de as Dictionary,
+};
 
 @Injectable({ providedIn: 'root' })
 export class I18nService {
   private readonly settings = inject(SettingsService);
-  private readonly cache = new Map<AppLanguage, Dictionary>();
-  private readonly fallbackLanguage: AppLanguage = 'nl';
+  private readonly cache = new Map<AppLanguage, Dictionary>(
+    (Object.entries(BUNDLED) as [AppLanguage, Dictionary][]).map(([lang, dict]) => [lang, dict]),
+  );
+  /** Ultimate offline safety net when a key is missing in the active language. */
+  private readonly fallbackLanguage: AppLanguage = 'en';
 
   readonly supportedLanguages: readonly AppLanguage[] = ['nl', 'en', 'de'];
   readonly language = signal<AppLanguage>('nl');
@@ -18,15 +31,14 @@ export class I18nService {
   constructor() {
     const fromSettings = this.normalizeLanguage(this.settings.get().language);
     this.language.set(fromSettings);
-    void this.loadLanguage(this.fallbackLanguage);
-    void this.loadLanguage(fromSettings);
+    this.applyLanguage(fromSettings);
   }
 
   async setLanguage(language: AppLanguage): Promise<void> {
     const normalized = this.normalizeLanguage(language);
     this.language.set(normalized);
     this.settings.update({ language: normalized });
-    await this.loadLanguage(normalized);
+    this.applyLanguage(normalized);
   }
 
   t(key: string, params?: Record<string, string | number>): string {
@@ -34,10 +46,7 @@ export class I18nService {
     let base = typeof fromActive === 'string' ? fromActive : '';
 
     if (!base && this.language() !== this.fallbackLanguage) {
-      const fallbackDictionary = this.cache.get(this.fallbackLanguage);
-      const fromFallback = fallbackDictionary
-        ? this.getByPath(fallbackDictionary, key)
-        : undefined;
+      const fromFallback = this.getByPath(this.cache.get(this.fallbackLanguage) ?? {}, key);
       base = typeof fromFallback === 'string' ? fromFallback : '';
     }
 
@@ -54,29 +63,9 @@ export class I18nService {
     }, base);
   }
 
-  private async loadLanguage(language: AppLanguage): Promise<void> {
-    if (this.cache.has(language)) {
-      this.dictionary.set(this.cache.get(language) ?? {});
-      return;
-    }
-
-    try {
-      const response = await fetch(`assets/i18n/${language}.json?ngsw-bypass=true&t=${Date.now()}`, {
-        cache: 'no-store',
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to load language: ${language}`);
-      }
-      const data = (await response.json()) as Dictionary;
-      this.cache.set(language, data);
-      this.dictionary.set(data);
-    } catch {
-      if (language !== 'nl') {
-        await this.loadLanguage('nl');
-      } else {
-        this.dictionary.set({});
-      }
-    }
+  private applyLanguage(language: AppLanguage): void {
+    const data = this.cache.get(language) ?? BUNDLED.en;
+    this.dictionary.set(data);
   }
 
   private getByPath(obj: Dictionary, path: string): unknown {

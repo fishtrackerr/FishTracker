@@ -8,44 +8,45 @@ import { FilterService, StatisticsFilter } from '../../../core/services/filter.s
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { I18nService } from '../../../core/services/i18n.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-filter-panel',
   standalone: true,
-  imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule],
+  imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, TranslatePipe],
   template: `
     <div class="filter-panel" [class.compact]="compact">
       @if (!compact) {
-        <h3 class="section-title">Filters @if (activeCount() > 0) { ({{ activeCount() }}) }</h3>
+        <h3 class="section-title">{{ 'filters.title' | tr }} @if (activeCount() > 0) { ({{ activeCount() }}) }</h3>
       }
 
       <div class="fields">
         <mat-form-field appearance="outline" class="full">
-          <mat-label>Date from</mat-label>
+          <mat-label>{{ 'filters.dateFrom' | tr }}</mat-label>
           <input matInput type="date" [(ngModel)]="filter.dateFrom" (ngModelChange)="emitChange()" />
         </mat-form-field>
         <mat-form-field appearance="outline" class="full">
-          <mat-label>Date to</mat-label>
+          <mat-label>{{ 'filters.dateTo' | tr }}</mat-label>
           <input matInput type="date" [(ngModel)]="filter.dateTo" (ngModelChange)="emitChange()" />
         </mat-form-field>
         <mat-form-field appearance="outline" class="full">
-          <mat-label>Species</mat-label>
+          <mat-label>{{ 'catchForm.species' | tr }}</mat-label>
           <input matInput [(ngModel)]="filter.species" (ngModelChange)="emitChange()" />
         </mat-form-field>
         <mat-form-field appearance="outline" class="full">
-          <mat-label>Session status</mat-label>
+          <mat-label>{{ 'filters.sessionStatus' | tr }}</mat-label>
           <mat-select [(ngModel)]="filter.sessionStatus" (ngModelChange)="emitChange()">
-            <mat-option [value]="undefined">Any</mat-option>
-            <mat-option value="active">Active</mat-option>
-            <mat-option value="completed">Completed</mat-option>
-            <mat-option value="planned">Planned</mat-option>
+            <mat-option [value]="undefined">{{ 'filters.any' | tr }}</mat-option>
+            <mat-option value="active">{{ 'sessionStatus.active' | tr }}</mat-option>
+            <mat-option value="completed">{{ 'sessionStatus.completed' | tr }}</mat-option>
+            <mat-option value="planned">{{ 'sessionStatus.planned' | tr }}</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
 
       <div class="actions">
-        <button mat-stroked-button type="button" (click)="clear()">Clear all</button>
-        <button mat-stroked-button type="button" (click)="savePreset()">Save preset</button>
+        <button mat-stroked-button type="button" (click)="clear()">{{ 'filters.clearAll' | tr }}</button>
+        <button mat-stroked-button type="button" (click)="savePreset()">{{ 'filters.savePreset' | tr }}</button>
       </div>
 
       @if (presets().length > 0) {
@@ -53,7 +54,7 @@ import { I18nService } from '../../../core/services/i18n.service';
           @for (preset of presets(); track preset.id) {
             <div class="preset-row">
               <button mat-button type="button" (click)="applyPreset(preset.filter)">{{ preset.name }}</button>
-              <button mat-icon-button type="button" aria-label="Delete preset" (click)="deletePreset(preset.id, preset.name)">×</button>
+              <button mat-icon-button type="button" [attr.aria-label]="'filters.deletePreset' | tr" (click)="deletePreset(preset.id, preset.name)">×</button>
             </div>
           }
         </div>

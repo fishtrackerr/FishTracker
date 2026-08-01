@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { PinLockService } from '../../core/services/pin-lock.service';
 import { AppStartupService } from '../../core/services/app-startup.service';
 import { I18nService } from '../../core/services/i18n.service';
+import { fetchWithTimeout } from '../../core/utils';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
@@ -70,9 +71,10 @@ export class PinSetupComponent {
 
   private async loadVersion(): Promise<void> {
     try {
-      const response = await fetch(`assets/version.json?ngsw-bypass=true&t=${Date.now()}`, {
-        cache: 'no-store',
-      });
+      const response = await fetchWithTimeout(
+        `assets/version.json?ngsw-bypass=true&t=${Date.now()}`,
+        { cache: 'no-store' },
+      );
       if (!response.ok) {
         return;
       }

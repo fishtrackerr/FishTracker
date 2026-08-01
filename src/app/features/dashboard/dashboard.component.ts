@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -34,6 +34,7 @@ import {
   imports: [
     MatButtonModule,
     MatDialogModule,
+    RouterLink,
     StatCardComponent,
     SessionCardComponent,
     WeatherCardComponent,
@@ -81,25 +82,36 @@ export class DashboardComponent implements OnInit {
     this.loadError.set(null);
     try {
       this.stats.set(await this.statsService.getDashboardStats());
-      try {
-        const pos = await this.geo.getCurrentPosition();
-        if (pos) {
-          const detailed = this.settings.get().detailedWeatherEnabled;
-          const snapshot = detailed
-            ? await this.weatherService.getDetailedForecast(pos.latitude, pos.longitude)
-            : await this.weatherService.getSnapshot(pos.latitude, pos.longitude);
-          this.weather.set(snapshot ?? this.weatherService.getCachedSnapshot());
-        } else {
-          this.weather.set(this.weatherService.getCachedSnapshot());
-        }
-      } catch {
-        this.weather.set(this.weatherService.getCachedSnapshot());
-      }
       this.homepageUrl.set(await this.imageService.getHomepageUrl());
+      // Show any nearby cached weather immediately so the card is not empty.
+      this.weather.set(this.weatherService.getCachedSnapshot());
     } catch {
       this.loadError.set('dashboard.loadError');
     } finally {
       this.loading.set(false);
+    }
+
+    // GPS + live weather must not block Start Session.
+    void this.loadWeatherInBackground();
+  }
+
+  private async loadWeatherInBackground(): Promise<void> {
+    try {
+      const pos = await this.geo.getCurrentPosition();
+      if (pos) {
+        const detailed = this.settings.get().detailedWeatherEnabled;
+        const snapshot = detailed
+          ? await this.weatherService.getDetailedForecast(pos.latitude, pos.longitude)
+          : await this.weatherService.getSnapshot(pos.latitude, pos.longitude);
+        this.weather.set(
+          snapshot ??
+            this.weatherService.getCachedSnapshotFor(pos.latitude, pos.longitude),
+        );
+      } else {
+        this.weather.set(this.weatherService.getCachedSnapshot());
+      }
+    } catch {
+      this.weather.set(this.weatherService.getCachedSnapshot());
     }
   }
 

@@ -1,9 +1,11 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { ImageService } from '../../../core/services/image.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-image-thumb',
   standalone: true,
+  imports: [TranslatePipe],
   template: `
     <div class="thumb-wrap">
       @if (url()) {
@@ -14,7 +16,7 @@ import { ImageService } from '../../../core/services/image.service';
         <img [src]="fallbackUrl" [alt]="alt" class="thumb" />
       }
       @if (showFavorite && isFavorite) {
-        <span class="fav-badge" aria-label="Favorite">★</span>
+        <span class="fav-badge" [attr.aria-label]="'lakes.favorite' | tr">★</span>
       }
     </div>
   `,

@@ -110,13 +110,28 @@ describe('QuickCatchDialogComponent', () => {
       .spyOn(document, 'createElement')
       .mockReturnValue(fakeInput);
 
-    component.pickPhoto();
+    component.pickPhoto(true);
     if (fakeInput.onchange) {
       fakeInput.onchange(new Event('change'));
     }
 
+    expect(fakeInput.capture).toBe('environment');
     expect(clickSpy).toHaveBeenCalled();
     expect(component.photo).toBe(file);
+    clickSpy.mockRestore();
+    createElementSpy.mockRestore();
+  });
+
+  it('opens gallery picker without camera capture', () => {
+    const component = TestBed.runInInjectionContext(() => new QuickCatchDialogComponent());
+    const fakeInput = document.createElement('input');
+    const clickSpy = vi.spyOn(fakeInput, 'click').mockImplementation(() => undefined);
+    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(fakeInput);
+
+    component.pickPhoto(false);
+
+    expect(fakeInput.capture).toBe('');
+    expect(clickSpy).toHaveBeenCalled();
     clickSpy.mockRestore();
     createElementSpy.mockRestore();
   });

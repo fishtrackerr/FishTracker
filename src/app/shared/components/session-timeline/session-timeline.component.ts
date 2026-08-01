@@ -5,15 +5,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { of, switchMap } from 'rxjs';
 import { SessionEvent } from '../../../core/models';
 import { SessionEventService } from '../../../core/services/session-event.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-session-timeline',
   standalone: true,
-  imports: [DatePipe, MatIconModule],
+  imports: [DatePipe, MatIconModule, TranslatePipe],
   template: `
     @if (events().length > 0) {
       <section class="timeline">
-        <h3 class="section-title">Session Timeline</h3>
+        <h3 class="section-title">{{ 'sessionTimeline.title' | tr }}</h3>
         <ul class="timeline-list">
           @for (event of events(); track event.id) {
             <li class="timeline-item">

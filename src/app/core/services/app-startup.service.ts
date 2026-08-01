@@ -3,26 +3,31 @@ import { Router } from '@angular/router';
 import { db } from '../db/fish-db';
 import { PinLockService } from './pin-lock.service';
 import { SessionRepository } from './session.repository';
-import { RETURN_URL_KEY } from '../constants/storage-keys';
+import { SessionWeatherMonitorService } from './session-weather-monitor.service';
+import { consumePersistedReturnUrl, persistReturnUrl } from '../utils/return-url';
 
 @Injectable({ providedIn: 'root' })
 export class AppStartupService {
   private readonly pinLock = inject(PinLockService);
   private readonly sessionRepo = inject(SessionRepository);
+  private readonly weatherMonitor = inject(SessionWeatherMonitorService);
   private readonly router = inject(Router);
 
   private readonly readySignal = signal(false);
   private initialNavigationDone = false;
+  /** Shared across guard + startup so return URL is only consumed once. */
+  private pinScreenRedirect?: Promise<string>;
 
   readonly isReady = this.readySignal.asReadonly();
 
   async initialize(): Promise<void> {
     await db.open();
     this.pinLock.initializeFromStorage();
+    this.weatherMonitor.start();
+    // Navigation on lock is handled by PinLockService.lock(); only reset redirect cache here.
     this.pinLock.subscribeToLockChanges((locked) => {
-      if (locked && !this.router.url.startsWith('/pin/')) {
-        this.storeReturnUrl(this.router.url);
-        void this.router.navigate(['/pin/unlock']);
+      if (locked) {
+        this.pinScreenRedirect = undefined;
       }
     });
     this.readySignal.set(true);
@@ -61,14 +66,20 @@ export class AppStartupService {
         if (!hasPin) {
           return '/pin/setup';
         }
-        return isLocked ? '/pin/unlock' : '/';
+        if (isLocked) {
+          return '/pin/unlock';
+        }
+        return this.resolveAfterLeavingPinScreen();
       }
 
       if (path.startsWith('/pin/unlock')) {
         if (!hasPin) {
           return '/pin/setup';
         }
-        return isLocked ? '/pin/unlock' : '/';
+        if (isLocked) {
+          return '/pin/unlock';
+        }
+        return this.resolveAfterLeavingPinScreen();
       }
     }
 
@@ -78,31 +89,20 @@ export class AppStartupService {
 
     if (isLocked) {
       this.storeReturnUrl(path);
+      this.pinScreenRedirect = undefined;
       return '/pin/unlock';
     }
 
-    if (this.isPreservableDeepLink(path)) {
-      return path;
-    }
-
-    const active = await this.getActiveSession();
-    if (active) {
-      return '/sessions/active';
-    }
-
-    return '/';
+    return this.resolveUnlockedDestination(path);
   }
 
   storeReturnUrl(url: string): void {
-    if (url && !url.startsWith('/pin/')) {
-      sessionStorage.setItem(RETURN_URL_KEY, url);
-    }
+    persistReturnUrl(url);
+    this.pinScreenRedirect = undefined;
   }
 
   consumeReturnUrl(): string {
-    const url = sessionStorage.getItem(RETURN_URL_KEY) ?? '/';
-    sessionStorage.removeItem(RETURN_URL_KEY);
-    return url;
+    return consumePersistedReturnUrl();
   }
 
   waitUntilReady(): Promise<void> {
@@ -126,6 +126,30 @@ export class AppStartupService {
     if (path && path !== '/') {
       return path + window.location.search;
     }
+    return '/';
+  }
+
+  private resolveAfterLeavingPinScreen(): Promise<string> {
+    if (!this.pinScreenRedirect) {
+      this.pinScreenRedirect = this.resolveUnlockedDestination(this.consumeReturnUrl());
+    }
+    return this.pinScreenRedirect;
+  }
+
+  private async resolveUnlockedDestination(path: string): Promise<string> {
+    if (path.startsWith('/pin/')) {
+      path = '/';
+    }
+
+    if (this.isPreservableDeepLink(path)) {
+      return path;
+    }
+
+    const active = await this.getActiveSession();
+    if (active) {
+      return '/sessions/active';
+    }
+
     return '/';
   }
 

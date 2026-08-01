@@ -16,6 +16,7 @@ Defined in `src/app/app.routes.ts`.
 | `/lakes`, `/lakes/:id` | Lakes list/detail | `pinLockGuard` |
 | `/gallery` | GalleryComponent | `pinLockGuard` |
 | `/statistics` | StatisticsComponent | `pinLockGuard` |
+| `/assistant` | AssistantComponent | `pinLockGuard` |
 | `/settings` | SettingsComponent | `pinLockGuard` |
 | `/profile`, `/profile/documents` | Profile | `pinLockGuard` |
 | `/release-notes` | ReleaseNotesComponent | `pinLockGuard` |
@@ -25,7 +26,7 @@ Defined in `src/app/app.routes.ts`.
 
 ### `pinLockGuard`
 
-Waits for `AppStartupService.waitUntilReady()`. Redirects to setup or unlock; stores return URL when locking.
+Waits for `AppStartupService.waitUntilReady()`. Redirects to setup or unlock; stores the **navigation target** (`RouterStateSnapshot.url`) as the return URL when locking — not `router.url`, which is often still `/` during cold start/refresh.
 
 ### `pinSetupGuard` / `pinUnlockGuard`
 

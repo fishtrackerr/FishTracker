@@ -23,7 +23,17 @@
 }
 
 .photo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
   margin: var(--spacing-xs) 0;
+}
+
+.photo-status {
+  flex: 1 1 100%;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 .more-label {

@@ -11,7 +11,8 @@
 `SessionCreateDialogComponent` collects name, start datetime, optional lake. `SessionService.start()`:
 
 - Reuses existing active session if one exists
-- Captures GPS/weather/cover optionally
+- Captures GPS/weather/cover optionally; initial weather is stored as latest on the session and as the first `sessionWeather` history row
+- Refresh weather appends another history snapshot (session.weather stays the latest)
 - Sets status `active`
 
 After creating a brand-new session (no previously active session), the app prompts for rod count, then opens `/sessions/:id?setupRods=1` so users can immediately fill rod details (bait, rig, notes, active/inactive) on rod cards before switching to active-session view.
@@ -40,7 +41,8 @@ Legacy sessions without rods show a setup prompt on active session detail.
 - Startup navigates to `/sessions/active` when an active session exists
 - Footer navigation shows a dedicated **Current** tab while an active session exists; it opens `/sessions/active`
 - Dashboard shows **Continue Active Session**
-- Active session page: timer, reactive catch list, Quick Catch, notes, end session, and direct actions for **View session details** and **Edit session**
+- Active session page: timer, reactive catch list, Quick Catch, **Recast** (update rod spot / cast), notes, end session, session photo strip (session + catch images), and direct actions for **View session details** and **Edit session**
+- Session detail (`/sessions/:id`) includes an images section (cover preview, picker, gallery) for session and catch photos
 - New-session startup flow routes through session detail setup mode first (`/sessions/:id?setupRods=1`), with a finish action that navigates to `/sessions/active?id=:id`
 
 ## Sessions list behavior

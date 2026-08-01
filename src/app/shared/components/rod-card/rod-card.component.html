@@ -70,6 +70,16 @@
 
     <div class="actions">
       <button mat-stroked-button type="button" (click)="startEdit()">{{ 'rod.editRod' | tr }}</button>
+      @if (canRecast) {
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="recast()"
+          [attr.aria-label]="'rod.recast' | tr"
+        >
+          <mat-icon>south</mat-icon> {{ 'rod.recast' | tr }}
+        </button>
+      }
       <button mat-stroked-button type="button" (click)="markFishSpotted()" [attr.aria-label]="'rod.markFishSpotted' | tr">
         <mat-icon>visibility</mat-icon> {{ 'rod.spotted' | tr }}
       </button>

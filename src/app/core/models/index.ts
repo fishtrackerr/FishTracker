@@ -1,4 +1,5 @@
 export * from './weather-snapshot.model';
+export * from './session-weather.model';
 export * from './fishing-spot.model';
 export * from './lake.model';
 export * from './fishing-session.model';
@@ -16,3 +17,4 @@ export * from './backup.model';
 export * from './user-profile.model';
 export * from './profile-document.model';
 export * from './app-lock-state.model';
+export * from './chat.model';

@@ -1,12 +1,14 @@
 import { Component, Input } from '@angular/core';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-loading-state',
   standalone: true,
+  imports: [TranslatePipe],
   template: `
     <div class="loading-state" role="status" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
-      <p>{{ message }}</p>
+      <p>{{ message | tr }}</p>
     </div>
   `,
   styles: `
@@ -30,5 +32,5 @@ import { Component, Input } from '@angular/core';
   `,
 })
 export class LoadingStateComponent {
-  @Input() message = 'Loading...';
+  @Input() message = 'common.loading';
 }

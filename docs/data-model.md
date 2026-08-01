@@ -13,7 +13,7 @@ Interfaces live in `src/app/core/models/`.
 | startDate | string (ISO) | yes | Session start |
 | endDate | string (ISO) | no | Session end |
 | latitude, longitude | number | no | GPS |
-| weather | WeatherSnapshot | no | Snapshot at start/update |
+| weather | WeatherSnapshot | no | Latest snapshot (history in sessionWeather table) |
 | waterTemperatureC | number | no | Water temp |
 | prebait, notes | string | no | Text fields |
 | tags | string[] | no | Session tags |
@@ -48,13 +48,26 @@ Interfaces live in `src/app/core/models/`.
 
 Includes `spots: FishingSpot[]` embedded array, cover image, favorites flag.
 
+## SessionWeatherRecord
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| id | string | yes | UUID |
+| sessionId | string | yes | Parent session |
+| capturedAt | string (ISO) | yes | When snapshot was taken |
+| weather | WeatherSnapshot | yes | Full conditions at capture |
+
 ## SessionSpot, SessionRod, BiteEvent, FishSpottedEvent, SessionEvent, UserOption
 
 See [rods-and-spots.md](./rods-and-spots.md) and model files in `src/app/core/models/`.
 
 ## AppSettings
 
-Stored in localStorage: theme, units, favorite species, PIN hash/salt, lock timeout, weather preferences.
+Stored in localStorage: theme, units, favorite species, PIN hash/salt, lock timeout, weather preferences, optional AI chat (`aiChatEnabled`, `aiApiKey`, `aiBaseUrl`, `aiModel`).
+
+## ChatThread / ChatMessage
+
+Ask-your-data assistant history in IndexedDB. See [assistant.md](./assistant.md).
 
 ## AppLockState
 

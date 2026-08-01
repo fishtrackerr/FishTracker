@@ -33,6 +33,7 @@ Historical sessions keep snapshots even if lake spots change later.
 - Reducing rod count requires confirmation if removed rods have activity
 - After starting a new session, users are routed to session detail setup mode (`setupRods=1`) to complete rod details right away
 - Immediate setup supports per-rod **bait**, **rig**, **notes**, and **active/inactive** status
+- **Recast** (active sessions only): change a rod's session spot and record `castAt` / a `rod-cast` timeline event. Available from the active session screen and each rod card. Spot changes also write `RodSpotHistory` and a `rod-moved` event when the spot differs.
 
 ## Bites and fish spotted
 
@@ -63,7 +64,7 @@ Catches with legacy `spotId` get `sessionSpotId` snapshots where possible. Activ
 
 | Service | Role |
 |---------|------|
-| `RodService` | Rod CRUD, spot assignment, count resize |
+| `RodService` | Rod CRUD, spot assignment, recast, count resize |
 | `BiteEventService` | Add/remove bites |
 | `FishSpottedEventService` | Register spotted fish |
 | `SessionEventService` | Timeline events |

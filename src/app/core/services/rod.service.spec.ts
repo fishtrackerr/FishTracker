@@ -8,19 +8,23 @@ describe('RodService', () => {
   let biteRepo: { countByRod: ReturnType<typeof vi.fn> };
   let fishSpottedRepo: { countByRod: ReturnType<typeof vi.fn> };
   let catchRepo: { getBySession: ReturnType<typeof vi.fn> };
+  let historyRepo: { put: ReturnType<typeof vi.fn> };
+  let sessionEvents: { record: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
-    sessionRepo = { put: vi.fn() };
+    sessionRepo = { put: vi.fn(async (s) => s) };
     biteRepo = { countByRod: vi.fn().mockResolvedValue(0) };
     fishSpottedRepo = { countByRod: vi.fn().mockResolvedValue(0) };
     catchRepo = { getBySession: vi.fn().mockResolvedValue([]) };
+    historyRepo = { put: vi.fn().mockResolvedValue(undefined) };
+    sessionEvents = { record: vi.fn().mockResolvedValue(undefined) };
     service = new RodService(
       sessionRepo as never,
       biteRepo as never,
       fishSpottedRepo as never,
       catchRepo as never,
-      {} as never,
-      { record: vi.fn() } as never,
+      historyRepo as never,
+      sessionEvents as never,
     );
   });
 
@@ -42,5 +46,70 @@ describe('RodService', () => {
     biteRepo.countByRod.mockResolvedValueOnce(2);
     const result = await service.resizeRodCount(session, 1);
     expect(result.requiresConfirm).toBe(true);
+  });
+
+  it('recasts to a new spot and records cast time', async () => {
+    const session = {
+      id: 's-1',
+      rods: [
+        {
+          id: 'r-1',
+          sessionId: 's-1',
+          rodNumber: 1,
+          name: 'Rod 1',
+          sessionSpotId: 'spot-a',
+          biteCount: 0,
+          fishSpottedCount: 0,
+          isActive: true,
+        },
+      ],
+      sessionSpots: [
+        { id: 'spot-a', name: 'Near bank' },
+        { id: 'spot-b', name: 'Far margin' },
+      ],
+    } as FishingSession;
+
+    const updated = await service.recast(session, 'r-1', 'spot-b');
+    const rod = updated.rods?.find((r) => r.id === 'r-1');
+    expect(rod?.sessionSpotId).toBe('spot-b');
+    expect(rod?.castAt).toBeTruthy();
+    expect(historyRepo.put).toHaveBeenCalled();
+    expect(sessionEvents.record).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'rod-moved' }),
+    );
+    expect(sessionEvents.record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'rod-cast',
+        description: 'Rod 1 cast at Far margin',
+      }),
+    );
+  });
+
+  it('recasts to the same spot without a move event', async () => {
+    const session = {
+      id: 's-1',
+      rods: [
+        {
+          id: 'r-1',
+          sessionId: 's-1',
+          rodNumber: 1,
+          name: 'Rod 1',
+          sessionSpotId: 'spot-a',
+          biteCount: 0,
+          fishSpottedCount: 0,
+          isActive: true,
+        },
+      ],
+      sessionSpots: [{ id: 'spot-a', name: 'Near bank' }],
+    } as FishingSession;
+
+    await service.recast(session, 'r-1', 'spot-a');
+    expect(historyRepo.put).not.toHaveBeenCalled();
+    expect(sessionEvents.record).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'rod-moved' }),
+    );
+    expect(sessionEvents.record).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'rod-cast' }),
+    );
   });
 });

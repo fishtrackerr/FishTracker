@@ -1,4 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { StatisticsService, DashboardStats } from '../../core/services/statistics.service';
 import { CatchRepository } from '../../core/services/catch.repository';
 import { FilterService, StatisticsFilter } from '../../core/services/filter.service';
@@ -12,6 +14,8 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
   selector: 'app-statistics',
   standalone: true,
   imports: [
+    RouterLink,
+    MatButtonModule,
     StatCardComponent,
     PageTitleComponent,
     FilterPanelComponent,

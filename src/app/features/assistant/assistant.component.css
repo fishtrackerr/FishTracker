@@ -1,0 +1,213 @@
+.subtitle {
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.hint {
+  margin: 0 0 var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  background: var(--background-secondary);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.hint a {
+  color: var(--primary);
+  margin-left: var(--spacing-xs);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.toolbar .danger {
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+
+.section-title {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.prompt-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm);
+}
+
+@media (min-width: 640px) {
+  .prompt-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.prompt-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  text-align: left;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--background-card);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.prompt-card:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.prompt-card strong {
+  color: var(--primary);
+}
+
+.prompt-card span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.prompt-card.new {
+  border-style: dashed;
+}
+
+.threads-panel {
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--background-secondary);
+}
+
+.thread-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.thread-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--background-card);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.thread-item.active {
+  border-color: var(--border-active);
+}
+
+.thread-title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thread-date {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.empty {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  min-height: 50vh;
+}
+
+.messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-height: min(55vh, 520px);
+  overflow-y: auto;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--background-secondary);
+}
+
+.bubble {
+  max-width: 92%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  background: var(--background-card);
+  border: 1px solid var(--border-primary);
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--primary) 18%, var(--background-card));
+  border-color: var(--border-active);
+}
+
+.bubble.assistant {
+  align-self: flex-start;
+}
+
+.badge {
+  display: inline-block;
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge.ai {
+  color: var(--primary);
+}
+
+.bubble-text {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.full {
+  width: 100%;
+}
+
+.send-btn {
+  align-self: flex-end;
+  background: var(--primary) !important;
+  color: var(--text-on-primary) !important;
+  min-height: var(--button-height);
+}

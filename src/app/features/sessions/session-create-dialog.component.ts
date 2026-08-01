@@ -10,7 +10,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Lake } from '../../core/models';
+import { I18nService } from '../../core/services/i18n.service';
 import { nowIso } from '../../core/utils';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 export interface SessionCreateResult {
   name: string;
@@ -34,27 +36,28 @@ export interface SessionCreateDialogData {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    TranslatePipe,
   ],
   template: `
-    <h2 mat-dialog-title class="dialog-title">Start Fishing Session</h2>
+    <h2 mat-dialog-title class="dialog-title">{{ 'dashboard.startSession' | tr }}</h2>
     <mat-dialog-content>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Session name</mat-label>
+        <mat-label>{{ 'sessionEdit.sessionName' | tr }}</mat-label>
         <input matInput [(ngModel)]="name" required />
       </mat-form-field>
       @if (!name.trim()) {
-        <p class="field-error">Session name is required</p>
+        <p class="field-error">{{ 'sessionEdit.nameRequired' | tr }}</p>
       }
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Start date & time</mat-label>
+        <mat-label>{{ 'sessionEdit.startDateTime' | tr }}</mat-label>
         <input matInput type="datetime-local" [(ngModel)]="startDateLocal" required />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Lake (optional)</mat-label>
+        <mat-label>{{ 'sessionEdit.lakeOptional' | tr }}</mat-label>
         <mat-select [(ngModel)]="lakeId">
-          <mat-option value="">None</mat-option>
+          <mat-option value="">{{ 'common.none' | tr }}</mat-option>
           @for (lake of data.lakes; track lake.id) {
             <mat-option [value]="lake.id">
               @if (lake.isFavorite) { ⭐ }
@@ -65,14 +68,14 @@ export interface SessionCreateDialogData {
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-stroked-button mat-dialog-close type="button" class="cancel-btn">Cancel</button>
+      <button mat-stroked-button mat-dialog-close type="button" class="cancel-btn">{{ 'common.cancel' | tr }}</button>
       <button
         mat-flat-button
         type="button"
         [disabled]="!canSave() || saving()"
         (click)="save()"
       >
-        {{ saving() ? 'Starting...' : 'Start Session' }}
+        {{ saving() ? ('dashboard.starting' | tr) : ('sessions.startSession' | tr) }}
       </button>
     </mat-dialog-actions>
   `,
@@ -108,8 +111,9 @@ export interface SessionCreateDialogData {
 export class SessionCreateDialogComponent {
   readonly data = inject<SessionCreateDialogData>(MAT_DIALOG_DATA);
   private readonly ref = inject(MatDialogRef<SessionCreateDialogComponent, SessionCreateResult | undefined>);
+  private readonly i18n = inject(I18nService);
 
-  name = this.data.defaultName ?? 'Fishing Session';
+  name = this.data.defaultName ?? this.i18n.t('sessionEdit.defaultName');
   startDateLocal = toLocalDatetimeInput(nowIso());
   lakeId = this.data.defaultLakeId ?? '';
   readonly saving = signal(false);

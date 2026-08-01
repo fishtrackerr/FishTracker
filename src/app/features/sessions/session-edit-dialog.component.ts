@@ -10,7 +10,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FishingSession, Lake, SessionStatus } from '../../core/models';
+import { I18nService } from '../../core/services/i18n.service';
 import { UpdateSessionOptions } from '../../core/services/session.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 export interface SessionEditDialogData {
   session: FishingSession;
@@ -29,22 +31,23 @@ export interface SessionEditResult extends UpdateSessionOptions {}
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    TranslatePipe,
   ],
   template: `
-    <h2 mat-dialog-title class="dialog-title">Edit Session</h2>
+    <h2 mat-dialog-title class="dialog-title">{{ 'sessionEdit.title' | tr }}</h2>
     <mat-dialog-content>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Session name</mat-label>
+        <mat-label>{{ 'sessionEdit.sessionName' | tr }}</mat-label>
         <input matInput [(ngModel)]="name" required />
       </mat-form-field>
       @if (!name.trim()) {
-        <p class="field-error">Session name is required</p>
+        <p class="field-error">{{ 'sessionEdit.nameRequired' | tr }}</p>
       }
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Lake</mat-label>
+        <mat-label>{{ 'sessionEdit.lake' | tr }}</mat-label>
         <mat-select [(ngModel)]="lakeId">
-          <mat-option value="">None</mat-option>
+          <mat-option value="">{{ 'common.none' | tr }}</mat-option>
           @for (lake of data.lakes; track lake.id) {
             <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
           }
@@ -52,21 +55,21 @@ export interface SessionEditResult extends UpdateSessionOptions {}
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Status</mat-label>
+        <mat-label>{{ 'sessionEdit.status' | tr }}</mat-label>
         <mat-select [(ngModel)]="status">
           @for (s of statuses; track s) {
-            <mat-option [value]="s">{{ s }}</mat-option>
+            <mat-option [value]="s">{{ ('sessionStatus.' + s) | tr }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Start date & time</mat-label>
+        <mat-label>{{ 'sessionEdit.startDateTime' | tr }}</mat-label>
         <input matInput type="datetime-local" [(ngModel)]="startDateLocal" required />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>End date & time (optional)</mat-label>
+        <mat-label>{{ 'sessionEdit.endDateTimeOptional' | tr }}</mat-label>
         <input matInput type="datetime-local" [(ngModel)]="endDateLocal" />
       </mat-form-field>
       @if (dateErrorMessage) {
@@ -74,24 +77,24 @@ export interface SessionEditResult extends UpdateSessionOptions {}
       }
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Prebait</mat-label>
+        <mat-label>{{ 'sessionDetail.prebait' | tr }}</mat-label>
         <input matInput [(ngModel)]="prebait" />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Notes</mat-label>
+        <mat-label>{{ 'common.notes' | tr }}</mat-label>
         <textarea matInput rows="3" [(ngModel)]="notes"></textarea>
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close type="button">Cancel</button>
+      <button mat-button mat-dialog-close type="button">{{ 'common.cancel' | tr }}</button>
       <button
         mat-flat-button
         type="button"
         [disabled]="!canSave() || saving()"
         (click)="save()"
       >
-        {{ saving() ? 'Saving...' : 'Save' }}
+        {{ saving() ? ('sessionEdit.saving' | tr) : ('common.save' | tr) }}
       </button>
     </mat-dialog-actions>
   `,
@@ -113,6 +116,7 @@ export interface SessionEditResult extends UpdateSessionOptions {}
 export class SessionEditDialogComponent {
   readonly data = inject<SessionEditDialogData>(MAT_DIALOG_DATA);
   private readonly ref = inject(MatDialogRef<SessionEditDialogComponent, SessionEditResult | undefined>);
+  private readonly i18n = inject(I18nService);
 
   readonly statuses: SessionStatus[] = ['planned', 'active', 'completed'];
   name = this.data.session.name;
@@ -147,7 +151,7 @@ export class SessionEditDialogComponent {
     const start = new Date(this.startDateLocal).getTime();
     const end = new Date(this.endDateLocal).getTime();
     if (end < start) {
-      return 'End date cannot be earlier than start date';
+      return this.i18n.t('sessionEdit.endDateBeforeStart');
     }
     return '';
   }

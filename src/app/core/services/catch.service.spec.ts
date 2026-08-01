@@ -36,7 +36,10 @@ describe('CatchService.createQuick', () => {
       } as never,
       sessionRepo as never,
       { getCurrentPosition: vi.fn().mockResolvedValue(null) } as never,
-      { getSnapshot: vi.fn().mockResolvedValue(null) } as never,
+      {
+        getSnapshot: vi.fn().mockResolvedValue(null),
+        getCachedSnapshotFor: vi.fn().mockReturnValue(null),
+      } as never,
       { processFile: vi.fn() } as never,
       { record: vi.fn() } as never,
     );
@@ -62,5 +65,49 @@ describe('CatchService.createQuick', () => {
         biggestFishKg: 8.5,
       }),
     );
+  });
+
+  it('uses cached weather instead of live fetch when session has no weather', async () => {
+    const cached = {
+      description: 'Cloudy',
+      temperatureC: 12,
+      windSpeedKmh: 8,
+      windDirection: 45,
+      airPressureHpa: 1005,
+      humidity: 70,
+      cloudCoverage: 80,
+      rain: false,
+      sunrise: '',
+      sunset: '',
+      moonPhase: 'Full Moon',
+      capturedAt: '2026-07-15T08:00:00.000Z',
+    };
+    const getCachedSnapshotFor = vi.fn().mockReturnValue(cached);
+    const getSnapshot = vi.fn();
+    const getCurrentPosition = vi.fn().mockResolvedValue({ latitude: 52.1, longitude: 5.1 });
+
+    service = new CatchService(
+      {
+        put: catchRepo.put,
+        getBySession: catchRepoGetBySession,
+        getAll: vi.fn().mockResolvedValue([]),
+        watchBySession: vi.fn(),
+        watchAll: vi.fn(),
+        getById: vi.fn(),
+        delete: vi.fn(),
+        deleteBySession: vi.fn(),
+      } as never,
+      sessionRepo as never,
+      { getCurrentPosition } as never,
+      { getSnapshot, getCachedSnapshotFor } as never,
+      { processFile: vi.fn() } as never,
+      { record: vi.fn() } as never,
+    );
+
+    const result = await service.create('session-1', { species: 'Pike' });
+
+    expect(result.weather).toEqual(cached);
+    expect(getCachedSnapshotFor).toHaveBeenCalledWith(52.1, 5.1);
+    expect(getSnapshot).not.toHaveBeenCalled();
   });
 });

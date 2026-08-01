@@ -5,6 +5,7 @@ export interface Lake {
   name: string;
   description?: string;
   address?: string;
+  country?: string;
   latitude?: number;
   longitude?: number;
   isFavorite: boolean;

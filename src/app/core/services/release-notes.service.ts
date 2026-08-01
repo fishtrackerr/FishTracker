@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { fetchWithTimeout } from '../utils';
 
 export interface ReleaseNoteItem {
   message: string;
@@ -16,7 +17,7 @@ export interface ReleaseNotesData {
 export class ReleaseNotesService {
   async getReleaseNotes(): Promise<ReleaseNotesData | null> {
     try {
-      const response = await fetch('assets/release-notes.json');
+      const response = await fetchWithTimeout('assets/release-notes.json');
       if (!response.ok) {
         return null;
       }

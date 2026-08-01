@@ -1,5 +1,9 @@
 <app-page-title title="statistics.title" />
 
+<a mat-stroked-button class="assistant-link" routerLink="/assistant">
+  {{ 'assistant.openFromStats' | tr }}
+</a>
+
 <app-filter-panel [filter]="activeFilter()" (filterChange)="onFilterChange($event)" />
 
 @if (stats(); as s) {

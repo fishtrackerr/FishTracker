@@ -19,6 +19,10 @@
     </button>
   }
 
+  <a mat-stroked-button class="assistant-btn" routerLink="/assistant">
+    {{ 'assistant.openFromDashboard' | tr }}
+  </a>
+
   @if (stats(); as s) {
     <div class="stats-grid">
       <app-stat-card [label]="'dashboard.sessions' | tr" [value]="s.totalSessions" />

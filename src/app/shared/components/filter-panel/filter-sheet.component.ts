@@ -3,6 +3,7 @@ import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bott
 import { MatButtonModule } from '@angular/material/button';
 import { FilterPanelComponent } from '../filter-panel/filter-panel.component';
 import { StatisticsFilter } from '../../../core/services/filter.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export interface FilterSheetData {
   filter: StatisticsFilter;
@@ -11,12 +12,12 @@ export interface FilterSheetData {
 @Component({
   selector: 'app-filter-sheet',
   standalone: true,
-  imports: [FilterPanelComponent, MatButtonModule],
+  imports: [FilterPanelComponent, MatButtonModule, TranslatePipe],
   template: `
     <div class="sheet">
       <div class="sheet-header">
-        <h3>Filters</h3>
-        <button mat-button type="button" (click)="close()">Close</button>
+        <h3>{{ 'filters.title' | tr }}</h3>
+        <button mat-button type="button" (click)="close()">{{ 'common.close' | tr }}</button>
       </div>
       <app-filter-panel
         [filter]="data.filter"
@@ -24,7 +25,7 @@ export interface FilterSheetData {
         (filterChange)="onChange($event)"
       />
       <div class="sheet-actions">
-        <button mat-flat-button type="button" (click)="apply()">Apply</button>
+        <button mat-flat-button type="button" (click)="apply()">{{ 'filters.apply' | tr }}</button>
       </div>
     </div>
   `,

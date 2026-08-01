@@ -1,13 +1,15 @@
 import { Component, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-
+import { fetchWithTimeout } from '../../../core/utils';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 @Component({
   selector: 'app-startup-splash',
   standalone: true,
+  imports: [TranslatePipe],
   template: `
-    <div class="splash" role="status" aria-live="polite" aria-label="Loading application">
-      <img class="logo" src="icons/icon-192x192.png" alt="FishTracker logo" />
-      <p class="label">Fishing Register</p>
+    <div class="splash" role="status" aria-live="polite" [attr.aria-label]="'splash.loading' | tr">
+      <img class="logo" src="icons/icon-192x192.png" [alt]="'splash.logoAlt' | tr" />
+      <p class="label">{{ 'splash.appName' | tr }}</p>
       <p class="version">v{{ version() }}</p>
       <div class="spinner" aria-hidden="true"></div>
     </div>
@@ -68,7 +70,7 @@ export class StartupSplashComponent {
 
   private async loadVersion(): Promise<void> {
     try {
-      const response = await fetch('assets/version.json', {
+      const response = await fetchWithTimeout('assets/version.json', {
         cache: 'no-store',
       });
       if (!response.ok) {

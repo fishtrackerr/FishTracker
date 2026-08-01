@@ -45,7 +45,7 @@ export interface WeatherSnapshot {
 }
 
 export interface WeatherWarning {
-  type: 'storm' | 'thunder' | 'wind' | 'rain' | 'temperature';
+  type: 'storm' | 'thunder' | 'wind' | 'rain' | 'temperature' | 'fire';
   message: string;
   severity: 'warning' | 'danger';
 }

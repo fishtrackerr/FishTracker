@@ -6,12 +6,20 @@ JSON file via `BackupService.export()`:
 
 ```typescript
 interface BackupData {
-  version: number;
+  version: number; // current export version: 5
   exportedAt: string;
   sessions: FishingSession[];
   catches: Catch[];
   lakes: Lake[];
   images: BackupImage[]; // base64 encoded blobs
+  biteEvents?: BiteEvent[];
+  fishSpottedEvents?: FishSpottedEvent[];
+  rodSpotHistory?: RodSpotHistory[];
+  sessionEvents?: SessionEvent[];
+  sessionWeather?: SessionWeatherRecord[];
+  userOptions?: UserOption[];
+  chatThreads?: ChatThread[];
+  chatMessages?: ChatMessage[];
 }
 ```
 

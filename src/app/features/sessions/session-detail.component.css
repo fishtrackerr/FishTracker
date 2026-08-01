@@ -20,7 +20,24 @@
   align-items: center;
   margin-bottom: 12px;
 }
-.section h2 { margin: 0; font-size: 1rem; color: var(--text-muted); }
+.section h2,
+.section-title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+.images-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cover-preview {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+}
 .catch-row {
   display: flex;
   gap: 12px;

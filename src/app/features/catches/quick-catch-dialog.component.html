@@ -30,8 +30,14 @@
   </mat-form-field>
 
   <div class="photo-row">
-    <button mat-stroked-button type="button" (click)="pickPhoto()">
-      {{ photo ? ('catchForm.photoSelected' | tr) : ('catchForm.addPhoto' | tr) }}
+    @if (photo) {
+      <span class="photo-status">{{ 'catchForm.photoSelected' | tr }}</span>
+    }
+    <button mat-stroked-button type="button" (click)="pickPhoto(true)">
+      {{ 'images.camera' | tr }}
+    </button>
+    <button mat-stroked-button type="button" (click)="pickPhoto(false)">
+      {{ 'images.gallery' | tr }}
     </button>
   </div>
 

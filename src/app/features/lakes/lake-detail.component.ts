@@ -115,6 +115,7 @@ export class LakeDetailComponent {
       name: l.name,
       description: l.description,
       address: l.address,
+      country: l.country,
       latitude: l.latitude,
       longitude: l.longitude,
       rules: l.rules,

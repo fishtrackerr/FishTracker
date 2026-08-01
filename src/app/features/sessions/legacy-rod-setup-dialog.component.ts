@@ -10,10 +10,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FishingSession, SessionSpot } from '../../core/models';
+import { I18nService } from '../../core/services/i18n.service';
 import { RodService } from '../../core/services/rod.service';
 import { SessionService } from '../../core/services/session.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { LakeService } from '../../core/services/lake.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 export interface LegacyRodSetupData {
   session: FishingSession;
@@ -30,20 +32,21 @@ export interface LegacyRodSetupData {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    TranslatePipe,
   ],
   template: `
-    <h2 mat-dialog-title class="dialog-title">Set up rods</h2>
+    <h2 mat-dialog-title class="dialog-title">{{ 'rodSetup.title' | tr }}</h2>
     <mat-dialog-content>
       <p>{{ introText }}</p>
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Number of rods</mat-label>
+        <mat-label>{{ 'sessionEdit.numberOfRods' | tr }}</mat-label>
         <input matInput type="number" [(ngModel)]="rodCount" [min]="1" [max]="maxRodCount" />
       </mat-form-field>
       @if (sessionSpots.length > 0) {
         <mat-form-field appearance="outline" class="full">
-          <mat-label>Default spot (optional)</mat-label>
+          <mat-label>{{ 'rodSetup.defaultSpotOptional' | tr }}</mat-label>
           <mat-select [(ngModel)]="defaultSpotId">
-            <mat-option value="">None</mat-option>
+            <mat-option value="">{{ 'common.none' | tr }}</mat-option>
             @for (spot of sessionSpots; track spot.id) {
               <mat-option [value]="spot.id">{{ spot.name }}</mat-option>
             }
@@ -52,8 +55,8 @@ export interface LegacyRodSetupData {
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close type="button">Skip for now</button>
-      <button mat-flat-button type="button" (click)="save()">Set up</button>
+      <button mat-button mat-dialog-close type="button">{{ 'rodSetup.skipForNow' | tr }}</button>
+      <button mat-flat-button type="button" (click)="save()">{{ 'rodSetup.setUp' | tr }}</button>
     </mat-dialog-actions>
   `,
   styles: `
@@ -78,6 +81,7 @@ export class LegacyRodSetupDialogComponent implements OnInit {
   private readonly rodService = inject(RodService);
   private readonly settings = inject(SettingsService);
   private readonly lakeService = inject(LakeService);
+  private readonly i18n = inject(I18nService);
 
   rodCount = Math.max(1, this.data.session.rods?.length ?? 1);
   defaultSpotId = '';
@@ -86,8 +90,8 @@ export class LegacyRodSetupDialogComponent implements OnInit {
 
   get introText(): string {
     return this.data.isNewSession
-      ? 'How many rods are you using for this session?'
-      : 'This session has no rods yet. How many rods are you using?';
+      ? this.i18n.t('rodSetup.introNew')
+      : this.i18n.t('rodSetup.introExisting');
   }
 
   async ngOnInit(): Promise<void> {

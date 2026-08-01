@@ -2,7 +2,8 @@ import { Injectable, inject, signal, isDevMode } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppLockState, DEFAULT_LOCK_STATE } from '../models/app-lock-state.model';
 import { SettingsService } from './settings.service';
-import { RETURN_URL_KEY, LOCK_STATE_KEY } from '../constants/storage-keys';
+import { LOCK_STATE_KEY } from '../constants/storage-keys';
+import { persistReturnUrl } from '../utils/return-url';
 
 @Injectable({ providedIn: 'root' })
 export class PinLockService {
@@ -94,7 +95,7 @@ export class PinLockService {
 
     const currentUrl = this.router.url;
     if (!currentUrl.startsWith('/pin/')) {
-      sessionStorage.setItem(RETURN_URL_KEY, currentUrl);
+      persistReturnUrl(currentUrl);
       void this.router.navigate(['/pin/unlock']);
     }
     this.lockChangeCallback?.(true);

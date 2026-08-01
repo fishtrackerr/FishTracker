@@ -26,6 +26,7 @@ Offline-first Angular PWA for logging fishing sessions, catches, lakes, and stat
 | [development-guidelines.md](./development-guidelines.md) | Repository rules |
 | [maps.md](./maps.md) | Google Maps URLs and geolocation |
 | [rods-and-spots.md](./rods-and-spots.md) | Rods, session spots, bites, timeline |
+| [assistant.md](./assistant.md) | Ask-your-data chat (local insights + optional AI) |
 
 ## Main architecture decisions
 

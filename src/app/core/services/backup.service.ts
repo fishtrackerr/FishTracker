@@ -4,12 +4,14 @@ import { BackupData, StoredImage } from '../models';
 import { blobToBase64, base64ToBlob, nowIso } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
+import { ChatRepository } from './chat.repository';
 import { FishSpottedRepository } from './fish-spotted.repository';
 import { ImageRepository } from './image.repository';
 import { LakeRepository } from './lake.repository';
 import { RodSpotHistoryRepository } from './rod-spot-history.repository';
 import { SessionEventRepository } from './session-event.repository';
 import { SessionRepository } from './session.repository';
+import { SessionWeatherRepository } from './session-weather.repository';
 import { UserOptionRepository } from './user-option.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -23,7 +25,9 @@ export class BackupService {
     private readonly fishSpottedRepo: FishSpottedRepository,
     private readonly rodSpotHistoryRepo: RodSpotHistoryRepository,
     private readonly sessionEventRepo: SessionEventRepository,
+    private readonly sessionWeatherRepo: SessionWeatherRepository,
     private readonly userOptionRepo: UserOptionRepository,
+    private readonly chatRepo: ChatRepository,
   ) {}
 
   async export(): Promise<BackupData> {
@@ -35,7 +39,10 @@ export class BackupService {
     const fishSpottedEvents = await db.fishSpottedEvents.toArray();
     const rodSpotHistory = await db.rodSpotHistory.toArray();
     const sessionEvents = await db.sessionEvents.toArray();
+    const sessionWeather = await this.sessionWeatherRepo.getAll();
     const userOptions = await this.userOptionRepo.getAll();
+    const chatThreads = await this.chatRepo.getAllThreads();
+    const chatMessages = await this.chatRepo.getAllMessages();
 
     const backupImages = await Promise.all(
       images.map(async (img) => ({
@@ -53,7 +60,7 @@ export class BackupService {
     );
 
     return {
-      version: 3,
+      version: 5,
       exportedAt: nowIso(),
       sessions,
       catches,
@@ -63,7 +70,10 @@ export class BackupService {
       fishSpottedEvents,
       rodSpotHistory,
       sessionEvents,
+      sessionWeather,
       userOptions,
+      chatThreads,
+      chatMessages,
     };
   }
 
@@ -91,7 +101,10 @@ export class BackupService {
         db.fishSpottedEvents,
         db.rodSpotHistory,
         db.sessionEvents,
+        db.sessionWeather,
         db.userOptions,
+        db.chatThreads,
+        db.chatMessages,
       ],
       async () => {
         await this.sessionRepo.clear();
@@ -102,7 +115,9 @@ export class BackupService {
         await this.fishSpottedRepo.clear();
         await this.rodSpotHistoryRepo.clear();
         await this.sessionEventRepo.clear();
+        await this.sessionWeatherRepo.clear();
         await this.userOptionRepo.clear();
+        await this.chatRepo.clear();
 
         for (const lake of data.lakes) {
           await this.lakeRepo.put(lake);
@@ -143,8 +158,34 @@ export class BackupService {
         for (const event of data.sessionEvents ?? []) {
           await this.sessionEventRepo.put(event);
         }
+        const weatherRecords = data.sessionWeather ?? [];
+        if (weatherRecords.length > 0) {
+          for (const record of weatherRecords) {
+            await this.sessionWeatherRepo.put(record);
+          }
+        } else {
+          // Legacy backups: seed history from embedded session.weather
+          for (const session of data.sessions) {
+            if (!session.weather) {
+              continue;
+            }
+            await this.sessionWeatherRepo.put({
+              id: session.id + '-weather-seed',
+              sessionId: session.id,
+              capturedAt:
+                session.weather.capturedAt ?? session.updatedAt ?? session.createdAt,
+              weather: session.weather,
+            });
+          }
+        }
         for (const option of data.userOptions ?? []) {
           await this.userOptionRepo.put(option);
+        }
+        for (const thread of data.chatThreads ?? []) {
+          await this.chatRepo.putThread(thread);
+        }
+        for (const message of data.chatMessages ?? []) {
+          await this.chatRepo.putMessage(message);
         }
       },
     );

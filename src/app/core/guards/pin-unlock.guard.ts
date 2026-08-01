@@ -14,7 +14,8 @@ export const pinUnlockGuard: CanActivateFn = async () => {
     return router.createUrlTree(['/pin/setup']);
   }
   if (!pinLock.isAppLocked()) {
-    return router.createUrlTree(['/']);
+    const target = await startup.resolveInitialRoute('/pin/unlock');
+    return router.parseUrl(target);
   }
   return true;
 };

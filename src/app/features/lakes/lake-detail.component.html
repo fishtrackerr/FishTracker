@@ -36,6 +36,11 @@
     <input matInput [ngModel]="l.address" (ngModelChange)="updateField('address', $event)" (blur)="saveLake()" />
   </mat-form-field>
 
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>{{ 'lakes.country' | tr }}</mat-label>
+    <input matInput [ngModel]="l.country" (ngModelChange)="updateField('country', $event)" (blur)="saveLake()" />
+  </mat-form-field>
+
   <button
     mat-stroked-button
     type="button"

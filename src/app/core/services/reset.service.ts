@@ -3,6 +3,7 @@ import { db } from '../db/fish-db';
 import { DEFAULT_SETTINGS, UserOptionCategory } from '../models';
 import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
+import { ChatRepository } from './chat.repository';
 import { FilterService } from './filter.service';
 import { FishSpottedRepository } from './fish-spotted.repository';
 import { ImageRepository } from './image.repository';
@@ -10,6 +11,7 @@ import { LakeRepository } from './lake.repository';
 import { RodSpotHistoryRepository } from './rod-spot-history.repository';
 import { SessionEventRepository } from './session-event.repository';
 import { SessionRepository } from './session.repository';
+import { SessionWeatherRepository } from './session-weather.repository';
 import { SettingsService } from './settings.service';
 import { ThemeService } from './theme.service';
 import { UserOptionRepository } from './user-option.repository';
@@ -35,7 +37,9 @@ export class ResetService {
   private readonly fishSpottedRepo = inject(FishSpottedRepository);
   private readonly rodSpotHistoryRepo = inject(RodSpotHistoryRepository);
   private readonly sessionEventRepo = inject(SessionEventRepository);
+  private readonly sessionWeatherRepo = inject(SessionWeatherRepository);
   private readonly userOptionRepo = inject(UserOptionRepository);
+  private readonly chatRepo = inject(ChatRepository);
 
   async resetCustomOptionsCategory(
     category: UserOptionCategory,
@@ -110,7 +114,10 @@ export class ResetService {
         db.fishSpottedEvents,
         db.rodSpotHistory,
         db.sessionEvents,
+        db.sessionWeather,
         db.userOptions,
+        db.chatThreads,
+        db.chatMessages,
       ],
       async () => {
         await this.sessionRepo.clear();
@@ -123,7 +130,9 @@ export class ResetService {
         await this.fishSpottedRepo.clear();
         await this.rodSpotHistoryRepo.clear();
         await this.sessionEventRepo.clear();
+        await this.sessionWeatherRepo.clear();
         await this.userOptionRepo.clear();
+        await this.chatRepo.clear();
       },
     );
     localStorage.removeItem(PRESETS_KEY);

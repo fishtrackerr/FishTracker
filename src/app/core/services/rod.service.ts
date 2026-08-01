@@ -154,23 +154,55 @@ export class RodService {
     return updatedSession;
   }
 
+  /**
+   * Recast a rod: optionally move it to a new session spot and record cast time.
+   * Spot may stay the same; castAt is always updated.
+   */
+  async recast(
+    session: FishingSession,
+    rodId: string,
+    sessionSpotId?: string,
+  ): Promise<FishingSession> {
+    const rod = (session.rods ?? []).find((r) => r.id === rodId);
+    if (!rod) {
+      return session;
+    }
+
+    const nextSpotId = sessionSpotId || undefined;
+    let updated = session;
+    if ((rod.sessionSpotId ?? '') !== (nextSpotId ?? '')) {
+      updated = await this.assignSpot(updated, rodId, nextSpotId);
+    }
+
+    return this.updateRod(updated, rodId, {
+      castAt: nowIso(),
+      sessionSpotId: nextSpotId,
+    });
+  }
+
   async updateRod(
     session: FishingSession,
     rodId: string,
     options: UpdateRodOptions,
   ): Promise<FishingSession> {
     const rods = session.rods ?? [];
+    const existing = rods.find((r) => r.id === rodId);
     const updatedRods = rods.map((rod) =>
       rod.id === rodId ? { ...rod, ...options, id: rodId, sessionId: session.id } : rod,
     );
     const updated = await this.saveSessionRods(session, updatedRods);
 
     if (options.castAt) {
+      const rodName = existing?.name ?? rodId;
+      const spotId = options.sessionSpotId ?? existing?.sessionSpotId;
+      const spotName =
+        session.sessionSpots?.find((s) => s.id === spotId)?.name ?? 'unassigned';
       await this.sessionEvents.record({
         sessionId: session.id,
         type: 'rod-cast',
         rodId,
-        description: `${rodId} cast`,
+        sessionSpotId: spotId,
+        description: `${rodName} cast at ${spotName}`,
         occurredAt: options.castAt,
       });
     }

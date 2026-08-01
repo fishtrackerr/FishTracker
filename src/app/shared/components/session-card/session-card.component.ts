@@ -18,6 +18,7 @@ import { ImageThumbComponent } from '../image-thumb/image-thumb.component';
 import { ExpandableSectionComponent } from '../expandable-section/expandable-section.component';
 import { SessionService } from '../../../core/services/session.service';
 import { formatDuration } from '../../../core/utils';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-session-card',
@@ -29,6 +30,7 @@ import { formatDuration } from '../../../core/utils';
     ImageThumbComponent,
     FormatWeightPipe,
     ExpandableSectionComponent,
+    TranslatePipe,
   ],
   template: `
     <article class="session-card">
@@ -47,11 +49,7 @@ import { formatDuration } from '../../../core/utils';
           <div class="header-main">
             <div class="title-row">
               <h3 class="name">{{ session.name }}</h3>
-              @if (session.status === 'active') {
-                <span class="badge active">Active</span>
-              } @else {
-                <span class="badge" [class]="session.status">{{ session.status }}</span>
-              }
+              <span class="badge" [class]="session.status">{{ ('sessionStatus.' + session.status) | tr }}</span>
             </div>
             @if (lakeName) {
               <p class="row lake">🌊 {{ lakeName }}</p>
@@ -61,17 +59,17 @@ import { formatDuration } from '../../../core/utils';
 
         <div class="card-body">
           <p class="row datetime">
-            Start: {{ session.startDate | date:'d MMMM y, HH:mm' }}
+            {{ 'sessionCard.start' | tr }} {{ session.startDate | date:'d MMMM y, HH:mm' }}
           </p>
-          <p class="row duration">Duration: {{ durationText() }}</p>
+          <p class="row duration">{{ 'sessionCard.duration' | tr }} {{ durationText() }}</p>
 
           <div class="stats-primary">
-            <span>Catches: {{ session.catchCount }}</span>
+            <span>{{ 'sessionCard.catches' | tr }} {{ session.catchCount }}</span>
             @if (session.biggestFishKg) {
-              <span>Biggest: {{ session.biggestFishKg | formatWeight }}</span>
+              <span>{{ 'sessionCard.biggest' | tr }} {{ session.biggestFishKg | formatWeight }}</span>
             }
             @if (session.totalCatchWeightKg > 0) {
-              <span>Total: {{ session.totalCatchWeightKg | formatWeight }}</span>
+              <span>{{ 'sessionCard.total' | tr }} {{ session.totalCatchWeightKg | formatWeight }}</span>
             }
           </div>
 
@@ -81,25 +79,25 @@ import { formatDuration } from '../../../core/utils';
             [persistKey]="'session-card-details-' + session.id"
             [defaultExpanded]="false"
           >
-            <div expandHeader class="expand-label">More information</div>
+            <div expandHeader class="expand-label">{{ 'sessionCard.moreInformation' | tr }}</div>
             @if (session.weather?.temperatureC != null) {
-              <p class="row">Temperature: {{ session.weather!.temperatureC }}°C</p>
+              <p class="row">{{ 'sessionCard.temperature' | tr }} {{ session.weather!.temperatureC }}°C</p>
             }
             @if (session.notes) {
               <p class="row notes">{{ session.notes }}</p>
             }
-            <p class="row muted">Updated: {{ session.updatedAt | date:'medium' }}</p>
+            <p class="row muted">{{ 'sessionCard.updated' | tr }} {{ session.updatedAt | date:'medium' }}</p>
           </app-expandable-section>
 
           <div class="actions" data-no-expand>
             @if (session.status === 'active') {
               <button mat-flat-button type="button" class="btn-primary" (click)="onContinue($event)">
-                Continue
+                {{ 'common.continue' | tr }}
               </button>
             }
-            <button mat-stroked-button type="button" (click)="onEdit($event)">Edit</button>
+            <button mat-stroked-button type="button" (click)="onEdit($event)">{{ 'common.edit' | tr }}</button>
             <a mat-stroked-button [routerLink]="['/sessions', session.id]" (click)="$event.stopPropagation()">
-              Details
+              {{ 'sessionCard.details' | tr }}
             </a>
           </div>
         </div>

@@ -18,7 +18,10 @@ Database name: `FishTrackerDb`. Schema in `src/app/core/db/fish-db.ts`.
 | fishSpottedEvents | id, sessionId, rodId, spottedAt | FishSpottedEvent |
 | rodSpotHistory | id, rodId, changedAt | RodSpotHistory |
 | sessionEvents | id, sessionId, type, occurredAt | SessionEvent |
+| sessionWeather | id, sessionId, capturedAt | SessionWeatherRecord |
 | userOptions | id, category, value | UserOption |
+| chatThreads | id, updatedAt | ChatThread |
+| chatMessages | id, threadId, createdAt | ChatMessage |
 
 ### Schema versions
 
@@ -26,6 +29,8 @@ Database name: `FishTrackerDb`. Schema in `src/app/core/db/fish-db.ts`.
 - **v2**: Image metadata (fileName, favorites, homepage flag)
 - **v3**: Profile and profile documents
 - **v4**: Rods/spots on sessions, bite/fish-spotted/session events, user options; legacy catch spot migration
+- **v5**: Session weather history table; seeds from existing `session.weather`
+- **v6**: Chat threads and messages for Ask-your-data assistant
 
 Migrations run in `.upgrade()` handlers; always add migrations for schema changes.
 

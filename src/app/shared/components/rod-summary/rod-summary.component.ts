@@ -1,7 +1,9 @@
 import { Component, Input, inject, signal, effect } from '@angular/core';
 import { Catch, FishingSession, RodSpotHistory, SessionRod } from '../../../core/models';
+import { I18nService } from '../../../core/services/i18n.service';
 import { RodSpotHistoryRepository } from '../../../core/services/rod-spot-history.repository';
 import { ExpandableSectionComponent } from '../expandable-section/expandable-section.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export interface RodSummaryLine {
   rod: SessionRod;
@@ -16,34 +18,34 @@ export interface RodSummaryLine {
 @Component({
   selector: 'app-rod-summary',
   standalone: true,
-  imports: [ExpandableSectionComponent],
+  imports: [ExpandableSectionComponent, TranslatePipe],
   template: `
     @if (summaries().length > 0) {
-      <app-expandable-section sectionId="rod-summary" label="Rod change summary" [defaultExpanded]="false">
-        <div expandHeader class="expand-label">Rod Summary</div>
+      <app-expandable-section sectionId="rod-summary" label="rod-summary" [defaultExpanded]="false">
+        <div expandHeader class="expand-label">{{ 'rodSummary.title' | tr }}</div>
         @for (line of summaries(); track line.rod.id) {
           <div class="summary-block">
             <strong>{{ line.rod.name }}</strong>
             <ul>
               @if (line.startedAt) {
-                <li>Started at {{ line.startedAt }}</li>
+                <li>{{ 'rodSummary.startedAt' | tr: { spot: line.startedAt } }}</li>
               }
               @for (move of line.movements; track move.id) {
-                <li>Moved to {{ spotName(move.toSessionSpotId) }} at {{ formatTime(move.changedAt) }}</li>
+                <li>{{ 'rodSummary.movedTo' | tr: { spot: spotName(move.toSessionSpotId), time: formatTime(move.changedAt) } }}</li>
               }
-              <li>{{ line.bites }} bites</li>
-              <li>{{ line.fishSpotted }} fish spotted</li>
-              <li>{{ line.catches }} catches</li>
+              <li>{{ 'rodSummary.bitesCount' | tr: { count: line.bites } }}</li>
+              <li>{{ 'rodSummary.fishSpottedCount' | tr: { count: line.fishSpotted } }}</li>
+              <li>{{ 'rodSummary.catchesCount' | tr: { count: line.catches } }}</li>
             </ul>
           </div>
         }
         <div class="totals">
-          <p>Total rods: {{ session.rods?.length ?? 0 }}</p>
-          <p>Total bites: {{ totalBites() }}</p>
-          <p>Total spotted: {{ totalSpotted() }}</p>
-          <p>Total catches: {{ totalCatches() }}</p>
-          @if (bestRod()) { <p>Best rod: {{ bestRod() }}</p> }
-          @if (bestSpot()) { <p>Best spot: {{ bestSpot() }}</p> }
+          <p>{{ 'rodSummary.totalRods' | tr: { count: session.rods?.length ?? 0 } }}</p>
+          <p>{{ 'rodSummary.totalBites' | tr: { count: totalBites() } }}</p>
+          <p>{{ 'rodSummary.totalSpotted' | tr: { count: totalSpotted() } }}</p>
+          <p>{{ 'rodSummary.totalCatches' | tr: { count: totalCatches() } }}</p>
+          @if (bestRod()) { <p>{{ 'rodSummary.bestRod' | tr: { name: bestRod()! } }}</p> }
+          @if (bestSpot()) { <p>{{ 'rodSummary.bestSpot' | tr: { name: bestSpot()! } }}</p> }
         </div>
       </app-expandable-section>
     }
@@ -58,6 +60,7 @@ export interface RodSummaryLine {
 })
 export class RodSummaryComponent {
   private readonly historyRepo = inject(RodSpotHistoryRepository);
+  private readonly i18n = inject(I18nService);
 
   @Input({ required: true }) session!: FishingSession;
   @Input() catches: Catch[] = [];
@@ -97,9 +100,9 @@ export class RodSummaryComponent {
 
   spotName(sessionSpotId?: string): string {
     if (!sessionSpotId) {
-      return 'Unassigned';
+      return this.i18n.t('rod.unassigned');
     }
-    return this.session.sessionSpots?.find((s) => s.id === sessionSpotId)?.name ?? 'Unknown';
+    return this.session.sessionSpots?.find((s) => s.id === sessionSpotId)?.name ?? this.i18n.t('common.unknown');
   }
 
   formatTime(iso: string): string {

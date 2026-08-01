@@ -71,7 +71,8 @@ export class CatchService {
     const lng = position?.longitude ?? session?.longitude;
     let weatherSnapshot = session?.weather;
     if (lat != null && lng != null && !weatherSnapshot) {
-      weatherSnapshot = (await this.weather.getSnapshot(lat, lng)) ?? undefined;
+      // Cache only — never block catch save on a live Open-Meteo round-trip.
+      weatherSnapshot = this.weather.getCachedSnapshotFor(lat, lng) ?? undefined;
     }
 
     const rod = input.rodId ? session?.rods?.find((r) => r.id === input.rodId) : undefined;

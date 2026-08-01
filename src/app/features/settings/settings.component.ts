@@ -150,8 +150,13 @@ export class SettingsComponent {
   }
 
   clearWeatherCache(): void {
-    localStorage.removeItem('fish-tracker-weather-cache');
+    this.weatherService.clearCache();
     this.notifications.success(this.i18n.t('messages.weatherCacheCleared'));
+  }
+
+  clearAiKey(): void {
+    this.settingsService.update({ aiApiKey: undefined });
+    this.notifications.success(this.i18n.t('settings.aiKeyCleared'));
   }
 
   async clearHomepageImage(): Promise<void> {

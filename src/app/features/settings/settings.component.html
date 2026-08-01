@@ -162,6 +162,51 @@
 </section>
 
 <section class="section app-card">
+  <app-expandable-section sectionId="settings-assistant" persistKey="settings-assistant" label="assistant" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.assistant' | tr }}</h2>
+    </div>
+    <div class="submenu-content">
+      <p class="hint">{{ 'settings.assistantHint' | tr }}</p>
+      <mat-slide-toggle
+        [ngModel]="settings().aiChatEnabled"
+        (ngModelChange)="updateSetting('aiChatEnabled', $event)"
+      >
+        {{ 'settings.enableAiChat' | tr }}
+      </mat-slide-toggle>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.aiApiKey' | tr }}</mat-label>
+        <input
+          matInput
+          type="password"
+          autocomplete="off"
+          [ngModel]="settings().aiApiKey ?? ''"
+          (ngModelChange)="updateSetting('aiApiKey', $event || undefined)"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.aiBaseUrl' | tr }}</mat-label>
+        <input
+          matInput
+          [ngModel]="settings().aiBaseUrl ?? ''"
+          (ngModelChange)="updateSetting('aiBaseUrl', $event || undefined)"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.aiModel' | tr }}</mat-label>
+        <input
+          matInput
+          [ngModel]="settings().aiModel ?? ''"
+          (ngModelChange)="updateSetting('aiModel', $event || undefined)"
+        />
+      </mat-form-field>
+      <button mat-stroked-button type="button" (click)="clearAiKey()">{{ 'settings.clearAiKey' | tr }}</button>
+      <a mat-stroked-button routerLink="/assistant">{{ 'settings.openAssistant' | tr }}</a>
+    </div>
+  </app-expandable-section>
+</section>
+
+<section class="section app-card">
   <app-expandable-section sectionId="settings-security" persistKey="settings-security" label="security" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.security' | tr }}</h2>

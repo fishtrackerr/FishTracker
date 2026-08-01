@@ -93,7 +93,9 @@ describe('SettingsComponent', () => {
         },
         {
           provide: WeatherService,
-          useValue: {},
+          useValue: {
+            clearCache: vi.fn(),
+          },
         },
         {
           provide: LakeService,

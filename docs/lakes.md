@@ -20,7 +20,7 @@ Photos stored via `ImageService`; IDs in `lake.photoIds`. Cover via `coverImageI
 
 `/lakes/:id` shows lake info, spots, statistics, photos.
 
-Latitude/longitude can be entered manually or looked up from lake name/address using the coordinate lookup action (requires internet).
+Optional address and country can be set on the lake. Latitude/longitude can be entered manually or looked up from lake name/address using the coordinate lookup action (requires internet).
 
 Lookup uses OpenStreetMap Nominatim from the client side and saves coordinates directly on success.
 

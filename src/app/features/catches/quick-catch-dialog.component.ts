@@ -57,11 +57,13 @@ export class QuickCatchDialogComponent {
 
   readonly selectPanelClass = this.theme.getSelectPanelClass();
 
-  pickPhoto(): void {
+  pickPhoto(useCamera: boolean): void {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.capture = 'environment';
+    if (useCamera) {
+      input.capture = 'environment';
+    }
     input.onchange = () => {
       this.photo = input.files?.[0];
     };

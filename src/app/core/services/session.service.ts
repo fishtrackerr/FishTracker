@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Catch, FishingSession, SessionSpot } from '../models';
+import { Catch, FishingSession, SessionSpot, WeatherSnapshot } from '../models';
 import { generateId, nowIso } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
@@ -12,6 +12,7 @@ import { RodService } from './rod.service';
 import { SessionEventRepository } from './session-event.repository';
 import { SessionEventService } from './session-event.service';
 import { SessionRepository } from './session.repository';
+import { SessionWeatherService } from './session-weather.service';
 import { SettingsService } from './settings.service';
 import { WeatherService } from './weather.service';
 
@@ -62,6 +63,7 @@ export class SessionService {
     private readonly fishSpottedRepo: FishSpottedRepository,
     private readonly rodSpotHistoryRepo: RodSpotHistoryRepository,
     private readonly sessionEventRepo: SessionEventRepository,
+    private readonly sessionWeather: SessionWeatherService,
   ) {}
 
   watchAll() {
@@ -105,20 +107,21 @@ export class SessionService {
 
     let latitude: number | undefined;
     let longitude: number | undefined;
-    let weatherSnapshot = null;
+    let weatherSnapshot: WeatherSnapshot | null = null;
 
     try {
       const position = await this.geo.getCurrentPosition();
       if (position) {
         latitude = position.latitude;
         longitude = position.longitude;
-        weatherSnapshot = await this.weather.getSnapshot(
+        // Prefer cache at start so create is not blocked by Open-Meteo.
+        weatherSnapshot = this.weather.getCachedSnapshotFor(
           position.latitude,
           position.longitude,
         );
       }
     } catch {
-      // GPS and weather are optional
+      // GPS is optional
     }
 
     let coverImageId: string | undefined;
@@ -148,6 +151,9 @@ export class SessionService {
     };
 
     await this.sessionRepo.put(session);
+    if (weatherSnapshot) {
+      await this.sessionWeather.record(session.id, weatherSnapshot);
+    }
     await this.sessionEvents.record({
       sessionId: session.id,
       type: 'session-start',
@@ -165,6 +171,12 @@ export class SessionService {
     if (lakeId) {
       this.settings.update({ lastLakeId: lakeId });
     }
+
+    // Live weather enrichment runs after persist so start stays responsive offline/slow.
+    if (latitude != null && longitude != null) {
+      void this.refreshWeather(session.id);
+    }
+
     return session;
   }
 
@@ -280,35 +292,41 @@ export class SessionService {
     if (!session) {
       return;
     }
-    const lat = session.latitude;
-    const lng = session.longitude;
+
+    const useGps = this.settings.get().useGpsForWeather;
+    const pos = useGps ? await this.geo.getCurrentPosition() : null;
+    const lat = pos?.latitude ?? session.latitude;
+    const lng = pos?.longitude ?? session.longitude;
     if (lat == null || lng == null) {
-      const pos = await this.geo.getCurrentPosition();
-      if (!pos) {
-        return;
-      }
-      const weather = await this.weather.getSnapshot(pos.latitude, pos.longitude);
-      await this.update(id, {
-        latitude: pos.latitude,
-        longitude: pos.longitude,
-        weather: weather ?? undefined,
-      });
-      await this.sessionEvents.record({
-        sessionId: id,
-        type: 'weather',
-        description: 'Weather updated',
-      });
       return;
     }
+
     const weather = await this.weather.getSnapshot(lat, lng);
-    if (weather) {
-      await this.update(id, { weather });
-      await this.sessionEvents.record({
-        sessionId: id,
-        type: 'weather',
-        description: 'Weather updated',
-      });
+    const updates: Partial<FishingSession> = {};
+    if (pos) {
+      updates.latitude = pos.latitude;
+      updates.longitude = pos.longitude;
     }
+    if (weather) {
+      updates.weather = weather;
+    }
+    if (Object.keys(updates).length === 0) {
+      return;
+    }
+
+    await this.update(id, updates);
+    if (weather) {
+      await this.appendWeatherHistory(id, weather);
+    }
+  }
+
+  private async appendWeatherHistory(sessionId: string, weather: WeatherSnapshot): Promise<void> {
+    await this.sessionWeather.record(sessionId, weather);
+    await this.sessionEvents.record({
+      sessionId,
+      type: 'weather',
+      description: 'Weather updated',
+    });
   }
 
   async addSessionPhoto(sessionId: string, file: File): Promise<void> {
@@ -327,6 +345,7 @@ export class SessionService {
     await this.biteEventRepo.deleteBySession(id);
     await this.fishSpottedRepo.deleteBySession(id);
     await this.sessionEventRepo.deleteBySession(id);
+    await this.sessionWeather.deleteBySession(id);
     const session = await this.sessionRepo.getById(id);
     if (session?.rods) {
       for (const rod of session.rods) {

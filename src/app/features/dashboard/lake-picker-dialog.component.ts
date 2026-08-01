@@ -3,13 +3,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { Lake } from '../../core/models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-lake-picker-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule, MatListModule],
+  imports: [MatDialogModule, MatButtonModule, MatListModule, TranslatePipe],
   template: `
-    <h2 mat-dialog-title>Select Lake</h2>
+    <h2 mat-dialog-title>{{ 'dashboard.selectLake' | tr }}</h2>
     <mat-dialog-content>
       <mat-selection-list [multiple]="false">
         @for (lake of data.lakes; track lake.id) {
@@ -24,8 +25,8 @@ import { Lake } from '../../core/models';
       </mat-selection-list>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-flat-button (click)="confirm()">Start</button>
+      <button mat-button mat-dialog-close>{{ 'common.cancel' | tr }}</button>
+      <button mat-flat-button (click)="confirm()">{{ 'dashboard.start' | tr }}</button>
     </mat-dialog-actions>
   `,
 })

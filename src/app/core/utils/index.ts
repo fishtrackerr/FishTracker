@@ -70,3 +70,7 @@ export function base64ToBlob(base64: string, mimeType: string): Blob {
 }
 
 export { toLocalDatetimeInput, fromLocalDatetimeInput } from './datetime.util';
+export {
+  DEFAULT_FETCH_TIMEOUT_MS,
+  fetchWithTimeout,
+} from './fetch-with-timeout';

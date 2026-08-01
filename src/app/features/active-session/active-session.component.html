@@ -1,5 +1,19 @@
 @if (session(); as s) {
   <div class="active">
+    @if (weatherAlerts().length > 0) {
+      <div
+        class="weather-alert-banner"
+        [class.has-danger]="weatherAlerts().some((w) => w.severity === 'danger')"
+        role="alert"
+      >
+        @for (alert of weatherAlerts(); track alert.type + alert.message) {
+          <p class="weather-alert-item" [class.danger]="alert.severity === 'danger'">
+            ⚠ {{ alert.message }}
+          </p>
+        }
+      </div>
+    }
+
     <div class="timer">{{ timer() }}</div>
 
     <div class="stats-row">
@@ -32,6 +46,7 @@
 
     <app-weather-card [weather]="s.weather" />
     <button mat-button class="refresh" (click)="refreshWeather()">{{ 'activeSession.refreshWeatherGps' | tr }}</button>
+    <app-weather-history [sessionId]="s.id" />
 
     @if (s.latitude != null && s.longitude != null) {
       <p class="gps">
@@ -52,18 +67,38 @@
       </mat-form-field>
     }
 
+    @if (sessionImages().length > 0) {
+      <section class="photo-strip" [attr.aria-label]="'activeSession.photos' | tr">
+        <h3>{{ 'activeSession.photos' | tr }}</h3>
+        <app-image-gallery
+          class="photo-strip-gallery"
+          [galleryItems]="sessionImages()"
+          [allowDelete]="false"
+          (changed)="loadSessionImages()"
+        />
+      </section>
+    }
+
     <div class="actions">
       <button mat-flat-button class="action-btn primary" (click)="quickCatch()">
         🐟 {{ 'activeSession.addCatch' | tr }}
       </button>
+      @if (hasRods) {
+        <button mat-stroked-button class="action-btn" (click)="recastRod()">
+          <mat-icon>south</mat-icon> {{ 'activeSession.recast' | tr }}
+        </button>
+      }
       <button mat-stroked-button class="action-btn" (click)="openDetails()">
         {{ 'activeSession.viewSessionDetails' | tr }}
       </button>
       <button mat-stroked-button class="action-btn" (click)="openEdit()">
         {{ 'sessionDetail.editSession' | tr }}
       </button>
-      <button mat-flat-button class="action-btn" (click)="quickCamera()">
-        📷 {{ 'activeSession.camera' | tr }}
+      <button mat-flat-button class="action-btn" (click)="addSessionPhoto(true)">
+        📷 {{ 'images.camera' | tr }}
+      </button>
+      <button mat-flat-button class="action-btn" (click)="addSessionPhoto(false)">
+        🖼️ {{ 'images.gallery' | tr }}
       </button>
       <button mat-flat-button class="action-btn" (click)="toggleNotes()">
         📝 {{ 'common.notes' | tr }}

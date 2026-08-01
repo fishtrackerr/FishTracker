@@ -6,16 +6,17 @@ import { WeatherService } from '../../../core/services/weather.service';
 import { GeolocationService } from '../../../core/services/geolocation.service';
 import { SettingsService } from '../../../core/services/settings.service';
 import { WeatherSnapshot, WeatherWarning } from '../../../core/models';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-weather-card',
   standalone: true,
-  imports: [FormatTempPipe, DatePipe, MatButtonModule],
+  imports: [FormatTempPipe, DatePipe, MatButtonModule, TranslatePipe],
   template: `
     @if (displayWeather(); as w) {
       <div class="weather-card">
         @if (w.isCached || w.source === 'cached') {
-          <p class="cached-badge">Cached / offline data</p>
+          <p class="cached-badge">{{ 'weather.cachedOffline' | tr }}</p>
         }
         @for (warning of warnings(); track warning.message) {
           <div class="warning" [class.danger]="warning.severity === 'danger'">
@@ -28,17 +29,17 @@ import { WeatherSnapshot, WeatherWarning } from '../../../core/models';
         </div>
         <div class="details">
           @if (w.feelsLikeC != null) {
-            <span>Feels like {{ w.feelsLikeC | formatTemp }}</span>
+            <span>{{ 'weather.feelsLike' | tr }} {{ w.feelsLikeC | formatTemp }}</span>
           }
           @if (w.tempMinC != null && w.tempMaxC != null) {
-            <span>Min/Max {{ w.tempMinC | formatTemp }} – {{ w.tempMaxC | formatTemp }}</span>
+            <span>{{ 'weather.minMax' | tr }} {{ w.tempMinC | formatTemp }} – {{ w.tempMaxC | formatTemp }}</span>
           }
           <span>💨 {{ w.windSpeedKmh }} km/h</span>
-          @if (w.windGustKmh) { <span>Gusts {{ w.windGustKmh }} km/h</span> }
+          @if (w.windGustKmh) { <span>{{ 'weather.gusts' | tr }} {{ w.windGustKmh }} km/h</span> }
           <span>🌡 {{ w.airPressureHpa }} hPa</span>
           <span>💧 {{ w.humidity }}%</span>
           @if (w.rainProbability != null) {
-            <span>Rain {{ w.rainProbability }}%</span>
+            <span>{{ 'weather.rain' | tr }} {{ w.rainProbability }}%</span>
           }
           @if (w.sunrise) {
             <span>🌅 {{ w.sunrise | date:'shortTime' }}</span>
@@ -50,7 +51,7 @@ import { WeatherSnapshot, WeatherWarning } from '../../../core/models';
         </div>
         @if (detailed && w.daily?.length) {
           <div class="forecast">
-            <h4>Daily Forecast</h4>
+            <h4>{{ 'weather.dailyForecast' | tr }}</h4>
             @for (day of w.daily!.slice(0, 5); track day.date) {
               <div class="forecast-row">
                 <span>{{ day.date | date:'EEE' }}</span>
@@ -62,15 +63,15 @@ import { WeatherSnapshot, WeatherWarning } from '../../../core/models';
         }
         @if (showRefresh) {
           <button mat-stroked-button type="button" class="refresh-btn" (click)="refresh()">
-            Refresh weather
+            {{ 'weather.refresh' | tr }}
           </button>
         }
       </div>
     } @else {
       <div class="weather-card unavailable">
-        Weather unavailable
+        {{ 'weather.unavailable' | tr }}
         @if (showRefresh) {
-          <button mat-stroked-button type="button" (click)="refresh()">Try again</button>
+          <button mat-stroked-button type="button" (click)="refresh()">{{ 'common.retry' | tr }}</button>
         }
       </div>
     }
@@ -181,6 +182,10 @@ export class WeatherCardComponent {
     const snapshot = useDetailed
       ? await this.weatherService.getDetailedForecast(pos.latitude, pos.longitude)
       : await this.weatherService.getSnapshot(pos.latitude, pos.longitude);
-    this.applyWeather(snapshot ?? undefined);
+    this.applyWeather(
+      snapshot ??
+        this.weatherService.getCachedSnapshotFor(pos.latitude, pos.longitude) ??
+        undefined,
+    );
   }
 }

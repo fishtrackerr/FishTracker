@@ -1,5 +1,6 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { fetchWithTimeout } from '../utils';
 
 @Injectable({ providedIn: 'root' })
 export class VersionCheckService {
@@ -35,7 +36,7 @@ export class VersionCheckService {
 
   private async readVersion(bypassSw: boolean): Promise<string | null> {
     try {
-      const response = await fetch(this.buildVersionUrl(bypassSw), {
+      const response = await fetchWithTimeout(this.buildVersionUrl(bypassSw), {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',

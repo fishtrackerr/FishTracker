@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ImageRepository } from './image.repository';
 import { ImageType, StoredImage } from '../models';
-import { generateId, nowIso } from '../utils';
+import { fetchWithTimeout, generateId, nowIso } from '../utils';
 import { SettingsService } from './settings.service';
 
 const COVER_IMAGES = [
@@ -48,7 +48,7 @@ export class ImageService {
   async createCoverImage(): Promise<string | undefined> {
     try {
       const path = COVER_IMAGES[Math.floor(Math.random() * COVER_IMAGES.length)];
-      const response = await fetch(path);
+      const response = await fetchWithTimeout(path);
       if (!response.ok) {
         return undefined;
       }

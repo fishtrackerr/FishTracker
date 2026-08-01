@@ -2,12 +2,15 @@ import Dexie, { Table } from 'dexie';
 import {
   BiteEvent,
   Catch,
+  ChatMessage,
+  ChatThread,
   FishSpottedEvent,
   FishingSession,
   Lake,
   ProfileDocument,
   RodSpotHistory,
   SessionEvent,
+  SessionWeatherRecord,
   StoredImage,
   UserOption,
   UserProfile,
@@ -28,7 +31,10 @@ export class FishDb extends Dexie {
   fishSpottedEvents!: Table<FishSpottedEvent, string>;
   rodSpotHistory!: Table<RodSpotHistory, string>;
   sessionEvents!: Table<SessionEvent, string>;
+  sessionWeather!: Table<SessionWeatherRecord, string>;
   userOptions!: Table<UserOption, string>;
+  chatThreads!: Table<ChatThread, string>;
+  chatMessages!: Table<ChatMessage, string>;
 
   constructor() {
     super('FishTrackerDb');
@@ -172,6 +178,54 @@ export class FishDb extends Dexie {
           }
         }
       });
+
+    this.version(5)
+      .stores({
+        sessions: 'id, status, lakeId, startDate',
+        catches: 'id, sessionId, rodId, sessionSpotId, species, caughtAt',
+        lakes: 'id, name, isFavorite',
+        images: 'id, type, parentId, isFavorite, isHomepageImage',
+        profiles: 'id',
+        profileDocuments: 'id, type, title',
+        biteEvents: 'id, sessionId, rodId, occurredAt',
+        fishSpottedEvents: 'id, sessionId, rodId, spottedAt',
+        rodSpotHistory: 'id, rodId, changedAt',
+        sessionEvents: 'id, sessionId, type, occurredAt',
+        sessionWeather: 'id, sessionId, capturedAt',
+        userOptions: 'id, category, value',
+      })
+      .upgrade(async (tx) => {
+        const sessions = await tx.table('sessions').toArray();
+        for (const session of sessions) {
+          if (!session.weather) {
+            continue;
+          }
+          const weather = session.weather;
+          await tx.table('sessionWeather').add({
+            id: generateId(),
+            sessionId: session.id,
+            capturedAt: weather.capturedAt ?? session.updatedAt ?? session.createdAt,
+            weather,
+          } satisfies SessionWeatherRecord);
+        }
+      });
+
+    this.version(6).stores({
+      sessions: 'id, status, lakeId, startDate',
+      catches: 'id, sessionId, rodId, sessionSpotId, species, caughtAt',
+      lakes: 'id, name, isFavorite',
+      images: 'id, type, parentId, isFavorite, isHomepageImage',
+      profiles: 'id',
+      profileDocuments: 'id, type, title',
+      biteEvents: 'id, sessionId, rodId, occurredAt',
+      fishSpottedEvents: 'id, sessionId, rodId, spottedAt',
+      rodSpotHistory: 'id, rodId, changedAt',
+      sessionEvents: 'id, sessionId, type, occurredAt',
+      sessionWeather: 'id, sessionId, capturedAt',
+      userOptions: 'id, category, value',
+      chatThreads: 'id, updatedAt',
+      chatMessages: 'id, threadId, createdAt',
+    });
   }
 }
 

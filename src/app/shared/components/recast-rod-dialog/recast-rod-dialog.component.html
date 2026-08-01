@@ -1,0 +1,39 @@
+<h2 mat-dialog-title class="dialog-title">{{ 'rod.recast' | tr }}</h2>
+<mat-dialog-content>
+  <p class="hint">{{ 'rod.recastHint' | tr }}</p>
+
+  @if (!rodLocked) {
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>{{ 'rod.rodName' | tr }}</mat-label>
+      <mat-select
+        [(ngModel)]="rodId"
+        [panelClass]="selectPanelClass"
+        (ngModelChange)="onRodChange()"
+      >
+        @for (rod of rods; track rod.id) {
+          <mat-option [value]="rod.id">{{ rod.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>{{ 'rod.spot' | tr }}</mat-label>
+    <mat-select [(ngModel)]="spotId" [panelClass]="selectPanelClass">
+      <mat-option value="">{{ 'rod.unassigned' | tr }}</mat-option>
+      @for (spot of sessionSpots; track spot.id) {
+        <mat-option [value]="spot.id">{{ spot.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (sessionSpots.length === 0) {
+    <p class="empty-spots">{{ 'rod.recastNoSpots' | tr }}</p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close type="button">{{ 'common.cancel' | tr }}</button>
+  <button mat-flat-button type="button" [disabled]="!rodId" (click)="confirm()">
+    {{ 'rod.recastConfirm' | tr }}
+  </button>
+</mat-dialog-actions>

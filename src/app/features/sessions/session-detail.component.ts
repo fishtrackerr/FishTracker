@@ -12,8 +12,16 @@ import { CatchService } from '../../core/services/catch.service';
 import { LakeService } from '../../core/services/lake.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ImageRepository } from '../../core/services/image.repository';
+import { ImageService } from '../../core/services/image.service';
 import { WeatherCardComponent } from '../../shared/components/weather-card/weather-card.component';
+import { WeatherHistoryComponent } from '../../shared/components/weather-history/weather-history.component';
 import { ImageThumbComponent } from '../../shared/components/image-thumb/image-thumb.component';
+import { ImagePickerComponent } from '../../shared/components/image-picker/image-picker.component';
+import {
+  GalleryImageItem,
+  ImageGalleryComponent,
+} from '../../shared/components/image-gallery/image-gallery.component';
 import { FormatWeightPipe, FormatLengthPipe } from '../../core/pipes/format-units.pipe';
 import { formatDuration } from '../../core/utils';
 import { FishingSession } from '../../core/models';
@@ -36,7 +44,10 @@ import { I18nService } from '../../core/services/i18n.service';
     MatInputModule,
     FormsModule,
     WeatherCardComponent,
+    WeatherHistoryComponent,
     ImageThumbComponent,
+    ImagePickerComponent,
+    ImageGalleryComponent,
     FormatWeightPipe,
     FormatLengthPipe,
     MapsLinkButtonComponent,
@@ -57,6 +68,8 @@ export class SessionDetailComponent {
   private readonly lakeService = inject(LakeService);
   private readonly confirm = inject(ConfirmService);
   private readonly notify = inject(NotificationService);
+  private readonly imageRepo = inject(ImageRepository);
+  private readonly imageService = inject(ImageService);
   private readonly i18n = inject(I18nService);
 
   readonly session = toSignal(
@@ -79,6 +92,7 @@ export class SessionDetailComponent {
 
   readonly lakeName = signal('');
   readonly durationText = signal('—');
+  readonly sessionImages = signal<GalleryImageItem[]>([]);
   notes = '';
   prebait = '';
   private durationIntervalId?: ReturnType<typeof setInterval>;
@@ -115,6 +129,16 @@ export class SessionDetailComponent {
         void this.hydrateFromSession(s);
       }
     });
+
+    effect(() => {
+      const s = this.session();
+      this.catches();
+      if (s) {
+        void this.loadSessionImages();
+      } else {
+        this.sessionImages.set([]);
+      }
+    });
   }
 
   async hydrateFromSession(s: FishingSession): Promise<void> {
@@ -126,6 +150,78 @@ export class SessionDetailComponent {
     }
     this.notes = s.notes ?? '';
     this.prebait = s.prebait ?? '';
+  }
+
+  async loadSessionImages(): Promise<void> {
+    const s = this.session();
+    if (!s) return;
+    const catchPhotoIds = this.catches()
+      .map((c) => c.photoId)
+      .filter((id): id is string => !!id);
+    const [sessionType, catchType] = await Promise.all([
+      this.imageRepo.getByType('session'),
+      this.imageRepo.getByType('catch'),
+    ]);
+    const linked = new Set([...s.photoIds, ...catchPhotoIds]);
+    const matched = [...sessionType, ...catchType].filter(
+      (img) => img.parentId === s.id || linked.has(img.id),
+    );
+    const byId = new Map(matched.map((img) => [img.id, img]));
+    const items: GalleryImageItem[] = await Promise.all(
+      [...byId.values()].map(async (img) => ({
+        ...img,
+        url: (await this.imageService.getObjectUrl(img.id)) ?? undefined,
+      })),
+    );
+    items.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    this.sessionImages.set(items);
+  }
+
+  async onImageUploaded(imageId: string): Promise<void> {
+    const s = this.session();
+    if (!s) return;
+    if (s.photoIds.includes(imageId)) {
+      await this.loadSessionImages();
+      return;
+    }
+    await this.sessionService.update(s.id, {
+      photoIds: [...s.photoIds, imageId],
+    });
+    await this.loadSessionImages();
+  }
+
+  async onImagesChanged(): Promise<void> {
+    await this.pruneDeletedPhotoRefs();
+    await this.loadSessionImages();
+  }
+
+  private async pruneDeletedPhotoRefs(): Promise<void> {
+    const s = this.session();
+    if (!s) return;
+
+    const photoIds: string[] = [];
+    for (const id of s.photoIds) {
+      if (await this.imageRepo.getById(id)) {
+        photoIds.push(id);
+      }
+    }
+
+    const updates: { photoIds?: string[]; coverImageId?: string } = {};
+    if (photoIds.length !== s.photoIds.length) {
+      updates.photoIds = photoIds;
+    }
+    if (s.coverImageId && !(await this.imageRepo.getById(s.coverImageId))) {
+      updates.coverImageId = undefined;
+    }
+    if (Object.keys(updates).length > 0) {
+      await this.sessionService.update(s.id, updates);
+    }
+
+    for (const c of this.catches()) {
+      if (c.photoId && !(await this.imageRepo.getById(c.photoId))) {
+        await this.catchService.update(c.id, { photoId: undefined });
+      }
+    }
   }
 
   async saveNotes(): Promise<void> {

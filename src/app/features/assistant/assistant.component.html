@@ -1,0 +1,121 @@
+<app-page-title title="assistant.title" />
+
+<p class="subtitle">{{ 'assistant.subtitle' | tr }}</p>
+
+<div class="toolbar">
+  <button mat-stroked-button type="button" (click)="showThreads.set(!showThreads())">
+    <mat-icon>forum</mat-icon>
+    {{ 'assistant.threads' | tr }}
+  </button>
+  <button mat-stroked-button type="button" (click)="startBlankChat()" [disabled]="sending()">
+    <mat-icon>add</mat-icon>
+    {{ 'assistant.newChat' | tr }}
+  </button>
+  @if (activeThreadId()) {
+    <button mat-stroked-button type="button" (click)="clearActive()">
+      {{ 'assistant.backToStarters' | tr }}
+    </button>
+    <button mat-stroked-button type="button" class="danger" (click)="deleteActive()">
+      <mat-icon>delete</mat-icon>
+      {{ 'assistant.deleteThread' | tr }}
+    </button>
+  }
+</div>
+
+@if (!aiReady()) {
+  <p class="hint">
+    {{ 'assistant.needsAiKey' | tr }}
+    <a routerLink="/settings">{{ 'common.settings' | tr }}</a>
+  </p>
+}
+
+@if (showThreads()) {
+  <section class="threads-panel">
+    <h2 class="section-title">{{ 'assistant.threads' | tr }}</h2>
+    @if (threads().length === 0) {
+      <p class="empty">{{ 'assistant.emptyThreads' | tr }}</p>
+    } @else {
+      <ul class="thread-list">
+        @for (thread of threads(); track thread.id) {
+          <li>
+            <button
+              type="button"
+              class="thread-item"
+              [class.active]="thread.id === activeThreadId()"
+              (click)="selectThread(thread.id)"
+            >
+              <span class="thread-title">{{ thread.title }}</span>
+              <span class="thread-date">{{ thread.updatedAt | date: 'short' }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+}
+
+@if (!activeThreadId()) {
+  <section class="starters">
+    <h2 class="section-title">{{ 'assistant.starterTitle' | tr }}</h2>
+    <div class="prompt-grid">
+      @for (prompt of prompts; track prompt.id) {
+        <button
+          type="button"
+          class="prompt-card"
+          (click)="startPrompt(prompt.id)"
+          [disabled]="sending()"
+        >
+          <strong>{{ prompt.titleKey | tr }}</strong>
+          <span>{{ prompt.descriptionKey | tr }}</span>
+        </button>
+      }
+      <button type="button" class="prompt-card new" (click)="startBlankChat()" [disabled]="sending()">
+        <strong>{{ 'assistant.newChat' | tr }}</strong>
+        <span>{{ 'assistant.composerPlaceholder' | tr }}</span>
+      </button>
+    </div>
+  </section>
+} @else {
+  <section class="chat">
+    <div #messageList class="messages">
+      @for (msg of messages(); track msg.id) {
+        <div class="bubble" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+          @if (msg.source === 'local') {
+            <span class="badge">{{ 'assistant.localBadge' | tr }}</span>
+          } @else if (msg.source === 'llm') {
+            <span class="badge ai">{{ 'assistant.llmBadge' | tr }}</span>
+          }
+          <pre class="bubble-text">{{ msg.content }}</pre>
+        </div>
+      }
+      @if (sending()) {
+        <div class="bubble assistant">
+          <pre class="bubble-text">{{ 'assistant.sending' | tr }}</pre>
+        </div>
+      }
+    </div>
+
+    <div class="composer">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'assistant.composerPlaceholder' | tr }}</mat-label>
+        <textarea
+          matInput
+          rows="2"
+          [ngModel]="draft()"
+          (ngModelChange)="draft.set($event)"
+          (keydown)="onComposerKeydown($event)"
+          [disabled]="sending()"
+        ></textarea>
+      </mat-form-field>
+      <button
+        mat-flat-button
+        type="button"
+        class="send-btn"
+        (click)="send()"
+        [disabled]="sending() || !draft().trim()"
+      >
+        {{ 'assistant.send' | tr }}
+      </button>
+    </div>
+  </section>
+}
