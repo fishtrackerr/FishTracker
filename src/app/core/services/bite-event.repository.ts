@@ -3,9 +3,10 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { BiteEvent } from '../models';
+import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
-export class BiteEventRepository {
+export class BiteEventRepository extends ModeScopedRepository {
   watchBySession(sessionId: string): Observable<BiteEvent[]> {
     return from(
       liveQuery(() =>
@@ -23,6 +24,14 @@ export class BiteEventRepository {
   }
 
   async getAll(): Promise<BiteEvent[]> {
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return [];
+    }
+    return db.biteEvents.where('fishingMode').equals(mode).toArray();
+  }
+
+  async getAllAcrossModes(): Promise<BiteEvent[]> {
     return db.biteEvents.toArray();
   }
 
@@ -39,7 +48,7 @@ export class BiteEventRepository {
   }
 
   async getById(id: string): Promise<BiteEvent | undefined> {
-    return db.biteEvents.get(id);
+    return this.forActiveMode(await db.biteEvents.get(id));
   }
 
   async getLatestByRod(rodId: string): Promise<BiteEvent | undefined> {
@@ -47,8 +56,8 @@ export class BiteEventRepository {
     return events.at(-1);
   }
 
-  async put(event: BiteEvent): Promise<void> {
-    await db.biteEvents.put(event);
+  async put(event: NewModeEntity<BiteEvent>): Promise<void> {
+    await db.biteEvents.put(this.withMode(event));
   }
 
   async delete(id: string): Promise<void> {
@@ -61,6 +70,11 @@ export class BiteEventRepository {
 
   async deleteByRod(rodId: string): Promise<void> {
     await db.biteEvents.where('rodId').equals(rodId).delete();
+  }
+
+  async clearCurrentMode(): Promise<void> {
+    const mode = this.activeMode();
+    await db.biteEvents.where('fishingMode').equals(mode).delete();
   }
 
   async clear(): Promise<void> {

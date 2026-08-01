@@ -39,6 +39,7 @@ describe('RelatedDataSyncService', () => {
       catches,
       lakes,
       settings,
+      fishingMode: { getMode: vi.fn().mockReturnValue('carper') },
       filters,
       i18n,
     });

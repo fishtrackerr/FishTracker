@@ -6,6 +6,7 @@ import en from '../../../assets/i18n/en.json';
 import nl from '../../../assets/i18n/nl.json';
 import { CatchRepository } from './catch.repository';
 import { FilterService } from './filter.service';
+import { FishingModeService } from './fishing-mode.service';
 import { I18nService } from './i18n.service';
 import { LakeRepository } from './lake.repository';
 import { SessionRepository } from './session.repository';
@@ -21,6 +22,7 @@ export class RelatedDataSyncService {
   private readonly catches = inject(CatchRepository);
   private readonly lakes = inject(LakeRepository);
   private readonly settings = inject(SettingsService);
+  private readonly fishingMode = inject(FishingModeService);
   private readonly filters = inject(FilterService);
   private readonly i18n = inject(I18nService);
 
@@ -282,21 +284,54 @@ export class RelatedDataSyncService {
       return list.map((v) => (v === oldValue ? newValue : v));
     };
 
+    const mode = this.fishingMode.getMode();
+    const patch: Partial<typeof settings> = {};
+
+    if (mode) {
+      const modePrefs = { ...(settings.modePreferences ?? {}) };
+      const prefs = modePrefs[mode];
+      if (prefs) {
+        const next = { ...prefs };
+        if (category === 'species') {
+          const favoriteSpecies = replaceIn(prefs.favoriteSpecies);
+          if (favoriteSpecies) {
+            next.favoriteSpecies = favoriteSpecies;
+          }
+        } else if (category === 'bait') {
+          const favoriteBaits = replaceIn(prefs.favoriteBaits);
+          if (favoriteBaits) {
+            next.favoriteBaits = favoriteBaits;
+          }
+        } else if (category === 'rig') {
+          const favoriteRigs = replaceIn(prefs.favoriteRigs);
+          if (favoriteRigs) {
+            next.favoriteRigs = favoriteRigs;
+          }
+        }
+        modePrefs[mode] = next;
+        patch.modePreferences = modePrefs;
+      }
+    }
+
     if (category === 'species') {
       const favoriteSpecies = replaceIn(settings.favoriteSpecies);
       if (favoriteSpecies) {
-        this.settings.update({ favoriteSpecies });
+        patch.favoriteSpecies = favoriteSpecies;
       }
     } else if (category === 'bait') {
       const favoriteBaits = replaceIn(settings.favoriteBaits);
       if (favoriteBaits) {
-        this.settings.update({ favoriteBaits });
+        patch.favoriteBaits = favoriteBaits;
       }
     } else if (category === 'rig') {
       const favoriteRigs = replaceIn(settings.favoriteRigs);
       if (favoriteRigs) {
-        this.settings.update({ favoriteRigs });
+        patch.favoriteRigs = favoriteRigs;
       }
+    }
+
+    if (Object.keys(patch).length > 0) {
+      this.settings.update(patch);
     }
   }
 

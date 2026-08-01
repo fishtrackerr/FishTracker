@@ -17,6 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { filter, startWith } from 'rxjs';
 import { ConnectivityService } from '../../core/services/connectivity.service';
 import { FeedbackPromptService } from '../../core/services/feedback-prompt.service';
+import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { SessionService } from '../../core/services/session.service';
 import { ShareService } from '../../core/services/share.service';
 import { WhatsNewService } from '../../core/services/whats-new.service';
@@ -41,6 +42,7 @@ export class ShellComponent implements AfterViewInit {
   readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly sessionService = inject(SessionService);
+  private readonly fishingMode = inject(FishingModeService);
   private readonly connectivity = inject(ConnectivityService);
   private readonly share = inject(ShareService);
   private readonly whatsNew = inject(WhatsNewService);
@@ -52,6 +54,8 @@ export class ShellComponent implements AfterViewInit {
   readonly activeSession = toSignal(this.sessionService.watchActive(), {
     initialValue: undefined,
   });
+
+  readonly currentMode = this.fishingMode.selectedMode;
 
   private readonly bannerDismissed = signal(false);
 

@@ -2,6 +2,7 @@ import { Injectable, inject, signal, isDevMode } from '@angular/core';
 import { Router } from '@angular/router';
 import { db } from '../db/fish-db';
 import { PinLockService } from './pin-lock.service';
+import { FishingModeService } from './fishing-mode.service';
 import { SessionRepository } from './session.repository';
 import { SessionWeatherMonitorService } from './session-weather-monitor.service';
 import { consumePersistedReturnUrl, persistReturnUrl } from '../utils/return-url';
@@ -11,6 +12,7 @@ export type DbRecoveryKind = 'versionMismatch' | 'upgradeFailed' | 'unknown';
 @Injectable({ providedIn: 'root' })
 export class AppStartupService {
   private readonly pinLock = inject(PinLockService);
+  private readonly fishingMode = inject(FishingModeService);
   private readonly sessionRepo = inject(SessionRepository);
   private readonly weatherMonitor = inject(SessionWeatherMonitorService);
   private readonly router = inject(Router);
@@ -208,8 +210,20 @@ export class AppStartupService {
     return this.pinScreenRedirect;
   }
 
-  private async resolveUnlockedDestination(path: string): Promise<string> {
+  /** Resolves post-PIN / post-mode destination (active session or home). */
+  async resolveUnlockedDestination(path: string): Promise<string> {
     if (path.startsWith('/pin/')) {
+      path = '/';
+    }
+
+    if (!this.fishingMode.hasMode()) {
+      if (this.isPreservableDeepLink(path)) {
+        this.storeReturnUrl(path);
+      }
+      return '/mode-select';
+    }
+
+    if (path.startsWith('/mode-select')) {
       path = '/';
     }
 
@@ -227,7 +241,7 @@ export class AppStartupService {
 
   private isPreservableDeepLink(path: string): boolean {
     const base = path.split('?')[0];
-    if (base === '/' || base === '') {
+    if (base === '/' || base === '' || base === '/mode-select') {
       return false;
     }
     if (base === '/sessions/active') {
@@ -242,6 +256,7 @@ export class AppStartupService {
       '/profile',
       '/release-notes',
       '/privacy',
+      '/assistant',
     ];
     if (shellRoutes.some((r) => base === r || base.startsWith(r + '/'))) {
       return true;

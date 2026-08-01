@@ -1,29 +1,29 @@
 # Ask-your-data assistant
 
-Hybrid fishing insights chat at `/assistant`.
+Hybrid fishing insights chat at `/assistant`. Threads and messages are scoped to the active **fishing mode**.
 
 ## Modes
 
 | Mode | Requirements | Behavior |
 |------|--------------|----------|
-| Insight prompts | None (offline) | Predefined questions answered from IndexedDB via `LocalInsightService` |
-| Online AI chat | Settings: enable AI + API key + network | OpenAI-compatible chat completions with a privacy-safe data summary |
+| Insight prompts | None (offline) | Predefined questions answered from IndexedDB via `LocalInsightService` (current fishing mode only) |
+| Online AI chat | Settings: enable AI + API key + network | OpenAI-compatible chat completions with a privacy-safe data summary of the **current fishing mode** |
 
-Entry points: Dashboard button, Statistics link, Settings → Ask your data.
+Entry points: Dashboard button, Statistics link, Settings → Ask your data, shell nav.
 
 ## Data flow
 
 Components → `ChatService` → (`LocalInsightService` | `LlmService` + `FishingDataContextService`) → `ChatRepository` → Dexie.
 
-Never send photos, PIN, or full addresses. Context is aggregated counts, lakes, hours, baits, species, recent session summaries.
+Never send photos, PIN, or full addresses. Context is aggregated counts, lakes, hours, baits, species, recent session summaries from the current fishing mode only.
 
 ## Storage
 
-Tables `chatThreads` and `chatMessages` (Dexie schema v6). Included in backup/export and full reset.
+Tables `chatThreads` (with `fishingMode`) and `chatMessages` (Dexie schema v6+; mode on threads since v7). Included in backup/export (all modes) and full reset. Reset current mode clears that mode’s threads/messages.
 
 ## Settings
 
-`AppSettings` fields (localStorage):
+`AppSettings` fields (localStorage) — **shared across fishing modes**:
 
 - `aiChatEnabled`
 - `aiApiKeyEncrypted` / `aiApiKeyIv` / `aiKeySalt` — AES-GCM ciphertext wrapped with a PIN-derived key (`SecretVaultService`). Plaintext `aiApiKey` is never written once ciphertext exists; legacy plaintext is migrated on unlock.

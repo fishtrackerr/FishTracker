@@ -16,8 +16,9 @@
 
 Prefixed debug logs in:
 
-- `AppStartupService` — navigation decisions; `db.open` failures in development
+- `AppStartupService` — navigation decisions (PIN / mode select / active session); `db.open` failures in development
 - `PinLockService` — lock/unlock (never PIN values)
+- `FishingModeService` — mode selection for the app run
 
 ## Async error rules
 

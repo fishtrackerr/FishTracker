@@ -75,7 +75,7 @@
     <div class="submenu-content">
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'settings.defaultLake' | tr }}</mat-label>
-        <mat-select [ngModel]="settings().defaultLakeId" (ngModelChange)="updateSetting('defaultLakeId', $event || undefined)">
+        <mat-select [ngModel]="modePreferences().defaultLakeId" (ngModelChange)="updateDefaultLake($event || undefined)">
           <mat-option value="">{{ 'common.none' | tr }}</mat-option>
           @for (lake of lakes(); track lake.id) {
             <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
@@ -303,6 +303,9 @@
 
       <h3 class="subsection danger">{{ 'settings.fullReset' | tr }}</h3>
       <p class="reset-warning">{{ 'settings.fullResetWarn' | tr }}</p>
+      <button mat-stroked-button color="warn" type="button" (click)="resetCurrentMode()">
+        {{ 'settings.resetCurrentMode' | tr }}
+      </button>
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'settings.confirmation' | tr }}</mat-label>
         <input matInput [ngModel]="fullResetInput()" (ngModelChange)="fullResetInput.set($event)" placeholder="RESET" />

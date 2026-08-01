@@ -13,6 +13,11 @@
       </button>
     </div>
   }
+  @if (currentMode(); as mode) {
+    <div class="mode-banner" role="status">
+      <span>{{ 'modeSelect.modes.' + mode | tr }}</span>
+    </div>
+  }
   <main #content class="content" tabindex="-1">
     <router-outlet />
   </main>

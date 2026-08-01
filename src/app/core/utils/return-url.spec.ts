@@ -65,6 +65,7 @@ describe('isSafeAppReturnUrl', () => {
   it('rejects unsafe paths', () => {
     expect(isSafeAppReturnUrl('//evil.com')).toBe(false);
     expect(isSafeAppReturnUrl('/pin/unlock')).toBe(false);
+    expect(isSafeAppReturnUrl('/mode-select')).toBe(false);
     expect(isSafeAppReturnUrl('https://x')).toBe(false);
     expect(isSafeAppReturnUrl('')).toBe(false);
   });

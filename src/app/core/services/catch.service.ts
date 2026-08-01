@@ -96,7 +96,7 @@ export class CatchService {
     }
 
     const now = nowIso();
-    const catchRecord: Catch = {
+    const catchRecord = {
       id: generateId(),
       sessionId,
       rodId: input.rodId,
@@ -128,7 +128,7 @@ export class CatchService {
       detailsPending: input.detailsPending,
       createdAt: now,
       updatedAt: now,
-    };
+    } as Catch;
 
     catchRecord.isPersonalRecord = await this.checkPersonalRecord(catchRecord);
     await this.catchRepo.put(catchRecord);

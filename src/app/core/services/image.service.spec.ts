@@ -8,7 +8,12 @@ describe('ImageService.createCoverImage', () => {
   beforeEach(() => {
     imageRepo = { put: vi.fn().mockResolvedValue(undefined) };
     const settings = { get: vi.fn().mockReturnValue({}), update: vi.fn() };
-    service = new ImageService(imageRepo as never, settings as never);
+    const fishingMode = {
+      getActivePreferences: vi.fn().mockReturnValue({}),
+      updateActivePreferences: vi.fn(),
+      requireMode: vi.fn().mockReturnValue('carper'),
+    };
+    service = new ImageService(imageRepo as never, settings as never, fishingMode as never);
   });
 
   afterEach(() => {

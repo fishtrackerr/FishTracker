@@ -1,3 +1,5 @@
+import { FishingMode } from './fishing-mode.model';
+
 export type ImageType =
   | 'cover'
   | 'session'
@@ -9,6 +11,7 @@ export type ImageType =
 
 export interface StoredImage {
   id: string;
+  fishingMode?: FishingMode;
   type: ImageType;
   parentId?: string;
   fileName: string;

@@ -1,7 +1,9 @@
+import { FishingMode } from './fishing-mode.model';
 import { WeatherSnapshot } from './weather-snapshot.model';
 
 export interface Catch {
   id: string;
+  fishingMode?: FishingMode;
   sessionId: string;
   rodId?: string;
   sessionSpotId?: string;

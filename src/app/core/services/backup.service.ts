@@ -4,9 +4,11 @@ import {
   BackupData,
   BackupPreview,
   BACKUP_EXPORT_VERSION,
+  FishingMode,
   StoredImage,
   SUPPORTED_BACKUP_VERSIONS,
 } from '../models';
+import { DEFAULT_FISHING_MODE, isFishingMode } from '../models/fishing-mode.model';
 import { blobToBase64, base64ToBlob, nowIso } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
@@ -29,6 +31,16 @@ function hasStringId(entry: unknown): boolean {
   return !!entry && typeof entry === 'object' && typeof (entry as { id?: unknown }).id === 'string';
 }
 
+function ensureMode<T extends { fishingMode?: FishingMode | string }>(
+  entity: T,
+  fallback: FishingMode = DEFAULT_FISHING_MODE,
+): T & { fishingMode: FishingMode } {
+  return {
+    ...entity,
+    fishingMode: isFishingMode(entity.fishingMode) ? entity.fishingMode : fallback,
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class BackupService {
   private readonly profileRepo = inject(ProfileRepository);
@@ -49,24 +61,25 @@ export class BackupService {
   ) {}
 
   async export(): Promise<BackupData> {
-    const sessions = await this.sessionRepo.getAll();
-    const catches = await this.catchRepo.getAll();
-    const lakes = await this.lakeRepo.getAll();
-    const images = await this.imageRepo.getAll();
-    const biteEvents = await this.biteEventRepo.getAll();
-    const fishSpottedEvents = await db.fishSpottedEvents.toArray();
-    const rodSpotHistory = await db.rodSpotHistory.toArray();
-    const sessionEvents = await db.sessionEvents.toArray();
-    const sessionWeather = await this.sessionWeatherRepo.getAll();
-    const userOptions = await this.userOptionRepo.getAll();
-    const chatThreads = await this.chatRepo.getAllThreads();
-    const chatMessages = await this.chatRepo.getAllMessages();
+    const sessions = await this.sessionRepo.getAllAcrossModes();
+    const catches = await this.catchRepo.getAllAcrossModes();
+    const lakes = await this.lakeRepo.getAllAcrossModes();
+    const images = await this.imageRepo.getAllAcrossModes();
+    const biteEvents = await this.biteEventRepo.getAllAcrossModes();
+    const fishSpottedEvents = await this.fishSpottedRepo.getAllAcrossModes();
+    const rodSpotHistory = await this.rodSpotHistoryRepo.getAllAcrossModes();
+    const sessionEvents = await this.sessionEventRepo.getAllAcrossModes();
+    const sessionWeather = await this.sessionWeatherRepo.getAllAcrossModes();
+    const userOptions = await this.userOptionRepo.getAllAcrossModes();
+    const chatThreads = await this.chatRepo.getAllThreadsAcrossModes();
+    const chatMessages = await this.chatRepo.getAllMessagesAcrossModes();
     const profile = await this.profileRepo.get();
     const profileDocuments = await this.profileDocumentRepo.getAll();
 
     const backupImages = await Promise.all(
       images.map(async (img) => ({
         id: img.id,
+        fishingMode: img.fishingMode,
         type: img.type,
         parentId: img.parentId,
         fileName: img.fileName,
@@ -182,12 +195,22 @@ export class BackupService {
   async import(data: BackupData): Promise<BackupPreview> {
     const preview = this.validate(data);
 
-    const activeSessions = data.sessions.filter((s) => s.status === 'active');
-    if (activeSessions.length > 1) {
-      activeSessions.slice(1).forEach((s) => {
-        s.status = 'completed';
-        s.endDate = s.endDate ?? nowIso();
-      });
+    // Allow one active session per fishing mode.
+    const activeByMode = new Map<string, number>();
+    for (const session of data.sessions) {
+      if (session.status !== 'active') {
+        continue;
+      }
+      const mode = isFishingMode(session.fishingMode)
+        ? session.fishingMode
+        : DEFAULT_FISHING_MODE;
+      const count = activeByMode.get(mode) ?? 0;
+      if (count >= 1) {
+        session.status = 'completed';
+        session.endDate = session.endDate ?? nowIso();
+      } else {
+        activeByMode.set(mode, count + 1);
+      }
     }
 
     await db.transaction(
@@ -224,17 +247,19 @@ export class BackupService {
         await this.chatRepo.clear();
 
         for (const lake of data.lakes) {
-          await this.lakeRepo.put(lake);
+          await this.lakeRepo.put(ensureMode(lake));
         }
         for (const session of data.sessions) {
-          await this.sessionRepo.put({
-            ...session,
-            sessionSpots: session.sessionSpots ?? [],
-            rods: session.rods ?? [],
-          });
+          await this.sessionRepo.put(
+            ensureMode({
+              ...session,
+              sessionSpots: session.sessionSpots ?? [],
+              rods: session.rods ?? [],
+            }),
+          );
         }
         for (const catchRecord of data.catches) {
-          await this.catchRepo.put(catchRecord);
+          await this.catchRepo.put(ensureMode(catchRecord));
         }
         for (const img of data.images ?? []) {
           if (typeof img.data !== 'string' || typeof img.thumbnail !== 'string') {
@@ -244,35 +269,38 @@ export class BackupService {
             typeof img.mimeType === 'string' && ALLOWED_IMAGE_MIME.has(img.mimeType)
               ? img.mimeType
               : 'image/jpeg';
-          await this.imageRepo.put({
-            id: img.id,
-            type: img.type as StoredImage['type'],
-            parentId: img.parentId,
-            fileName: img.fileName ?? `${img.id}.jpg`,
-            blob: base64ToBlob(img.data, mimeType),
-            thumbnailBlob: base64ToBlob(img.thumbnail, mimeType),
-            mimeType,
-            createdAt: img.createdAt,
-            isFavorite: img.isFavorite ?? false,
-            isHomepageImage: img.isHomepageImage ?? false,
-          });
+          await this.imageRepo.put(
+            ensureMode({
+              id: img.id,
+              fishingMode: img.fishingMode as FishingMode | undefined,
+              type: img.type as StoredImage['type'],
+              parentId: img.parentId,
+              fileName: img.fileName ?? `${img.id}.jpg`,
+              blob: base64ToBlob(img.data, mimeType),
+              thumbnailBlob: base64ToBlob(img.thumbnail, mimeType),
+              mimeType,
+              createdAt: img.createdAt,
+              isFavorite: img.isFavorite ?? false,
+              isHomepageImage: img.isHomepageImage ?? false,
+            }),
+          );
         }
         for (const event of data.biteEvents ?? []) {
-          await this.biteEventRepo.put(event);
+          await this.biteEventRepo.put(ensureMode(event));
         }
         for (const event of data.fishSpottedEvents ?? []) {
-          await this.fishSpottedRepo.put(event);
+          await this.fishSpottedRepo.put(ensureMode(event));
         }
         for (const entry of data.rodSpotHistory ?? []) {
-          await this.rodSpotHistoryRepo.put(entry);
+          await this.rodSpotHistoryRepo.put(ensureMode(entry));
         }
         for (const event of data.sessionEvents ?? []) {
-          await this.sessionEventRepo.put(event);
+          await this.sessionEventRepo.put(ensureMode(event));
         }
         const weatherRecords = data.sessionWeather ?? [];
         if (weatherRecords.length > 0) {
           for (const record of weatherRecords) {
-            await this.sessionWeatherRepo.put(record);
+            await this.sessionWeatherRepo.put(ensureMode(record));
           }
         } else {
           // Legacy backups: seed history from embedded session.weather
@@ -280,20 +308,23 @@ export class BackupService {
             if (!session.weather) {
               continue;
             }
-            await this.sessionWeatherRepo.put({
-              id: session.id + '-weather-seed',
-              sessionId: session.id,
-              capturedAt:
-                session.weather.capturedAt ?? session.updatedAt ?? session.createdAt,
-              weather: session.weather,
-            });
+            await this.sessionWeatherRepo.put(
+              ensureMode({
+                id: session.id + '-weather-seed',
+                fishingMode: session.fishingMode,
+                sessionId: session.id,
+                capturedAt:
+                  session.weather.capturedAt ?? session.updatedAt ?? session.createdAt,
+                weather: session.weather,
+              }),
+            );
           }
         }
         for (const option of data.userOptions ?? []) {
-          await this.userOptionRepo.put(option);
+          await this.userOptionRepo.put(ensureMode(option));
         }
         for (const thread of data.chatThreads ?? []) {
-          await this.chatRepo.putThread(thread);
+          await this.chatRepo.putThread(ensureMode(thread));
         }
         for (const message of data.chatMessages ?? []) {
           await this.chatRepo.putMessage(message);

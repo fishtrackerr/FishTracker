@@ -23,6 +23,9 @@ export function isSafeAppReturnUrl(url: string): boolean {
   if (path.startsWith('/pin/')) {
     return false;
   }
+  if (path === '/mode-select' || path.startsWith('/mode-select/')) {
+    return false;
+  }
   return true;
 }
 

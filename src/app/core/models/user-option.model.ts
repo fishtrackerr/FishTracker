@@ -1,3 +1,5 @@
+import { FishingMode } from './fishing-mode.model';
+
 export type UserOptionCategory =
   | 'species'
   | 'bait'
@@ -11,6 +13,7 @@ export type UserOptionCategory =
 
 export interface UserOption {
   id: string;
+  fishingMode?: FishingMode;
   category: UserOptionCategory;
   value: string;
   isFavorite: boolean;

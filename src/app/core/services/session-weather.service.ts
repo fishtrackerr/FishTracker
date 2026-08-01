@@ -17,14 +17,14 @@ export class SessionWeatherService {
 
   /** Append a weather snapshot to session history. */
   async record(sessionId: string, weather: WeatherSnapshot): Promise<SessionWeatherRecord> {
-    const record: SessionWeatherRecord = {
+    const record = {
       id: generateId(),
       sessionId,
       capturedAt: weather.capturedAt,
       weather,
     };
     await this.repo.put(record);
-    return record;
+    return record as SessionWeatherRecord;
   }
 
   async deleteBySession(sessionId: string): Promise<void> {

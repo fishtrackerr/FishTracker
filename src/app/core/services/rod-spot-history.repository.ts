@@ -3,9 +3,10 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { RodSpotHistory } from '../models';
+import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
-export class RodSpotHistoryRepository {
+export class RodSpotHistoryRepository extends ModeScopedRepository {
   watchByRod(rodId: string): Observable<RodSpotHistory[]> {
     return from(
       liveQuery(() =>
@@ -25,12 +26,21 @@ export class RodSpotHistoryRepository {
     return db.rodSpotHistory.where('rodId').anyOf(rodIds).sortBy('changedAt');
   }
 
-  async put(entry: RodSpotHistory): Promise<void> {
-    await db.rodSpotHistory.put(entry);
+  async getAllAcrossModes(): Promise<RodSpotHistory[]> {
+    return db.rodSpotHistory.toArray();
+  }
+
+  async put(entry: NewModeEntity<RodSpotHistory>): Promise<void> {
+    await db.rodSpotHistory.put(this.withMode(entry));
   }
 
   async deleteByRod(rodId: string): Promise<void> {
     await db.rodSpotHistory.where('rodId').equals(rodId).delete();
+  }
+
+  async clearCurrentMode(): Promise<void> {
+    const mode = this.activeMode();
+    await db.rodSpotHistory.where('fishingMode').equals(mode).delete();
   }
 
   async clear(): Promise<void> {

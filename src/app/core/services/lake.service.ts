@@ -29,7 +29,7 @@ export class LakeService {
 
   async create(data: Partial<Lake>): Promise<Lake> {
     const now = nowIso();
-    const lake: Lake = {
+    const lake = {
       id: generateId(),
       name: data.name ?? 'New Lake',
       description: data.description,
@@ -52,7 +52,7 @@ export class LakeService {
       updatedAt: now,
     };
     await this.lakeRepo.put(lake);
-    return lake;
+    return lake as unknown as Lake;
   }
 
   async update(id: string, data: Partial<Lake>): Promise<Lake | undefined> {

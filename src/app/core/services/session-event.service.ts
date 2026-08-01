@@ -25,7 +25,7 @@ export class SessionEventService {
   }
 
   async record(options: RecordSessionEventOptions): Promise<SessionEvent> {
-    const event: SessionEvent = {
+    const event = {
       id: generateId(),
       sessionId: options.sessionId,
       type: options.type,
@@ -35,7 +35,7 @@ export class SessionEventService {
       occurredAt: options.occurredAt ?? nowIso(),
     };
     await this.repo.put(event);
-    return event;
+    return event as SessionEvent;
   }
 
   async deleteBySession(sessionId: string): Promise<void> {

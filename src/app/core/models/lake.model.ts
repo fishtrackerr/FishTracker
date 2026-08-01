@@ -1,7 +1,9 @@
+import { FishingMode } from './fishing-mode.model';
 import { FishingSpot } from './fishing-spot.model';
 
 export interface Lake {
   id: string;
+  fishingMode?: FishingMode;
   name: string;
   description?: string;
   address?: string;

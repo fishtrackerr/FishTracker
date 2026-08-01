@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -23,6 +23,7 @@ import { I18nService } from '../../core/services/i18n.service';
 import { PwaInstallService } from '../../core/services/pwa-install.service';
 import { ShareService } from '../../core/services/share.service';
 import { UserOptionService } from '../../core/services/user-option.service';
+import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { BackupData, ThemeMode, UserOption, UserOptionCategory, AppLanguage } from '../../core/models';
 import { openFeedbackMailto } from '../../core/constants/feedback';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
@@ -67,8 +68,11 @@ export class SettingsComponent implements OnInit {
   readonly pwaInstall = inject(PwaInstallService);
   private readonly share = inject(ShareService);
   private readonly userOptions = inject(UserOptionService);
+  private readonly fishingMode = inject(FishingModeService);
+  private readonly router = inject(Router);
 
   readonly settings = this.settingsService.settings;
+  readonly modePreferences = () => this.fishingMode.getActivePreferences();
   readonly aiApiKey = this.vault.aiApiKey;
   readonly supportedLanguages = this.i18n.supportedLanguages;
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
@@ -135,6 +139,10 @@ export class SettingsComponent implements OnInit {
     value: ReturnType<SettingsService['get']>[K],
   ): void {
     this.settingsService.update({ [field]: value });
+  }
+
+  updateDefaultLake(lakeId: string | undefined): void {
+    this.fishingMode.updateActivePreferences({ defaultLakeId: lakeId });
   }
 
   updateLockTimeout(value: number): void {
@@ -332,6 +340,18 @@ export class SettingsComponent implements OnInit {
     this.notifications.success(this.i18n.t('settings.allSettingsReset'));
   }
 
+  async resetCurrentMode(): Promise<void> {
+    const ok = await this.confirm.confirm({
+      title: this.i18n.t('settings.resetCurrentModeTitle'),
+      message: this.i18n.t('settings.resetCurrentModeMessage'),
+      confirmLabel: this.i18n.t('settings.resetCurrentModeConfirm'),
+    });
+    if (!ok) return;
+    await this.resetService.resetCurrentMode();
+    await this.reloadManagedOptions();
+    this.notifications.success(this.i18n.t('settings.currentModeReset'));
+  }
+
   async resetFullApplication(): Promise<void> {
     const exportFirst = await this.confirm.confirm({
       title: this.i18n.t('settings.exportBeforeResetTitle'),
@@ -355,6 +375,7 @@ export class SettingsComponent implements OnInit {
     await this.resetService.resetFullApplication();
     this.fullResetInput.set('');
     this.notifications.success(this.i18n.t('messages.applicationResetComplete'));
+    await this.router.navigateByUrl('/mode-select');
   }
 
   languageLabel(language: AppLanguage): string {

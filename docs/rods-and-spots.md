@@ -4,6 +4,8 @@
 
 Sessions can include **session spots** (snapshots of lake spots) and **rods** (active fishing positions). Rods track bites, fish spotted, bait/rig, and link to catches.
 
+Rods and spots are **mode-scoped via their parent session**: sessions, bite events, fish-spotted events, rod-spot history, and session timeline events all carry `fishingMode`. Repositories stamp the active mode on write; lists used from the UI come from mode-scoped sessions.
+
 ## Models
 
 - `SessionSpot` — snapshot on session (`sessionSpots[]` on `FishingSession`)

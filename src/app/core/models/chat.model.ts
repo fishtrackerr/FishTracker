@@ -1,3 +1,5 @@
+import { FishingMode } from './fishing-mode.model';
+
 export type ChatRole = 'user' | 'assistant' | 'system';
 
 export type InsightPromptId =
@@ -8,6 +10,7 @@ export type InsightPromptId =
 
 export interface ChatThread {
   id: string;
+  fishingMode?: FishingMode;
   title: string;
   promptId?: InsightPromptId;
   createdAt: string;

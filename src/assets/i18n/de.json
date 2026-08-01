@@ -133,6 +133,11 @@
     "resetAllSettings": "Alle Einstellungen zurücksetzen",
     "fullReset": "Vollständiges Zurücksetzen",
     "fullResetWarn": "Löscht dauerhaft alle lokal gespeicherten Daten. Geben Sie RESET ein, um fortzufahren.",
+    "resetCurrentMode": "Aktuellen Angelmodus zurücksetzen",
+    "resetCurrentModeTitle": "Diesen Angelmodus zurücksetzen?",
+    "resetCurrentModeMessage": "Löscht Seen, Sitzungen, Fänge, Optionen, Chats und Bilder nur für den aktuellen Modus. Andere Modi bleiben erhalten.",
+    "resetCurrentModeConfirm": "Modus zurücksetzen",
+    "currentModeReset": "Aktueller Angelmodus zurückgesetzt",
     "confirmation": "Bestätigung",
     "resetEntire": "Gesamte Anwendung zurücksetzen",
     "data": "Daten",
@@ -229,6 +234,18 @@
     "more": "Mehr",
     "assistant": "Assistent",
     "shareWhatsApp": "Per WhatsApp teilen"
+  },
+  "modeSelect": {
+    "title": "Angelmodus wählen",
+    "hint": "Damit gelten Seen, Köder, Sitzungen und Fänge für diesen App-Lauf. Zum Wechseln die App neu starten.",
+    "modes": {
+      "carper": "Karpfen",
+      "catfish": "Wels",
+      "pike": "Hecht",
+      "bass": "Barsch",
+      "feeder": "Feeder",
+      "general": "Allgemein"
+    }
   },
   "activeSession": {
     "catches": "Fänge",

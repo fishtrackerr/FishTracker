@@ -18,7 +18,7 @@ On live fetch failure (timeout, network error, or non-OK response), `WeatherServ
 
 ## Session weather history
 
-Each refresh is also stored in the `sessionWeather` IndexedDB table (`SessionWeatherRecord`: id, sessionId, capturedAt, weather). `session.weather` remains the **latest** snapshot for cards and catch defaults. History is seeded from existing `session.weather` on Dexie v5 migration and on import of older backups.
+Each refresh is also stored in the `sessionWeather` IndexedDB table (`SessionWeatherRecord`: id, `fishingMode`, sessionId, capturedAt, weather). `session.weather` remains the **latest** snapshot for cards and catch defaults. History is seeded from existing `session.weather` on Dexie v5 migration and on import of older backups. Records are stamped with the active fishing mode; backup exports include all modes.
 
 ## Session integration
 
@@ -26,7 +26,7 @@ Captured at session start when GPS available. **Refresh weather & GPS** re-queri
 
 ## Active session monitoring
 
-`SessionWeatherMonitorService` starts at app init. While a session is `active` and `autoLoadWeather` is on, it refreshes weather every `weatherRefreshMinutes` (minimum 5). Polls are **skipped while offline**; when connectivity returns, one immediate refresh runs. Warnings respect `showWeatherWarnings`.
+`SessionWeatherMonitorService` starts at app init. While a session is `active` **in the current fishing mode** and `autoLoadWeather` is on, it refreshes weather every `weatherRefreshMinutes` (minimum 5). When no mode is selected yet, active-session watches yield nothing and polls stay idle. Polls are **skipped while offline**; when connectivity returns, one immediate refresh runs. Warnings respect `showWeatherWarnings`.
 
 - Sticky alert banner on the active session screen lists current warnings
 - Snackbars (`NotificationService.weatherWarning`) fire only when a warning is **new** or **severity escalates** (e.g. wind warning → danger), not on every poll

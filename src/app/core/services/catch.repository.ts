@@ -3,11 +3,23 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { Catch } from '../models';
+import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
-export class CatchRepository {
+export class CatchRepository extends ModeScopedRepository {
   watchAll(): Observable<Catch[]> {
-    return from(liveQuery(() => db.catches.orderBy('caughtAt').reverse().toArray()));
+    return from(
+      liveQuery(async () => {
+        const mode = this.tryActiveMode();
+        if (!mode) {
+          return [];
+        }
+        const rows = await db.catches.where('fishingMode').equals(mode).toArray();
+        return rows.sort(
+          (a, b) => new Date(b.caughtAt).getTime() - new Date(a.caughtAt).getTime(),
+        );
+      }),
+    );
   }
 
   watchBySession(sessionId: string): Observable<Catch[]> {
@@ -19,6 +31,14 @@ export class CatchRepository {
   }
 
   async getAll(): Promise<Catch[]> {
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return [];
+    }
+    return db.catches.where('fishingMode').equals(mode).toArray();
+  }
+
+  async getAllAcrossModes(): Promise<Catch[]> {
     return db.catches.toArray();
   }
 
@@ -27,11 +47,11 @@ export class CatchRepository {
   }
 
   async getById(id: string): Promise<Catch | undefined> {
-    return db.catches.get(id);
+    return this.forActiveMode(await db.catches.get(id));
   }
 
-  async put(catchRecord: Catch): Promise<void> {
-    await db.catches.put(catchRecord);
+  async put(catchRecord: NewModeEntity<Catch>): Promise<void> {
+    await db.catches.put(this.withMode(catchRecord));
   }
 
   async delete(id: string): Promise<void> {
@@ -40,6 +60,11 @@ export class CatchRepository {
 
   async deleteBySession(sessionId: string): Promise<void> {
     await db.catches.where('sessionId').equals(sessionId).delete();
+  }
+
+  async clearCurrentMode(): Promise<void> {
+    const mode = this.activeMode();
+    await db.catches.where('fishingMode').equals(mode).delete();
   }
 
   async clear(): Promise<void> {

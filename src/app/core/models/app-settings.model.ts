@@ -1,3 +1,5 @@
+import { ModePreferences } from './fishing-mode.model';
+
 export type WeightUnit = 'kg' | 'lbs';
 export type LengthUnit = 'cm' | 'inch';
 export type TemperatureUnit = 'celsius' | 'fahrenheit';
@@ -15,10 +17,15 @@ export interface AppSettings {
   pinSalt?: string;
   lockTimeoutMinutes: number;
   pinEnabled: boolean;
+  /** @deprecated Prefer modePreferences[mode].lastLakeId */
   lastLakeId?: string;
+  /** @deprecated Prefer modePreferences[mode].favoriteSpecies */
   favoriteSpecies: string[];
+  /** @deprecated Prefer modePreferences[mode].favoriteBaits */
   favoriteBaits: string[];
+  /** @deprecated Prefer modePreferences[mode].favoriteRigs */
   favoriteRigs: string[];
+  /** @deprecated Prefer modePreferences[mode].homepageImageId */
   homepageImageId?: string;
   detailedWeatherEnabled: boolean;
   autoLoadWeather: boolean;
@@ -32,6 +39,7 @@ export interface AppSettings {
   dateFormat: string;
   timeFormat: '12h' | '24h';
   firstDayOfWeek: 0 | 1;
+  /** @deprecated Prefer modePreferences[mode].defaultLakeId */
   defaultLakeId?: string;
   maxRodCount: number;
   aiChatEnabled: boolean;
@@ -45,6 +53,8 @@ export interface AppSettings {
   aiKeySalt?: string;
   aiBaseUrl?: string;
   aiModel?: string;
+  /** Per-mode lakes/favorites/homepage preferences. */
+  modePreferences?: Partial<Record<string, ModePreferences>>;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -74,4 +84,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   aiChatEnabled: false,
   aiBaseUrl: 'https://api.openai.com/v1',
   aiModel: 'gpt-4o-mini',
+  modePreferences: {},
 };

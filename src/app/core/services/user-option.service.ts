@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { UserOption, UserOptionCategory } from '../models';
 import { generateId, nowIso } from '../utils';
-import { DEFAULT_SETTINGS } from '../models/app-settings.model';
+import { FishingModeService } from './fishing-mode.service';
 import { RelatedDataSyncService } from './related-data-sync.service';
 import { UserOptionRepository } from './user-option.repository';
 
@@ -10,6 +10,7 @@ export class UserOptionService {
   constructor(
     private readonly repo: UserOptionRepository,
     private readonly sync: RelatedDataSyncService,
+    private readonly fishingMode: FishingModeService,
   ) {}
 
   watchByCategory(category: UserOptionCategory) {
@@ -55,6 +56,7 @@ export class UserOptionService {
     const now = nowIso();
     const option: UserOption = {
       id: generateId(),
+      fishingMode: this.fishingMode.requireMode(),
       category,
       value: trimmed,
       isFavorite,
@@ -165,7 +167,21 @@ export class UserOptionService {
       }
       return;
     }
-    await this.repo.clear();
+    await this.repo.clearCurrentMode();
+    const categories: UserOptionCategory[] = ['species', 'bait', 'rig'];
+    for (const cat of categories) {
+      for (const value of this.getDefaultValues(cat)) {
+        await this.saveDefault(cat, value);
+      }
+    }
+  }
+
+  /** Seeds species/bait/rig defaults when the current mode has no options yet. */
+  async ensureDefaultsForCurrentMode(): Promise<void> {
+    const existing = await this.repo.getAll();
+    if (existing.length > 0) {
+      return;
+    }
     const categories: UserOptionCategory[] = ['species', 'bait', 'rig'];
     for (const cat of categories) {
       for (const value of this.getDefaultValues(cat)) {
@@ -175,13 +191,14 @@ export class UserOptionService {
   }
 
   private getDefaultValues(category: UserOptionCategory): string[] {
+    const prefs = this.fishingMode.getActivePreferences();
     switch (category) {
       case 'species':
-        return DEFAULT_SETTINGS.favoriteSpecies;
+        return prefs.favoriteSpecies;
       case 'bait':
-        return DEFAULT_SETTINGS.favoriteBaits;
+        return prefs.favoriteBaits;
       case 'rig':
-        return DEFAULT_SETTINGS.favoriteRigs;
+        return prefs.favoriteRigs;
       default:
         return [];
     }
@@ -191,6 +208,7 @@ export class UserOptionService {
     const now = nowIso();
     await this.repo.put({
       id: generateId(),
+      fishingMode: this.fishingMode.requireMode(),
       category,
       value,
       isFavorite: false,

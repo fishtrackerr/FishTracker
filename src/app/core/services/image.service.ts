@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ImageRepository } from './image.repository';
 import { ImageType, StoredImage } from '../models';
 import { fetchWithTimeout, generateId, nowIso } from '../utils';
+import { FishingModeService } from './fishing-mode.service';
 import { SettingsService } from './settings.service';
 
 const COVER_IMAGES = [
@@ -21,6 +22,7 @@ export class ImageService {
   constructor(
     private readonly imageRepo: ImageRepository,
     private readonly settings: SettingsService,
+    private readonly fishingMode: FishingModeService,
   ) {}
 
   async processFile(
@@ -37,7 +39,7 @@ export class ImageService {
     }
     const { blob, thumbnailBlob } = await this.compressImage(file);
     const id = generateId();
-    const image: StoredImage = {
+    const image = {
       id,
       type,
       parentId,
@@ -116,7 +118,7 @@ export class ImageService {
   }
 
   async getHomepageUrl(): Promise<string> {
-    const homepageId = this.settings.get().homepageImageId;
+    const homepageId = this.fishingMode.getActivePreferences().homepageImageId;
     if (homepageId) {
       const url = await this.getObjectUrl(homepageId);
       if (url) return url;
@@ -148,20 +150,20 @@ export class ImageService {
     const image = await this.imageRepo.getById(id);
     if (!image) return;
     await this.imageRepo.put({ ...image, isHomepageImage: true });
-    this.settings.update({ homepageImageId: id });
+    this.fishingMode.updateActivePreferences({ homepageImageId: id });
   }
 
   async clearHomepageImage(): Promise<void> {
     await this.imageRepo.clearHomepageFlags();
-    this.settings.update({ homepageImageId: undefined });
+    this.fishingMode.updateActivePreferences({ homepageImageId: undefined });
   }
 
   async delete(id: string): Promise<void> {
     this.revokeUrl(id);
     this.revokeFullUrl(id);
     await this.imageRepo.delete(id);
-    if (this.settings.get().homepageImageId === id) {
-      this.settings.update({ homepageImageId: undefined });
+    if (this.fishingMode.getActivePreferences().homepageImageId === id) {
+      this.fishingMode.updateActivePreferences({ homepageImageId: undefined });
     }
   }
 

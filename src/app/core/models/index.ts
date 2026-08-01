@@ -1,5 +1,6 @@
 export * from './weather-snapshot.model';
 export * from './session-weather.model';
+export * from './fishing-mode.model';
 export * from './fishing-spot.model';
 export * from './lake.model';
 export * from './fishing-session.model';

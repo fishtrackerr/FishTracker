@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Catch, FishingSession, UserOptionCategory } from '../models';
+import { FILTER_PRESETS_KEY_PREFIX } from '../constants/storage-keys';
+import { FishingModeService } from './fishing-mode.service';
 
 export interface StatisticsFilter {
   dateFrom?: string;
@@ -24,10 +26,9 @@ export interface FilterPreset {
   createdAt: string;
 }
 
-const PRESETS_KEY = 'fish-tracker-filter-presets';
-
 @Injectable({ providedIn: 'root' })
 export class FilterService {
+  private readonly fishingMode = inject(FishingModeService);
   private readonly activeFilter = { value: {} as StatisticsFilter };
 
   getActive(): StatisticsFilter {
@@ -56,7 +57,7 @@ export class FilterService {
 
   getPresets(): FilterPreset[] {
     try {
-      const raw = localStorage.getItem(PRESETS_KEY);
+      const raw = localStorage.getItem(this.presetsKey());
       return raw ? (JSON.parse(raw) as FilterPreset[]) : [];
     } catch {
       return [];
@@ -72,13 +73,13 @@ export class FilterService {
       createdAt: new Date().toISOString(),
     };
     presets.push(preset);
-    localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+    localStorage.setItem(this.presetsKey(), JSON.stringify(presets));
     return preset;
   }
 
   deletePreset(id: string): void {
     const presets = this.getPresets().filter((p) => p.id !== id);
-    localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+    localStorage.setItem(this.presetsKey(), JSON.stringify(presets));
   }
 
   /** Rewrite free-text option values in active filter and saved presets. */
@@ -110,8 +111,13 @@ export class FilterService {
       };
     });
     if (changed) {
-      localStorage.setItem(PRESETS_KEY, JSON.stringify(next));
+      localStorage.setItem(this.presetsKey(), JSON.stringify(next));
     }
+  }
+
+  private presetsKey(): string {
+    const mode = this.fishingMode.getMode() ?? 'none';
+    return `${FILTER_PRESETS_KEY_PREFIX}:${mode}`;
   }
 
   private filterFieldFor(

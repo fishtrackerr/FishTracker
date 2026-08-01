@@ -1,5 +1,7 @@
 # Statistics
 
+Statistics and dashboard aggregates use only data for the **current fishing mode**.
+
 ## Available statistics
 
 Dashboard (`StatisticsService.getDashboardStats()`):
@@ -12,7 +14,7 @@ Statistics page: filtered catch/session aggregates with charts and tables.
 
 ## Calculation rules
 
-- Weights summed from catch records
+- Weights summed from catch records (current mode)
 - Biggest fish: max `weightKg` across catches
 - Session filters applied before aggregation
 
@@ -20,12 +22,15 @@ Statistics page: filtered catch/session aggregates with charts and tables.
 
 `FilterService` / `FilterPanelComponent`:
 
-- Date range, species, session status
-- Presets saved to localStorage
+- Date range, species, session status, and related fields
+- Active filter is in-memory for the app run
+- Presets saved to localStorage under `fish-tracker-filter-presets:<fishingMode>`
 
 ## Saved filter presets
 
-Named presets via save/delete with confirmation on delete.
+Named presets via save/delete with confirmation on delete. Presets are **per fishing mode** so lake/species values from one mode do not appear in another.
+
+Option rename rewrites matching values only in the active mode’s presets and `modePreferences`.
 
 ## Performance
 

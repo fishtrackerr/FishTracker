@@ -48,7 +48,7 @@ export class FishSpottedEventService {
       : undefined;
     const sessionSpotId = options.sessionSpotId ?? rod?.sessionSpotId;
 
-    const event: FishSpottedEvent = {
+    const event = {
       id: generateId(),
       sessionId: options.sessionId,
       rodId: options.rodId,

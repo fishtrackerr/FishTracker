@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BackupService } from './backup.service';
 import { ConfirmService } from './confirm.service';
 import { DialogService } from './dialog.service';
+import { FishingModeService } from './fishing-mode.service';
 import { I18nService } from './i18n.service';
 import { LakeService } from './lake.service';
 import { NotificationService } from './notification.service';
@@ -70,6 +71,12 @@ describe('SessionStartFlowService', () => {
         {
           provide: SettingsService,
           useValue: { get: vi.fn().mockReturnValue({}) },
+        },
+        {
+          provide: FishingModeService,
+          useValue: {
+            getActivePreferences: vi.fn().mockReturnValue({ lastLakeId: undefined }),
+          },
         },
         {
           provide: NotificationService,

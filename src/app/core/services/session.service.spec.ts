@@ -17,6 +17,10 @@ describe('SessionService.start', () => {
   };
   let image: { createCoverImage: ReturnType<typeof vi.fn> };
   let settings: { update: ReturnType<typeof vi.fn>; get: ReturnType<typeof vi.fn> };
+  let fishingMode: {
+    updateActivePreferences: ReturnType<typeof vi.fn>;
+    requireMode: ReturnType<typeof vi.fn>;
+  };
   const emptyDeps = {
     rodService: {
       createRodRecords: vi.fn().mockReturnValue([{ id: 'r-1', name: 'Rod 1', biteCount: 0, fishSpottedCount: 0, isActive: true, sessionId: 'x', rodNumber: 1 }]),
@@ -48,6 +52,10 @@ describe('SessionService.start', () => {
     };
     image = { createCoverImage: vi.fn().mockResolvedValue(undefined) };
     settings = { update: vi.fn(), get: vi.fn().mockReturnValue({ maxRodCount: 10 }) };
+    fishingMode = {
+      updateActivePreferences: vi.fn(),
+      requireMode: vi.fn().mockReturnValue('carper'),
+    };
     const i18n = {
       t: vi.fn((key: string, params?: Record<string, string>) => {
         if (key === 'sessions.defaultNameAtLake') return `Session at ${params?.['lake']}`;
@@ -64,6 +72,7 @@ describe('SessionService.start', () => {
       weather as never,
       image as never,
       settings as never,
+      fishingMode as never,
       emptyDeps.rodService as never,
       emptyDeps.sessionEvents as never,
       emptyDeps.biteEventRepo as never,
@@ -100,7 +109,7 @@ describe('SessionService.start', () => {
     });
 
     expect(session.lakeId).toBe('lake-1');
-    expect(settings.update).toHaveBeenCalledWith({ lastLakeId: 'lake-1' });
+    expect(fishingMode.updateActivePreferences).toHaveBeenCalledWith({ lastLakeId: 'lake-1' });
   });
 
   it('returns existing active session without creating duplicate', async () => {
@@ -195,6 +204,7 @@ describe('SessionService.updateSession', () => {
       {} as never,
       {} as never,
       { get: vi.fn().mockReturnValue({ maxRodCount: 10 }) } as never,
+      { updateActivePreferences: vi.fn() } as never,
       {
         resizeRodCount: vi.fn().mockImplementation(async (session) => ({
           session,

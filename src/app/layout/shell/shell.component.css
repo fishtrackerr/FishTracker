@@ -60,6 +60,23 @@
   background: color-mix(in srgb, var(--text-primary) 8%, transparent);
 }
 
+.mode-banner {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, var(--background-secondary));
+  border-bottom: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.shell:not(:has(.offline-banner)) .mode-banner {
+  padding-top: calc(4px + env(safe-area-inset-top));
+}
+
 .content {
   flex: 1;
   overflow-y: auto;

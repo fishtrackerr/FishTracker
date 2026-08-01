@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
-import { SettingsService } from '../../core/services/settings.service';
+import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { PhotoPickService } from '../../core/services/photo-pick.service';
 import { QuickCatchInput } from '../../core/services/catch.service';
@@ -36,7 +36,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 })
 export class QuickCatchDialogComponent {
   private readonly ref = inject(MatDialogRef<QuickCatchDialogComponent>);
-  private readonly settings = inject(SettingsService);
+  private readonly fishingMode = inject(FishingModeService);
   private readonly photoPick = inject(PhotoPickService);
   readonly theme = inject(ThemeService);
 
@@ -51,10 +51,7 @@ export class QuickCatchDialogComponent {
   readonly saving = signal(false);
 
   readonly speciesList = [
-    ...this.settings.get().favoriteSpecies,
-    'Catfish',
-    'Zander',
-    'Tench',
+    ...this.fishingMode.getActivePreferences().favoriteSpecies,
     'Other',
   ];
 

@@ -33,7 +33,7 @@ export class BiteEventService {
       return undefined;
     }
 
-    const event: BiteEvent = {
+    const event = {
       id: generateId(),
       sessionId,
       rodId,

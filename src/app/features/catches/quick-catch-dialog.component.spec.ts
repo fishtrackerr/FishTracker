@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QuickCatchDialogComponent } from './quick-catch-dialog.component';
-import { SettingsService } from '../../core/services/settings.service';
+import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { PhotoPickService } from '../../core/services/photo-pick.service';
 
@@ -22,10 +22,12 @@ describe('QuickCatchDialogComponent', () => {
           },
         },
         {
-          provide: SettingsService,
+          provide: FishingModeService,
           useValue: {
-            get: () => ({
+            getActivePreferences: () => ({
               favoriteSpecies: ['Carp', 'Pike'],
+              favoriteBaits: [],
+              favoriteRigs: [],
             }),
           },
         },
@@ -45,17 +47,10 @@ describe('QuickCatchDialogComponent', () => {
     });
   });
 
-  it('builds species list from favorites plus defaults', () => {
+  it('builds species list from mode favorites plus Other', () => {
     const component = TestBed.runInInjectionContext(() => new QuickCatchDialogComponent());
 
-    expect(component.speciesList).toEqual([
-      'Carp',
-      'Pike',
-      'Catfish',
-      'Zander',
-      'Tench',
-      'Other',
-    ]);
+    expect(component.speciesList).toEqual(['Carp', 'Pike', 'Other']);
     expect(component.selectPanelClass).toBe('theme-dark-select-panel');
   });
 

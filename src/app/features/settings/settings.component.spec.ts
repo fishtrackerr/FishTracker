@@ -17,6 +17,9 @@ import { I18nService } from '../../core/services/i18n.service';
 import { PwaInstallService } from '../../core/services/pwa-install.service';
 import { ShareService } from '../../core/services/share.service';
 import { SecretVaultService } from '../../core/services/secret-vault.service';
+import { FishingModeService } from '../../core/services/fishing-mode.service';
+import { UserOptionService } from '../../core/services/user-option.service';
+import { Router } from '@angular/router';
 
 const settingsState = signal({
   themeMode: 'dark',
@@ -157,6 +160,31 @@ describe('SettingsComponent', () => {
             setAiApiKey: vi.fn().mockResolvedValue(undefined),
             clearAiApiKey: vi.fn().mockResolvedValue(undefined),
           },
+        },
+        {
+          provide: FishingModeService,
+          useValue: {
+            getActivePreferences: () => ({
+              favoriteSpecies: [],
+              favoriteBaits: [],
+              favoriteRigs: [],
+            }),
+            updateActivePreferences: vi.fn(),
+            getMode: () => 'carper',
+          },
+        },
+        {
+          provide: UserOptionService,
+          useValue: {
+            getSortedOptions: vi.fn().mockResolvedValue([]),
+            saveOption: vi.fn(),
+            toggleFavorite: vi.fn(),
+            rename: vi.fn(),
+          },
+        },
+        {
+          provide: Router,
+          useValue: { navigateByUrl: vi.fn() },
         },
       ],
     });

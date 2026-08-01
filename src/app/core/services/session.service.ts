@@ -4,6 +4,7 @@ import { generateId, nowIso } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
 import { FishSpottedRepository } from './fish-spotted.repository';
+import { FishingModeService } from './fishing-mode.service';
 import { GeolocationService } from './geolocation.service';
 import { I18nService } from './i18n.service';
 import { ImageService } from './image.service';
@@ -58,6 +59,7 @@ export class SessionService {
     private readonly weather: WeatherService,
     private readonly image: ImageService,
     private readonly settings: SettingsService,
+    private readonly fishingMode: FishingModeService,
     private readonly rodService: RodService,
     private readonly sessionEvents: SessionEventService,
     private readonly biteEventRepo: BiteEventRepository,
@@ -133,7 +135,7 @@ export class SessionService {
       // Cover image is optional
     }
 
-    const session: FishingSession = {
+    const session = {
       id: sessionId,
       name:
         name.trim() ||
@@ -141,7 +143,7 @@ export class SessionService {
           ? this.i18n.t('sessions.defaultNameAtLake', { lake: lake.name })
           : this.i18n.t('sessions.defaultName')),
       lakeId,
-      status: 'active',
+      status: 'active' as const,
       startDate,
       latitude,
       longitude,
@@ -175,7 +177,7 @@ export class SessionService {
       });
     }
     if (lakeId) {
-      this.settings.update({ lastLakeId: lakeId });
+      this.fishingMode.updateActivePreferences({ lastLakeId: lakeId });
     }
 
     // Live weather enrichment runs after persist so start stays responsive offline/slow.
@@ -183,7 +185,7 @@ export class SessionService {
       void this.refreshWeather(session.id);
     }
 
-    return session;
+    return session as unknown as FishingSession;
   }
 
   async complete(id: string): Promise<FishingSession | undefined> {

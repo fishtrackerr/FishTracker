@@ -1,3 +1,5 @@
+import { FishingMode } from './fishing-mode.model';
+
 export type SessionEventType =
   | 'session-start'
   | 'rod-created'
@@ -12,6 +14,7 @@ export type SessionEventType =
 
 export interface SessionEvent {
   id: string;
+  fishingMode?: FishingMode;
   sessionId: string;
   type: SessionEventType;
   rodId?: string;

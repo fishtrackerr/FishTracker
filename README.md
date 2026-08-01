@@ -1,6 +1,6 @@
 # FishTracker
 
-Offline-first Angular 21 PWA for logging fishing sessions, catches, lakes, gallery photos, and statistics. All data stays on the device (Dexie/IndexedDB). Deployed as a static site to GitHub Pages, and packaged for Google Play via Capacitor (Android).
+Offline-first Angular 21 PWA for logging fishing sessions, catches, lakes, gallery photos, and statistics. Data is stored on the device (Dexie/IndexedDB) and partitioned by **fishing mode** (carper, catfish, pike, bass, feeder, general). Deployed as a static site to GitHub Pages, and packaged for Google Play via Capacitor (Android).
 
 ## Documentation
 
@@ -37,7 +37,7 @@ Open `http://localhost:4200/`.
 ## Architecture (short)
 
 - Standalone Angular components, zoneless change detection, Material UI
-- Repositories + services over Dexie; no backend
+- Repositories + services over Dexie; fishing data scoped by fishing mode; no backend
 - Optional online AI chat (allowlisted providers) and Open-Meteo weather
 - Client PIN lock (shoulder-surfing protection; data is not encrypted at rest)
 - Capacitor Android shell for Play Store (`android/`, app id `com.fishtrackerr.fishtracker`)

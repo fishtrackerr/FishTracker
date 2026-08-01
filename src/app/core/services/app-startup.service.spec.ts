@@ -3,11 +3,17 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { AppStartupService } from './app-startup.service';
 import { PinLockService } from './pin-lock.service';
+import { FishingModeService } from './fishing-mode.service';
 import { SessionRepository } from './session.repository';
 import { SessionWeatherMonitorService } from './session-weather-monitor.service';
 import { FishingSession } from '../models';
 import { RETURN_URL_KEY } from '../constants/storage-keys';
 import { db } from '../db/fish-db';
+
+const fishingModeStub = {
+  hasMode: vi.fn().mockReturnValue(true),
+  getMode: vi.fn().mockReturnValue('carper'),
+};
 
 describe('AppStartupService.initialize', () => {
   let service: AppStartupService;
@@ -30,6 +36,7 @@ describe('AppStartupService.initialize', () => {
       providers: [
         AppStartupService,
         { provide: PinLockService, useValue: pinLock },
+        { provide: FishingModeService, useValue: fishingModeStub },
         { provide: SessionRepository, useValue: { getAllActive: vi.fn().mockResolvedValue([]) } },
         { provide: SessionWeatherMonitorService, useValue: weatherMonitor },
         { provide: Router, useValue: { url: '/', navigate: vi.fn(), navigateByUrl: vi.fn() } },
@@ -102,6 +109,7 @@ describe('AppStartupService.resolveInitialRoute', () => {
 
   beforeEach(() => {
     sessionStorage.clear();
+    fishingModeStub.hasMode.mockReturnValue(true);
     pinLock = {
       hasPinConfigured: vi.fn().mockReturnValue(true),
       isAppLocked: vi.fn().mockReturnValue(false),
@@ -114,6 +122,7 @@ describe('AppStartupService.resolveInitialRoute', () => {
       providers: [
         AppStartupService,
         { provide: PinLockService, useValue: pinLock },
+        { provide: FishingModeService, useValue: fishingModeStub },
         { provide: SessionRepository, useValue: sessionRepo },
         { provide: SessionWeatherMonitorService, useValue: { start: vi.fn() } },
         { provide: Router, useValue: { url: '/', navigate: vi.fn(), navigateByUrl: vi.fn() } },
@@ -149,6 +158,19 @@ describe('AppStartupService.resolveInitialRoute', () => {
     pinLock.hasPinConfigured.mockReturnValue(false);
     const route = await service.resolveInitialRoute('/');
     expect(route).toBe('/pin/setup');
+  });
+
+  it('returns mode select when no fishing mode chosen', async () => {
+    fishingModeStub.hasMode.mockReturnValue(false);
+    const route = await service.resolveInitialRoute('/');
+    expect(route).toBe('/mode-select');
+  });
+
+  it('stores deep link when redirecting to mode select', async () => {
+    fishingModeStub.hasMode.mockReturnValue(false);
+    const route = await service.resolveInitialRoute('/settings');
+    expect(route).toBe('/mode-select');
+    expect(sessionStorage.getItem(RETURN_URL_KEY)).toBe('/settings');
   });
 
   it('returns active session when at home and session exists', async () => {

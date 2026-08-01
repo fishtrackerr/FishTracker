@@ -13,6 +13,7 @@ import { UserProfile } from './user-profile.model';
 
 export interface BackupImage {
   id: string;
+  fishingMode?: string;
   type: string;
   parentId?: string;
   fileName?: string;
@@ -56,7 +57,7 @@ export interface BackupPreview {
 }
 
 /** Current backup format version written by export(). */
-export const BACKUP_EXPORT_VERSION = 6;
+export const BACKUP_EXPORT_VERSION = 7;
 
 /** Versions accepted by import() (legacy + current). */
-export const SUPPORTED_BACKUP_VERSIONS = [4, 5, 6] as const;
+export const SUPPORTED_BACKUP_VERSIONS = [4, 5, 6, 7] as const;

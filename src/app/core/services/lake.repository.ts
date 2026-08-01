@@ -3,31 +3,55 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { Lake } from '../models';
+import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
-export class LakeRepository {
+export class LakeRepository extends ModeScopedRepository {
   watchAll(): Observable<Lake[]> {
-    return from(liveQuery(() => db.lakes.orderBy('name').toArray()));
+    return from(
+      liveQuery(async () => {
+        const mode = this.tryActiveMode();
+        if (!mode) {
+          return [];
+        }
+        const rows = await db.lakes.where('fishingMode').equals(mode).toArray();
+        return rows.sort((a, b) => a.name.localeCompare(b.name));
+      }),
+    );
   }
 
   watchById(id: string): Observable<Lake | undefined> {
-    return from(liveQuery(() => db.lakes.get(id)));
+    return from(liveQuery(async () => this.forActiveMode(await db.lakes.get(id))));
   }
 
   async getAll(): Promise<Lake[]> {
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return [];
+    }
+    const rows = await db.lakes.where('fishingMode').equals(mode).toArray();
+    return rows.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async getAllAcrossModes(): Promise<Lake[]> {
     return db.lakes.orderBy('name').toArray();
   }
 
   async getById(id: string): Promise<Lake | undefined> {
-    return db.lakes.get(id);
+    return this.forActiveMode(await db.lakes.get(id));
   }
 
-  async put(lake: Lake): Promise<void> {
-    await db.lakes.put(lake);
+  async put(lake: NewModeEntity<Lake>): Promise<void> {
+    await db.lakes.put(this.withMode(lake));
   }
 
   async delete(id: string): Promise<void> {
     await db.lakes.delete(id);
+  }
+
+  async clearCurrentMode(): Promise<void> {
+    const mode = this.activeMode();
+    await db.lakes.where('fishingMode').equals(mode).delete();
   }
 
   async clear(): Promise<void> {

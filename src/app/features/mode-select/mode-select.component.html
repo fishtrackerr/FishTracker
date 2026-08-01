@@ -1,0 +1,18 @@
+<div class="mode-screen">
+  <h1>{{ 'modeSelect.title' | tr }}</h1>
+  <p class="hint">{{ 'modeSelect.hint' | tr }}</p>
+  <div class="mode-grid" role="list">
+    @for (mode of modes; track mode) {
+      <button
+        type="button"
+        class="mode-card"
+        role="listitem"
+        [disabled]="selecting()"
+        (click)="selectMode(mode)"
+      >
+        <mat-icon aria-hidden="true">{{ modeIcons[mode] }}</mat-icon>
+        <span class="mode-label">{{ 'modeSelect.modes.' + mode | tr }}</span>
+      </button>
+    }
+  </div>
+</div>

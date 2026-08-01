@@ -22,8 +22,10 @@ Full-size viewer URLs are cached in `ImageService` and revoked when navigating b
 
 ## Favorites and homepage
 
-- `isFavorite`: gallery filtering
-- `isHomepageImage`: dashboard hero (one at a time)
+- `isFavorite`: gallery filtering (current fishing mode)
+- `isHomepageImage`: dashboard hero (one at a time **per fishing mode**); id also stored in `modePreferences[mode].homepageImageId`
+
+Images are stamped with `fishingMode` on write; gallery and homepage queries are mode-scoped.
 
 ## Cover images
 

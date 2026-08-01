@@ -21,7 +21,14 @@ describe('UserOptionService', () => {
       delete: vi.fn(),
     };
     sync = { onOptionRenamed: vi.fn().mockResolvedValue(undefined) };
-    service = new UserOptionService(repo as never, sync as never);
+    service = new UserOptionService(repo as never, sync as never, {
+      requireMode: vi.fn().mockReturnValue('carper'),
+      getActivePreferences: vi.fn().mockReturnValue({
+        favoriteSpecies: ['Carp'],
+        favoriteBaits: ['Corn'],
+        favoriteRigs: ['Hair Rig'],
+      }),
+    } as never);
   });
 
   it('prevents duplicate options case-insensitively', async () => {

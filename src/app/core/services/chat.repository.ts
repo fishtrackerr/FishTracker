@@ -3,11 +3,23 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { ChatMessage, ChatThread } from '../models';
+import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
-export class ChatRepository {
+export class ChatRepository extends ModeScopedRepository {
   watchThreads(): Observable<ChatThread[]> {
-    return from(liveQuery(() => db.chatThreads.orderBy('updatedAt').reverse().toArray()));
+    return from(
+      liveQuery(async () => {
+        const mode = this.tryActiveMode();
+        if (!mode) {
+          return [];
+        }
+        const rows = await db.chatThreads.where('fishingMode').equals(mode).toArray();
+        return rows.sort(
+          (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        );
+      }),
+    );
   }
 
   watchMessages(threadId: string): Observable<ChatMessage[]> {
@@ -19,15 +31,33 @@ export class ChatRepository {
   }
 
   async getAllThreads(): Promise<ChatThread[]> {
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return [];
+    }
+    const rows = await db.chatThreads.where('fishingMode').equals(mode).toArray();
+    return rows.sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+  }
+
+  async getAllThreadsAcrossModes(): Promise<ChatThread[]> {
     return db.chatThreads.orderBy('updatedAt').reverse().toArray();
   }
 
   async getAllMessages(): Promise<ChatMessage[]> {
+    const threads = await this.getAllThreads();
+    const threadIds = new Set(threads.map((t) => t.id));
+    const all = await db.chatMessages.toArray();
+    return all.filter((m) => threadIds.has(m.threadId));
+  }
+
+  async getAllMessagesAcrossModes(): Promise<ChatMessage[]> {
     return db.chatMessages.toArray();
   }
 
   async getThread(id: string): Promise<ChatThread | undefined> {
-    return db.chatThreads.get(id);
+    return this.forActiveMode(await db.chatThreads.get(id));
   }
 
   async getMessages(threadId: string): Promise<ChatMessage[]> {
@@ -42,8 +72,8 @@ export class ChatRepository {
     return messages.at(-1);
   }
 
-  async putThread(thread: ChatThread): Promise<void> {
-    await db.chatThreads.put(thread);
+  async putThread(thread: NewModeEntity<ChatThread>): Promise<void> {
+    await db.chatThreads.put(this.withMode(thread));
   }
 
   async putMessage(message: ChatMessage): Promise<void> {
@@ -54,6 +84,18 @@ export class ChatRepository {
     await db.transaction('rw', [db.chatThreads, db.chatMessages], async () => {
       await db.chatMessages.where('threadId').equals(id).delete();
       await db.chatThreads.delete(id);
+    });
+  }
+
+  async clearCurrentMode(): Promise<void> {
+    const mode = this.activeMode();
+    const threads = await db.chatThreads.where('fishingMode').equals(mode).toArray();
+    const ids = threads.map((t) => t.id);
+    await db.transaction('rw', [db.chatThreads, db.chatMessages], async () => {
+      for (const id of ids) {
+        await db.chatMessages.where('threadId').equals(id).delete();
+      }
+      await db.chatThreads.where('fishingMode').equals(mode).delete();
     });
   }
 

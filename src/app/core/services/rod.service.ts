@@ -131,7 +131,7 @@ export class RodService {
     const updatedRods = rods.map((r) => (r.id === rodId ? updatedRod : r));
     const updatedSession = await this.saveSessionRods(session, updatedRods);
 
-    const history: RodSpotHistory = {
+    const history = {
       id: generateId(),
       rodId,
       fromSessionSpotId: fromSpotId,

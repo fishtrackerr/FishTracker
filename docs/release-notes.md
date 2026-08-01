@@ -42,4 +42,4 @@ After unlock, `WhatsNewService` compares the notes version to `fish-tracker-last
 
 ## User-visible changes
 
-Document navigation fixes, session editing, theme improvements, and catch visibility fixes in release notes when shipping.
+Document navigation fixes, session editing, theme improvements, fishing-mode changes, and catch visibility fixes in release notes when shipping.

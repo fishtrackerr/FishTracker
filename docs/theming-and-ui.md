@@ -1,5 +1,13 @@
 # Theming and UI
 
+## Shell
+
+- Fixed bottom navigation with active states
+- **Mode banner** under the offline banner (when a fishing mode is selected) showing the current mode label
+- Offline connectivity banner above content (dismissible for the session; reappears when going offline again)
+- Content area scrolls; bottom padding clears the nav
+- Safe-area insets for notched devices
+
 ## Themes
 
 - **Dark** (default): orange primary accents on dark backgrounds; body text uses light warm neutrals (`--text-primary: #f2e6d8`) for readable contrast on `#0b0b0b`

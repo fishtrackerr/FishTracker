@@ -3,17 +3,22 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { ImageType, StoredImage } from '../models';
+import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
-export class ImageRepository {
+export class ImageRepository extends ModeScopedRepository {
   watchGallery(): Observable<StoredImage[]> {
     return from(
-      liveQuery(() =>
-        db.images
+      liveQuery(async () => {
+        const mode = this.tryActiveMode();
+        if (!mode) {
+          return [];
+        }
+        const rows = await db.images.where('fishingMode').equals(mode).toArray();
+        return rows
           .filter((img) => img.type !== 'cover')
-          .reverse()
-          .sortBy('createdAt'),
-      ),
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      }),
     );
   }
 
@@ -26,27 +31,67 @@ export class ImageRepository {
   }
 
   async getById(id: string): Promise<StoredImage | undefined> {
-    return db.images.get(id);
+    return this.forActiveMode(await db.images.get(id));
   }
 
   async getAll(): Promise<StoredImage[]> {
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return [];
+    }
+    return db.images.where('fishingMode').equals(mode).toArray();
+  }
+
+  async getAllAcrossModes(): Promise<StoredImage[]> {
     return db.images.toArray();
   }
 
   async getGalleryImages(): Promise<StoredImage[]> {
-    return db.images.filter((img) => img.type !== 'cover').toArray();
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return [];
+    }
+    return db.images
+      .where('fishingMode')
+      .equals(mode)
+      .filter((img) => img.type !== 'cover')
+      .toArray();
   }
 
   async getFavorites(): Promise<StoredImage[]> {
-    return db.images.filter((img) => img.isFavorite).toArray();
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return [];
+    }
+    return db.images
+      .where('fishingMode')
+      .equals(mode)
+      .filter((img) => img.isFavorite)
+      .toArray();
   }
 
   async getHomepageImage(): Promise<StoredImage | undefined> {
-    return db.images.filter((img) => img.isHomepageImage).first();
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return undefined;
+    }
+    return db.images
+      .where('fishingMode')
+      .equals(mode)
+      .filter((img) => img.isHomepageImage)
+      .first();
   }
 
   async clearHomepageFlags(): Promise<void> {
-    const homepageImages = await db.images.filter((img) => img.isHomepageImage).toArray();
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return;
+    }
+    const homepageImages = await db.images
+      .where('fishingMode')
+      .equals(mode)
+      .filter((img) => img.isHomepageImage)
+      .toArray();
     await Promise.all(
       homepageImages.map((img) =>
         db.images.update(img.id, { isHomepageImage: false }),
@@ -54,12 +99,17 @@ export class ImageRepository {
     );
   }
 
-  async put(image: StoredImage): Promise<void> {
-    await db.images.put(image);
+  async put(image: NewModeEntity<StoredImage>): Promise<void> {
+    await db.images.put(this.withMode(image));
   }
 
   async delete(id: string): Promise<void> {
     await db.images.delete(id);
+  }
+
+  async clearCurrentMode(): Promise<void> {
+    const mode = this.activeMode();
+    await db.images.where('fishingMode').equals(mode).delete();
   }
 
   async clear(): Promise<void> {
@@ -67,6 +117,14 @@ export class ImageRepository {
   }
 
   async getByType(type: ImageType): Promise<StoredImage[]> {
-    return db.images.where('type').equals(type).toArray();
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return [];
+    }
+    return db.images
+      .where('fishingMode')
+      .equals(mode)
+      .filter((img) => img.type === type)
+      .toArray();
   }
 }

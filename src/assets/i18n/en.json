@@ -133,6 +133,11 @@
     "resetAllSettings": "Reset all settings",
     "fullReset": "Full application reset",
     "fullResetWarn": "Permanently removes all locally stored data. Type RESET to continue.",
+    "resetCurrentMode": "Reset current fishing mode",
+    "resetCurrentModeTitle": "Reset this fishing mode?",
+    "resetCurrentModeMessage": "Deletes lakes, sessions, catches, options, chats, and images for the current mode only. Other modes stay intact.",
+    "resetCurrentModeConfirm": "Reset mode",
+    "currentModeReset": "Current fishing mode reset",
     "confirmation": "Confirmation",
     "resetEntire": "Reset entire application",
     "data": "Data",
@@ -229,6 +234,18 @@
     "more": "More",
     "assistant": "Assistant",
     "shareWhatsApp": "Share via WhatsApp"
+  },
+  "modeSelect": {
+    "title": "Choose fishing mode",
+    "hint": "This sets lakes, baits, sessions, and catches for this app run. Restart the app to switch.",
+    "modes": {
+      "carper": "Carper",
+      "catfish": "Catfish",
+      "pike": "Pike",
+      "bass": "Bass",
+      "feeder": "Feeder",
+      "general": "General"
+    }
   },
   "activeSession": {
     "catches": "catches",

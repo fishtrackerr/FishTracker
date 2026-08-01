@@ -9,6 +9,14 @@
 - Keep async flows explicit
 - Do not introduce a backend unless explicitly requested
 
+## Fishing modes
+
+- Scope fishing reads/writes through mode-aware repositories (`ModeScopedRepository`)
+- Do not share lakes, sessions, catches, options, images, chats, or filter presets across modes
+- Shared across modes: PIN, theme, units, language, AI key, profile
+- Prefer `FishingModeService.getActivePreferences()` over deprecated top-level favorites / `lastLakeId`
+- One active session maximum **per mode**
+
 ## UI
 
 - Use shared UI components and design tokens
@@ -25,15 +33,16 @@
 ## Storage
 
 - IndexedDB for app data and images
-- localStorage for settings, lock state, filter presets only
+- localStorage for settings, lock state, filter presets only; fishing mode in sessionStorage
 - Handle write errors; schema changes require Dexie migrations
 - Optional fields must not block creation
 - No direct `db` access from components
+- Keys live in `storage-keys.ts`
 
 ## Sessions and catches
 
 - One catch belongs to exactly one session
-- Active session navigation via `AppStartupService`
+- Active session navigation via `AppStartupService` (after PIN and mode select)
 - Adding a catch must update session stats and reactive lists
 - Session edits preserve catches and catch timestamps
 - Session creation works without weather, GPS, or images
@@ -43,7 +52,7 @@
 - Never store or log the raw PIN (PBKDF2 hash storage is expected)
 - Guards wait for startup initialization
 - Auto-lock must be deterministic
-- Preserve intended route after unlock via return URL
+- Preserve intended route after unlock and after mode select via return URL
 
 ## Documentation
 
@@ -55,7 +64,7 @@
 
 - Add regression tests for fixed bugs
 - Test empty states, offline mode, dark/light themes, mobile layouts
-- Test PWA reload with and without active session
+- Test PWA reload with and without active session / with mode in sessionStorage
 
 ## Code quality
 

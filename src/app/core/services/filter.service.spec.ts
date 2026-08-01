@@ -1,13 +1,24 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { TestBed } from '@angular/core/testing';
 import { FilterService } from './filter.service';
+import { FishingModeService } from './fishing-mode.service';
 import { FishingSession } from '../models';
 
 describe('FilterService', () => {
   let service: FilterService;
 
   beforeEach(() => {
-    service = new FilterService();
     localStorage.clear();
+    TestBed.configureTestingModule({
+      providers: [
+        FilterService,
+        {
+          provide: FishingModeService,
+          useValue: { getMode: () => 'carper' },
+        },
+      ],
+    });
+    service = TestBed.inject(FilterService);
   });
 
   it('counts active filters', () => {

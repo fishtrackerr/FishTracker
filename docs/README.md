@@ -1,13 +1,13 @@
 # Fishing Register Documentation
 
-Offline-first Angular PWA for logging fishing sessions, catches, lakes, and statistics. All data is stored locally in IndexedDB.
+Offline-first Angular PWA for logging fishing sessions, catches, lakes, and statistics. All data is stored locally in IndexedDB, partitioned by **fishing mode** (carper, catfish, pike, bass, feeder, general).
 
 ## Documentation index
 
 | Document | Description |
 |----------|-------------|
 | [architecture.md](./architecture.md) | System architecture and layers |
-| [application-flow.md](./application-flow.md) | User flows and startup behavior |
+| [application-flow.md](./application-flow.md) | User flows, startup, fishing mode |
 | [routing.md](./routing.md) | Routes and guards |
 | [data-model.md](./data-model.md) | TypeScript interfaces |
 | [storage.md](./storage.md) | IndexedDB schema and migrations |
@@ -32,10 +32,11 @@ Offline-first Angular PWA for logging fishing sessions, catches, lakes, and stat
 
 ## Main architecture decisions
 
-- **Offline-first**: Dexie/IndexedDB for all app data; localStorage only for settings, lock state, and filter presets.
+- **Offline-first**: Dexie/IndexedDB for all app data; localStorage/sessionStorage for settings, lock state, fishing mode, and filter presets.
+- **Fishing modes**: One mode selected per app run after PIN unlock; lakes, sessions, catches, options, images, and AI chats are isolated per mode. PIN, theme, units, and AI key stay shared.
 - **Standalone Angular components**: No NgModules; feature folders under `src/app/features/`.
 - **Reactive data**: Dexie `liveQuery` exposed via RxJS observables and `toSignal`.
-- **Central startup**: `AppStartupService` resolves initial route (PIN, active session, or home).
+- **Central startup**: `AppStartupService` resolves initial route (PIN → mode select → active session or home).
 - **Zoneless change detection**: Angular 21 zoneless mode.
 
 ## Keeping documentation updated

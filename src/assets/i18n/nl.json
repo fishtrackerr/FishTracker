@@ -133,6 +133,11 @@
     "resetAllSettings": "Alle instellingen resetten",
     "fullReset": "Volledige app-reset",
     "fullResetWarn": "Verwijdert permanent alle lokaal opgeslagen gegevens. Typ RESET om door te gaan.",
+    "resetCurrentMode": "Huidige vissmodus resetten",
+    "resetCurrentModeTitle": "Deze vissmodus resetten?",
+    "resetCurrentModeMessage": "Verwijdert meren, sessies, vangsten, opties, chats en afbeeldingen alleen voor de huidige modus. Andere modi blijven intact.",
+    "resetCurrentModeConfirm": "Modus resetten",
+    "currentModeReset": "Huidige vissmodus gereset",
     "confirmation": "Bevestiging",
     "resetEntire": "Volledige applicatie resetten",
     "data": "Gegevens",
@@ -229,6 +234,18 @@
     "more": "Meer",
     "assistant": "Assistent",
     "shareWhatsApp": "Delen via WhatsApp"
+  },
+  "modeSelect": {
+    "title": "Kies vissmodus",
+    "hint": "Dit bepaalt meren, aas, sessies en vangsten voor deze sessie. Herstart de app om te wisselen.",
+    "modes": {
+      "carper": "Karper",
+      "catfish": "Meerval",
+      "pike": "Snoek",
+      "bass": "Baars",
+      "feeder": "Feeder",
+      "general": "Algemeen"
+    }
   },
   "activeSession": {
     "catches": "vangsten",

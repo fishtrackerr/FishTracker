@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { BackupService } from './backup.service';
 import { ConfirmService } from './confirm.service';
 import { DialogService } from './dialog.service';
+import { FishingModeService } from './fishing-mode.service';
 import { I18nService } from './i18n.service';
 import { LakeService } from './lake.service';
 import { NotificationService } from './notification.service';
@@ -23,6 +24,7 @@ export class SessionStartFlowService {
   private readonly sessionService = inject(SessionService);
   private readonly lakeService = inject(LakeService);
   private readonly settings = inject(SettingsService);
+  private readonly fishingMode = inject(FishingModeService);
   private readonly notifications = inject(NotificationService);
   private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
@@ -39,7 +41,7 @@ export class SessionStartFlowService {
     }
     try {
       const lakes = this.lakeService.getSortedLakes(await this.lakeService.getAll());
-      const lastId = this.settings.get().lastLakeId;
+      const lastId = this.fishingMode.getActivePreferences().lastLakeId;
       const defaultLake = lakes.find((l) => l.id === lastId);
       const defaultName = defaultLake
         ? this.i18n.t('sessions.defaultNameAtLake', { lake: defaultLake.name })

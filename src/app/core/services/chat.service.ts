@@ -38,21 +38,21 @@ export class ChatService {
 
   async createBlankThread(): Promise<ChatThread> {
     const now = nowIso();
-    const thread: ChatThread = {
+    const thread = {
       id: generateId(),
       title: this.i18n.t('assistant.newChat'),
       createdAt: now,
       updatedAt: now,
     };
     await this.chatRepo.putThread(thread);
-    return thread;
+    return thread as ChatThread;
   }
 
   async startPromptThread(promptId: InsightPromptId): Promise<ChatThread> {
     const prompt = INSIGHT_PROMPTS.find((p) => p.id === promptId);
     const now = nowIso();
     const title = prompt ? this.i18n.t(prompt.titleKey) : this.i18n.t('assistant.newChat');
-    const thread: ChatThread = {
+    const thread = {
       id: generateId(),
       title,
       promptId,
@@ -69,7 +69,7 @@ export class ChatService {
     const answer = await this.resolveAnswer(userText, promptId);
     await this.appendMessage(thread.id, 'assistant', answer.text, answer.source);
     await this.touchThread(thread.id, title);
-    return thread;
+    return thread as ChatThread;
   }
 
   async sendMessage(threadId: string, content: string): Promise<void> {

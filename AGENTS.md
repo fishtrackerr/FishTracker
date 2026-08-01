@@ -12,6 +12,17 @@ Rules for AI-assisted changes to this repository.
 - Avoid `any`
 - Offline-first: IndexedDB via Dexie; no backend unless requested
 
+## Fishing modes
+
+- Modes: `carper`, `catfish`, `pike`, `bass`, `feeder`, `general` — selected once per app run after PIN (`/mode-select`)
+- Persist selection only in `sessionStorage` (`fish-tracker-fishing-mode`); clearing requires process restart or full reset
+- Extend `ModeScopedRepository` for fishing data; stamp `fishingMode` on write; filter lists with `tryActiveMode()` (empty when null); hide cross-mode rows in `getById` / `watchById` via `forActiveMode`
+- Use `getAllAcrossModes()` only for backup/import/full wipe
+- Per-mode prefs in `AppSettings.modePreferences`; PIN, theme, units, language, AI key stay shared
+- At most one `active` session **per mode**
+- Filter presets key: `fish-tracker-filter-presets:<mode>`
+- Existing unscoped data migrates to `carper` (Dexie v7)
+
 ## UI
 
 - Use shared components: `session-card`, `filter-panel`, `expandable-section`, `page-title`
@@ -26,14 +37,15 @@ Rules for AI-assisted changes to this repository.
 ## Storage
 
 - IndexedDB for data and images
-- localStorage for settings, lock state, filter presets only
+- localStorage for settings, lock state, filter presets only; fishing mode in sessionStorage
 - Schema changes require Dexie version migration in `fish-db.ts`
 - Optional fields must not block entity creation
+- Centralize keys in `src/app/core/constants/storage-keys.ts`
 
 ## Sessions and catches
 
 - One catch → one session (`sessionId`)
-- Startup navigation via `AppStartupService`
+- Startup navigation via `AppStartupService` (PIN → mode select → active session or home)
 - Catch lists use `watchBySession()` liveQuery
 - `SessionService.updateSession()` for edits with validation
 - Editing sessions must not remove or re-timestamp catches
@@ -61,13 +73,16 @@ Rules for AI-assisted changes to this repository.
 - Prevent case-insensitive duplicates via `UserOptionService`
 - Keep defaults recoverable via Settings reset
 - Reuse one shared `UserOptionService` / `option-combobox`
+- Options and favorites are per fishing mode
 
 ## Reset actions
 
 - Every reset requires `ConfirmService` confirmation
 - Full reset requires typing `RESET` plus final confirm
 - Offer export before deleting all data
-- Settings reset must not delete fishing records
+- Settings reset must not delete fishing records; keep `modePreferences`
+- `resetCurrentMode` clears only the active mode’s fishing data and reseeds that mode’s defaults
+- Full application reset clears fishing mode and should navigate to `/mode-select`
 
 ## Security
 
@@ -75,7 +90,7 @@ Rules for AI-assisted changes to this repository.
 - PIN unlock has attempt lockout / exponential backoff
 - AI API key is PIN-wrapped at rest (`SecretVaultService`); plaintext only while unlocked
 - `PinLockService` persists lock state; guards await startup init
-- Preserve return URL after unlock (same-app relative paths only)
+- Preserve return URL after unlock **and** after mode select (same-app relative paths only; not `/pin/*` or `/mode-select`)
 - Backup import validates size, ids, and image mime types
 - Static CSP meta in `index.html` for GitHub Pages hosting
 
@@ -87,6 +102,7 @@ Rules for AI-assisted changes to this repository.
 - After any session or catch behavior change → update `docs/sessions.md` or `docs/catches.md`
 - After any storage or DB schema change → update `docs/storage.md`
 - After any UI/theme change → update `docs/theming-and-ui.md`
+- After fishing-mode behavior changes → update `docs/application-flow.md` and related feature docs
 - See [docs/README.md](./docs/README.md) for the full index
 
 ## Testing
@@ -103,6 +119,8 @@ Rules for AI-assisted changes to this repository.
 | Concern | File |
 |---------|------|
 | Startup | `src/app/core/services/app-startup.service.ts` |
+| Fishing mode | `src/app/core/services/fishing-mode.service.ts` |
+| Mode-scoped repos | `src/app/core/services/mode-scoped.repository.ts` |
 | Routes | `src/app/app.routes.ts` |
 | Database | `src/app/core/db/fish-db.ts` |
 | Theme | `src/app/core/services/theme.service.ts` |

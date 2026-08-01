@@ -34,6 +34,8 @@ Inactivity checked every 30 seconds. Activity tracked on pointer and keyboard ev
 
 Guards await startup initialization before evaluating lock state. Return URL stored in sessionStorage when redirecting to unlock. Only same-app relative paths are accepted (`/…`, not `//…` or absolute URLs).
 
+After unlock, if no fishing mode is selected for this app run, navigation goes to `/mode-select` before shell routes. See [routing.md](./routing.md) and [application-flow.md](./application-flow.md).
+
 ## Lock navigation
 
 `PinLockService.lock()` navigates to `/pin/unlock` and preserves current route for post-unlock restore.

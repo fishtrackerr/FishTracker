@@ -1,5 +1,7 @@
 # Catches
 
+Catches are scoped to the active **fishing mode** (via `fishingMode` on the record and mode-filtered repositories).
+
 ## Instant catch
 
 One-tap button on the active session (`createInstant`):
@@ -13,7 +15,7 @@ One-tap button on the active session (`createInstant`):
 
 Dialog on active session (`QuickCatchDialogComponent`):
 
-- Primary: species, weight, length, bait, rig, photo
+- Primary: species (from **current mode** favorites + Other), weight, length, bait, rig, photo
 - Collapsible: released, notes
 - Saves via `CatchService.createQuick()`
 
@@ -22,7 +24,7 @@ Dialog on active session (`QuickCatchDialogComponent`):
 - Create: `/sessions/:id/catches/new` — extended fields (hook, line, depth, rod, session spot, etc.)
 - Edit: `/sessions/:id/catches/:catchId/edit` — same form; clears `detailsPending` on save; does **not** overwrite frozen `weather`, `caughtAt`, or GPS
 
-Custom dropdown options via `option-combobox` and `UserOptionService`. Query params `rodId` and `sessionSpotId` preselect from rod cards.
+Custom dropdown options via `option-combobox` and `UserOptionService` (mode-scoped). Query params `rodId` and `sessionSpotId` preselect from rod cards.
 
 Catches store optional `rodId` and `sessionSpotId` links.
 
@@ -37,18 +39,20 @@ Quick Catch / full form require species. Instant catch does not. Duplicate submi
 ## Persistence
 
 1. Generate catch ID and timestamps
-2. Optional photo via `ImageService`
-3. `catchRepo.put()`
+2. Optional photo via `ImageService` (current mode)
+3. `catchRepo.put()` (stamps `fishingMode`)
 4. `updateSessionStats()` on parent session
 
 ## Catch visibility
 
 Session detail and active session subscribe to `catchService.watchBySession(sessionId)` using Dexie `liveQuery`. Lists update immediately after insert without page refresh. Rows with `detailsPending` show a badge; tapping a row opens the edit form.
 
+`getById` only returns catches for the active fishing mode.
+
 ## Catch statistics
 
-Session-level stats (count, total weight, biggest) updated on every catch create/update/delete.
+Session-level stats (count, total weight, biggest) updated on every catch create/update/delete. Global statistics page aggregates only the current mode’s catches.
 
 ## Personal records
 
-`CatchService.checkPersonalRecord()` flags PR when weight exceeds prior records for species.
+`CatchService.checkPersonalRecord()` flags PR when weight exceeds prior records for species **within the current mode**.

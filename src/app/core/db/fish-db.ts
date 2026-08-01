@@ -16,6 +16,7 @@ import {
   UserProfile,
 } from '../models';
 import { DEFAULT_SETTINGS } from '../models/app-settings.model';
+import { DEFAULT_FISHING_MODE } from '../models/fishing-mode.model';
 import { generateId, nowIso } from '../utils';
 
 const SETTINGS_KEY = 'fish-tracker-settings';
@@ -206,7 +207,7 @@ export class FishDb extends Dexie {
             sessionId: session.id,
             capturedAt: weather.capturedAt ?? session.updatedAt ?? session.createdAt,
             weather,
-          } satisfies SessionWeatherRecord);
+          });
         }
       });
 
@@ -226,6 +227,48 @@ export class FishDb extends Dexie {
       chatThreads: 'id, updatedAt',
       chatMessages: 'id, threadId, createdAt',
     });
+
+    this.version(7)
+      .stores({
+        sessions: 'id, fishingMode, [fishingMode+status], lakeId, startDate',
+        catches: 'id, fishingMode, sessionId, rodId, sessionSpotId, species, caughtAt',
+        lakes: 'id, fishingMode, name, isFavorite',
+        images: 'id, fishingMode, type, parentId, isFavorite, isHomepageImage',
+        profiles: 'id',
+        profileDocuments: 'id, type, title',
+        biteEvents: 'id, fishingMode, sessionId, rodId, occurredAt',
+        fishSpottedEvents: 'id, fishingMode, sessionId, rodId, spottedAt',
+        rodSpotHistory: 'id, fishingMode, rodId, changedAt',
+        sessionEvents: 'id, fishingMode, sessionId, type, occurredAt',
+        sessionWeather: 'id, fishingMode, sessionId, capturedAt',
+        userOptions: 'id, fishingMode, [fishingMode+category], category, value',
+        chatThreads: 'id, fishingMode, updatedAt',
+        chatMessages: 'id, threadId, createdAt',
+      })
+      .upgrade(async (tx) => {
+        const mode = DEFAULT_FISHING_MODE;
+        const tables = [
+          'sessions',
+          'catches',
+          'lakes',
+          'images',
+          'biteEvents',
+          'fishSpottedEvents',
+          'rodSpotHistory',
+          'sessionEvents',
+          'sessionWeather',
+          'userOptions',
+          'chatThreads',
+        ] as const;
+        for (const tableName of tables) {
+          const rows = await tx.table(tableName).toArray();
+          for (const row of rows) {
+            if (!row.fishingMode) {
+              await tx.table(tableName).update(row.id, { fishingMode: mode });
+            }
+          }
+        }
+      });
   }
 }
 

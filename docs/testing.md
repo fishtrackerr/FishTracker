@@ -6,11 +6,11 @@ Vitest via `ng test` (`@angular/build:unit-test`, jsdom). Config: `tsconfig.spec
 
 ## Coverage today
 
-About **37** `*.spec.ts` files across:
+About **40+** `*.spec.ts` files across:
 
-- Core services: session, catch, weather, theme, filter, search, statistics, pin-lock, settings, maps, geolocation, rods, bites, user-options, local insights, startup, lake geocoding, image, session-weather-monitor
+- Core services: session, catch, weather, theme, filter, search, statistics, pin-lock, settings, maps, geolocation, rods, bites, user-options, local insights, startup, fishing mode, lake geocoding, image, session-weather-monitor
 - Guards / utils: pin-lock guard, return-url, fetch-with-timeout
-- Features: active-session, sessions list/detail/create dialog, catches (form + quick catch), assistant, settings, lake detail, pin-unlock, release notes, shell, expandable-section, confirm-dialog
+- Features: active-session, sessions list/detail/create dialog, catches (form + quick catch), assistant, settings, lake detail, pin-unlock, mode-select, release notes, shell, expandable-section, confirm-dialog
 - App bootstrap smoke (`app.spec.ts`)
 
 ## Priority gaps
@@ -28,8 +28,9 @@ About **37** `*.spec.ts` files across:
 
 | Area | Tests |
 |------|-------|
-| Startup | Route resolution: home, active session, PIN |
+| Startup | Route resolution: PIN → mode select → home / active session (per mode) |
 | PIN | Cold-start lock without sessionStorage; inactivity; visibility checks timeout before activity |
+| Fishing mode | Mode select, sessionStorage persistence, mode-scoped lists, one active session per mode |
 | Catches | Insert, stats update, watchBySession |
 | Themes | resolvedTheme, overlay class sync |
 | Session edit | Date validation, catches preserved |
