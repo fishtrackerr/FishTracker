@@ -119,7 +119,7 @@ export class CatchService {
 
     catchRecord.isPersonalRecord = await this.checkPersonalRecord(catchRecord);
     await this.catchRepo.put(catchRecord);
-    await this.updateSessionStats(sessionId);
+    await this.updateSessionStats(sessionId, photoId);
     await this.sessionEvents.record({
       sessionId,
       type: 'catch',
@@ -172,7 +172,10 @@ export class CatchService {
     return weightRecord || lengthRecord;
   }
 
-  private async updateSessionStats(sessionId: string): Promise<void> {
+  private async updateSessionStats(
+    sessionId: string,
+    newCoverPhotoId?: string,
+  ): Promise<void> {
     const session = await this.sessionRepo.getById(sessionId);
     if (!session) {
       return;
@@ -188,6 +191,7 @@ export class CatchService {
       catchCount: catches.length,
       totalCatchWeightKg: totalWeight,
       biggestFishKg: biggest > 0 ? biggest : undefined,
+      ...(newCoverPhotoId ? { coverImageId: newCoverPhotoId } : {}),
       updatedAt: nowIso(),
     });
   }

@@ -28,8 +28,3 @@
 mat-dialog-content {
   color: var(--text-primary);
 }
-
-button[mat-flat-button] {
-  background: var(--primary) !important;
-  color: var(--text-on-primary) !important;
-}

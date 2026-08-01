@@ -8,6 +8,8 @@
 
 @if (loadError(); as err) {
   <app-error-state [message]="err" (retry)="loadDashboard()" />
+} @else if (loading()) {
+  <app-loading-state />
 } @else {
   <button mat-flat-button class="start-btn" (click)="startSession()" [disabled]="starting() || loading()">
     {{ starting() ? ('dashboard.starting' | tr) : ('dashboard.startSession' | tr) }}
@@ -41,10 +43,10 @@
     />
   </section>
 
-  @if (recentSessions.length > 0) {
+  @if (recentSessions().length > 0) {
     <section class="section">
       <h2 class="section-title">{{ 'dashboard.recentSessions' | tr }}</h2>
-      @for (session of recentSessions; track session.id) {
+      @for (session of recentSessions(); track session.id) {
         <app-session-card [session]="session" />
       }
     </section>

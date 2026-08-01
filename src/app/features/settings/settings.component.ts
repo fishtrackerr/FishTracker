@@ -132,16 +132,26 @@ export class SettingsComponent {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    const ok = await this.confirm.confirm({
-      title: 'Import backup?',
-      message: 'This will replace all data. This action cannot be undone.',
-      confirmLabel: 'Import',
-    });
-    if (!ok) return;
     try {
       const text = await file.text();
-      const data = JSON.parse(text) as BackupData;
-      await this.backupService.import(data);
+      const raw = JSON.parse(text) as unknown;
+      const preview = this.backupService.validate(raw);
+      const summary = this.i18n.t('settings.importPreview', {
+        sessions: String(preview.sessionCount),
+        catches: String(preview.catchCount),
+        lakes: String(preview.lakeCount),
+        images: String(preview.imageCount),
+      });
+      const ok = await this.confirm.confirm({
+        title: this.i18n.t('settings.importConfirmTitle'),
+        message: `${summary}\n\n${this.i18n.t('settings.importConfirmMessage')}`,
+        confirmLabel: this.i18n.t('common.import'),
+      });
+      if (!ok) {
+        input.value = '';
+        return;
+      }
+      await this.backupService.import(raw as BackupData);
       this.message.set(this.i18n.t('messages.backupRestored'));
     } catch {
       this.message.set(this.i18n.t('messages.importFailed'));

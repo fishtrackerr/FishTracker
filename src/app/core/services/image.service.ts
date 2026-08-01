@@ -16,6 +16,7 @@ const PLACEHOLDER = 'assets/images/img-not-found.svg';
 @Injectable({ providedIn: 'root' })
 export class ImageService {
   private readonly urlCache = new Map<string, string>();
+  private readonly fullUrlCache = new Map<string, string>();
 
   constructor(
     private readonly imageRepo: ImageRepository,
@@ -27,6 +28,13 @@ export class ImageService {
     type: ImageType,
     parentId?: string,
   ): Promise<string> {
+    if (!file.type.startsWith('image/')) {
+      throw new Error('File must be an image');
+    }
+    const maxBytes = 20 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      throw new Error('Image exceeds 20 MB limit');
+    }
     const { blob, thumbnailBlob } = await this.compressImage(file);
     const id = generateId();
     const image: StoredImage = {
@@ -91,11 +99,16 @@ export class ImageService {
   }
 
   async getFullObjectUrl(id: string): Promise<string | null> {
+    if (this.fullUrlCache.has(id)) {
+      return this.fullUrlCache.get(id)!;
+    }
     const image = await this.imageRepo.getById(id);
     if (!image) {
       return null;
     }
-    return URL.createObjectURL(image.blob);
+    const url = URL.createObjectURL(image.blob);
+    this.fullUrlCache.set(id, url);
+    return url;
   }
 
   getPlaceholderUrl(): string {
@@ -145,6 +158,7 @@ export class ImageService {
 
   async delete(id: string): Promise<void> {
     this.revokeUrl(id);
+    this.revokeFullUrl(id);
     await this.imageRepo.delete(id);
     if (this.settings.get().homepageImageId === id) {
       this.settings.update({ homepageImageId: undefined });
@@ -156,6 +170,20 @@ export class ImageService {
     if (url) {
       URL.revokeObjectURL(url);
       this.urlCache.delete(id);
+    }
+  }
+
+  revokeFullUrl(id: string): void {
+    const url = this.fullUrlCache.get(id);
+    if (url) {
+      URL.revokeObjectURL(url);
+      this.fullUrlCache.delete(id);
+    }
+  }
+
+  revokeAllFullUrls(): void {
+    for (const id of [...this.fullUrlCache.keys()]) {
+      this.revokeFullUrl(id);
     }
   }
 

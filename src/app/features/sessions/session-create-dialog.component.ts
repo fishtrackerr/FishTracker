@@ -68,7 +68,7 @@ export interface SessionCreateDialogData {
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-stroked-button mat-dialog-close type="button" class="cancel-btn">{{ 'common.cancel' | tr }}</button>
+      <button mat-stroked-button mat-dialog-close type="button">{{ 'common.cancel' | tr }}</button>
       <button
         mat-flat-button
         type="button"
@@ -97,14 +97,6 @@ export interface SessionCreateDialogData {
       --mdc-outlined-text-field-focus-outline-color: var(--border-active);
       --mdc-outlined-text-field-label-text-color: var(--primary);
       --mdc-outlined-text-field-input-text-color: var(--text-primary);
-    }
-    .cancel-btn {
-      border-color: var(--border-active) !important;
-      color: var(--primary) !important;
-    }
-    button[mat-flat-button] {
-      background: var(--primary) !important;
-      color: var(--text-on-primary) !important;
     }
   `,
 })

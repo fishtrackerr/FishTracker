@@ -1,6 +1,7 @@
 <div class="pin-screen">
   <h1>{{ 'pin.setPin' | tr }}</h1>
   <p>{{ step() === 'enter' ? ('pin.choosePin' | tr) : ('pin.confirmPin' | tr) }}</p>
+  <p class="hint">{{ 'pin.privacyHint' | tr }}</p>
   <p class="version">v{{ version() }}</p>
   <div class="dots">
     @for (i of [0,1,2,3,4,5]; track i) {

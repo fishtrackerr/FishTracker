@@ -22,6 +22,11 @@
     "loading": "Laden...",
     "errorGeneric": "Er is iets misgegaan"
   },
+  "connectivity": {
+    "offlineBanner": "Je bent offline — vangsten en sessies blijven werken",
+    "dismissBanner": "Offline melding sluiten",
+    "mapsOffline": "Kaarten hebben een verbinding nodig. Je coördinaten blijven in de app bewaard."
+  },
   "dashboard": {
     "startSession": "Start vissessie",
     "starting": "Starten...",
@@ -78,13 +83,19 @@
     "deleteCachedWeather": "Weercache verwijderen",
     "assistant": "Vraag je data",
     "assistantHint": "Inzicht-prompts werken offline. Optionele online AI gebruikt je API-sleutel en alleen een samenvatting van je visdata (geen foto's).",
+    "assistantPrivacyWarning": "Online AI stuurt een samenvatting van meren, sessies, soorten en aas naar de geconfigureerde provider. Schakel dit niet in op een gedeeld of onbetrouwbaar apparaat.",
     "enableAiChat": "Online AI-chat inschakelen",
     "aiApiKey": "API-sleutel",
     "aiBaseUrl": "API-basis-URL",
+    "aiBaseUrlHint": "Toegestane hosts: api.openai.com, openrouter.ai (alleen HTTPS)",
     "aiModel": "Model",
     "clearAiKey": "API-sleutel wissen",
     "openAssistant": "Assistent openen",
     "aiKeyCleared": "API-sleutel gewist",
+    "pinPrivacyHint": "De pincode beschermt tegen meegluren op dit apparaat. Visgegevens in de browser zijn niet versleuteld en blijven leesbaar bij toegang tot het apparaat.",
+    "importConfirmTitle": "Back-up importeren?",
+    "importConfirmMessage": "Dit vervangt alle lokale gegevens. Dit kan niet ongedaan worden gemaakt. Back-ups bevatten GPS en vangstgeschiedenis in platte JSON.",
+    "importPreview": "Sessies: {{sessions}}, vangsten: {{catches}}, meren: {{lakes}}, afbeeldingen: {{images}}",
     "gallery": "Galerij",
     "defaultSorting": "Standaard sortering",
     "newest": "Nieuwste",
@@ -172,7 +183,8 @@
     "setHomepage": "Als startpagina instellen",
     "deleteImage": "Afbeelding verwijderen",
     "homepageUpdated": "Startpagina-afbeelding bijgewerkt",
-    "imageDeleted": "Afbeelding verwijderd"
+    "imageDeleted": "Afbeelding verwijderd",
+    "loadError": "Galerij kon niet worden geladen. Probeer opnieuw."
   },
   "confirm": {
     "deleteItem": "Weet je zeker dat je \"{{item}}\" wilt verwijderen?",
@@ -199,7 +211,9 @@
     "lakes": "Meren",
     "gallery": "Galerij",
     "stats": "Statistieken",
-    "settings": "Instellingen"
+    "settings": "Instellingen",
+    "more": "Meer",
+    "assistant": "Assistent"
   },
   "activeSession": {
     "catches": "vangsten",
@@ -232,6 +246,8 @@
     "sessionCount": "sessie(s)",
     "starting": "Starten...",
     "startSession": "Sessie starten",
+    "defaultName": "Vissessie",
+    "defaultNameAtLake": "Sessie bij {{lake}}",
     "emptyTitle": "Nog geen sessies",
     "emptyMessage": "Start je eerste vissessie om te beginnen met bijhouden.",
     "sessionStarted": "Sessie gestart",
@@ -422,6 +438,7 @@
   },
   "statistics": {
     "title": "Statistieken",
+    "loadError": "Statistieken konden niet worden geladen. Probeer opnieuw.",
     "general": "Algemeen",
     "totalSessions": "Totaal sessies",
     "active": "Actief",
@@ -546,6 +563,7 @@
     "start": "Start:",
     "duration": "Duur:",
     "catches": "Vangsten:",
+    "catchesBadge": "{{count}} vangsten",
     "biggest": "Grootste:",
     "total": "Totaal:",
     "moreInformation": "Meer informatie",
@@ -585,7 +603,8 @@
     "incorrectPin": "Onjuiste pincode",
     "appVersion": "App-versie",
     "checkForUpdates": "Controleren op updates",
-    "checkingForUpdates": "Bezig met controleren op updates..."
+    "checkingForUpdates": "Bezig met controleren op updates...",
+    "privacyHint": "Deze pincode is alleen een casual schermvergrendeling. Gegevens in deze browser zijn niet versleuteld."
   },
   "releaseNotes": {
     "title": "Wijzigingslog",

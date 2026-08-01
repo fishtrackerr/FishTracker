@@ -40,7 +40,7 @@ Safety net: redirects to `/` if no active session exists.
 
 Primary logic in `AppStartupService.resolveInitialRoute()`. Guards complement but do not duplicate startup navigation.
 
-When an active session exists, startup may route `/` to `/sessions/active`. The shell footer also exposes a dedicated **Current** tab (conditional), while **Sessions** continues to point to `/sessions` for list/history access.
+When an active session exists, startup may route `/` to `/sessions/active`. The shell bottom nav shows primary destinations (Home, Current when active, Assistant when fishing, Sessions, Lakes) plus a **More** menu for Gallery, Stats, Settings (and Assistant when idle).
 
 ## Deep links
 

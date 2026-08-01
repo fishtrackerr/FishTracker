@@ -2,7 +2,7 @@
 
 ## Overview
 
-FishTracker is an Angular 21 standalone-component PWA with an offline-first data layer.
+FishTracker is an Angular 21 standalone-component PWA with an offline-first data layer. Production builds are **static** (`outputMode: static`) for GitHub Pages — there is no SSR/Express server.
 
 ```mermaid
 flowchart TD
@@ -21,7 +21,7 @@ flowchart TD
 ### Presentation (`src/app/features/`, `src/app/layout/`, `src/app/shared/`)
 
 - **Features**: dashboard, sessions, active-session, catches, lakes, gallery, statistics, settings, profile, PIN screens.
-- **Layout**: shell with bottom navigation.
+- **Layout**: shell with bottom navigation and dismissible offline banner.
 - **Shared**: session-card, filter-panel, expandable-section, weather-card, dialogs.
 
 ### Core services (`src/app/core/services/`)
@@ -34,7 +34,8 @@ flowchart TD
 | `CatchService` | Catch CRUD, session stats update |
 | `LakeService` | Lake and spot management |
 | `ImageService` | Compression, thumbnails, cover images |
-| `WeatherService` | Live and cached weather |
+| `WeatherService` | Live and multi-slot cached weather |
+| `ConnectivityService` | Online/offline signal for shell banner and network-aware services |
 | `ThemeService` | Dark/light/system theme, overlay sync |
 | `DialogService` | Theme-aware Material dialogs |
 | `SettingsService` | App settings in localStorage |
@@ -55,7 +56,7 @@ Components must not access `db` directly.
 
 ### PWA
 
-Service worker registered in production via `@angular/service-worker`. Offline data remains available through IndexedDB.
+Service worker registered in production via `@angular/service-worker`. Offline data remains available through IndexedDB. Optional network features (weather, geocoding, maps, AI) degrade via `ConnectivityService`, local caches, and snackbars.
 
 ## Key files
 

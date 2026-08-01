@@ -6,7 +6,7 @@ JSON file via `BackupService.export()`:
 
 ```typescript
 interface BackupData {
-  version: number; // current export version: 5
+  version: number; // current export version: 6
   exportedAt: string;
   sessions: FishingSession[];
   catches: Catch[];
@@ -20,16 +20,25 @@ interface BackupData {
   userOptions?: UserOption[];
   chatThreads?: ChatThread[];
   chatMessages?: ChatMessage[];
+  profiles?: UserProfile[];
+  profileDocuments?: ProfileDocument[];
 }
 ```
 
 ## Import validation
 
-`BackupService.import()` checks version compatibility and required arrays before writing.
+`BackupService.validate()` runs before any write:
+
+- `version` must be in `SUPPORTED_BACKUP_VERSIONS` (4, 5, 6)
+- `sessions`, `catches`, `lakes` must be arrays; optional collections must be arrays when present
+- Session entries must include an `id`
+- Returns a `BackupPreview` (counts) for the Settings confirm dialog
+
+`BackupService.import()` calls `validate()` then fully replaces IndexedDB data (including profiles/documents).
 
 ## Image backup
 
-Images exported as base64; restored to IndexedDB blobs on import.
+Images exported as base64; restored to IndexedDB blobs on import. Entries without `data`/`thumbnail` strings are rejected.
 
 ## Schema compatibility
 
@@ -37,7 +46,11 @@ Backup `version` must match supported versions. Schema migrations apply on next 
 
 ## Restore errors
 
-Invalid files throw; UI should surface error via notification. Partial imports are not supported — full replace strategy.
+Invalid files throw; UI surfaces error via notification. Partial imports are not supported — full replace strategy.
+
+## Privacy note
+
+Backup JSON contains GPS coordinates and catch history in cleartext. Store files securely outside the app.
 
 ## Recommendations
 

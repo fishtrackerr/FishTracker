@@ -54,4 +54,21 @@ describe('SettingsService', () => {
 
     expect(service.get()).toEqual(DEFAULT_SETTINGS);
   });
+
+  it('clears optional keys when update passes undefined', () => {
+    const service = new SettingsService();
+    service.update({ aiApiKey: 'secret' });
+    expect(service.get().aiApiKey).toBe('secret');
+
+    service.update({ aiApiKey: undefined });
+    expect(service.get().aiApiKey).toBeUndefined();
+    expect(JSON.parse(localStorage.getItem('fish-tracker-settings')!)).not.toHaveProperty('aiApiKey');
+  });
+
+  it('replace clears secrets omitted from the payload', () => {
+    const service = new SettingsService();
+    service.update({ aiApiKey: 'secret' });
+    service.replace({ ...DEFAULT_SETTINGS });
+    expect(service.get().aiApiKey).toBeUndefined();
+  });
 });

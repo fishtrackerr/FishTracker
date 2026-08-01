@@ -10,15 +10,18 @@ describe('CatchService.createQuick', () => {
     put: ReturnType<typeof vi.fn>;
   };
   let catchRepoGetBySession: ReturnType<typeof vi.fn>;
+  let processFile: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     catchRepo = { put: vi.fn().mockResolvedValue(undefined) };
     catchRepoGetBySession = vi.fn().mockResolvedValue([]);
+    processFile = vi.fn();
     sessionRepo = {
       getById: vi.fn().mockResolvedValue({
         id: 'session-1',
         catchCount: 0,
         totalCatchWeightKg: 0,
+        coverImageId: 'generated-cover',
       }),
       put: vi.fn().mockResolvedValue(undefined),
     };
@@ -40,7 +43,7 @@ describe('CatchService.createQuick', () => {
         getSnapshot: vi.fn().mockResolvedValue(null),
         getCachedSnapshotFor: vi.fn().mockReturnValue(null),
       } as never,
-      { processFile: vi.fn() } as never,
+      { processFile } as never,
       { record: vi.fn() } as never,
     );
   });
@@ -63,6 +66,30 @@ describe('CatchService.createQuick', () => {
         catchCount: 1,
         totalCatchWeightKg: 8.5,
         biggestFishKg: 8.5,
+        coverImageId: 'generated-cover',
+      }),
+    );
+  });
+
+  it('sets catch photo as session coverImageId', async () => {
+    processFile.mockResolvedValue('catch-photo-1');
+    catchRepoGetBySession.mockResolvedValue([
+      { weightKg: 3, photoId: 'catch-photo-1' } as Catch,
+    ]);
+    const photo = new File(['img'], 'catch.jpg', { type: 'image/jpeg' });
+
+    const result = await service.createQuick('session-1', {
+      species: 'Carp',
+      weightKg: 3,
+      photo,
+    });
+
+    expect(processFile).toHaveBeenCalledWith(photo, 'catch', 'session-1');
+    expect(result.photoId).toBe('catch-photo-1');
+    expect(sessionRepo.put).toHaveBeenCalledWith(
+      expect.objectContaining({
+        coverImageId: 'catch-photo-1',
+        catchCount: 1,
       }),
     );
   });
@@ -100,7 +127,7 @@ describe('CatchService.createQuick', () => {
       sessionRepo as never,
       { getCurrentPosition } as never,
       { getSnapshot, getCachedSnapshotFor } as never,
-      { processFile: vi.fn() } as never,
+      { processFile } as never,
       { record: vi.fn() } as never,
     );
 

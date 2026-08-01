@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, distinctUntilChanged, filter, skip } from 'rxjs';
 import { FishingSession, WeatherSnapshot, WeatherWarning } from '../models';
+import { ConnectivityService } from './connectivity.service';
 import { NotificationService } from './notification.service';
 import { SessionEventService } from './session-event.service';
 import { SessionService } from './session.service';
@@ -55,9 +56,11 @@ export class SessionWeatherMonitorService implements OnDestroy {
   private readonly settings = inject(SettingsService);
   private readonly notifications = inject(NotificationService);
   private readonly sessionEvents = inject(SessionEventService);
+  private readonly connectivity = inject(ConnectivityService);
 
   private started = false;
   private sessionSub?: Subscription;
+  private connectivitySub?: Subscription;
   private pollTimerId?: ReturnType<typeof setInterval>;
   private activeSessionId: string | null = null;
   private readonly fingerprintsBySession = new Map<string, Set<string>>();
@@ -72,10 +75,22 @@ export class SessionWeatherMonitorService implements OnDestroy {
     this.sessionSub = this.sessionService.watchActive().subscribe((session) => {
       void this.onActiveSession(session);
     });
+    this.connectivitySub = this.connectivity.online$
+      .pipe(
+        distinctUntilChanged(),
+        skip(1),
+        filter((online) => online),
+      )
+      .subscribe(() => {
+        if (this.activeSessionId && this.settings.get().autoLoadWeather) {
+          void this.pollRefresh();
+        }
+      });
   }
 
   ngOnDestroy(): void {
     this.sessionSub?.unsubscribe();
+    this.connectivitySub?.unsubscribe();
     this.clearPollTimer();
   }
 
@@ -129,6 +144,9 @@ export class SessionWeatherMonitorService implements OnDestroy {
       return;
     }
     if (!this.settings.get().autoLoadWeather) {
+      return;
+    }
+    if (!this.connectivity.isOnline()) {
       return;
     }
 

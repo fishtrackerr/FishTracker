@@ -37,6 +37,8 @@ export interface WeatherSnapshot {
   sunrise: string;
   sunset: string;
   moonPhase: string;
+  /** Short reverse-geocoded place label (city/area), when available. */
+  locationName?: string;
   capturedAt: string;
   isCached?: boolean;
   source?: 'live' | 'cached' | 'manual';

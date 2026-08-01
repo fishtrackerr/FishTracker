@@ -48,8 +48,3 @@
   background: var(--background-card);
   padding-top: var(--spacing-sm);
 }
-
-.save-btn {
-  background: var(--primary) !important;
-  color: var(--text-on-primary) !important;
-}

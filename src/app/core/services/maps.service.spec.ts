@@ -1,16 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { signal } from '@angular/core';
 import { MapsService } from './maps.service';
 
 describe('MapsService', () => {
   let service: MapsService;
   let geo: { getCurrentPositionDetailed: ReturnType<typeof vi.fn> };
-  let notify: { error: ReturnType<typeof vi.fn> };
+  let notify: { error: ReturnType<typeof vi.fn>; offline: ReturnType<typeof vi.fn> };
+  let online: ReturnType<typeof signal<boolean>>;
+  let i18n: { t: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     geo = { getCurrentPositionDetailed: vi.fn() };
-    notify = { error: vi.fn() };
-    service = new MapsService(geo as never, notify as never);
-    vi.spyOn(window, 'open').mockImplementation(() => null);
+    notify = { error: vi.fn(), offline: vi.fn() };
+    online = signal(true);
+    i18n = { t: vi.fn((key: string) => key) };
+    service = new MapsService(
+      geo as never,
+      notify as never,
+      { isOnline: online.asReadonly() } as never,
+      i18n as never,
+    );
+    vi.spyOn(window, 'open').mockReset().mockImplementation(() => null);
   });
 
   it('validates coordinates', () => {
@@ -38,9 +48,16 @@ describe('MapsService', () => {
     expect(window.open).not.toHaveBeenCalled();
   });
 
-  it('opens valid location', () => {
+  it('opens valid location when online', () => {
     expect(service.openLocation(52.1, 4.3)).toBe(true);
     expect(window.open).toHaveBeenCalled();
+  });
+
+  it('blocks openLocation when offline and shows snackbar', () => {
+    online.set(false);
+    expect(service.openLocation(52.1, 4.3)).toBe(false);
+    expect(window.open).not.toHaveBeenCalled();
+    expect(notify.offline).toHaveBeenCalledWith('connectivity.mapsOffline');
   });
 
   it('shows error when geolocation denied', async () => {

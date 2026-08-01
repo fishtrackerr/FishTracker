@@ -4,6 +4,7 @@ import { ImageService } from '../../../core/services/image.service';
 import { ImageType } from '../../../core/models';
 import { NotificationService } from '../../../core/services/notification.service';
 import { I18nService } from '../../../core/services/i18n.service';
+import { PhotoPickService } from '../../../core/services/photo-pick.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
@@ -32,22 +33,15 @@ export class ImagePickerComponent {
   private readonly imageService = inject(ImageService);
   private readonly notifications = inject(NotificationService);
   private readonly i18n = inject(I18nService);
+  private readonly photoPick = inject(PhotoPickService);
 
   @Input({ required: true }) type!: ImageType;
   @Input() parentId?: string;
   readonly uploaded = output<string>();
 
-  pickFile(useCamera: boolean): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    if (useCamera) {
-      input.capture = 'environment';
-    }
-    input.onchange = () => {
-      void this.handleFile(input.files?.[0]);
-    };
-    input.click();
+  async pickFile(useCamera: boolean): Promise<void> {
+    const file = await this.photoPick.pickImage({ capture: useCamera });
+    await this.handleFile(file ?? undefined);
   }
 
   private async handleFile(file?: File): Promise<void> {

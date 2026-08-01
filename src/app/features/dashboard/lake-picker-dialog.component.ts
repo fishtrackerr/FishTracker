@@ -25,7 +25,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
       </mat-selection-list>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>{{ 'common.cancel' | tr }}</button>
+      <button mat-stroked-button mat-dialog-close>{{ 'common.cancel' | tr }}</button>
       <button mat-flat-button (click)="confirm()">{{ 'dashboard.start' | tr }}</button>
     </mat-dialog-actions>
   `,

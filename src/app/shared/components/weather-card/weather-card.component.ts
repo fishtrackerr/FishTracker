@@ -27,6 +27,9 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
           <span class="temp">{{ w.temperatureC | formatTemp }}</span>
           <span class="desc">{{ w.description }}</span>
         </div>
+        @if (w.locationName) {
+          <p class="location">📍 {{ w.locationName }}</p>
+        }
         <div class="details">
           @if (w.feelsLikeC != null) {
             <span>{{ 'weather.feelsLike' | tr }} {{ w.feelsLikeC | formatTemp }}</span>
@@ -112,6 +115,11 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       color: var(--primary);
     }
     .desc { color: var(--text-muted); }
+    .location {
+      margin: 0 0 var(--spacing-sm);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
     .details {
       display: flex;
       flex-wrap: wrap;

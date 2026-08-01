@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,6 +8,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { CatchService } from '../../core/services/catch.service';
 import { SessionService } from '../../core/services/session.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
 import { OptionComboboxComponent } from '../../shared/components/option-combobox/option-combobox.component';
 import { FishingSession } from '../../core/models';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -15,6 +16,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 @Component({
   selector: 'app-catch-form',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatButtonModule,
     MatFormFieldModule,
@@ -33,6 +35,7 @@ export class CatchFormComponent {
   private readonly router = inject(Router);
   private readonly catchService = inject(CatchService);
   private readonly sessionService = inject(SessionService);
+  private readonly photoPick = inject(PhotoPickService);
 
   sessionId = this.route.snapshot.paramMap.get('id')!;
   session?: FishingSession;
@@ -104,17 +107,8 @@ export class CatchFormComponent {
     this.tagsInput = '';
   }
 
-  pickPhoto(useCamera: boolean): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    if (useCamera) {
-      input.capture = 'environment';
-    }
-    input.onchange = () => {
-      this.photo = input.files?.[0];
-    };
-    input.click();
+  async pickPhoto(useCamera: boolean): Promise<void> {
+    this.photo = (await this.photoPick.pickImage({ capture: useCamera })) ?? undefined;
   }
 
   onRodChange(rodId: string): void {

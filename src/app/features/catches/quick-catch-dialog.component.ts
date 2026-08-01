@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,6 +8,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../core/services/settings.service';
 import { ThemeService } from '../../core/services/theme.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
 import { QuickCatchInput } from '../../core/services/catch.service';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -15,6 +16,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 @Component({
   selector: 'app-quick-catch-dialog',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatDialogModule,
     MatButtonModule,
@@ -35,6 +37,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 export class QuickCatchDialogComponent {
   private readonly ref = inject(MatDialogRef<QuickCatchDialogComponent>);
   private readonly settings = inject(SettingsService);
+  private readonly photoPick = inject(PhotoPickService);
   readonly theme = inject(ThemeService);
 
   species = '';
@@ -57,17 +60,8 @@ export class QuickCatchDialogComponent {
 
   readonly selectPanelClass = this.theme.getSelectPanelClass();
 
-  pickPhoto(useCamera: boolean): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    if (useCamera) {
-      input.capture = 'environment';
-    }
-    input.onchange = () => {
-      this.photo = input.files?.[0];
-    };
-    input.click();
+  async pickPhoto(useCamera: boolean): Promise<void> {
+    this.photo = (await this.photoPick.pickImage({ capture: useCamera })) ?? undefined;
   }
 
   save(): void {

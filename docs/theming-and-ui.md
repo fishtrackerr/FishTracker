@@ -2,7 +2,7 @@
 
 ## Themes
 
-- **Dark** (default): orange primary on dark backgrounds
+- **Dark** (default): orange primary accents on dark backgrounds; body text uses light warm neutrals (`--text-primary: #f2e6d8`) for readable contrast on `#0b0b0b`
 - **Light**: blue primary on light backgrounds
 - **System**: follows `prefers-color-scheme`
 
@@ -31,7 +31,8 @@ Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hard
 
 ## Shared components
 
-- `app-card`, `session-card`, `stat-card`, `weather-card`
+- Shared cards via CSS class `.app-card` plus components: `session-card`, `stat-card`, `weather-card`
+- Loading / error / empty: `LoadingStateComponent`, `ErrorStateComponent`, `EmptyStateComponent`
 - `expandable-section` — consistent expand/collapse with `aria-expanded`
 - `page-title` — centered titles
 - `filter-panel` — desktop expandable / mobile bottom sheet

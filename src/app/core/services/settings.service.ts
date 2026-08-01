@@ -14,7 +14,19 @@ export class SettingsService {
   }
 
   update(partial: Partial<AppSettings>): void {
-    const next = { ...this.settingsSignal(), ...partial };
+    const next: AppSettings = { ...this.settingsSignal(), ...partial };
+    for (const key of Object.keys(partial) as (keyof AppSettings)[]) {
+      if (partial[key] === undefined) {
+        delete (next as unknown as Record<string, unknown>)[key];
+      }
+    }
+    this.settingsSignal.set(next);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  }
+
+  /** Fully replaces settings (clears optional keys omitted from the payload). */
+  replace(settings: AppSettings): void {
+    const next = { ...settings };
     this.settingsSignal.set(next);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   }

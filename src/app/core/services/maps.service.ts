@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { ConnectivityService, readNavigatorOnline } from './connectivity.service';
 import { GeolocationService } from './geolocation.service';
+import { I18nService } from './i18n.service';
 import { NotificationService } from './notification.service';
 
 export interface MapCoordinate {
@@ -12,6 +14,8 @@ export class MapsService {
   constructor(
     private readonly geo: GeolocationService,
     private readonly notify: NotificationService,
+    private readonly connectivity?: ConnectivityService,
+    private readonly i18n?: I18nService,
   ) {}
 
   isValidCoordinate(latitude?: number | null, longitude?: number | null): boolean {
@@ -40,6 +44,9 @@ export class MapsService {
     if (!this.isValidCoordinate(latitude, longitude)) {
       return false;
     }
+    if (!this.ensureOnlineForMaps()) {
+      return false;
+    }
     window.open(this.buildLocationUrl(latitude, longitude), '_blank', 'noopener,noreferrer');
     return true;
   }
@@ -51,11 +58,17 @@ export class MapsService {
     ) {
       return false;
     }
+    if (!this.ensureOnlineForMaps()) {
+      return false;
+    }
     window.open(this.buildDirectionsUrl(origin, destination), '_blank', 'noopener,noreferrer');
     return true;
   }
 
   async openCurrentLocation(): Promise<boolean> {
+    if (!this.ensureOnlineForMaps()) {
+      return false;
+    }
     const result = await this.geo.getCurrentPositionDetailed();
     if (!result.success) {
       const message =
@@ -75,6 +88,9 @@ export class MapsService {
       this.notify.error('Destination coordinates are missing or invalid.');
       return false;
     }
+    if (!this.ensureOnlineForMaps()) {
+      return false;
+    }
     const result = await this.geo.getCurrentPositionDetailed();
     if (!result.success) {
       const message =
@@ -88,5 +104,17 @@ export class MapsService {
       { latitude: result.latitude, longitude: result.longitude },
       destination,
     );
+  }
+
+  private ensureOnlineForMaps(): boolean {
+    const online = this.connectivity?.isOnline() ?? readNavigatorOnline();
+    if (online) {
+      return true;
+    }
+    const message =
+      this.i18n?.t('connectivity.mapsOffline') ??
+      'Maps needs a connection. Your coordinates are still saved in the app.';
+    this.notify.offline(message);
+    return false;
   }
 }

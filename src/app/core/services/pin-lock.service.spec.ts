@@ -35,9 +35,23 @@ describe('PinLockService', () => {
 
   afterEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
   });
 
-  it('initializes unlocked state from storage when not locked', () => {
+  it('locks on cold start even when localStorage says unlocked', () => {
+    localStorage.setItem(
+      'fish-tracker-lock-state',
+      JSON.stringify({
+        isLocked: false,
+        lastActivityAt: new Date().toISOString(),
+      }),
+    );
+    service.initializeFromStorage();
+    expect(service.isAppLocked()).toBe(true);
+  });
+
+  it('stays unlocked when unlock session exists and activity is recent', () => {
+    sessionStorage.setItem('fish-tracker-unlock-session', '1');
     localStorage.setItem(
       'fish-tracker-lock-state',
       JSON.stringify({
@@ -49,7 +63,8 @@ describe('PinLockService', () => {
     expect(service.isAppLocked()).toBe(false);
   });
 
-  it('locks after inactivity timeout', () => {
+  it('locks after inactivity timeout even with unlock session', () => {
+    sessionStorage.setItem('fish-tracker-unlock-session', '1');
     const past = new Date(Date.now() - 20 * 60 * 1000).toISOString();
     localStorage.setItem(
       'fish-tracker-lock-state',
@@ -67,6 +82,7 @@ describe('PinLockService', () => {
     const stored = JSON.parse(localStorage.getItem('fish-tracker-lock-state')!);
     expect(stored.isLocked).toBe(false);
     expect(stored.lastActivityAt).toBeDefined();
+    expect(sessionStorage.getItem('fish-tracker-unlock-session')).toBe('1');
   });
 
   it('navigates to unlock on lock when not on pin page', () => {
@@ -75,5 +91,6 @@ describe('PinLockService', () => {
     service.lock();
     expect(router.navigate).toHaveBeenCalledWith(['/pin/unlock']);
     expect(sessionStorage.getItem('fish-tracker-return-url')).toBe('/sessions');
+    expect(sessionStorage.getItem('fish-tracker-unlock-session')).toBeNull();
   });
 });

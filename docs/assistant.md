@@ -26,9 +26,11 @@ Tables `chatThreads` and `chatMessages` (Dexie schema v6). Included in backup/ex
 `AppSettings` fields (localStorage):
 
 - `aiChatEnabled`
-- `aiApiKey` (optional; stored on device)
-- `aiBaseUrl` (default `https://api.openai.com/v1`)
+- `aiApiKey` (optional; stored on device; cleared on full reset / settings reset)
+- `aiBaseUrl` (default `https://api.openai.com/v1`; **allowlisted hosts only**: `api.openai.com`, `openrouter.ai`, `api.openrouter.ai`; HTTPS required)
 - `aiModel` (default `gpt-4o-mini`)
+
+Enabling online AI sends an aggregated fishing summary to the provider. Settings UI warns about this.
 
 ## Predefined prompts
 

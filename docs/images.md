@@ -10,7 +10,15 @@
 
 ## Thumbnails
 
-Generated alongside full image; displayed via `ImageThumbComponent`.
+Generated alongside full image; displayed via `ImageThumbComponent` and gallery.
+
+Gallery builds metadata without eagerly creating blob URLs. `ImageGalleryComponent` loads thumbnails via `IntersectionObserver` when tiles enter the viewport (`ImageService.getObjectUrl` caches thumbs).
+
+Full-size viewer URLs are cached in `ImageService` and revoked when navigating between images or closing the viewer (`revokeFullUrl` / `revokeAllFullUrls`).
+
+## Upload limits
+
+`processFile` rejects non-image MIME types and files larger than 20 MB.
 
 ## Favorites and homepage
 

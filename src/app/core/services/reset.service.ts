@@ -93,7 +93,8 @@ export class ResetService {
     const pinHash = this.settings.get().pinHash;
     const pinSalt = this.settings.get().pinSalt;
     const pinEnabled = this.settings.get().pinEnabled;
-    this.settings.update({ ...DEFAULT_SETTINGS, pinHash, pinSalt, pinEnabled });
+    // replace() so optional secrets (aiApiKey) are cleared, not left via merge.
+    this.settings.replace({ ...DEFAULT_SETTINGS, pinHash, pinSalt, pinEnabled });
     this.resetFilters();
     await this.resetAppearance();
     this.resetWeather();
@@ -138,8 +139,14 @@ export class ResetService {
     localStorage.removeItem(PRESETS_KEY);
     localStorage.removeItem(WEATHER_CACHE_KEY);
     localStorage.removeItem(LOCK_STATE_KEY);
+    try {
+      sessionStorage.removeItem('fish-tracker-unlock-session');
+    } catch {
+      /* ignore */
+    }
     this.clearExpandStates();
-    this.settings.update({ ...DEFAULT_SETTINGS });
+    // replace() clears aiApiKey and other optional secrets omitted from defaults.
+    this.settings.replace({ ...DEFAULT_SETTINGS });
     await this.userOptions.restoreDefaults();
   }
 

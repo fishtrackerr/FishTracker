@@ -4,10 +4,12 @@ import { ChatMessage, ChatThread } from './chat.model';
 import { FishSpottedEvent } from './fish-spotted-event.model';
 import { FishingSession } from './fishing-session.model';
 import { Lake } from './lake.model';
+import { ProfileDocument } from './profile-document.model';
 import { RodSpotHistory } from './rod-spot-history.model';
 import { SessionEvent } from './session-event.model';
 import { SessionWeatherRecord } from './session-weather.model';
 import { UserOption } from './user-option.model';
+import { UserProfile } from './user-profile.model';
 
 export interface BackupImage {
   id: string;
@@ -37,4 +39,24 @@ export interface BackupData {
   userOptions?: UserOption[];
   chatThreads?: ChatThread[];
   chatMessages?: ChatMessage[];
+  profiles?: UserProfile[];
+  profileDocuments?: ProfileDocument[];
 }
+
+/** Summary returned by validate before a destructive import. */
+export interface BackupPreview {
+  version: number;
+  exportedAt?: string;
+  sessionCount: number;
+  catchCount: number;
+  lakeCount: number;
+  imageCount: number;
+  profileCount: number;
+  profileDocumentCount: number;
+}
+
+/** Current backup format version written by export(). */
+export const BACKUP_EXPORT_VERSION = 6;
+
+/** Versions accepted by import() (legacy + current). */
+export const SUPPORTED_BACKUP_VERSIONS = [4, 5, 6] as const;

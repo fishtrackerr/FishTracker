@@ -19,7 +19,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       text-align: center;
       padding: 24px 16px;
       border: 1px solid var(--border-danger, #d64545);
-      border-radius: var(--radius-md, 12px);
+      border-radius: var(--radius-md);
       background: var(--background-card, #1c1c1c);
     }
     .message {

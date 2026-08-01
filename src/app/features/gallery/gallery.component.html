@@ -29,7 +29,11 @@
   </label>
 </div>
 
-@if (items().length === 0) {
+@if (loading()) {
+  <app-loading-state />
+} @else if (loadError(); as err) {
+  <app-error-state [message]="err" (retry)="loadFilters()" />
+} @else if (items().length === 0) {
   <app-empty-state title="gallery.emptyTitle" message="gallery.emptyMessage" />
 } @else {
   <app-image-gallery [galleryItems]="items()" [allowDelete]="true" (changed)="buildItems()" />

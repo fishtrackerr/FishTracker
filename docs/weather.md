@@ -2,15 +2,19 @@
 
 ## Providers
 
-Open-Meteo API for live forecasts. No API key required. Requests force Celsius / km/h / mm and use `cache: 'no-store'` so browsers do not serve stale HTTP responses as live weather.
+Open-Meteo API for live forecasts. No API key required. Requests force Celsius / km/h / mm and use `cache: 'no-store'` so browsers do not serve stale HTTP responses as live weather. Place names are resolved separately via Nominatim reverse geocoding.
 
 ## Offline weather
 
-`WeatherService.getCachedSnapshot()` / `getCachedSnapshotFor(lat, lng)` return the last successful fetch from localStorage. Entries are keyed by coordinates (~5 km tolerance). When online, live Open-Meteo data is always preferred; cache is only used if the request fails or the device is offline. Legacy caches without coordinates are not reused for a location-specific lookup.
+`WeatherService.getCachedSnapshot()` / `getCachedSnapshotFor(lat, lng)` return successful fetches from a **multi-slot** localStorage cache (`fish-tracker-weather-cache`, up to 8 locations). Entries are keyed by coordinates (~5 km tolerance). When online, live Open-Meteo data is always preferred; cache is only used if the request fails (after one short retry) or the device is offline. Legacy single-entry and bare-snapshot caches are migrated on read. Wrong-lake weather is never returned — if no nearby slot exists, the result is `null`.
+
+## Retry
+
+On live fetch failure (timeout, network error, or non-OK response), `WeatherService` waits ~1.5s and retries **once**, then falls back to the nearest cache slot. This helps flaky waterside LTE without long hangs.
 
 ## Weather snapshots
 
-`WeatherSnapshot` stored on sessions and optionally on catches: temperature, wind, pressure, humidity, sunrise/sunset, optional hourly/daily arrays.
+`WeatherSnapshot` stored on sessions and optionally on catches: temperature, wind, pressure, humidity, sunrise/sunset, optional hourly/daily arrays, and optional `locationName` (short city/area label from Nominatim reverse geocoding of the GPS coordinates used for the fetch). Reverse-geocode failures do not block weather.
 
 ## Session weather history
 
@@ -22,7 +26,7 @@ Captured at session start when GPS available. **Refresh weather & GPS** re-queri
 
 ## Active session monitoring
 
-`SessionWeatherMonitorService` starts at app init. While a session is `active` and `autoLoadWeather` is on, it refreshes weather every `weatherRefreshMinutes` (minimum 5). Warnings respect `showWeatherWarnings`.
+`SessionWeatherMonitorService` starts at app init. While a session is `active` and `autoLoadWeather` is on, it refreshes weather every `weatherRefreshMinutes` (minimum 5). Polls are **skipped while offline**; when connectivity returns, one immediate refresh runs. Warnings respect `showWeatherWarnings`.
 
 - Sticky alert banner on the active session screen lists current warnings
 - Snackbars (`NotificationService.weatherWarning`) fire only when a warning is **new** or **severity escalates** (e.g. wind warning → danger), not on every poll
@@ -49,7 +53,7 @@ When `detailedWeatherEnabled` in settings, dashboard and weather card show exten
 
 ## Error and fallback
 
-GPS/weather failures are non-blocking. Session creation succeeds without weather. Nearby cached snapshots are used when live fetch fails or the app is offline.
+GPS/weather failures are non-blocking. Session creation succeeds without weather. Nearby cached snapshots are used when live fetch fails or the app is offline. Connectivity is tracked via `ConnectivityService` (with `navigator.onLine` fallback in unit tests).
 
 ## Storm information
 

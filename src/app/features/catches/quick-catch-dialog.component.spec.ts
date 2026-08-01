@@ -4,9 +4,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QuickCatchDialogComponent } from './quick-catch-dialog.component';
 import { SettingsService } from '../../core/services/settings.service';
 import { ThemeService } from '../../core/services/theme.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
 
 describe('QuickCatchDialogComponent', () => {
   const close = vi.fn();
+  const pickImage = vi.fn<PhotoPickService['pickImage']>();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -31,6 +33,12 @@ describe('QuickCatchDialogComponent', () => {
           provide: ThemeService,
           useValue: {
             getSelectPanelClass: () => 'theme-dark-select-panel',
+          },
+        },
+        {
+          provide: PhotoPickService,
+          useValue: {
+            pickImage,
           },
         },
       ],
@@ -96,43 +104,23 @@ describe('QuickCatchDialogComponent', () => {
     });
   });
 
-  it('stores selected photo when user picks an image', () => {
+  it('stores selected photo when user picks an image', async () => {
     const component = TestBed.runInInjectionContext(() => new QuickCatchDialogComponent());
     const file = new File(['image'], 'quick.jpg', { type: 'image/jpeg' });
-    const fakeInput = document.createElement('input');
-    Object.defineProperty(fakeInput, 'files', {
-      value: [file],
-      configurable: true,
-    });
-    const clickSpy = vi.spyOn(fakeInput, 'click').mockImplementation(() => undefined);
+    pickImage.mockResolvedValue(file);
 
-    const createElementSpy = vi
-      .spyOn(document, 'createElement')
-      .mockReturnValue(fakeInput);
+    await component.pickPhoto(true);
 
-    component.pickPhoto(true);
-    if (fakeInput.onchange) {
-      fakeInput.onchange(new Event('change'));
-    }
-
-    expect(fakeInput.capture).toBe('environment');
-    expect(clickSpy).toHaveBeenCalled();
+    expect(pickImage).toHaveBeenCalledWith({ capture: true });
     expect(component.photo).toBe(file);
-    clickSpy.mockRestore();
-    createElementSpy.mockRestore();
   });
 
-  it('opens gallery picker without camera capture', () => {
+  it('opens gallery picker without camera capture', async () => {
     const component = TestBed.runInInjectionContext(() => new QuickCatchDialogComponent());
-    const fakeInput = document.createElement('input');
-    const clickSpy = vi.spyOn(fakeInput, 'click').mockImplementation(() => undefined);
-    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(fakeInput);
+    pickImage.mockResolvedValue(null);
 
-    component.pickPhoto(false);
+    await component.pickPhoto(false);
 
-    expect(fakeInput.capture).toBe('');
-    expect(clickSpy).toHaveBeenCalled();
-    clickSpy.mockRestore();
-    createElementSpy.mockRestore();
+    expect(pickImage).toHaveBeenCalledWith({ capture: false });
   });
 });

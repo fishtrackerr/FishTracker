@@ -1,6 +1,11 @@
 import { ChangeDetectorRef, Pipe, PipeTransform, effect, inject } from '@angular/core';
 import { I18nService } from '../../core/services/i18n.service';
 
+/**
+ * Translate pipe. Marked impure so language switches refresh without threading
+ * `language()` through every binding. The effect + `markForCheck` keeps OnPush
+ * hosts in sync when `I18nService` language/dictionary signals change.
+ */
 @Pipe({
   name: 'tr',
   standalone: true,
@@ -12,7 +17,6 @@ export class TranslatePipe implements PipeTransform {
 
   constructor() {
     effect(() => {
-      // Re-render templates when language or dictionary changes.
       this.i18n.language();
       this.i18n.dictionary();
       this.cdr.markForCheck();

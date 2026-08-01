@@ -12,7 +12,7 @@ import { Component, Input } from '@angular/core';
   styles: `
     .stat-card {
       background: #1a1a1a;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       padding: 16px;
       text-align: center;
       border: 1px solid #333;

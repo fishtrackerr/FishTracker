@@ -35,11 +35,12 @@ describe('ConfirmDialogComponent', () => {
     fixture.detectChanges();
 
     const root = fixture.nativeElement as HTMLElement;
-    const cancelButton = root.querySelector('button.cancel-btn');
-    const confirmButton = root.querySelector('button.confirm-btn');
+    const buttons = root.querySelectorAll('button');
+    const cancelButton = buttons[0];
+    const confirmButton = buttons[1];
 
-    expect(cancelButton).toBeTruthy();
-    expect(confirmButton).toBeTruthy();
+    expect(cancelButton?.classList.contains('mat-mdc-outlined-button')).toBe(true);
+    expect(confirmButton?.classList.contains('mat-mdc-unelevated-button')).toBe(true);
   });
 
   it('closes true when confirm is triggered', () => {

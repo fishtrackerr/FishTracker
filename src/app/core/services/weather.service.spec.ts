@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { WeatherService } from './weather.service';
-
-const CACHE_KEY = 'fish-tracker-weather-cache';
+import { WEATHER_CACHE_KEY } from '../constants/storage-keys';
+import { LakeGeocodingService } from './lake-geocoding.service';
+import { WeatherService, WEATHER_RETRY_DELAY_MS } from './weather.service';
 
 const openMeteoPayload = {
   current: {
@@ -29,19 +29,27 @@ const openMeteoPayload = {
 describe('WeatherService', () => {
   let service: WeatherService;
   let fetchMock: ReturnType<typeof vi.fn>;
+  let reverseLookup: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     localStorage.clear();
-    service = new WeatherService();
+    reverseLookup = vi.fn().mockResolvedValue({
+      status: 'success',
+      locationName: 'Amsterdam, North Holland',
+    });
+    const geocoding = { reverseLookup } as unknown as LakeGeocodingService;
+    service = new WeatherService(geocoding);
     fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
     Object.defineProperty(navigator, 'onLine', {
       configurable: true,
       get: () => true,
     });
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
     localStorage.clear();
   });
@@ -52,13 +60,16 @@ describe('WeatherService', () => {
       json: async () => openMeteoPayload,
     });
 
-    const snapshot = await service.getSnapshot(52.37, 4.89);
+    const snapshotPromise = service.getSnapshot(52.37, 4.89);
+    const snapshot = await snapshotPromise;
 
     expect(snapshot?.source).toBe('live');
     expect(snapshot?.isCached).toBe(false);
     expect(snapshot?.temperatureC).toBe(18.4);
     expect(snapshot?.description).toBe('Mainly clear');
     expect(snapshot?.windSpeedKmh).toBe(12.5);
+    expect(snapshot?.locationName).toBe('Amsterdam, North Holland');
+    expect(reverseLookup).toHaveBeenCalledWith(52.37, 4.89);
     expect(fetchMock).toHaveBeenCalledOnce();
 
     const url = String(fetchMock.mock.calls[0][0]);
@@ -69,7 +80,20 @@ describe('WeatherService', () => {
     expect((fetchMock.mock.calls[0][1] as RequestInit).signal).toBeInstanceOf(AbortSignal);
   });
 
-  it('stores cache keyed by coordinates', async () => {
+  it('omits locationName when reverse geocode fails', async () => {
+    reverseLookup.mockResolvedValue({ status: 'error' });
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => openMeteoPayload,
+    });
+
+    const snapshot = await service.getSnapshot(52.37, 4.89);
+
+    expect(snapshot?.temperatureC).toBe(18.4);
+    expect(snapshot?.locationName).toBeUndefined();
+  });
+
+  it('stores multi-slot cache keyed by coordinates', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => openMeteoPayload,
@@ -80,14 +104,43 @@ describe('WeatherService', () => {
     const nearby = service.getCachedSnapshotFor(52.38, 4.9);
     expect(nearby?.temperatureC).toBe(18.4);
     expect(nearby?.source).toBe('cached');
+    expect(nearby?.locationName).toBe('Amsterdam, North Holland');
 
     const farAway = service.getCachedSnapshotFor(48.85, 2.35);
     expect(farAway).toBeNull();
+
+    const raw = JSON.parse(localStorage.getItem(WEATHER_CACHE_KEY) ?? '{}') as {
+      version: number;
+      entries: unknown[];
+    };
+    expect(raw.version).toBe(2);
+    expect(raw.entries).toHaveLength(1);
+  });
+
+  it('keeps separate cache slots for distant lakes', async () => {
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => openMeteoPayload,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          ...openMeteoPayload,
+          current: { ...openMeteoPayload.current, temperature_2m: 11 },
+        }),
+      });
+
+    await service.getSnapshot(52.37, 4.89);
+    await service.getSnapshot(48.85, 2.35);
+
+    expect(service.getCachedSnapshotFor(52.37, 4.89)?.temperatureC).toBe(18.4);
+    expect(service.getCachedSnapshotFor(48.85, 2.35)?.temperatureC).toBe(11);
   });
 
   it('does not reuse legacy cache without coordinates for a location', () => {
     localStorage.setItem(
-      CACHE_KEY,
+      WEATHER_CACHE_KEY,
       JSON.stringify({
         description: 'Clear',
         temperatureC: 99,
@@ -109,17 +162,22 @@ describe('WeatherService', () => {
     expect(service.getCachedSnapshot()?.temperatureC).toBe(99);
   });
 
-  it('returns nearby cache when the network request fails', async () => {
+  it('retries once then returns nearby cache when the network request fails', async () => {
     fetchMock
       .mockResolvedValueOnce({
         ok: true,
         json: async () => openMeteoPayload,
       })
+      .mockResolvedValueOnce({ ok: false })
       .mockResolvedValueOnce({ ok: false });
 
     await service.getSnapshot(52.37, 4.89);
-    const fallback = await service.getSnapshot(52.37, 4.89);
 
+    const fallbackPromise = service.getSnapshot(52.37, 4.89);
+    await vi.advanceTimersByTimeAsync(WEATHER_RETRY_DELAY_MS);
+    const fallback = await fallbackPromise;
+
+    expect(fetchMock).toHaveBeenCalledTimes(3);
     expect(fallback?.source).toBe('cached');
     expect(fallback?.temperatureC).toBe(18.4);
   });
@@ -130,34 +188,42 @@ describe('WeatherService', () => {
       get: () => false,
     });
     localStorage.setItem(
-      CACHE_KEY,
+      WEATHER_CACHE_KEY,
       JSON.stringify({
-        latitude: 52.37,
-        longitude: 4.89,
-        cachedAt: '2026-08-01T12:00:00.000Z',
-        snapshot: {
-          description: 'Clear',
-          temperatureC: 20,
-          windSpeedKmh: 5,
-          windDirection: 90,
-          airPressureHpa: 1010,
-          humidity: 55,
-          cloudCoverage: 10,
-          rain: false,
-          sunrise: '',
-          sunset: '',
-          moonPhase: 'Waxing Crescent',
-          capturedAt: '2026-08-01T12:00:00.000Z',
-          source: 'live',
-        },
+        version: 2,
+        entries: [
+          {
+            latitude: 52.37,
+            longitude: 4.89,
+            cachedAt: '2026-08-01T12:00:00.000Z',
+            snapshot: {
+              description: 'Clear',
+              temperatureC: 20,
+              windSpeedKmh: 5,
+              windDirection: 90,
+              airPressureHpa: 1010,
+              humidity: 55,
+              cloudCoverage: 10,
+              rain: false,
+              sunrise: '',
+              sunset: '',
+              moonPhase: 'Waxing Crescent',
+              locationName: 'Amsterdam, North Holland',
+              capturedAt: '2026-08-01T12:00:00.000Z',
+              source: 'live',
+            },
+          },
+        ],
       }),
     );
 
     const snapshot = await service.getSnapshot(52.37, 4.89);
 
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(reverseLookup).not.toHaveBeenCalled();
     expect(snapshot?.source).toBe('cached');
     expect(snapshot?.temperatureC).toBe(20);
+    expect(snapshot?.locationName).toBe('Amsterdam, North Holland');
   });
 
   it('clearCache removes stored weather', async () => {

@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CatchFormComponent } from './catch-form.component';
 import { CatchService } from '../../core/services/catch.service';
 import { SessionService } from '../../core/services/session.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
 import type { FishingSession } from '../../core/models';
 
 function createParamMap(values: Record<string, string | undefined>) {
@@ -68,6 +69,7 @@ describe('CatchFormComponent', () => {
       ({ id: 'catch-1' } as Awaited<ReturnType<CatchService['create']>>),
   );
   const getById = vi.fn<SessionService['getById']>().mockResolvedValue(createSession());
+  const pickImage = vi.fn<PhotoPickService['pickImage']>();
 
   const routeStub = {
     snapshot: {
@@ -102,6 +104,12 @@ describe('CatchFormComponent', () => {
           provide: SessionService,
           useValue: {
             getById,
+          },
+        },
+        {
+          provide: PhotoPickService,
+          useValue: {
+            pickImage,
           },
         },
       ],
@@ -201,61 +209,33 @@ describe('CatchFormComponent', () => {
     expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1']);
   });
 
-  it('stores selected photo when user picks from camera', () => {
+  it('stores selected photo when user picks from camera', async () => {
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
     const file = new File(['image'], 'photo.jpg', { type: 'image/jpeg' });
-    const fakeInput = document.createElement('input');
-    Object.defineProperty(fakeInput, 'files', {
-      value: [file],
-      configurable: true,
-    });
-    const clickSpy = vi.spyOn(fakeInput, 'click').mockImplementation(() => undefined);
-    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(fakeInput);
+    pickImage.mockResolvedValue(file);
 
-    component.pickPhoto(true);
-    if (fakeInput.onchange) {
-      fakeInput.onchange(new Event('change'));
-    }
+    await component.pickPhoto(true);
 
-    expect(fakeInput.capture).toBe('environment');
-    expect(clickSpy).toHaveBeenCalled();
+    expect(pickImage).toHaveBeenCalledWith({ capture: true });
     expect(component.photo).toBe(file);
-    clickSpy.mockRestore();
-    createElementSpy.mockRestore();
   });
 
-  it('opens gallery picker without camera capture', () => {
+  it('opens gallery picker without camera capture', async () => {
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
-    const fakeInput = document.createElement('input');
-    const clickSpy = vi.spyOn(fakeInput, 'click').mockImplementation(() => undefined);
-    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(fakeInput);
+    pickImage.mockResolvedValue(null);
 
-    component.pickPhoto(false);
+    await component.pickPhoto(false);
 
-    expect(fakeInput.capture).toBe('');
-    expect(clickSpy).toHaveBeenCalled();
-    clickSpy.mockRestore();
-    createElementSpy.mockRestore();
+    expect(pickImage).toHaveBeenCalledWith({ capture: false });
   });
 
-  it('clears selected photo when no file is chosen', () => {
+  it('clears selected photo when no file is chosen', async () => {
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
-    const fakeInput = document.createElement('input');
-    Object.defineProperty(fakeInput, 'files', {
-      value: [],
-      configurable: true,
-    });
-    const clickSpy = vi.spyOn(fakeInput, 'click').mockImplementation(() => undefined);
-    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(fakeInput);
-
     component.photo = new File(['old'], 'old.jpg', { type: 'image/jpeg' });
-    component.pickPhoto(false);
-    if (fakeInput.onchange) {
-      fakeInput.onchange(new Event('change'));
-    }
+    pickImage.mockResolvedValue(null);
+
+    await component.pickPhoto(false);
 
     expect(component.photo).toBeUndefined();
-    clickSpy.mockRestore();
-    createElementSpy.mockRestore();
   });
 });

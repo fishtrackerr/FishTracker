@@ -28,7 +28,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     .logo {
       width: 84px;
       height: 84px;
-      border-radius: 20px;
+      border-radius: var(--radius-lg);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
     }
     .label {

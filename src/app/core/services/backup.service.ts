@@ -1,6 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { db } from '../db/fish-db';
-import { BackupData, StoredImage } from '../models';
+import {
+  BackupData,
+  BackupPreview,
+  BACKUP_EXPORT_VERSION,
+  StoredImage,
+  SUPPORTED_BACKUP_VERSIONS,
+} from '../models';
 import { blobToBase64, base64ToBlob, nowIso } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
@@ -8,6 +14,8 @@ import { ChatRepository } from './chat.repository';
 import { FishSpottedRepository } from './fish-spotted.repository';
 import { ImageRepository } from './image.repository';
 import { LakeRepository } from './lake.repository';
+import { ProfileDocumentRepository } from './profile-document.repository';
+import { ProfileRepository } from './profile.repository';
 import { RodSpotHistoryRepository } from './rod-spot-history.repository';
 import { SessionEventRepository } from './session-event.repository';
 import { SessionRepository } from './session.repository';
@@ -16,6 +24,9 @@ import { UserOptionRepository } from './user-option.repository';
 
 @Injectable({ providedIn: 'root' })
 export class BackupService {
+  private readonly profileRepo = inject(ProfileRepository);
+  private readonly profileDocumentRepo = inject(ProfileDocumentRepository);
+
   constructor(
     private readonly sessionRepo: SessionRepository,
     private readonly catchRepo: CatchRepository,
@@ -43,6 +54,8 @@ export class BackupService {
     const userOptions = await this.userOptionRepo.getAll();
     const chatThreads = await this.chatRepo.getAllThreads();
     const chatMessages = await this.chatRepo.getAllMessages();
+    const profile = await this.profileRepo.get();
+    const profileDocuments = await this.profileDocumentRepo.getAll();
 
     const backupImages = await Promise.all(
       images.map(async (img) => ({
@@ -60,7 +73,7 @@ export class BackupService {
     );
 
     return {
-      version: 5,
+      version: BACKUP_EXPORT_VERSION,
       exportedAt: nowIso(),
       sessions,
       catches,
@@ -74,13 +87,71 @@ export class BackupService {
       userOptions,
       chatThreads,
       chatMessages,
+      profiles: [profile],
+      profileDocuments,
     };
   }
 
-  async import(data: BackupData): Promise<void> {
-    if (!data.version || !data.sessions || !data.catches || !data.lakes) {
+  /**
+   * Validates structure/version and returns a preview. Throws on invalid backup.
+   * Does not write to the database.
+   */
+  validate(data: unknown): BackupPreview {
+    if (!data || typeof data !== 'object') {
       throw new Error('Invalid backup file');
     }
+    const backup = data as BackupData;
+    if (typeof backup.version !== 'number') {
+      throw new Error('Invalid backup file: missing version');
+    }
+    if (!(SUPPORTED_BACKUP_VERSIONS as readonly number[]).includes(backup.version)) {
+      throw new Error(
+        `Unsupported backup version ${backup.version}. Supported: ${SUPPORTED_BACKUP_VERSIONS.join(', ')}`,
+      );
+    }
+    if (!Array.isArray(backup.sessions) || !Array.isArray(backup.catches) || !Array.isArray(backup.lakes)) {
+      throw new Error('Invalid backup file: sessions, catches, and lakes must be arrays');
+    }
+    if (backup.images !== undefined && !Array.isArray(backup.images)) {
+      throw new Error('Invalid backup file: images must be an array');
+    }
+    for (const optional of [
+      'biteEvents',
+      'fishSpottedEvents',
+      'rodSpotHistory',
+      'sessionEvents',
+      'sessionWeather',
+      'userOptions',
+      'chatThreads',
+      'chatMessages',
+      'profiles',
+      'profileDocuments',
+    ] as const) {
+      const value = backup[optional];
+      if (value !== undefined && !Array.isArray(value)) {
+        throw new Error(`Invalid backup file: ${optional} must be an array`);
+      }
+    }
+    for (const session of backup.sessions) {
+      if (!session || typeof session !== 'object' || typeof (session as { id?: unknown }).id !== 'string') {
+        throw new Error('Invalid backup file: session entries must have an id');
+      }
+    }
+
+    return {
+      version: backup.version,
+      exportedAt: typeof backup.exportedAt === 'string' ? backup.exportedAt : undefined,
+      sessionCount: backup.sessions.length,
+      catchCount: backup.catches.length,
+      lakeCount: backup.lakes.length,
+      imageCount: backup.images?.length ?? 0,
+      profileCount: backup.profiles?.length ?? 0,
+      profileDocumentCount: backup.profileDocuments?.length ?? 0,
+    };
+  }
+
+  async import(data: BackupData): Promise<BackupPreview> {
+    const preview = this.validate(data);
 
     const activeSessions = data.sessions.filter((s) => s.status === 'active');
     if (activeSessions.length > 1) {
@@ -97,6 +168,8 @@ export class BackupService {
         db.catches,
         db.lakes,
         db.images,
+        db.profiles,
+        db.profileDocuments,
         db.biteEvents,
         db.fishSpottedEvents,
         db.rodSpotHistory,
@@ -111,6 +184,8 @@ export class BackupService {
         await this.catchRepo.clear();
         await this.lakeRepo.clear();
         await this.imageRepo.clear();
+        await db.profiles.clear();
+        await db.profileDocuments.clear();
         await this.biteEventRepo.clear();
         await this.fishSpottedRepo.clear();
         await this.rodSpotHistoryRepo.clear();
@@ -133,6 +208,9 @@ export class BackupService {
           await this.catchRepo.put(catchRecord);
         }
         for (const img of data.images ?? []) {
+          if (typeof img.data !== 'string' || typeof img.thumbnail !== 'string') {
+            throw new Error('Invalid backup file: image entries require data and thumbnail');
+          }
           await this.imageRepo.put({
             id: img.id,
             type: img.type as StoredImage['type'],
@@ -187,8 +265,20 @@ export class BackupService {
         for (const message of data.chatMessages ?? []) {
           await this.chatRepo.putMessage(message);
         }
+        for (const profile of data.profiles ?? []) {
+          if (profile && typeof profile.id === 'string') {
+            await this.profileRepo.put(profile);
+          }
+        }
+        for (const doc of data.profileDocuments ?? []) {
+          if (doc && typeof doc.id === 'string') {
+            await this.profileDocumentRepo.put(doc);
+          }
+        }
       },
     );
+
+    return preview;
   }
 
   downloadJson(data: BackupData): void {

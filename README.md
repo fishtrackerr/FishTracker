@@ -1,65 +1,43 @@
 # FishTracker
 
-Offline-first Angular PWA for logging fishing sessions, catches, and lake statistics.
+Offline-first Angular 21 PWA for logging fishing sessions, catches, lakes, gallery photos, and statistics. All data stays on the device (Dexie/IndexedDB). Deployed as a static site to GitHub Pages.
 
 ## Documentation
 
-Full project documentation: [docs/README.md](./docs/README.md)
+- Full docs index: [docs/README.md](./docs/README.md)
+- AI/repo rules: [AGENTS.md](./AGENTS.md)
 
-AI/repository rules: [AGENTS.md](./AGENTS.md)
-
-## Development server
-
-To start a local development server, run:
+## Quick start
 
 ```bash
-ng serve
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open `http://localhost:4200/`.
 
-## Code scaffolding
+## Scripts
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+| Command | Purpose |
+|---------|---------|
+| `npm start` | Dev server |
+| `npm test` | Unit tests (Vitest via `ng test`) |
+| `npm run build` / `build-prod` | Static production build (does **not** bump version) |
+| `npm run lint` | ESLint (TypeScript) |
+| `npm run icons` | Generate PWA PNG icons + favicon from the SVG logo |
+| `npm run deploy` | Bump version, icons, release notes, prod build, gh-pages |
 
-```bash
-ng generate component component-name
-```
+## Architecture (short)
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- Standalone Angular components, zoneless change detection, Material UI
+- Repositories + services over Dexie; no backend
+- Optional online AI chat (allowlisted providers) and Open-Meteo weather
+- Client PIN lock (shoulder-surfing protection; data is not encrypted at rest)
 
-```bash
-ng generate --help
-```
+## Testing
 
-## Building
+See [docs/testing.md](./docs/testing.md). CI runs install → lint → test → build on pull requests (`.github/workflows/ci.yml`).
 
-To build the project run:
+## Deploy
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Static build (`outputMode: static`) with `--base-href=/FishTracker/`. SSR/Express scaffolding was removed; the app is client-only.

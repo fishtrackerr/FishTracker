@@ -27,8 +27,8 @@ export interface ConfirmDialogData {
       <p>{{ data.message ?? ('confirm.cannotUndo' | tr) }}</p>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-stroked-button mat-dialog-close type="button" class="cancel-btn">{{ 'confirm.cancel' | tr }}</button>
-      <button mat-flat-button type="button" class="confirm-btn" (click)="confirm()">
+      <button mat-stroked-button mat-dialog-close type="button">{{ 'confirm.cancel' | tr }}</button>
+      <button mat-flat-button type="button" (click)="confirm()">
         {{ data.confirmLabel ?? ('confirm.delete' | tr) }}
       </button>
     </mat-dialog-actions>
@@ -45,14 +45,6 @@ export interface ConfirmDialogData {
     }
     mat-dialog-content {
       color: var(--primary);
-    }
-    .cancel-btn {
-      border-color: var(--border-active) !important;
-      color: var(--primary) !important;
-    }
-    .confirm-btn {
-      background: var(--primary) !important;
-      color: var(--text-on-primary) !important;
     }
   `,
 })

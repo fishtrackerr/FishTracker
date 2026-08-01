@@ -8,7 +8,9 @@
 
 ## Session creation
 
-`SessionCreateDialogComponent` collects name, start datetime, optional lake. `SessionService.start()`:
+Dashboard and sessions list start sessions via `SessionStartFlowService` (shared dialog + create + navigate).
+`SessionCreateDialogComponent` collects name, start datetime, optional lake. Default names are i18n keys
+(`sessions.defaultName` / `sessions.defaultNameAtLake`). `SessionService.start()`:
 
 - Reuses existing active session if one exists
 - Captures GPS/weather/cover optionally; initial weather is stored as latest on the session and as the first `sessionWeather` history row
@@ -20,8 +22,6 @@ After creating a brand-new session (no previously active session), the app promp
 ## Session editing
 
 Edit via `/sessions/:id/edit` (`SessionEditComponent`): name, lake, session spots, rod count, dates, status, GPS, weather refresh, notes, prebait, tags.
-
-`SessionEditDialogComponent` is deprecated; list/detail navigate to the edit route.
 
 Legacy sessions without rods show a setup prompt on active session detail.
 

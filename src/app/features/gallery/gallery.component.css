@@ -22,7 +22,7 @@
   position: relative;
   cursor: pointer;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 .grid-item img {
   width: 100%;

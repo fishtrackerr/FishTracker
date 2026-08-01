@@ -55,7 +55,7 @@ export interface LegacyRodSetupData {
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close type="button">{{ 'rodSetup.skipForNow' | tr }}</button>
+      <button mat-stroked-button mat-dialog-close type="button">{{ 'rodSetup.skipForNow' | tr }}</button>
       <button mat-flat-button type="button" (click)="save()">{{ 'rodSetup.setUp' | tr }}</button>
     </mat-dialog-actions>
   `,
@@ -68,10 +68,6 @@ export interface LegacyRodSetupData {
     .dialog-title { text-align: center; width: 100%; }
     .full { width: 100%; }
     mat-dialog-content { color: var(--text-primary); }
-    button[mat-flat-button] {
-      background: var(--primary) !important;
-      color: var(--text-on-primary) !important;
-    }
   `,
 })
 export class LegacyRodSetupDialogComponent implements OnInit {

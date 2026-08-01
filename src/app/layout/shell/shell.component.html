@@ -1,37 +1,97 @@
 <div class="shell">
+  @if (showOfflineBanner()) {
+    <div class="offline-banner" role="status">
+      <mat-icon class="offline-banner-icon" aria-hidden="true">cloud_off</mat-icon>
+      <span class="offline-banner-text">{{ 'connectivity.offlineBanner' | tr }}</span>
+      <button
+        type="button"
+        class="offline-banner-dismiss"
+        (click)="dismissOfflineBanner()"
+        [attr.aria-label]="'connectivity.dismissBanner' | tr"
+      >
+        <mat-icon aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+  }
   <main #content class="content" tabindex="-1">
     <router-outlet />
   </main>
-  <nav class="bottom-nav" [class.with-current]="!!activeSession()">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+  <nav class="bottom-nav" [class.with-current]="!!activeSession()" aria-label="Main">
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [attr.aria-current]="router.url === '/' || router.url.startsWith('/?') ? 'page' : null"
+    >
       <mat-icon>home</mat-icon>
       <span>{{ 'nav.home' | tr }}</span>
     </a>
     @if (activeSession()) {
-      <a routerLink="/sessions/active" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <a
+        routerLink="/sessions/active"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [attr.aria-current]="router.url.startsWith('/sessions/active') ? 'page' : null"
+      >
         <mat-icon>play_circle</mat-icon>
         <span>{{ 'nav.current' | tr }}</span>
       </a>
+      <a
+        routerLink="/assistant"
+        routerLinkActive="active"
+        [attr.aria-current]="router.url.startsWith('/assistant') ? 'page' : null"
+      >
+        <mat-icon>smart_toy</mat-icon>
+        <span>{{ 'nav.assistant' | tr }}</span>
+      </a>
     }
-    <a routerLink="/sessions" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+    <a
+      routerLink="/sessions"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [attr.aria-current]="router.url === '/sessions' || router.url.startsWith('/sessions?') ? 'page' : null"
+    >
       <mat-icon>event</mat-icon>
       <span>{{ 'nav.sessions' | tr }}</span>
     </a>
-    <a routerLink="/lakes" routerLinkActive="active">
+    <a
+      routerLink="/lakes"
+      routerLinkActive="active"
+      [attr.aria-current]="router.url.startsWith('/lakes') ? 'page' : null"
+    >
       <mat-icon>water</mat-icon>
       <span>{{ 'nav.lakes' | tr }}</span>
     </a>
-    <a routerLink="/gallery" routerLinkActive="active">
-      <mat-icon>photo_library</mat-icon>
-      <span>{{ 'nav.gallery' | tr }}</span>
-    </a>
-    <a routerLink="/statistics" routerLinkActive="active">
-      <mat-icon>bar_chart</mat-icon>
-      <span>{{ 'nav.stats' | tr }}</span>
-    </a>
-    <a routerLink="/settings" routerLinkActive="active">
-      <mat-icon>settings</mat-icon>
-      <span>{{ 'nav.settings' | tr }}</span>
-    </a>
+    <button
+      type="button"
+      class="more-trigger"
+      [class.active]="isMoreRouteActive()"
+      [matMenuTriggerFor]="moreMenu"
+      [attr.aria-label]="'nav.more' | tr"
+      [attr.aria-current]="isMoreRouteActive() ? 'page' : null"
+    >
+      <mat-icon>more_horiz</mat-icon>
+      <span>{{ 'nav.more' | tr }}</span>
+    </button>
+    <mat-menu #moreMenu="matMenu" class="more-nav-menu">
+      @if (!activeSession()) {
+        <a mat-menu-item routerLink="/assistant">
+          <mat-icon>smart_toy</mat-icon>
+          <span>{{ 'nav.assistant' | tr }}</span>
+        </a>
+      }
+      <a mat-menu-item routerLink="/gallery">
+        <mat-icon>photo_library</mat-icon>
+        <span>{{ 'nav.gallery' | tr }}</span>
+      </a>
+      <a mat-menu-item routerLink="/statistics">
+        <mat-icon>bar_chart</mat-icon>
+        <span>{{ 'nav.stats' | tr }}</span>
+      </a>
+      <a mat-menu-item routerLink="/settings">
+        <mat-icon>settings</mat-icon>
+        <span>{{ 'nav.settings' | tr }}</span>
+      </a>
+    </mat-menu>
   </nav>
 </div>

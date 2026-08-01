@@ -100,16 +100,6 @@ a {
   cursor: not-allowed;
 }
 
-.snack-success {
-  --mdc-snackbar-container-color: var(--success);
-  --mdc-snackbar-supporting-text-color: #fff;
-}
-
-.snack-error {
-  --mdc-snackbar-container-color: var(--danger);
-  --mdc-snackbar-supporting-text-color: #fff;
-}
-
 .cdk-overlay-container .mat-mdc-snack-bar-container {
   margin-bottom: calc(72px + env(safe-area-inset-bottom));
 }
@@ -119,8 +109,9 @@ a {
   border: 1px solid var(--border-active);
 }
 
+.app-snackbar.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface,
 .app-snackbar .mdc-snackbar__surface {
-  background: var(--snackbar-bg, var(--background-card));
+  background-color: var(--snackbar-bg, var(--background-card));
   color: var(--snackbar-text, var(--text-primary));
 }
 

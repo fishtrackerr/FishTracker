@@ -17,14 +17,30 @@
 }
 
 .mat-mdc-input-element,
-.mat-mdc-select-value-text,
 textarea.mat-mdc-input-element {
   padding-inline: 12px !important;
+}
+
+.mat-mdc-select {
+  --mat-select-enabled-arrow-color: var(--text-secondary);
+  --mat-select-focused-arrow-color: var(--border-active);
+  --mat-select-disabled-arrow-color: var(--text-muted);
 }
 
 .mat-mdc-select-value,
 .mat-mdc-input-element {
   color: var(--text-primary) !important;
+}
+
+.mat-mdc-select-value,
+.mat-mdc-select-value-text {
+  padding-inline-start: 12px !important;
+  padding-inline-end: 8px !important;
+}
+
+/* Material's caret SVG overflows a 10x5 box; inset the wrapper so it clears the outline */
+.mat-mdc-select-arrow-wrapper {
+  padding-inline-end: 16px;
 }
 
 .mat-mdc-form-field-subscript-wrapper {
@@ -40,12 +56,18 @@ textarea.mat-mdc-input-element {
   background: color-mix(in srgb, var(--primary) 12%, var(--background-card)) !important;
 }
 
+.mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.mat-mdc-option.mat-mdc-option-active {
+  background: color-mix(in srgb, var(--primary) 8%, var(--background-card)) !important;
+}
+
 .mat-mdc-select-panel,
 .theme-dark-select-panel,
 .theme-light-select-panel {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
   border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
 }
 
 .cdk-overlay-container[data-theme='dark'] .mat-mdc-select-panel,
@@ -61,22 +83,27 @@ textarea.mat-mdc-input-element {
 .mat-mdc-autocomplete-panel {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
 }
 
 .mat-datepicker-content {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
+  border-radius: var(--radius-md);
 }
 
 .mat-mdc-menu-panel {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
+  border-radius: var(--radius-md);
 }
 
 .mat-bottom-sheet-container,
 .themed-bottom-sheet {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 .mat-mdc-checkbox {
@@ -126,6 +153,10 @@ textarea.mat-mdc-input-element {
 }
 
 .mat-mdc-dialog-container .mat-mdc-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
   background: var(--background-card);
   border-top: 1px solid var(--border-primary);
   padding-top: var(--spacing-sm);
@@ -189,6 +220,17 @@ textarea.mat-mdc-input-element {
 }
 
 .mat-mdc-button,
+.mat-mdc-outlined-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-raised-button,
+.mat-mdc-flat-button {
+  --mdc-text-button-container-shape: var(--radius-sm);
+  --mdc-outlined-button-container-shape: var(--radius-sm);
+  --mdc-filled-button-container-shape: var(--radius-sm);
+  --mdc-protected-button-container-shape: var(--radius-sm);
+}
+
+.mat-mdc-button,
 .mat-mdc-outlined-button {
   --mdc-outlined-button-label-text-color: var(--primary);
   --mdc-outlined-button-outline-color: var(--primary);
@@ -207,6 +249,11 @@ textarea.mat-mdc-input-element {
   --mdc-filled-button-label-text-color: #fff;
 }
 
+.mat-mdc-fab,
+.mat-mdc-mini-fab {
+  --mdc-fab-container-shape: var(--radius-sm);
+}
+
 .mat-mdc-tab-group,
 .mat-mdc-tab {
   --mat-tab-header-active-label-text-color: var(--primary);
@@ -215,11 +262,13 @@ textarea.mat-mdc-input-element {
 }
 
 .mat-mdc-snack-bar-container {
-  --mdc-snackbar-container-color: var(--background-card);
-  --mdc-snackbar-supporting-text-color: var(--text-primary);
+  --mat-snack-bar-container-color: var(--snackbar-bg, var(--background-card));
+  --mat-snack-bar-supporting-text-color: var(--snackbar-text, var(--text-primary));
+  --mat-snack-bar-button-color: var(--snackbar-action, var(--primary));
 }
 
 .mat-mdc-chip.mat-mdc-standard-chip {
+  --mdc-chip-container-shape-radius: var(--radius-sm);
   --mdc-chip-elevated-container-color: var(--background-secondary);
   --mdc-chip-label-text-color: var(--text-secondary);
 }

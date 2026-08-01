@@ -12,6 +12,7 @@
 ## UI
 
 - Use shared UI components and design tokens
+- Prefer `SessionStartFlowService` for starting sessions and `PhotoPickService` for image file inputs
 - Follow active theme; never hardcode default blue in dark mode
 - All dialogs via `DialogService`; overlays must be themed
 - All delete actions require confirmation

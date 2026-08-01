@@ -32,7 +32,7 @@
   }
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close type="button">{{ 'common.cancel' | tr }}</button>
+  <button mat-stroked-button mat-dialog-close type="button">{{ 'common.cancel' | tr }}</button>
   <button mat-flat-button type="button" [disabled]="!rodId" (click)="confirm()">
     {{ 'rod.recastConfirm' | tr }}
   </button>

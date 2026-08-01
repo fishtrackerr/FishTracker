@@ -49,7 +49,17 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
           <div class="header-main">
             <div class="title-row">
               <h3 class="name">{{ session.name }}</h3>
-              <span class="badge" [class]="session.status">{{ ('sessionStatus.' + session.status) | tr }}</span>
+              <div class="badges">
+                @if (session.catchCount > 0) {
+                  <span
+                    class="badge catches"
+                    [attr.aria-label]="('sessionCard.catchesBadge' | tr: { count: session.catchCount })"
+                  >
+                    🐟 {{ session.catchCount }}
+                  </span>
+                }
+                <span class="badge" [class]="session.status">{{ ('sessionStatus.' + session.status) | tr }}</span>
+              </div>
             </div>
             @if (lakeName) {
               <p class="row lake">🌊 {{ lakeName }}</p>
@@ -165,6 +175,13 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       min-width: 0;
       word-break: break-word;
     }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--spacing-xs);
+      flex-shrink: 0;
+    }
     .badge {
       text-transform: capitalize;
       padding: 2px 10px;
@@ -179,6 +196,11 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     }
     .badge.completed { background: color-mix(in srgb, var(--success, #22c55e) 15%, transparent); color: var(--success, #22c55e); }
     .badge.planned { background: color-mix(in srgb, var(--info, #3b82f6) 15%, transparent); color: var(--info, #3b82f6); }
+    .badge.catches {
+      text-transform: none;
+      background: color-mix(in srgb, var(--success, #22c55e) 15%, transparent);
+      color: var(--success, #22c55e);
+    }
     .row {
       margin: 0;
       font-size: 0.9rem;

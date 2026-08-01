@@ -35,6 +35,16 @@
         "timeout": "10s",
         "strategy": "freshness"
       }
+    },
+    {
+      "name": "nominatim",
+      "urls": ["https://nominatim.openstreetmap.org/**"],
+      "cacheConfig": {
+        "maxSize": 30,
+        "maxAge": "7d",
+        "timeout": "8s",
+        "strategy": "freshness"
+      }
     }
   ]
 }

@@ -13,11 +13,13 @@ PBKDF2-SHA256, 100,000 iterations, 256-bit derived key, random 16-byte salt.
 `AppLockState` persisted in localStorage:
 
 - `isLocked`, `unlockedAt`, `lastActivityAt`
-- Restored on app load; expired sessions auto-lock based on `lockTimeoutMinutes`
+- A separate `fish-tracker-unlock-session` flag in **sessionStorage** proves a successful PIN unlock in this browser tab
+- Cold start (no unlock session) always requires PIN — localStorage `isLocked: false` alone is not trusted
+- Expired sessions auto-lock based on `lockTimeoutMinutes`
 
 ## Auto-lock
 
-Inactivity checked every 30 seconds. Activity tracked on pointer and keyboard events. Tab visibility change updates activity before checking timeout.
+Inactivity checked every 30 seconds. Activity tracked on pointer and keyboard events. On tab visibility → visible, inactivity is checked **before** refreshing activity so backgrounded tabs still lock.
 
 ## Route guard behavior
 
@@ -34,9 +36,10 @@ Guards await startup initialization before evaluating lock state. Return URL sto
 
 ## Security limitations
 
-- Client-side PIN only; suitable for casual device privacy, not high-security scenarios
-- No server authentication
+- Client-side PIN only; suitable for casual shoulder-surfing privacy, **not** high-security scenarios
+- IndexedDB fishing data is **not encrypted**; device/DevTools access can read catches, GPS, and photos without the PIN
 - PIN hash in localStorage — device access implies offline attack surface
+- In-app copy on PIN setup and Settings explains these limits
 
 ## Development logging
 

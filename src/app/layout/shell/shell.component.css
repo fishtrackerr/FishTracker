@@ -6,6 +6,60 @@
   color: var(--text-primary);
 }
 
+.offline-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  flex-shrink: 0;
+  padding: 8px 12px;
+  padding-top: calc(8px + env(safe-area-inset-top));
+  background: color-mix(in srgb, var(--warning) 22%, var(--background-secondary));
+  border-bottom: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  z-index: 110;
+}
+
+.offline-banner-icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--warning);
+}
+
+.offline-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.offline-banner-dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.offline-banner-dismiss mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.offline-banner-dismiss:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+}
+
 .content {
   flex: 1;
   overflow-y: auto;
@@ -33,7 +87,8 @@
   z-index: 100;
 }
 
-.bottom-nav a {
+.bottom-nav a,
+.bottom-nav .more-trigger {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -45,9 +100,14 @@
   min-height: 48px;
   justify-content: center;
   padding: 4px 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
-.bottom-nav a.active {
+.bottom-nav a.active,
+.bottom-nav .more-trigger.active {
   color: var(--primary);
 }
 
@@ -57,14 +117,16 @@
   height: 22px;
 }
 
-.bottom-nav.with-current a {
+.bottom-nav.with-current a,
+.bottom-nav.with-current .more-trigger {
   min-width: 40px;
   padding: 4px 4px;
   font-size: 0.6rem;
 }
 
 @media (min-width: 769px) {
-  .bottom-nav.with-current a {
+  .bottom-nav.with-current a,
+  .bottom-nav.with-current .more-trigger {
     min-width: 48px;
     padding: 4px 8px;
     font-size: 0.65rem;

@@ -22,6 +22,11 @@
     "loading": "Loading...",
     "errorGeneric": "Something went wrong"
   },
+  "connectivity": {
+    "offlineBanner": "You're offline — catches and sessions still work",
+    "dismissBanner": "Dismiss offline notice",
+    "mapsOffline": "Maps needs a connection. Your coordinates are still saved in the app."
+  },
   "dashboard": {
     "startSession": "Start Fishing Session",
     "starting": "Starting...",
@@ -78,13 +83,19 @@
     "deleteCachedWeather": "Delete cached weather",
     "assistant": "Ask your data",
     "assistantHint": "Insight prompts work offline. Optional online AI uses your API key and a summary of your fishing data only (no photos).",
+    "assistantPrivacyWarning": "Enabling online AI sends a summary of your lakes, sessions, species, and baits to the configured provider. Do not enable on a shared or untrusted device.",
     "enableAiChat": "Enable online AI chat",
     "aiApiKey": "API key",
     "aiBaseUrl": "API base URL",
+    "aiBaseUrlHint": "Allowed hosts: api.openai.com, openrouter.ai (HTTPS only)",
     "aiModel": "Model",
     "clearAiKey": "Clear API key",
     "openAssistant": "Open assistant",
     "aiKeyCleared": "API key cleared",
+    "pinPrivacyHint": "PIN protects against casual shoulder-surfing on this device. Fishing data in the browser is not encrypted and can still be read with device access.",
+    "importConfirmTitle": "Import backup?",
+    "importConfirmMessage": "This will replace all local data. This action cannot be undone. Backups contain GPS and catch history in cleartext JSON.",
+    "importPreview": "Sessions: {{sessions}}, catches: {{catches}}, lakes: {{lakes}}, images: {{images}}",
     "gallery": "Gallery",
     "defaultSorting": "Default sorting",
     "newest": "Newest",
@@ -172,7 +183,8 @@
     "setHomepage": "Set as homepage",
     "deleteImage": "Delete image",
     "homepageUpdated": "Homepage image updated",
-    "imageDeleted": "Image deleted"
+    "imageDeleted": "Image deleted",
+    "loadError": "Could not load gallery. Please try again."
   },
   "confirm": {
     "deleteItem": "Are you sure you want to delete \"{{item}}\"?",
@@ -199,7 +211,9 @@
     "lakes": "Lakes",
     "gallery": "Gallery",
     "stats": "Stats",
-    "settings": "Settings"
+    "settings": "Settings",
+    "more": "More",
+    "assistant": "Assistant"
   },
   "activeSession": {
     "catches": "catches",
@@ -232,6 +246,8 @@
     "sessionCount": "session(s)",
     "starting": "Starting...",
     "startSession": "Start Session",
+    "defaultName": "Fishing Session",
+    "defaultNameAtLake": "Session at {{lake}}",
     "emptyTitle": "No sessions yet",
     "emptyMessage": "Start your first fishing session to begin tracking.",
     "sessionStarted": "Session started",
@@ -422,6 +438,7 @@
   },
   "statistics": {
     "title": "Statistics",
+    "loadError": "Could not load statistics. Please try again.",
     "general": "General",
     "totalSessions": "Total Sessions",
     "active": "Active",
@@ -546,6 +563,7 @@
     "start": "Start:",
     "duration": "Duration:",
     "catches": "Catches:",
+    "catchesBadge": "{{count}} catches",
     "biggest": "Biggest:",
     "total": "Total:",
     "moreInformation": "More information",
@@ -585,7 +603,8 @@
     "incorrectPin": "Incorrect PIN",
     "appVersion": "App version",
     "checkForUpdates": "Check for updates",
-    "checkingForUpdates": "Checking for updates..."
+    "checkingForUpdates": "Checking for updates...",
+    "privacyHint": "This PIN is a casual screen lock only. Data stored in this browser is not encrypted."
   },
   "releaseNotes": {
     "title": "Changelog",

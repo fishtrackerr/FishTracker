@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,11 +36,13 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { I18nService } from '../../core/services/i18n.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
 import { WeatherWarning } from '../../core/models';
 
 @Component({
   selector: 'app-active-session',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DatePipe,
     RouterLink,
@@ -73,6 +75,7 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
   private readonly imageRepo = inject(ImageRepository);
   private readonly imageService = inject(ImageService);
   private readonly i18n = inject(I18nService);
+  private readonly photoPick = inject(PhotoPickService);
 
   readonly session = toSignal(
     this.route.paramMap.pipe(
@@ -216,20 +219,11 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
   async addSessionPhoto(useCamera: boolean): Promise<void> {
     const s = this.session();
     if (!s) return;
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    if (useCamera) {
-      input.capture = 'environment';
+    const file = await this.photoPick.pickImage({ capture: useCamera });
+    if (file) {
+      await this.sessionService.addSessionPhoto(s.id, file);
+      await this.loadSessionImages();
     }
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (file) {
-        await this.sessionService.addSessionPhoto(s.id, file);
-        await this.loadSessionImages();
-      }
-    };
-    input.click();
   }
 
   async openDetails(): Promise<void> {

@@ -24,7 +24,7 @@
 .spot-card {
   padding: 12px;
   background: var(--background-card);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   margin-bottom: 8px;
   border: 1px solid var(--border-primary);
 }
@@ -32,7 +32,7 @@
 .spot-edit {
   padding: 16px;
   background: var(--background-secondary);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   margin: 16px 0;
   border: 1px solid var(--border-active);
 }

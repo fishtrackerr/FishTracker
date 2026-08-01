@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +10,7 @@ import { ProfileService } from '../../core/services/profile.service';
 import { LakeService } from '../../core/services/lake.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
 import { UserProfile } from '../../core/models';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { ImageThumbComponent } from '../../shared/components/image-thumb/image-thumb.component';
@@ -19,6 +20,7 @@ import { I18nService } from '../../core/services/i18n.service';
 @Component({
   selector: 'app-profile',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     MatButtonModule,
@@ -39,6 +41,7 @@ export class ProfileComponent {
   private readonly settings = inject(SettingsService);
   private readonly notifications = inject(NotificationService);
   private readonly i18n = inject(I18nService);
+  private readonly photoPick = inject(PhotoPickService);
 
   readonly profile = toSignal(this.profileService.watch(), { initialValue: undefined });
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
@@ -96,18 +99,11 @@ export class ProfileComponent {
     this.notifications.success(this.i18n.t('profile.pictureRemoved'));
   }
 
-  pickProfilePicture(): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = () => {
-      const file = input.files?.[0];
-      if (file) {
-        void this.profileService.uploadProfilePicture(file).then(() => {
-          this.notifications.success(this.i18n.t('profile.pictureUpdated'));
-        });
-      }
-    };
-    input.click();
+  async pickProfilePicture(): Promise<void> {
+    const file = await this.photoPick.pickImage();
+    if (file) {
+      await this.profileService.uploadProfilePicture(file);
+      this.notifications.success(this.i18n.t('profile.pictureUpdated'));
+    }
   }
 }

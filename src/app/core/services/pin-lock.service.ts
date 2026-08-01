@@ -2,7 +2,7 @@ import { Injectable, inject, signal, isDevMode } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppLockState, DEFAULT_LOCK_STATE } from '../models/app-lock-state.model';
 import { SettingsService } from './settings.service';
-import { LOCK_STATE_KEY } from '../constants/storage-keys';
+import { LOCK_STATE_KEY, UNLOCK_SESSION_KEY } from '../constants/storage-keys';
 import { persistReturnUrl } from '../utils/return-url';
 
 @Injectable({ providedIn: 'root' })
@@ -28,23 +28,41 @@ export class PinLockService {
     }
 
     this.lockState = this.loadLockState();
+    const hasUnlockSession = this.hasUnlockSession();
     const timeoutMs = this.settings.get().lockTimeoutMinutes * 60 * 1000;
     const lastActivity = this.lockState.lastActivityAt
       ? new Date(this.lockState.lastActivityAt).getTime()
       : 0;
 
-    if (!this.lockState.isLocked && lastActivity > 0) {
+    // Cold start or no verified unlock session → always lock (do not trust localStorage isLocked alone).
+    if (!hasUnlockSession) {
+      this.lockState.isLocked = true;
+      this.persistLockState();
+      this.lockedSignal.set(true);
+      if (isDevMode()) {
+        console.debug('[PinLock] locked on cold start (no unlock session)');
+      }
+      return;
+    }
+
+    if (lastActivity > 0) {
       const elapsed = Date.now() - lastActivity;
       if (elapsed > timeoutMs) {
         this.lockState.isLocked = true;
+        this.clearUnlockSession();
         this.persistLockState();
+        this.lockedSignal.set(true);
         if (isDevMode()) {
           console.debug('[PinLock] Session expired due to inactivity');
         }
+        return;
       }
     }
 
     this.lockedSignal.set(this.lockState.isLocked);
+    if (this.lockState.isLocked) {
+      this.clearUnlockSession();
+    }
     if (isDevMode()) {
       console.debug('[PinLock] initialized from storage', { isLocked: this.lockState.isLocked });
     }
@@ -73,6 +91,7 @@ export class PinLockService {
       unlockedAt: new Date().toISOString(),
       lastActivityAt: new Date().toISOString(),
     };
+    this.setUnlockSession();
     this.persistLockState();
     if (isDevMode()) {
       console.debug('[PinLock] unlocked');
@@ -88,6 +107,7 @@ export class PinLockService {
       ...this.lockState,
       isLocked: true,
     };
+    this.clearUnlockSession();
     this.persistLockState();
     if (isDevMode()) {
       console.debug('[PinLock] locked');
@@ -176,10 +196,37 @@ export class PinLockService {
     setInterval(() => this.checkInactivity(), 30000);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        this.touchActivity();
+        // Check timeout before refreshing activity so backgrounded tabs still lock.
         this.checkInactivity();
+        if (!this.lockedSignal()) {
+          this.touchActivity();
+        }
       }
     });
+  }
+
+  private hasUnlockSession(): boolean {
+    try {
+      return sessionStorage.getItem(UNLOCK_SESSION_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  private setUnlockSession(): void {
+    try {
+      sessionStorage.setItem(UNLOCK_SESSION_KEY, '1');
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }
+
+  private clearUnlockSession(): void {
+    try {
+      sessionStorage.removeItem(UNLOCK_SESSION_KEY);
+    } catch {
+      /* ignore */
+    }
   }
 
   private loadLockState(): AppLockState {

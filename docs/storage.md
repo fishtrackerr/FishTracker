@@ -42,6 +42,8 @@ Migrations run in `.upgrade()` handlers; always add migrations for schema change
 | `fish-tracker-lock-state` | AppLockState |
 | `fish-tracker-return-url` | sessionStorage — post-unlock navigation |
 | `fish-tracker-filter-presets` | Saved filter presets |
+| `fish-tracker-weather-cache` | Multi-slot Open-Meteo weather snapshots (up to 8 locations) |
+| `fish-tracker-geocode-cache` | Nominatim forward/reverse lookup cache (up to 50 entries) |
 
 ## Transactions
 
@@ -53,7 +55,7 @@ Binary blobs in `images` store with thumbnails. See [images.md](./images.md).
 
 ## Cache strategy
 
-Weather snapshots cached by coordinates in `WeatherService`. Homepage image flag on `StoredImage`.
+Weather snapshots cached by coordinates in `WeatherService` (multi-slot). Geocode results cached in `LakeGeocodingService`. Homepage image flag on `StoredImage`.
 
 ## Error handling
 
