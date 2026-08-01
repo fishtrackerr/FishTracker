@@ -19,6 +19,7 @@
     "import": "Import",
     "reset": "Reset",
     "retry": "Try again",
+    "loading": "Loading...",
     "errorGeneric": "Something went wrong"
   },
   "dashboard": {
@@ -35,7 +36,9 @@
     "loadError": "Could not load dashboard data. Please try again.",
     "startFailed": "Could not start session. Please try again.",
     "sessionStarted": "Session started",
-    "createFailed": "Failed to create session. Please try again."
+    "createFailed": "Failed to create session. Please try again.",
+    "selectLake": "Select Lake",
+    "start": "Start"
   },
   "settings": {
     "appearance": "Appearance",
@@ -73,6 +76,15 @@
     "showWarnings": "Show weather warnings",
     "refreshMinutes": "Refresh interval (minutes)",
     "deleteCachedWeather": "Delete cached weather",
+    "assistant": "Ask your data",
+    "assistantHint": "Insight prompts work offline. Optional online AI uses your API key and a summary of your fishing data only (no photos).",
+    "enableAiChat": "Enable online AI chat",
+    "aiApiKey": "API key",
+    "aiBaseUrl": "API base URL",
+    "aiModel": "Model",
+    "clearAiKey": "Clear API key",
+    "openAssistant": "Open assistant",
+    "aiKeyCleared": "API key cleared",
     "gallery": "Gallery",
     "defaultSorting": "Default sorting",
     "newest": "Newest",
@@ -118,8 +130,8 @@
     "releaseNotes": "Release Notes",
     "changelog": "Changelog",
     "changelogDesc": "Review release history generated from commit messages.",
-    "openChangelog": "Open changelog"
-    ,"homepageImageCleared": "Homepage image cleared",
+    "openChangelog": "Open changelog",
+    "homepageImageCleared": "Homepage image cleared",
     "resetAllCustomTitle": "Reset all custom options?",
     "resetAllCustomMessage": "All custom dropdown options will be removed. Favorites are kept where possible.",
     "resetAllCustomConfirm": "Reset all",
@@ -196,7 +208,9 @@
     "viewSessionDetails": "View session details",
     "refreshWeatherGps": "Refresh weather & GPS",
     "addCatch": "Add Catch",
+    "recast": "Recast",
     "camera": "Camera",
+    "photos": "Session photos",
     "endSession": "End Session",
     "endSessionConfirm": "End this fishing session?",
     "sessionEnded": "Session ended",
@@ -235,6 +249,7 @@
     "bites": "bites",
     "spotted": "spotted",
     "catches": "Catches",
+    "images": "Session Images",
     "addCatch": "Add Catch",
     "pr": "PR",
     "editSession": "Edit Session",
@@ -244,6 +259,9 @@
     "backToSessions": "Back to sessions",
     "deleteSessionQuestion": "Delete session?",
     "sessionDeleted": "Session deleted"
+  },
+  "weatherHistory": {
+    "title": "Weather history"
   },
   "sessionEdit": {
     "title": "Edit Session",
@@ -274,7 +292,10 @@
     "reduceRodCountMessage": "Some rods have bites, spotted fish, or catches. Reducing the count will remove those rods but keep their activity data.",
     "reduceAnyway": "Reduce anyway",
     "updateFailed": "Failed to update session",
-    "weatherRefreshed": "Weather refreshed"
+    "weatherRefreshed": "Weather refreshed",
+    "nameRequired": "Session name is required",
+    "lakeOptional": "Lake (optional)",
+    "defaultName": "Fishing Session"
   },
   "catchForm": {
     "title": "Add Catch",
@@ -317,6 +338,7 @@
     "cover": "cover",
     "description": "Description",
     "address": "Address",
+    "country": "Country",
     "lookupCoordinates": "Find coordinates from address",
     "lookupLoading": "Looking up coordinates...",
     "lookupNeedsAddress": "Enter a lake name or address first.",
@@ -451,6 +473,12 @@
     "rodName": "Rod name",
     "saveRod": "Save rod",
     "editRod": "Edit rod",
+    "recast": "Recast",
+    "recastHint": "Update this rod's spot and record a new cast.",
+    "recastConfirm": "Recast",
+    "recastNoSpots": "No session spots yet. You can still recast, or add spots via Edit session.",
+    "recastSuccess": "Rod recast",
+    "recastFailed": "Failed to recast rod",
     "markFishSpotted": "Mark fish spotted",
     "spotted": "Spotted",
     "addCatch": "Add catch",
@@ -468,11 +496,16 @@
       "method": "methods",
       "weatherType": "weather types",
       "tag": "tags"
-    }
+    },
+    "noMatch": "No match for \"{{value}}\"",
+    "useOnce": "Use once",
+    "saveAsOption": "Save as option",
+    "defaultLabel": "Option"
   },
   "images": {
     "fallbackAlt": "Image not found",
     "upload": "Upload",
+    "gallery": "Gallery",
     "camera": "Camera",
     "uploaded": "Image uploaded",
     "uploadFailed": "Failed to upload image"
@@ -480,7 +513,67 @@
   "filters": {
     "presetNamePrompt": "Preset name",
     "presetSaved": "Filter preset saved",
-    "deletePresetQuestion": "Delete filter preset?"
+    "deletePresetQuestion": "Delete filter preset?",
+    "title": "Filters",
+    "dateFrom": "Date from",
+    "dateTo": "Date to",
+    "sessionStatus": "Session status",
+    "any": "Any",
+    "clearAll": "Clear all",
+    "savePreset": "Save preset",
+    "deletePreset": "Delete preset",
+    "apply": "Apply"
+  },
+  "rodSetup": {
+    "title": "Set up rods",
+    "introNew": "How many rods are you using for this session?",
+    "introExisting": "This session has no rods yet. How many rods are you using?",
+    "defaultSpotOptional": "Default spot (optional)",
+    "skipForNow": "Skip for now",
+    "setUp": "Set up"
+  },
+  "weather": {
+    "cachedOffline": "Cached / offline data",
+    "feelsLike": "Feels like",
+    "minMax": "Min/Max",
+    "gusts": "Gusts",
+    "rain": "Rain",
+    "dailyForecast": "Daily Forecast",
+    "refresh": "Refresh weather",
+    "unavailable": "Weather unavailable"
+  },
+  "sessionCard": {
+    "start": "Start:",
+    "duration": "Duration:",
+    "catches": "Catches:",
+    "biggest": "Biggest:",
+    "total": "Total:",
+    "moreInformation": "More information",
+    "temperature": "Temperature:",
+    "updated": "Updated:",
+    "details": "Details"
+  },
+  "rodSummary": {
+    "title": "Rod Summary",
+    "startedAt": "Started at {{spot}}",
+    "movedTo": "Moved to {{spot}} at {{time}}",
+    "bitesCount": "{{count}} bites",
+    "fishSpottedCount": "{{count}} fish spotted",
+    "catchesCount": "{{count}} catches",
+    "totalRods": "Total rods: {{count}}",
+    "totalBites": "Total bites: {{count}}",
+    "totalSpotted": "Total spotted: {{count}}",
+    "totalCatches": "Total catches: {{count}}",
+    "bestRod": "Best rod: {{name}}",
+    "bestSpot": "Best spot: {{name}}"
+  },
+  "sessionTimeline": {
+    "title": "Session Timeline"
+  },
+  "splash": {
+    "loading": "Loading application",
+    "appName": "Fishing Register",
+    "logoAlt": "FishTracker logo"
   },
   "pin": {
     "setPin": "Set PIN",
@@ -499,5 +592,67 @@
     "loading": "Loading changelog...",
     "version": "Version",
     "empty": "No changelog available."
+  },
+  "assistant": {
+    "title": "Ask your data",
+    "subtitle": "Insight prompts work offline. Online AI needs a key in Settings.",
+    "newChat": "New chat",
+    "starterTitle": "Suggested questions",
+    "threads": "Chats",
+    "emptyThreads": "No chats yet. Pick a prompt or start a new chat.",
+    "composerPlaceholder": "Ask about lakes, times, bait…",
+    "send": "Send",
+    "sending": "Thinking…",
+    "backToStarters": "Prompts",
+    "deleteThread": "Delete chat",
+    "deleteConfirmTitle": "Delete this chat?",
+    "deleteConfirmMessage": "This cannot be undone.",
+    "needsAiKey": "Free-form chat needs online AI. Add an API key under Settings → Ask your data, or use a suggested prompt (works offline).",
+    "aiUnavailable": "Online AI failed. Try again when online, or use a suggested prompt.",
+    "localBadge": "From your data",
+    "llmBadge": "AI",
+    "openFromDashboard": "Ask your data",
+    "openFromStats": "Ask your data",
+    "prompts": {
+      "bestTime": {
+        "title": "Best fishing time",
+        "description": "When do most of your catches happen?",
+        "userMessage": "What is the best fishing time based on my catches?"
+      },
+      "bestLake": {
+        "title": "Best lake",
+        "description": "Compare lakes by sessions and catches.",
+        "userMessage": "Which lake performs best based on my data?"
+      },
+      "bestBaitRig": {
+        "title": "Best bait & rig",
+        "description": "Top baits and rigs from your catches.",
+        "userMessage": "What bait and rig work best for me?"
+      },
+      "speciesRecords": {
+        "title": "Species & records",
+        "description": "Species breakdown and personal bests.",
+        "userMessage": "Summarize my species and personal records."
+      }
+    },
+    "insights": {
+      "noData": "Not enough data yet.",
+      "noCatches": "No catches logged yet. Add some catches to get insights.",
+      "noLakes": "No lake activity yet. Link sessions to lakes to compare them.",
+      "catches": "catches",
+      "sessions": "sessions",
+      "baits": "Baits",
+      "rigs": "Rigs",
+      "bestTimeIntro": "Your strongest hour is around {{time}}.",
+      "bestMonth": "Best month so far: {{month}}.",
+      "bestLakeIntro": "Your strongest lake so far is {{lake}}.",
+      "bestBaitRigIntro": "Best bait: {{bait}}. Best rig: {{rig}}.",
+      "speciesIntro": "Species from your logbook:"
+    },
+    "errors": {
+      "offline": "You are offline. Insight prompts still work without AI.",
+      "unauthorized": "API key rejected. Check Settings.",
+      "generic": "Could not reach the AI provider."
+    }
   }
 }

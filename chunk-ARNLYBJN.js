@@ -1,1 +1,0 @@
-import{e as s}from"./chunk-LGTHGJE4.js";import{Gc as o,ca as e,lb as a,wa as n}from"./chunk-W7TOWTEY.js";var c=class t{i18n=e(s);cdr=e(o);constructor(){n(()=>{this.i18n.language(),this.i18n.dictionary(),this.cdr.markForCheck()})}transform(i,r){return this.i18n.t(i,r)}static \u0275fac=function(r){return new(r||t)};static \u0275pipe=a({name:"tr",type:t,pure:!1})};export{c as a};

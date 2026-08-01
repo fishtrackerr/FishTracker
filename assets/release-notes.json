@@ -1,10 +1,15 @@
 {
-  "version": "0.0.24",
-  "date": "2026-07-23",
+  "version": "0.0.26",
+  "date": "2026-08-01",
   "sections": [
     {
       "category": "New Features",
       "items": [
+        {
+          "message": "add fetchWithTimeout utility for network requests with timeout handling",
+          "shortHash": "fc7d799",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/fc7d79980a31ca0bebf0ad11abc6689c3b83eefb"
+        },
         {
           "message": "update active session page with direct actions for viewing and editing session details, enhance session navigation, and update version to 0.0.23",
           "shortHash": "6de58b6",

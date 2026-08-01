@@ -19,6 +19,7 @@
     "import": "Importieren",
     "reset": "Zurücksetzen",
     "retry": "Erneut versuchen",
+    "loading": "Wird geladen...",
     "errorGeneric": "Etwas ist schiefgelaufen"
   },
   "dashboard": {
@@ -35,7 +36,9 @@
     "loadError": "Dashboard-Daten konnten nicht geladen werden. Bitte erneut versuchen.",
     "startFailed": "Sitzung konnte nicht gestartet werden. Bitte erneut versuchen.",
     "sessionStarted": "Sitzung gestartet",
-    "createFailed": "Sitzung konnte nicht erstellt werden. Bitte erneut versuchen."
+    "createFailed": "Sitzung konnte nicht erstellt werden. Bitte erneut versuchen.",
+    "selectLake": "See auswählen",
+    "start": "Start"
   },
   "settings": {
     "appearance": "Darstellung",
@@ -73,6 +76,15 @@
     "showWarnings": "Wetterwarnungen anzeigen",
     "refreshMinutes": "Aktualisierungsintervall (Minuten)",
     "deleteCachedWeather": "Gespeichertes Wetter löschen",
+    "assistant": "Frag deine Daten",
+    "assistantHint": "Einblick-Prompts funktionieren offline. Optionale Online-KI nutzt deinen API-Schlüssel und nur eine Zusammenfassung deiner Angeldaten (keine Fotos).",
+    "enableAiChat": "Online-KI-Chat aktivieren",
+    "aiApiKey": "API-Schlüssel",
+    "aiBaseUrl": "API-Basis-URL",
+    "aiModel": "Modell",
+    "clearAiKey": "API-Schlüssel löschen",
+    "openAssistant": "Assistent öffnen",
+    "aiKeyCleared": "API-Schlüssel gelöscht",
     "gallery": "Galerie",
     "defaultSorting": "Standardsortierung",
     "newest": "Neueste",
@@ -118,8 +130,8 @@
     "releaseNotes": "Release Notes",
     "changelog": "Änderungsprotokoll",
     "changelogDesc": "Sieh dir den Versionsverlauf an, der aus Commit-Nachrichten erzeugt wird.",
-    "openChangelog": "Änderungsprotokoll öffnen"
-    ,"homepageImageCleared": "Startseitenbild gelöscht",
+    "openChangelog": "Änderungsprotokoll öffnen",
+    "homepageImageCleared": "Startseitenbild gelöscht",
     "resetAllCustomTitle": "Alle benutzerdefinierten Optionen zurücksetzen?",
     "resetAllCustomMessage": "Alle benutzerdefinierten Dropdown-Optionen werden entfernt. Favoriten bleiben nach Möglichkeit erhalten.",
     "resetAllCustomConfirm": "Alles zurücksetzen",
@@ -196,7 +208,9 @@
     "viewSessionDetails": "Sitzungsdetails anzeigen",
     "refreshWeatherGps": "Wetter und GPS aktualisieren",
     "addCatch": "Fang hinzufügen",
+    "recast": "Neu auswerfen",
     "camera": "Kamera",
+    "photos": "Sitzungsfotos",
     "endSession": "Sitzung beenden",
     "endSessionConfirm": "Sitzung beenden?",
     "sessionEnded": "Sitzung beendet",
@@ -235,6 +249,7 @@
     "bites": "Bisse",
     "spotted": "gesichtet",
     "catches": "Fänge",
+    "images": "Sitzungsbilder",
     "addCatch": "Fang hinzufügen",
     "pr": "PR",
     "editSession": "Sitzung bearbeiten",
@@ -244,6 +259,9 @@
     "backToSessions": "Zurück zu Sitzungen",
     "deleteSessionQuestion": "Sitzung löschen?",
     "sessionDeleted": "Sitzung gelöscht"
+  },
+  "weatherHistory": {
+    "title": "Wetterverlauf"
   },
   "sessionEdit": {
     "title": "Sitzung bearbeiten",
@@ -274,7 +292,10 @@
     "reduceRodCountMessage": "Einige Ruten haben Bisse, Sichtungen oder Fänge. Beim Reduzieren werden diese Ruten entfernt, die Aktivitätsdaten bleiben erhalten.",
     "reduceAnyway": "Trotzdem reduzieren",
     "updateFailed": "Sitzung konnte nicht aktualisiert werden",
-    "weatherRefreshed": "Wetter aktualisiert"
+    "weatherRefreshed": "Wetter aktualisiert",
+    "nameRequired": "Sitzungsname ist erforderlich",
+    "lakeOptional": "See (optional)",
+    "defaultName": "Angelsitzung"
   },
   "catchForm": {
     "title": "Fang hinzufügen",
@@ -317,6 +338,7 @@
     "cover": "Titelbild",
     "description": "Beschreibung",
     "address": "Adresse",
+    "country": "Land",
     "lookupCoordinates": "Koordinaten aus Adresse finden",
     "lookupLoading": "Koordinaten werden gesucht...",
     "lookupNeedsAddress": "Bitte zuerst Seenamen oder Adresse eingeben.",
@@ -451,6 +473,12 @@
     "rodName": "Rutenname",
     "saveRod": "Rute speichern",
     "editRod": "Rute bearbeiten",
+    "recast": "Neu auswerfen",
+    "recastHint": "Aktualisiere den Platz dieser Rute und erfasse einen neuen Wurf.",
+    "recastConfirm": "Auswerfen",
+    "recastNoSpots": "Noch keine Sitzungsplätze. Du kannst trotzdem auswerfen oder Plätze über Sitzung bearbeiten hinzufügen.",
+    "recastSuccess": "Rute neu ausgeworfen",
+    "recastFailed": "Neu auswerfen fehlgeschlagen",
     "markFishSpotted": "Fisch gesichtet markieren",
     "spotted": "Gesichtet",
     "addCatch": "Fang hinzufügen",
@@ -468,11 +496,16 @@
       "method": "Methoden",
       "weatherType": "Wettertypen",
       "tag": "Tags"
-    }
+    },
+    "noMatch": "Keine Übereinstimmung für \"{{value}}\"",
+    "useOnce": "Einmal verwenden",
+    "saveAsOption": "Als Option speichern",
+    "defaultLabel": "Option"
   },
   "images": {
     "fallbackAlt": "Bild nicht gefunden",
     "upload": "Hochladen",
+    "gallery": "Galerie",
     "camera": "Kamera",
     "uploaded": "Bild hochgeladen",
     "uploadFailed": "Bild konnte nicht hochgeladen werden"
@@ -480,7 +513,67 @@
   "filters": {
     "presetNamePrompt": "Name der Vorlage",
     "presetSaved": "Filtervorlage gespeichert",
-    "deletePresetQuestion": "Filtervorlage löschen?"
+    "deletePresetQuestion": "Filtervorlage löschen?",
+    "title": "Filter",
+    "dateFrom": "Datum von",
+    "dateTo": "Datum bis",
+    "sessionStatus": "Sitzungsstatus",
+    "any": "Beliebig",
+    "clearAll": "Alles löschen",
+    "savePreset": "Vorlage speichern",
+    "deletePreset": "Vorlage löschen",
+    "apply": "Anwenden"
+  },
+  "rodSetup": {
+    "title": "Ruten einrichten",
+    "introNew": "Wie viele Ruten verwendest du für diese Sitzung?",
+    "introExisting": "Diese Sitzung hat noch keine Ruten. Wie viele Ruten verwendest du?",
+    "defaultSpotOptional": "Standardplatz (optional)",
+    "skipForNow": "Vorerst überspringen",
+    "setUp": "Einrichten"
+  },
+  "weather": {
+    "cachedOffline": "Zwischengespeicherte / Offline-Daten",
+    "feelsLike": "Gefühlt",
+    "minMax": "Min/Max",
+    "gusts": "Böen",
+    "rain": "Regen",
+    "dailyForecast": "Tagesvorhersage",
+    "refresh": "Wetter aktualisieren",
+    "unavailable": "Wetter nicht verfügbar"
+  },
+  "sessionCard": {
+    "start": "Start:",
+    "duration": "Dauer:",
+    "catches": "Fänge:",
+    "biggest": "Größter:",
+    "total": "Gesamt:",
+    "moreInformation": "Mehr Informationen",
+    "temperature": "Temperatur:",
+    "updated": "Aktualisiert:",
+    "details": "Details"
+  },
+  "rodSummary": {
+    "title": "Rutenübersicht",
+    "startedAt": "Gestartet bei {{spot}}",
+    "movedTo": "Verschoben nach {{spot}} um {{time}}",
+    "bitesCount": "{{count}} Bisse",
+    "fishSpottedCount": "{{count}} Fische gesichtet",
+    "catchesCount": "{{count}} Fänge",
+    "totalRods": "Ruten gesamt: {{count}}",
+    "totalBites": "Bisse gesamt: {{count}}",
+    "totalSpotted": "Sichtungen gesamt: {{count}}",
+    "totalCatches": "Fänge gesamt: {{count}}",
+    "bestRod": "Beste Rute: {{name}}",
+    "bestSpot": "Bester Platz: {{name}}"
+  },
+  "sessionTimeline": {
+    "title": "Sitzungszeitachse"
+  },
+  "splash": {
+    "loading": "Anwendung wird geladen",
+    "appName": "Angelregister",
+    "logoAlt": "FishTracker-Logo"
   },
   "pin": {
     "setPin": "PIN festlegen",
@@ -499,5 +592,67 @@
     "loading": "Änderungsprotokoll wird geladen...",
     "version": "Version",
     "empty": "Kein Änderungsprotokoll verfügbar."
+  },
+  "assistant": {
+    "title": "Frag deine Daten",
+    "subtitle": "Einblick-Prompts funktionieren offline. Online-KI braucht einen Schlüssel in den Einstellungen.",
+    "newChat": "Neuer Chat",
+    "starterTitle": "Vorgeschlagene Fragen",
+    "threads": "Chats",
+    "emptyThreads": "Noch keine Chats. Wähle einen Prompt oder starte einen neuen Chat.",
+    "composerPlaceholder": "Frage zu Seen, Zeiten, Ködern…",
+    "send": "Senden",
+    "sending": "Denke nach…",
+    "backToStarters": "Prompts",
+    "deleteThread": "Chat löschen",
+    "deleteConfirmTitle": "Diesen Chat löschen?",
+    "deleteConfirmMessage": "Das kann nicht rückgängig gemacht werden.",
+    "needsAiKey": "Freier Chat braucht Online-KI. Füge unter Einstellungen → Frag deine Daten einen API-Schlüssel hinzu, oder nutze einen vorgeschlagenen Prompt (offline).",
+    "aiUnavailable": "Online-KI fehlgeschlagen. Versuche es online erneut oder nutze einen vorgeschlagenen Prompt.",
+    "localBadge": "Aus deinen Daten",
+    "llmBadge": "KI",
+    "openFromDashboard": "Frag deine Daten",
+    "openFromStats": "Frag deine Daten",
+    "prompts": {
+      "bestTime": {
+        "title": "Beste Angelzeit",
+        "description": "Wann passieren die meisten Fänge?",
+        "userMessage": "Was ist die beste Angelzeit anhand meiner Fänge?"
+      },
+      "bestLake": {
+        "title": "Bester See",
+        "description": "Vergleiche Seen nach Sitzungen und Fängen.",
+        "userMessage": "Welcher See performt am besten nach meinen Daten?"
+      },
+      "bestBaitRig": {
+        "title": "Bester Köder & Montage",
+        "description": "Top-Köder und Montagen aus deinen Fängen.",
+        "userMessage": "Welcher Köder und welche Montage funktionieren bei mir am besten?"
+      },
+      "speciesRecords": {
+        "title": "Arten & Rekorde",
+        "description": "Artenübersicht und persönliche Rekorde.",
+        "userMessage": "Fasse meine Arten und persönlichen Rekorde zusammen."
+      }
+    },
+    "insights": {
+      "noData": "Noch nicht genug Daten.",
+      "noCatches": "Noch keine Fänge. Füge Fänge hinzu, um Einblicke zu erhalten.",
+      "noLakes": "Noch keine See-Aktivität. Verknüpfe Sitzungen mit Seen zum Vergleich.",
+      "catches": "Fänge",
+      "sessions": "Sitzungen",
+      "baits": "Köder",
+      "rigs": "Montagen",
+      "bestTimeIntro": "Deine stärkste Stunde ist um {{time}}.",
+      "bestMonth": "Bester Monat bisher: {{month}}.",
+      "bestLakeIntro": "Dein stärkster See bisher ist {{lake}}.",
+      "bestBaitRigIntro": "Bester Köder: {{bait}}. Beste Montage: {{rig}}.",
+      "speciesIntro": "Arten aus deinem Logbuch:"
+    },
+    "errors": {
+      "offline": "Du bist offline. Einblick-Prompts funktionieren weiterhin ohne KI.",
+      "unauthorized": "API-Schlüssel abgelehnt. Prüfe die Einstellungen.",
+      "generic": "KI-Anbieter konnte nicht erreicht werden."
+    }
   }
 }
