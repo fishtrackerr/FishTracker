@@ -18,6 +18,7 @@
     "unknown": "Unknown",
     "import": "Import",
     "reset": "Reset",
+    "rename": "Rename",
     "retry": "Try again",
     "loading": "Loading...",
     "errorGeneric": "Something went wrong"
@@ -119,6 +120,10 @@
     "resetSection": "Reset",
     "resetDesc": "Every reset requires confirmation. Settings resets do not delete fishing records.",
     "customOptions": "Custom options",
+    "manageOptions": "Manage options",
+    "manageOptionsDesc": "Rename an option to update it everywhere it appears in catches, rods, filters, and favorites.",
+    "renameOptionPrompt": "New name for \"{{value}}\"",
+    "optionRenamed": "Option renamed",
     "resetAllCustom": "Reset all custom options",
     "preferences": "Preferences",
     "resetFilters": "Reset filters",
@@ -128,6 +133,11 @@
     "resetAllSettings": "Reset all settings",
     "fullReset": "Full application reset",
     "fullResetWarn": "Permanently removes all locally stored data. Type RESET to continue.",
+    "resetCurrentMode": "Reset current fishing mode",
+    "resetCurrentModeTitle": "Reset this fishing mode?",
+    "resetCurrentModeMessage": "Deletes lakes, sessions, catches, options, chats, and images for the current mode only. Other modes stay intact.",
+    "resetCurrentModeConfirm": "Reset mode",
+    "currentModeReset": "Current fishing mode reset",
     "confirmation": "Confirmation",
     "resetEntire": "Reset entire application",
     "data": "Data",
@@ -136,8 +146,17 @@
     "importJson": "Import JSON Backup",
     "about": "About",
     "aboutText": "Fish Tracker — offline-first fishing register.",
+    "sendFeedback": "Send feedback",
+    "feedbackSubject": "Fish Tracker feedback",
+    "installApp": "Install app",
+    "shareWhatsApp": "Share via WhatsApp",
+    "shareWhatsAppText": "Check out Fish Tracker: {{url}}",
+    "iosInstallHint": "On iPhone/iPad: tap Share, then Add to Home Screen.",
     "profile": "Profile",
     "documents": "Documents",
+    "privacy": "Privacy",
+    "privacyDesc": "How your fishing data is stored and handled on this device.",
+    "openPrivacy": "Open privacy policy",
     "releaseNotes": "Release Notes",
     "changelog": "Changelog",
     "changelogDesc": "Review release history generated from commit messages.",
@@ -213,7 +232,20 @@
     "stats": "Stats",
     "settings": "Settings",
     "more": "More",
-    "assistant": "Assistant"
+    "assistant": "Assistant",
+    "shareWhatsApp": "Share via WhatsApp"
+  },
+  "modeSelect": {
+    "title": "Choose fishing mode",
+    "hint": "This sets lakes, baits, sessions, and catches for this app run. Restart the app to switch.",
+    "modes": {
+      "carper": "Carper",
+      "catfish": "Catfish",
+      "pike": "Pike",
+      "bass": "Bass",
+      "feeder": "Feeder",
+      "general": "General"
+    }
   },
   "activeSession": {
     "catches": "catches",
@@ -221,6 +253,12 @@
     "recentCatches": "Recent catches",
     "viewSessionDetails": "View session details",
     "refreshWeatherGps": "Refresh weather & GPS",
+    "instantCatch": "Instant catch",
+    "instantCatchLogged": "Catch logged — add details when you can",
+    "instantCatchFailed": "Failed to log catch",
+    "instantCatchEvent": "Quick catch logged",
+    "addDetails": "Add details",
+    "detailsPending": "Details pending",
     "addCatch": "Add Catch",
     "recast": "Recast",
     "camera": "Camera",
@@ -251,7 +289,12 @@
     "emptyTitle": "No sessions yet",
     "emptyMessage": "Start your first fishing session to begin tracking.",
     "sessionStarted": "Session started",
-    "createFailed": "Failed to create session. Please try again."
+    "createFailed": "Failed to create session. Please try again.",
+    "backingUp": "Saving a backup before starting…",
+    "backupSaved": "Backup saved to your device",
+    "backupFailedTitle": "Backup failed",
+    "backupFailedMessage": "Could not save a backup to this device. Start the session without a backup? You can still restore from Settings → Import if you have an earlier file.",
+    "startWithoutBackup": "Start without backup"
   },
   "sessionDetail": {
     "prebait": "Prebait",
@@ -334,8 +377,11 @@
     "tag": "Tag",
     "released": "Released",
     "photoSelected": "Photo selected",
+    "photoAttached": "Photo attached",
     "addPhoto": "Add Photo",
-    "saveCatch": "Save Catch"
+    "saveCatch": "Save Catch",
+    "saveChanges": "Save changes",
+    "editTitle": "Edit Catch"
   },
   "quickCatch": {
     "title": "Quick Add Catch",
@@ -593,6 +639,23 @@
     "appName": "Fishing Register",
     "logoAlt": "FishTracker logo"
   },
+  "dbRecovery": {
+    "title": "Local database could not be opened",
+    "versionMismatch": "This app build is older than the database already stored in this browser. Your fishing data is still here.",
+    "upgradeFailed": "Updating the local database schema failed. Your data was not wiped; you can retry safely.",
+    "unknown": "The local database could not be opened. Your data was not wiped.",
+    "dataSafe": "Update or reload to a matching app version to continue. Do not clear site data unless you have a backup.",
+    "checkForUpdates": "Check for updates",
+    "checkingUpdates": "Checking for updates...",
+    "retry": "Retry",
+    "retrying": "Retrying...",
+    "reload": "Reload"
+  },
+  "pwa": {
+    "updateAvailable": "A new version is available.",
+    "updateNow": "Update now",
+    "updateFailed": "An app update failed to install. Please refresh manually."
+  },
   "pin": {
     "setPin": "Set PIN",
     "choosePin": "Choose a 6-digit PIN",
@@ -601,6 +664,7 @@
     "unlock": "Unlock",
     "enterPin": "Enter your 6-digit PIN",
     "incorrectPin": "Incorrect PIN",
+    "lockout": "Too many attempts. Try again in {{seconds}}s",
     "appVersion": "App version",
     "checkForUpdates": "Check for updates",
     "checkingForUpdates": "Checking for updates...",
@@ -612,12 +676,48 @@
     "version": "Version",
     "empty": "No changelog available."
   },
+  "whatsNew": {
+    "title": "What's new in v{{version}}",
+    "gotIt": "Got it",
+    "viewChangelog": "Full changelog"
+  },
+  "feedbackPrompt": {
+    "title": "Feedback & features",
+    "message": "Have feedback or feature ideas? Send them by email — it helps improve Fish Tracker.",
+    "send": "Send feedback",
+    "notNow": "Not now"
+  },
+  "privacy": {
+    "title": "Privacy & data",
+    "summaryTitle": "Summary",
+    "summaryBody": "Fish Tracker is an offline-first fishing logbook. There are no user accounts and no cloud database for your catches. Your fishing data stays on this device unless you choose to export a backup or use an optional online feature.",
+    "storedTitle": "What is stored",
+    "storedBody": "The app can store sessions, catches, lakes and spots, photos, optional profile and license details, settings, and assistant chat history. All of this lives locally in your browser.",
+    "storageTitle": "Where it lives",
+    "storageBody": "Fishing data is kept in this browser using IndexedDB and localStorage. The app itself may be hosted as a static website, but that host does not store your fishing logbook.",
+    "thirdPartiesTitle": "What leaves the device",
+    "thirdPartiesIntro": "Nothing is uploaded by default. Data is only sent when you use a feature that needs the network:",
+    "thirdPartyWeather": "Weather: location coordinates are sent to Open-Meteo for forecasts.",
+    "thirdPartyGeocode": "Place lookup: search text or coordinates are sent to OpenStreetMap Nominatim.",
+    "thirdPartyMaps": "Maps: opening a maps link sends coordinates to Google Maps in your browser.",
+    "thirdPartyAi": "Optional AI: if you enable online AI, a summary of fishing stats (not photos) is sent to the provider you configured.",
+    "photosTitle": "Photos",
+    "photosBody": "Photos stay on this device in local storage. They are not uploaded to a server. They are only included if you export a backup file yourself.",
+    "pinTitle": "PIN lock",
+    "pinBody": "The optional PIN is a casual screen lock. It is stored as a hash, not as plain text. It does not encrypt your fishing data — someone with access to this device or browser tools can still read it.",
+    "backupsTitle": "Backups",
+    "backupsBody": "Export creates a JSON file on your device that can include GPS history, catches, profile details, and photos. Keep backup files somewhere safe. Import replaces the data currently stored in this browser.",
+    "controlTitle": "Your control",
+    "controlBody": "You can wipe everything with a full reset in Settings or by clearing this site’s data in your browser. Fish Tracker does not use analytics or advertising SDKs."
+  },
   "assistant": {
     "title": "Ask your data",
     "subtitle": "Insight prompts work offline. Online AI needs a key in Settings.",
     "newChat": "New chat",
     "starterTitle": "Suggested questions",
     "threads": "Chats",
+    "recentChats": "Recent chats",
+    "noPreview": "No messages yet",
     "emptyThreads": "No chats yet. Pick a prompt or start a new chat.",
     "composerPlaceholder": "Ask about lakes, times, bait…",
     "send": "Send",

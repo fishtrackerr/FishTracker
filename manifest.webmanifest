@@ -1,9 +1,15 @@
 {
   "name": "Fish Tracker",
   "short_name": "FishTracker",
-  "theme_color": "#ff6b00",
-  "background_color": "#000000",
+  "description": "Offline-first fishing register for sessions, catches, lakes, and weather.",
+  "id": "./",
+  "lang": "en",
+  "orientation": "any",
+  "categories": ["sports", "utilities"],
+  "theme_color": "#0b0b0b",
+  "background_color": "#0b0f14",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "scope": "./",
   "start_url": "./",
   "icons": [
@@ -44,7 +50,7 @@
       "purpose": "any"
     },
     {
-      "src": "icons/icon-192x192.png",
+      "src": "icons/icon-maskable-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
@@ -62,10 +68,81 @@
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512x512.png",
+      "src": "icons/icon-maskable-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/narrow-sessions.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Track fishing sessions offline"
+    },
+    {
+      "src": "screenshots/narrow-catches.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Log catches with photos and weather"
+    },
+    {
+      "src": "screenshots/narrow-lakes.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Save lakes and spots you return to"
+    },
+    {
+      "src": "screenshots/wide-overview.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FishTracker overview"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Active session",
+      "short_name": "Session",
+      "description": "Open or continue the active fishing session",
+      "url": "./sessions/active",
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Lakes",
+      "short_name": "Lakes",
+      "description": "Browse saved lakes and spots",
+      "url": "./lakes",
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Gallery",
+      "short_name": "Gallery",
+      "description": "View catch and trip photos",
+      "url": "./gallery",
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

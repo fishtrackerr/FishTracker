@@ -18,6 +18,7 @@
     "unknown": "Onbekend",
     "import": "Importeren",
     "reset": "Resetten",
+    "rename": "Hernoemen",
     "retry": "Opnieuw proberen",
     "loading": "Laden...",
     "errorGeneric": "Er is iets misgegaan"
@@ -119,6 +120,10 @@
     "resetSection": "Reset",
     "resetDesc": "Elke reset vereist bevestiging. Instellingen resetten verwijdert geen visgegevens.",
     "customOptions": "Aangepaste opties",
+    "manageOptions": "Opties beheren",
+    "manageOptionsDesc": "Hernoem een optie om deze overal bij te werken in vangsten, hengels, filters en favorieten.",
+    "renameOptionPrompt": "Nieuwe naam voor \"{{value}}\"",
+    "optionRenamed": "Optie hernoemd",
     "resetAllCustom": "Alle aangepaste opties resetten",
     "preferences": "Voorkeuren",
     "resetFilters": "Filters resetten",
@@ -128,6 +133,11 @@
     "resetAllSettings": "Alle instellingen resetten",
     "fullReset": "Volledige app-reset",
     "fullResetWarn": "Verwijdert permanent alle lokaal opgeslagen gegevens. Typ RESET om door te gaan.",
+    "resetCurrentMode": "Huidige vissmodus resetten",
+    "resetCurrentModeTitle": "Deze vissmodus resetten?",
+    "resetCurrentModeMessage": "Verwijdert meren, sessies, vangsten, opties, chats en afbeeldingen alleen voor de huidige modus. Andere modi blijven intact.",
+    "resetCurrentModeConfirm": "Modus resetten",
+    "currentModeReset": "Huidige vissmodus gereset",
     "confirmation": "Bevestiging",
     "resetEntire": "Volledige applicatie resetten",
     "data": "Gegevens",
@@ -136,8 +146,17 @@
     "importJson": "JSON-back-up importeren",
     "about": "Over",
     "aboutText": "Fish Tracker — offline-first visregistratie.",
+    "sendFeedback": "Feedback sturen",
+    "feedbackSubject": "Fish Tracker feedback",
+    "installApp": "App installeren",
+    "shareWhatsApp": "Delen via WhatsApp",
+    "shareWhatsAppText": "Bekijk Fish Tracker: {{url}}",
+    "iosInstallHint": "Op iPhone/iPad: tik op Delen, daarna Zet op beginscherm.",
     "profile": "Profiel",
     "documents": "Documenten",
+    "privacy": "Privacy",
+    "privacyDesc": "Hoe je visgegevens op dit apparaat worden opgeslagen en verwerkt.",
+    "openPrivacy": "Privacybeleid openen",
     "releaseNotes": "Release-opmerkingen",
     "changelog": "Wijzigingslog",
     "changelogDesc": "Bekijk de releasegeschiedenis op basis van commitberichten.",
@@ -213,7 +232,20 @@
     "stats": "Statistieken",
     "settings": "Instellingen",
     "more": "Meer",
-    "assistant": "Assistent"
+    "assistant": "Assistent",
+    "shareWhatsApp": "Delen via WhatsApp"
+  },
+  "modeSelect": {
+    "title": "Kies vissmodus",
+    "hint": "Dit bepaalt meren, aas, sessies en vangsten voor deze sessie. Herstart de app om te wisselen.",
+    "modes": {
+      "carper": "Karper",
+      "catfish": "Meerval",
+      "pike": "Snoek",
+      "bass": "Baars",
+      "feeder": "Feeder",
+      "general": "Algemeen"
+    }
   },
   "activeSession": {
     "catches": "vangsten",
@@ -221,6 +253,12 @@
     "recentCatches": "Recente vangsten",
     "viewSessionDetails": "Sessiedetails bekijken",
     "refreshWeatherGps": "Weer en GPS verversen",
+    "instantCatch": "Snelle vangst",
+    "instantCatchLogged": "Vangst gelogd — vul details later in",
+    "instantCatchFailed": "Vangst loggen mislukt",
+    "instantCatchEvent": "Snelle vangst gelogd",
+    "addDetails": "Details toevoegen",
+    "detailsPending": "Details open",
     "addCatch": "Vangst toevoegen",
     "recast": "Opnieuw inwerpen",
     "camera": "Camera",
@@ -251,7 +289,12 @@
     "emptyTitle": "Nog geen sessies",
     "emptyMessage": "Start je eerste vissessie om te beginnen met bijhouden.",
     "sessionStarted": "Sessie gestart",
-    "createFailed": "Sessie maken mislukt. Probeer opnieuw."
+    "createFailed": "Sessie maken mislukt. Probeer opnieuw.",
+    "backingUp": "Back-up opslaan vóór het starten…",
+    "backupSaved": "Back-up opgeslagen op je apparaat",
+    "backupFailedTitle": "Back-up mislukt",
+    "backupFailedMessage": "Kon geen back-up op dit apparaat opslaan. Sessie starten zonder back-up? Je kunt later nog herstellen via Instellingen → Importeren als je een eerdere file hebt.",
+    "startWithoutBackup": "Starten zonder back-up"
   },
   "sessionDetail": {
     "prebait": "Voorvoeren",
@@ -334,8 +377,11 @@
     "tag": "Tag",
     "released": "Teruggezet",
     "photoSelected": "Foto geselecteerd",
+    "photoAttached": "Foto gekoppeld",
     "addPhoto": "Foto toevoegen",
-    "saveCatch": "Vangst opslaan"
+    "saveCatch": "Vangst opslaan",
+    "saveChanges": "Wijzigingen opslaan",
+    "editTitle": "Vangst bewerken"
   },
   "quickCatch": {
     "title": "Snelle vangst toevoegen",
@@ -593,6 +639,23 @@
     "appName": "Visregister",
     "logoAlt": "FishTracker-logo"
   },
+  "dbRecovery": {
+    "title": "Lokale database kon niet worden geopend",
+    "versionMismatch": "Deze appversie is ouder dan de database die al in deze browser staat. Je visgegevens staan er nog.",
+    "upgradeFailed": "Het bijwerken van het databaseschema is mislukt. Je gegevens zijn niet gewist; je kunt veilig opnieuw proberen.",
+    "unknown": "De lokale database kon niet worden geopend. Je gegevens zijn niet gewist.",
+    "dataSafe": "Werk bij of herlaad naar een passende appversie om door te gaan. Wis geen sitegegevens tenzij je een back-up hebt.",
+    "checkForUpdates": "Controleren op updates",
+    "checkingUpdates": "Bezig met controleren op updates...",
+    "retry": "Opnieuw proberen",
+    "retrying": "Bezig met opnieuw proberen...",
+    "reload": "Herladen"
+  },
+  "pwa": {
+    "updateAvailable": "Er is een nieuwe versie beschikbaar.",
+    "updateNow": "Nu bijwerken",
+    "updateFailed": "App-update kon niet worden geïnstalleerd. Vernieuw handmatig."
+  },
   "pin": {
     "setPin": "Pincode instellen",
     "choosePin": "Kies een pincode van 6 cijfers",
@@ -601,6 +664,7 @@
     "unlock": "Ontgrendelen",
     "enterPin": "Voer je pincode van 6 cijfers in",
     "incorrectPin": "Onjuiste pincode",
+    "lockout": "Te veel pogingen. Probeer opnieuw over {{seconds}}s",
     "appVersion": "App-versie",
     "checkForUpdates": "Controleren op updates",
     "checkingForUpdates": "Bezig met controleren op updates...",
@@ -612,12 +676,48 @@
     "version": "Versie",
     "empty": "Geen wijzigingslog beschikbaar."
   },
+  "whatsNew": {
+    "title": "Wat is nieuw in v{{version}}",
+    "gotIt": "Begrepen",
+    "viewChangelog": "Volledige wijzigingslog"
+  },
+  "feedbackPrompt": {
+    "title": "Feedback & functies",
+    "message": "Heb je feedback of ideeën voor functies? Stuur ze per e-mail — zo verbeteren we Fish Tracker.",
+    "send": "Feedback sturen",
+    "notNow": "Niet nu"
+  },
+  "privacy": {
+    "title": "Privacy & gegevens",
+    "summaryTitle": "Samenvatting",
+    "summaryBody": "Fish Tracker is een offline-first vislogboek. Er zijn geen gebruikersaccounts en geen cloud-database voor je vangsten. Je visgegevens blijven op dit apparaat, tenzij je zelf een back-up exporteert of een optionele online functie gebruikt.",
+    "storedTitle": "Wat wordt opgeslagen",
+    "storedBody": "De app kan sessies, vangsten, meren en stekken, foto’s, optionele profiel- en vergunninggegevens, instellingen en assistent-chatgeschiedenis opslaan. Dit alles blijft lokaal in je browser.",
+    "storageTitle": "Waar het staat",
+    "storageBody": "Visgegevens worden in deze browser bewaard via IndexedDB en localStorage. De app zelf kan als statische website worden gehost, maar die host bewaart je vislogboek niet.",
+    "thirdPartiesTitle": "Wat het apparaat verlaat",
+    "thirdPartiesIntro": "Er wordt standaard niets geüpload. Gegevens worden alleen verstuurd als je een functie gebruikt die netwerk nodig heeft:",
+    "thirdPartyWeather": "Weer: locatiecoördinaten gaan naar Open-Meteo voor voorspellingen.",
+    "thirdPartyGeocode": "Plaatszoeken: zoektekst of coördinaten gaan naar OpenStreetMap Nominatim.",
+    "thirdPartyMaps": "Kaarten: een kaartenlink opent Google Maps in je browser met coördinaten.",
+    "thirdPartyAi": "Optionele AI: als je online AI inschakelt, gaat een samenvatting van visstatistieken (geen foto’s) naar de provider die jij hebt ingesteld.",
+    "photosTitle": "Foto’s",
+    "photosBody": "Foto’s blijven op dit apparaat in lokale opslag. Ze worden niet naar een server geüpload. Ze zitten alleen in een back-upbestand als je dat zelf exporteert.",
+    "pinTitle": "Pincode",
+    "pinBody": "De optionele pincode is een eenvoudige schermvergrendeling. Die wordt als hash opgeslagen, niet als platte tekst. Je visgegevens worden er niet mee versleuteld — iemand met toegang tot dit apparaat of browsertools kan ze nog steeds lezen.",
+    "backupsTitle": "Back-ups",
+    "backupsBody": "Exporteren maakt een JSON-bestand op je apparaat dat GPS-geschiedenis, vangsten, profielgegevens en foto’s kan bevatten. Bewaar back-ups veilig. Importeren vervangt de gegevens die nu in deze browser staan.",
+    "controlTitle": "Jouw controle",
+    "controlBody": "Je kunt alles wissen via een volledige reset in Instellingen of door de sitegegevens in je browser te wissen. Fish Tracker gebruikt geen analytics- of reclame-SDK’s."
+  },
   "assistant": {
     "title": "Vraag je data",
     "subtitle": "Inzicht-prompts werken offline. Online AI heeft een sleutel nodig in Instellingen.",
     "newChat": "Nieuwe chat",
     "starterTitle": "Voorgestelde vragen",
     "threads": "Chats",
+    "recentChats": "Recente chats",
+    "noPreview": "Nog geen berichten",
     "emptyThreads": "Nog geen chats. Kies een prompt of start een nieuwe chat.",
     "composerPlaceholder": "Vraag over meren, tijden, aas…",
     "send": "Verstuur",
