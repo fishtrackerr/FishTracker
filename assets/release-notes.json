@@ -1,10 +1,15 @@
 {
-  "version": "0.0.26",
+  "version": "0.0.27",
   "date": "2026-08-01",
   "sections": [
     {
       "category": "New Features",
       "items": [
+        {
+          "message": "update recast rod dialog styles and button types for improved UI",
+          "shortHash": "82d9d0b",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/82d9d0b49df85b926bd9cf5a0836717c318ac893"
+        },
         {
           "message": "add fetchWithTimeout utility for network requests with timeout handling",
           "shortHash": "fc7d799",

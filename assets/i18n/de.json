@@ -22,6 +22,11 @@
     "loading": "Wird geladen...",
     "errorGeneric": "Etwas ist schiefgelaufen"
   },
+  "connectivity": {
+    "offlineBanner": "Du bist offline — Fänge und Sessions funktionieren weiter",
+    "dismissBanner": "Offline-Hinweis schließen",
+    "mapsOffline": "Karten brauchen eine Verbindung. Deine Koordinaten bleiben in der App gespeichert."
+  },
   "dashboard": {
     "startSession": "Angelsitzung starten",
     "starting": "Wird gestartet...",
@@ -78,13 +83,19 @@
     "deleteCachedWeather": "Gespeichertes Wetter löschen",
     "assistant": "Frag deine Daten",
     "assistantHint": "Einblick-Prompts funktionieren offline. Optionale Online-KI nutzt deinen API-Schlüssel und nur eine Zusammenfassung deiner Angeldaten (keine Fotos).",
+    "assistantPrivacyWarning": "Online-KI sendet eine Zusammenfassung deiner Gewässer, Sessions, Arten und Köder an den konfigurierten Anbieter. Nicht auf geteilten oder unsicheren Geräten aktivieren.",
     "enableAiChat": "Online-KI-Chat aktivieren",
     "aiApiKey": "API-Schlüssel",
     "aiBaseUrl": "API-Basis-URL",
+    "aiBaseUrlHint": "Erlaubte Hosts: api.openai.com, openrouter.ai (nur HTTPS)",
     "aiModel": "Modell",
     "clearAiKey": "API-Schlüssel löschen",
     "openAssistant": "Assistent öffnen",
     "aiKeyCleared": "API-Schlüssel gelöscht",
+    "pinPrivacyHint": "Die PIN schützt vor zufälligem Mitlesen auf diesem Gerät. Angeldaten im Browser sind nicht verschlüsselt und bei Gerätezugriff lesbar.",
+    "importConfirmTitle": "Backup importieren?",
+    "importConfirmMessage": "Dies ersetzt alle lokalen Daten. Das kann nicht rückgängig gemacht werden. Backups enthalten GPS und Fanghistorie als Klartext-JSON.",
+    "importPreview": "Sessions: {{sessions}}, Fänge: {{catches}}, Gewässer: {{lakes}}, Bilder: {{images}}",
     "gallery": "Galerie",
     "defaultSorting": "Standardsortierung",
     "newest": "Neueste",
@@ -172,7 +183,8 @@
     "setHomepage": "Als Startseite setzen",
     "deleteImage": "Bild löschen",
     "homepageUpdated": "Startseitenbild aktualisiert",
-    "imageDeleted": "Bild gelöscht"
+    "imageDeleted": "Bild gelöscht",
+    "loadError": "Galerie konnte nicht geladen werden. Bitte erneut versuchen."
   },
   "confirm": {
     "deleteItem": "Möchten Sie \"{{item}}\" wirklich löschen?",
@@ -199,7 +211,9 @@
     "lakes": "Seen",
     "gallery": "Galerie",
     "stats": "Statistik",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "more": "Mehr",
+    "assistant": "Assistent"
   },
   "activeSession": {
     "catches": "Fänge",
@@ -232,6 +246,8 @@
     "sessionCount": "Sitzung(en)",
     "starting": "Wird gestartet...",
     "startSession": "Sitzung starten",
+    "defaultName": "Angelsitzung",
+    "defaultNameAtLake": "Sitzung am {{lake}}",
     "emptyTitle": "Noch keine Sitzungen",
     "emptyMessage": "Starte deine erste Angelsitzung, um mit der Erfassung zu beginnen.",
     "sessionStarted": "Sitzung gestartet",
@@ -422,6 +438,7 @@
   },
   "statistics": {
     "title": "Statistik",
+    "loadError": "Statistik konnte nicht geladen werden. Bitte erneut versuchen.",
     "general": "Allgemein",
     "totalSessions": "Sitzungen gesamt",
     "active": "Aktiv",
@@ -546,6 +563,7 @@
     "start": "Start:",
     "duration": "Dauer:",
     "catches": "Fänge:",
+    "catchesBadge": "{{count}} Fänge",
     "biggest": "Größter:",
     "total": "Gesamt:",
     "moreInformation": "Mehr Informationen",
@@ -585,7 +603,8 @@
     "incorrectPin": "Falsche PIN",
     "appVersion": "App-Version",
     "checkForUpdates": "Nach Updates suchen",
-    "checkingForUpdates": "Suche nach Updates..."
+    "checkingForUpdates": "Suche nach Updates...",
+    "privacyHint": "Diese PIN ist nur eine einfache Bildschirmsperre. Daten in diesem Browser sind nicht verschlüsselt."
   },
   "releaseNotes": {
     "title": "Änderungsprotokoll",
