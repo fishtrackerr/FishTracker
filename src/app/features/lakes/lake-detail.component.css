@@ -38,7 +38,6 @@
 }
 .save-btn {
   width: 100%;
-  background: var(--primary) !important;
-  color: var(--text-on-primary) !important;
+  font-weight: 600 !important;
 }
 .delete-btn { width: 100%; margin-top: 24px; }

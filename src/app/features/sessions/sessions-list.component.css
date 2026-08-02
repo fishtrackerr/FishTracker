@@ -41,8 +41,6 @@
 .start-btn {
   width: 100%;
   min-height: var(--button-height);
-  background: var(--primary) !important;
-  color: var(--text-on-primary) !important;
   margin-bottom: var(--spacing-md);
 }
 

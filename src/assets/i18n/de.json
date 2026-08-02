@@ -21,7 +21,8 @@
     "rename": "Umbenennen",
     "retry": "Erneut versuchen",
     "loading": "Wird geladen...",
-    "errorGeneric": "Etwas ist schiefgelaufen"
+    "errorGeneric": "Etwas ist schiefgelaufen",
+    "back": "Zurück"
   },
   "connectivity": {
     "offlineBanner": "Du bist offline — Fänge und Sessions funktionieren weiter",
@@ -39,6 +40,7 @@
     "currentWeather": "Aktuelles Wetter",
     "recentSessions": "Letzte Sitzungen",
     "homepageAlt": "Startseitenbild",
+    "changeHomepageImage": "Startseitenbild ändern",
     "loadError": "Dashboard-Daten konnten nicht geladen werden. Bitte erneut versuchen.",
     "startFailed": "Sitzung konnte nicht gestartet werden. Bitte erneut versuchen.",
     "sessionStarted": "Sitzung gestartet",
@@ -108,6 +110,7 @@
     "large": "Groß",
     "showFavoritesFirst": "Favoriten zuerst anzeigen",
     "clearHomepageImage": "Startseitenbild löschen",
+    "changeHomepageImage": "Startseitenbild ändern",
     "general": "Allgemein",
     "defaultLake": "Standardsee",
     "maxRods": "Max. Ruten pro Sitzung",
@@ -233,7 +236,7 @@
     "settings": "Einstellungen",
     "more": "Mehr",
     "assistant": "Assistent",
-    "shareWhatsApp": "Per WhatsApp teilen"
+    "shareWhatsApp": "WhatsApp"
   },
   "modeSelect": {
     "title": "Angelmodus wählen",
@@ -320,7 +323,9 @@
     "sessionDeleted": "Sitzung gelöscht"
   },
   "weatherHistory": {
-    "title": "Wetterverlauf"
+    "title": "Wetterverlauf",
+    "pageTitle": "Wetterverlauf",
+    "more": "Mehr Wetterdaten"
   },
   "sessionEdit": {
     "title": "Sitzung bearbeiten",

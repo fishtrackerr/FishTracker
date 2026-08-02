@@ -67,40 +67,60 @@
       <mat-icon>water</mat-icon>
       <span>{{ 'nav.lakes' | tr }}</span>
     </a>
+    <div class="more-wrap">
+      <button
+        type="button"
+        class="more-trigger"
+        [class.active]="isMoreRouteActive() || moreMenuOpen()"
+        (click)="toggleMoreMenu($event)"
+        [attr.aria-label]="'nav.more' | tr"
+        [attr.aria-expanded]="moreMenuOpen()"
+        [attr.aria-controls]="'more-nav-menu'"
+        [attr.aria-current]="isMoreRouteActive() ? 'page' : null"
+      >
+        <mat-icon>more_horiz</mat-icon>
+        <span>{{ 'nav.more' | tr }}</span>
+      </button>
+      @if (moreMenuOpen()) {
+        <div
+          id="more-nav-menu"
+          class="more-nav-menu"
+          role="menu"
+          [attr.aria-label]="'nav.more' | tr"
+        >
+          @if (!activeSession()) {
+            <a role="menuitem" routerLink="/assistant" (click)="closeMoreMenu()">
+              <mat-icon>smart_toy</mat-icon>
+              <span>{{ 'nav.assistant' | tr }}</span>
+            </a>
+          }
+          <a role="menuitem" routerLink="/gallery" (click)="closeMoreMenu()">
+            <mat-icon>photo_library</mat-icon>
+            <span>{{ 'nav.gallery' | tr }}</span>
+          </a>
+          <a role="menuitem" routerLink="/statistics" (click)="closeMoreMenu()">
+            <mat-icon>bar_chart</mat-icon>
+            <span>{{ 'nav.stats' | tr }}</span>
+          </a>
+          <button role="menuitem" type="button" (click)="shareViaWhatsApp()">
+            <mat-icon>share</mat-icon>
+            <span>{{ 'nav.shareWhatsApp' | tr }}</span>
+          </button>
+          <a role="menuitem" routerLink="/settings" (click)="closeMoreMenu()">
+            <mat-icon>settings</mat-icon>
+            <span>{{ 'nav.settings' | tr }}</span>
+          </a>
+        </div>
+      }
+    </div>
+  </nav>
+  @if (moreMenuOpen()) {
     <button
       type="button"
-      class="more-trigger"
-      [class.active]="isMoreRouteActive()"
-      [matMenuTriggerFor]="moreMenu"
-      [attr.aria-label]="'nav.more' | tr"
-      [attr.aria-current]="isMoreRouteActive() ? 'page' : null"
-    >
-      <mat-icon>more_horiz</mat-icon>
-      <span>{{ 'nav.more' | tr }}</span>
-    </button>
-    <mat-menu #moreMenu="matMenu" class="more-nav-menu">
-      @if (!activeSession()) {
-        <a mat-menu-item routerLink="/assistant">
-          <mat-icon>smart_toy</mat-icon>
-          <span>{{ 'nav.assistant' | tr }}</span>
-        </a>
-      }
-      <a mat-menu-item routerLink="/gallery">
-        <mat-icon>photo_library</mat-icon>
-        <span>{{ 'nav.gallery' | tr }}</span>
-      </a>
-      <a mat-menu-item routerLink="/statistics">
-        <mat-icon>bar_chart</mat-icon>
-        <span>{{ 'nav.stats' | tr }}</span>
-      </a>
-      <button mat-menu-item type="button" (click)="shareViaWhatsApp()">
-        <mat-icon>share</mat-icon>
-        <span>{{ 'nav.shareWhatsApp' | tr }}</span>
-      </button>
-      <a mat-menu-item routerLink="/settings">
-        <mat-icon>settings</mat-icon>
-        <span>{{ 'nav.settings' | tr }}</span>
-      </a>
-    </mat-menu>
-  </nav>
+      class="more-menu-backdrop"
+      (click)="closeMoreMenu()"
+      aria-hidden="true"
+      tabindex="-1"
+    ></button>
+  }
 </div>

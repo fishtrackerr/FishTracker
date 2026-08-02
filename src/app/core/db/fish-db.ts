@@ -18,6 +18,7 @@ import {
 import { DEFAULT_SETTINGS } from '../models/app-settings.model';
 import { DEFAULT_FISHING_MODE } from '../models/fishing-mode.model';
 import { generateId, nowIso } from '../utils';
+import { migrateCarperToCatfish } from './migrate-carper-to-catfish';
 
 const SETTINGS_KEY = 'fish-tracker-settings';
 
@@ -268,6 +269,28 @@ export class FishDb extends Dexie {
             }
           }
         }
+      });
+
+    // One-time: move all carper-scoped data into catfish (indexes unchanged).
+    this.version(8)
+      .stores({
+        sessions: 'id, fishingMode, [fishingMode+status], lakeId, startDate',
+        catches: 'id, fishingMode, sessionId, rodId, sessionSpotId, species, caughtAt',
+        lakes: 'id, fishingMode, name, isFavorite',
+        images: 'id, fishingMode, type, parentId, isFavorite, isHomepageImage',
+        profiles: 'id',
+        profileDocuments: 'id, type, title',
+        biteEvents: 'id, fishingMode, sessionId, rodId, occurredAt',
+        fishSpottedEvents: 'id, fishingMode, sessionId, rodId, spottedAt',
+        rodSpotHistory: 'id, fishingMode, rodId, changedAt',
+        sessionEvents: 'id, fishingMode, sessionId, type, occurredAt',
+        sessionWeather: 'id, fishingMode, sessionId, capturedAt',
+        userOptions: 'id, fishingMode, [fishingMode+category], category, value',
+        chatThreads: 'id, fishingMode, updatedAt',
+        chatMessages: 'id, threadId, createdAt',
+      })
+      .upgrade(async (tx) => {
+        await migrateCarperToCatfish(tx);
       });
   }
 }

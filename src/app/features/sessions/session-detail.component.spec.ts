@@ -59,6 +59,7 @@ describe('SessionDetailComponent', () => {
             getDurationMs: vi.fn().mockReturnValue(0),
             complete: vi.fn(),
             delete: vi.fn(),
+            resolveCoverImageId: vi.fn().mockResolvedValue(undefined),
           },
         },
         {

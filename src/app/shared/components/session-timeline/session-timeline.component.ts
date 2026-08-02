@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
-import { of, switchMap } from 'rxjs';
+import { map, of, switchMap } from 'rxjs';
 import { SessionEvent } from '../../../core/models';
 import { SessionEventService } from '../../../core/services/session-event.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -47,9 +47,11 @@ export class SessionTimelineComponent {
 
   readonly sessionId = input.required<string>();
 
+  /** Weather updates live under Weather history; keep the session timeline readable. */
   readonly events = toSignal(
     toObservable(this.sessionId).pipe(
       switchMap((id) => (id ? this.sessionEvents.watchBySession(id) : of([] as SessionEvent[]))),
+      map((events) => events.filter((e) => e.type !== 'weather')),
     ),
     { initialValue: [] as SessionEvent[] },
   );

@@ -44,26 +44,24 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       >
         <div expandHeader class="card-header">
           <div class="cover-wrap">
-            <app-image-thumb [imageId]="session.coverImageId" placeholder="🌊" />
+            <app-image-thumb [imageId]="coverImageId()" placeholder="🌊" />
           </div>
           <div class="header-main">
-            <div class="title-row">
-              <h3 class="name">{{ session.name }}</h3>
-              <div class="badges">
-                @if (session.catchCount > 0) {
-                  <span
-                    class="badge catches"
-                    [attr.aria-label]="('sessionCard.catchesBadge' | tr: { count: session.catchCount })"
-                  >
-                    🐟 {{ session.catchCount }}
-                  </span>
-                }
-                <span class="badge" [class]="session.status">{{ ('sessionStatus.' + session.status) | tr }}</span>
-              </div>
-            </div>
+            <h3 class="name">{{ session.name }}</h3>
             @if (lakeName) {
               <p class="row lake">🌊 {{ lakeName }}</p>
             }
+            <div class="badges">
+              <span class="badge" [class]="session.status">{{ ('sessionStatus.' + session.status) | tr }}</span>
+              @if (session.catchCount > 0) {
+                <span
+                  class="badge catches"
+                  [attr.aria-label]="('sessionCard.catchesBadge' | tr: { count: session.catchCount })"
+                >
+                  🐟 {{ session.catchCount }}
+                </span>
+              }
+            </div>
           </div>
         </div>
 
@@ -83,21 +81,26 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
             }
           </div>
 
-          <app-expandable-section
-            sectionId="session-{{ session.id }}-details"
-            label="session details"
-            [persistKey]="'session-card-details-' + session.id"
-            [defaultExpanded]="false"
-          >
-            <div expandHeader class="expand-label">{{ 'sessionCard.moreInformation' | tr }}</div>
-            @if (session.weather?.temperatureC != null) {
-              <p class="row">{{ 'sessionCard.temperature' | tr }} {{ session.weather!.temperatureC }}°C</p>
-            }
-            @if (session.notes) {
-              <p class="row notes">{{ session.notes }}</p>
-            }
-            <p class="row muted">{{ 'sessionCard.updated' | tr }} {{ session.updatedAt | date:'medium' }}</p>
-          </app-expandable-section>
+          <div class="more-info-box">
+            <app-expandable-section
+              sectionId="session-{{ session.id }}-details"
+              label="session details"
+              [persistKey]="'session-card-details-' + session.id"
+              [defaultExpanded]="false"
+              [flat]="true"
+            >
+              <div expandHeader class="expand-label">{{ 'sessionCard.moreInformation' | tr }}</div>
+              <div class="more-info-body">
+                @if (session.weather?.temperatureC != null) {
+                  <p class="row">{{ 'sessionCard.temperature' | tr }} {{ session.weather!.temperatureC }}°C</p>
+                }
+                @if (session.notes) {
+                  <p class="row notes">{{ session.notes }}</p>
+                }
+                <p class="row muted">{{ 'sessionCard.updated' | tr }} {{ session.updatedAt | date:'medium' }}</p>
+              </div>
+            </app-expandable-section>
+          </div>
 
           <div class="actions" data-no-expand>
             @if (session.status === 'active') {
@@ -129,17 +132,20 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     }
     .card-header {
       display: flex;
+      align-items: flex-start;
       gap: var(--spacing-md);
       width: 100%;
       padding: var(--spacing-md);
-      padding-right: 0;
+      padding-right: var(--spacing-xs);
+      min-width: 0;
     }
     .cover-wrap {
-      width: 88px;
-      height: 72px;
+      width: 80px;
+      height: 80px;
       flex-shrink: 0;
       border-radius: var(--radius-sm);
       overflow: hidden;
+      background: var(--background-secondary);
     }
     .cover-wrap app-image-thumb {
       display: block;
@@ -151,36 +157,32 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-xs);
+      gap: 6px;
       justify-content: center;
-    }
-    .card-body {
-      padding: 0 var(--spacing-md) var(--spacing-md);
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-xs);
-    }
-    .title-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: var(--spacing-sm);
-      justify-content: space-between;
+      padding-right: var(--spacing-xs);
     }
     .name {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 1.125rem;
       font-weight: 600;
-      flex: 1;
-      min-width: 0;
-      word-break: break-word;
+      line-height: 1.3;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+    .row.lake {
+      font-size: 0.85rem;
+      color: var(--text-muted);
     }
     .badges {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: var(--spacing-xs);
-      flex-shrink: 0;
     }
     .badge {
       text-transform: capitalize;
@@ -194,12 +196,24 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       background: color-mix(in srgb, var(--primary) 15%, transparent);
       color: var(--primary);
     }
-    .badge.completed { background: color-mix(in srgb, var(--success, #22c55e) 15%, transparent); color: var(--success, #22c55e); }
-    .badge.planned { background: color-mix(in srgb, var(--info, #3b82f6) 15%, transparent); color: var(--info, #3b82f6); }
+    .badge.completed {
+      background: color-mix(in srgb, var(--success, #22c55e) 15%, transparent);
+      color: var(--success, #22c55e);
+    }
+    .badge.planned {
+      background: color-mix(in srgb, var(--info, #3b82f6) 15%, transparent);
+      color: var(--info, #3b82f6);
+    }
     .badge.catches {
       text-transform: none;
       background: color-mix(in srgb, var(--success, #22c55e) 15%, transparent);
       color: var(--success, #22c55e);
+    }
+    .card-body {
+      padding: 4px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
     }
     .row {
       margin: 0;
@@ -207,7 +221,10 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       color: var(--text-secondary);
       line-height: 1.4;
     }
-    .row.muted { font-size: 0.8rem; color: var(--text-muted); }
+    .row.muted {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
     .row.notes {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -228,18 +245,35 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       font-weight: 600;
       color: var(--text-secondary);
     }
+    .more-info-box {
+      margin-top: var(--spacing-xs);
+      padding: 8px 16px;
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-md);
+      background: var(--background-secondary);
+    }
+    .more-info-body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+      padding: 8px 0;
+    }
     .actions {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: var(--spacing-sm);
       margin-top: var(--spacing-sm);
     }
+    .actions > button,
+    .actions > a {
+      flex: 1 1 0;
+      min-width: 0;
+    }
     .btn-primary {
-      background: var(--primary) !important;
-      color: var(--text-on-primary) !important;
+      font-weight: 600 !important;
     }
     .card-body app-expandable-section {
-      margin-top: var(--spacing-xs);
+      display: block;
     }
   `,
 })
@@ -255,20 +289,32 @@ export class SessionCardComponent implements OnInit, OnChanges, OnDestroy {
   readonly editSession = output<FishingSession>();
 
   readonly durationText = signal('');
+  readonly coverImageId = signal<string | undefined>(undefined);
   private durationIntervalId?: ReturnType<typeof setInterval>;
 
   ngOnInit(): void {
     this.startDurationTicker();
+    void this.refreshCover();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['session'] && !changes['session'].firstChange) {
       this.startDurationTicker();
+      void this.refreshCover();
     }
   }
 
   ngOnDestroy(): void {
     this.stopDurationTicker();
+  }
+
+  private async refreshCover(): Promise<void> {
+    const session = this.session;
+    if (!session) {
+      this.coverImageId.set(undefined);
+      return;
+    }
+    this.coverImageId.set(await this.sessionService.resolveCoverImageId(session));
   }
 
   private startDurationTicker(): void {

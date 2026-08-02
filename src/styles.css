@@ -15,6 +15,8 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
   background: var(--background-primary);
   color: var(--text-primary);
   font-family: var(--font-family);
@@ -64,7 +66,7 @@ a {
   gap: var(--spacing-sm);
   min-height: var(--button-height);
   padding: 0 var(--spacing-md);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-button);
   font-weight: 500;
   cursor: pointer;
   border: none;
@@ -72,16 +74,17 @@ a {
 }
 
 .app-btn-primary {
-  background: var(--primary);
-  color: var(--text-on-primary);
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
 }
 
 .app-btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .app-btn-primary:active:not(:disabled) {
-  background: var(--primary-active);
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 .app-btn-outline {
@@ -91,8 +94,9 @@ a {
 }
 
 .app-btn-danger {
-  background: var(--danger);
-  color: #fff;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
 }
 
 .app-btn:disabled {

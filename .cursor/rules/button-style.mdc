@@ -1,0 +1,47 @@
+---
+description: Unified action button corner radius and Material button conventions
+globs:
+  - "**/*.{html,css,ts}"
+alwaysApply: false
+---
+
+# Button style
+
+Action buttons share the weather-card / app-card corner radius via `--radius-button` (aliased to `--radius-md` / 12px).
+
+## Must do
+
+- Use Angular Material `mat-flat-button` / `mat-unelevated-button` (primary), `mat-stroked-button` (secondary), or `mat-button` (tertiary text). Prefer `.app-btn*` utilities only when Material is not appropriate.
+- Corner radius must be `var(--radius-button)` — never hardcoded px values.
+- Rely on global overrides in `src/styles/material-overrides.css`. Do not re-declare `border-radius` on feature CSS unless necessary; if you must, use `var(--radius-button)`.
+- Primary = filled with `--primary`; secondary = stroked; destructive = `mat-warn` + confirmation dialog.
+
+## Must not
+
+- Force `--radius-button` on `mat-icon-button` — icon buttons stay circular.
+- Hardcode `border-radius` on action buttons (e.g. `8px`, `14px`).
+- Invent a one-off button shape that diverges from weather-card rounding.
+
+## Examples
+
+```html
+<!-- ✅ GOOD -->
+<button mat-flat-button color="primary" type="button">Save</button>
+<button mat-stroked-button type="button">Cancel</button>
+
+<!-- ❌ BAD — custom radius on an action button -->
+<button mat-flat-button type="button" style="border-radius: 4px">Save</button>
+```
+
+```css
+/* ✅ GOOD */
+.my-cta {
+  min-height: var(--button-height);
+  /* shape comes from Material + --radius-button */
+}
+
+/* ❌ BAD */
+.my-cta {
+  border-radius: 8px;
+}
+```

@@ -21,7 +21,8 @@
     "rename": "Hernoemen",
     "retry": "Opnieuw proberen",
     "loading": "Laden...",
-    "errorGeneric": "Er is iets misgegaan"
+    "errorGeneric": "Er is iets misgegaan",
+    "back": "Terug"
   },
   "connectivity": {
     "offlineBanner": "Je bent offline — vangsten en sessies blijven werken",
@@ -39,6 +40,7 @@
     "currentWeather": "Huidig weer",
     "recentSessions": "Recente sessies",
     "homepageAlt": "Startpagina afbeelding",
+    "changeHomepageImage": "Startpagina-afbeelding wijzigen",
     "loadError": "Dashboardgegevens konden niet worden geladen. Probeer opnieuw.",
     "startFailed": "Kon sessie niet starten. Probeer opnieuw.",
     "sessionStarted": "Sessie gestart",
@@ -108,6 +110,7 @@
     "large": "Groot",
     "showFavoritesFirst": "Toon favorieten eerst",
     "clearHomepageImage": "Startpagina-afbeelding wissen",
+    "changeHomepageImage": "Startpagina-afbeelding wijzigen",
     "general": "Algemeen",
     "defaultLake": "Standaard meer",
     "maxRods": "Max. hengels per sessie",
@@ -233,7 +236,7 @@
     "settings": "Instellingen",
     "more": "Meer",
     "assistant": "Assistent",
-    "shareWhatsApp": "Delen via WhatsApp"
+    "shareWhatsApp": "WhatsApp"
   },
   "modeSelect": {
     "title": "Kies vissmodus",
@@ -320,7 +323,9 @@
     "sessionDeleted": "Sessie verwijderd"
   },
   "weatherHistory": {
-    "title": "Weergeschiedenis"
+    "title": "Weergeschiedenis",
+    "pageTitle": "Weergeschiedenis",
+    "more": "Meer weergegevens"
   },
   "sessionEdit": {
     "title": "Sessie bewerken",

@@ -1,17 +1,53 @@
 /* Angular Material overrides using design tokens */
 
+/* Form fields / selects — match outline button look (primary border, button radius) */
 .mat-mdc-form-field {
   width: 100%;
-  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mdc-outlined-text-field-label-text-color: var(--primary);
   --mdc-outlined-text-field-input-text-color: var(--text-primary);
-  --mdc-outlined-text-field-outline-color: var(--border-primary);
-  --mdc-outlined-text-field-focus-outline-color: var(--border-active);
-  --mdc-outlined-text-field-hover-outline-color: var(--text-muted);
-  --mdc-outlined-text-field-container-shape: var(--radius-sm);
+  --mdc-outlined-text-field-caret-color: var(--primary);
+  --mdc-outlined-text-field-outline-color: var(--primary);
+  --mdc-outlined-text-field-focus-outline-color: var(--primary);
+  --mdc-outlined-text-field-hover-outline-color: var(--primary-hover);
+  --mdc-outlined-text-field-disabled-outline-color: var(--border-primary);
+  --mdc-outlined-text-field-disabled-input-text-color: var(--text-muted);
+  --mdc-outlined-text-field-disabled-label-text-color: var(--text-muted);
+  --mdc-outlined-text-field-container-shape: var(--radius-button);
+  --mat-form-field-outlined-container-shape: var(--radius-button);
+  --mat-form-field-outlined-outline-width: 1px;
+  --mat-form-field-outlined-focus-outline-width: 1px;
+  --mat-form-field-container-height: var(--button-height);
+  --mat-form-field-container-vertical-padding: 10px;
+}
+
+.mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-color: var(--primary) !important;
+}
+
+.mat-mdc-form-field.mat-focused .mdc-notched-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-color: var(--primary) !important;
+}
+
+.mat-mdc-form-field .mdc-notched-outline__leading {
+  border-top-left-radius: var(--radius-button) !important;
+  border-bottom-left-radius: var(--radius-button) !important;
+}
+
+.mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-top-right-radius: var(--radius-button) !important;
+  border-bottom-right-radius: var(--radius-button) !important;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-focus-overlay {
+  background: transparent;
 }
 
 .mat-mdc-text-field-wrapper .mat-mdc-form-field-infix {
-  min-height: var(--input-height);
+  min-height: var(--button-height);
   padding-top: 12px;
   padding-bottom: 12px;
 }
@@ -21,9 +57,16 @@ textarea.mat-mdc-input-element {
   padding-inline: 12px !important;
 }
 
+.mat-mdc-form-field .mat-mdc-form-field-icon-prefix,
+.mat-mdc-form-field .mat-icon[matPrefix],
+.mat-mdc-form-field .mat-mdc-form-field-icon-suffix,
+.mat-mdc-form-field .mat-icon[matSuffix] {
+  color: var(--primary);
+}
+
 .mat-mdc-select {
-  --mat-select-enabled-arrow-color: var(--text-secondary);
-  --mat-select-focused-arrow-color: var(--border-active);
+  --mat-select-enabled-arrow-color: var(--primary);
+  --mat-select-focused-arrow-color: var(--primary);
   --mat-select-disabled-arrow-color: var(--text-muted);
 }
 
@@ -66,8 +109,8 @@ textarea.mat-mdc-input-element {
 .theme-light-select-panel {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-button);
 }
 
 .cdk-overlay-container[data-theme='dark'] .mat-mdc-select-panel,
@@ -83,8 +126,8 @@ textarea.mat-mdc-input-element {
 .mat-mdc-autocomplete-panel {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-button);
 }
 
 .mat-datepicker-content {
@@ -162,25 +205,29 @@ textarea.mat-mdc-input-element {
   padding-top: var(--spacing-sm);
 }
 
-/* Dialog button styling for all button types */
+/* Dialog buttons — same outline style as app-wide buttons */
 .mat-mdc-dialog-container .mat-mdc-button:not(:disabled),
-.mat-mdc-dialog-container .mat-mdc-outlined-button:not(:disabled) {
+.mat-mdc-dialog-container .mat-mdc-outlined-button:not(:disabled),
+.mat-mdc-dialog-container .mat-mdc-unelevated-button:not(:disabled),
+.mat-mdc-dialog-container .mat-mdc-flat-button:not(:disabled),
+.mat-mdc-dialog-container .mat-mdc-raised-button:not(:disabled) {
   --mdc-text-button-label-text-color: var(--primary);
   --mdc-outlined-button-label-text-color: var(--primary);
   --mdc-outlined-button-outline-color: var(--primary);
-}
-
-.mat-mdc-dialog-container .mat-mdc-flat-button:not(:disabled) {
-  --mdc-filled-button-container-color: var(--primary);
-  --mdc-filled-button-label-text-color: var(--text-on-primary);
+  --mdc-filled-button-container-color: transparent;
+  --mdc-filled-button-label-text-color: var(--primary);
+  --mdc-protected-button-container-color: transparent;
+  --mdc-protected-button-label-text-color: var(--primary);
 }
 
 /* Ensure form fields inside dialogs have proper styling */
 .mat-mdc-dialog-container .mat-mdc-form-field {
-  --mdc-outlined-text-field-outline-color: var(--border-primary);
-  --mdc-outlined-text-field-focus-outline-color: var(--border-active);
-  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mdc-outlined-text-field-outline-color: var(--primary);
+  --mdc-outlined-text-field-focus-outline-color: var(--primary);
+  --mdc-outlined-text-field-hover-outline-color: var(--primary-hover);
+  --mdc-outlined-text-field-label-text-color: var(--primary);
   --mdc-outlined-text-field-input-text-color: var(--text-primary);
+  --mdc-outlined-text-field-container-shape: var(--radius-button);
 }
 
 .cdk-overlay-backdrop.themed-backdrop.theme-backdrop-dark,
@@ -196,50 +243,98 @@ textarea.mat-mdc-input-element {
   background: rgba(23, 33, 43, 0.26);
 }
 
+/* Unified outline button style (“Vraag je data”) for all Material buttons */
 .mat-mdc-button,
 .mat-mdc-outlined-button,
 .mat-mdc-unelevated-button,
 .mat-mdc-raised-button,
-.mat-mdc-flat-button {
-  --mat-button-text-container-shape: var(--radius-md);
-  --mat-button-filled-container-shape: var(--radius-md);
-  --mat-button-protected-container-shape: var(--radius-md);
-  --mat-button-outlined-container-shape: var(--radius-md);
-  --mat-button-tonal-container-shape: var(--radius-md);
-  border-radius: var(--radius-md);
+.mat-mdc-flat-button,
+a.mat-mdc-button,
+a.mat-mdc-outlined-button,
+a.mat-mdc-unelevated-button,
+a.mat-mdc-raised-button,
+a.mat-mdc-flat-button {
+  --mat-button-text-container-shape: var(--radius-button);
+  --mat-button-filled-container-shape: var(--radius-button);
+  --mat-button-protected-container-shape: var(--radius-button);
+  --mat-button-outlined-container-shape: var(--radius-button);
+  --mat-button-tonal-container-shape: var(--radius-button);
+  --mdc-outlined-button-label-text-color: var(--primary);
+  --mdc-outlined-button-outline-color: var(--primary);
+  --mdc-outlined-button-disabled-label-text-color: var(--text-muted);
+  --mdc-outlined-button-disabled-outline-color: var(--border-primary);
+  --mdc-filled-button-container-color: transparent;
+  --mdc-filled-button-label-text-color: var(--primary);
+  --mdc-filled-button-disabled-container-color: transparent;
+  --mdc-filled-button-disabled-label-text-color: var(--text-muted);
+  --mdc-protected-button-container-color: transparent;
+  --mdc-protected-button-label-text-color: var(--primary);
+  --mdc-protected-button-container-elevation-shadow: none;
+  --mdc-text-button-label-text-color: var(--primary);
+  border-radius: var(--radius-button) !important;
+  overflow: hidden;
+  min-height: var(--button-height);
+  background: transparent !important;
+  color: var(--primary) !important;
+  border: 1px solid var(--primary) !important;
+  box-shadow: none !important;
 }
 
 .mat-mdc-button .mdc-button__ripple,
 .mat-mdc-outlined-button .mdc-button__ripple,
 .mat-mdc-unelevated-button .mdc-button__ripple,
 .mat-mdc-raised-button .mdc-button__ripple,
-.mat-mdc-flat-button .mdc-button__ripple {
-  border-radius: var(--radius-md);
+.mat-mdc-flat-button .mdc-button__ripple,
+.mat-mdc-button .mdc-button__focus-ring,
+.mat-mdc-outlined-button .mdc-button__focus-ring,
+.mat-mdc-unelevated-button .mdc-button__focus-ring,
+.mat-mdc-raised-button .mdc-button__focus-ring,
+.mat-mdc-flat-button .mdc-button__focus-ring {
+  border-radius: var(--radius-button);
 }
 
-.mat-mdc-button,
-.mat-mdc-outlined-button {
-  --mdc-outlined-button-label-text-color: var(--primary);
-  --mdc-outlined-button-outline-color: var(--primary);
+.mat-mdc-button:disabled,
+.mat-mdc-outlined-button:disabled,
+.mat-mdc-unelevated-button:disabled,
+.mat-mdc-raised-button:disabled,
+.mat-mdc-flat-button:disabled,
+a.mat-mdc-button:disabled,
+a.mat-mdc-outlined-button:disabled,
+a.mat-mdc-unelevated-button:disabled,
+a.mat-mdc-raised-button:disabled,
+a.mat-mdc-flat-button:disabled {
+  color: var(--text-muted) !important;
+  border-color: var(--border-primary) !important;
+  background: transparent !important;
+  opacity: 0.6;
 }
 
-.mat-mdc-unelevated-button.mat-primary,
-.mat-mdc-raised-button.mat-primary,
-.mat-mdc-unelevated-button:not(:disabled) {
-  --mdc-filled-button-container-color: var(--primary);
-  --mdc-filled-button-label-text-color: var(--text-on-primary);
-}
-
+.mat-mdc-button.mat-warn,
+.mat-mdc-outlined-button.mat-warn,
 .mat-mdc-unelevated-button.mat-warn,
-.mat-mdc-raised-button.mat-warn {
-  --mdc-filled-button-container-color: var(--danger);
-  --mdc-filled-button-label-text-color: #fff;
+.mat-mdc-raised-button.mat-warn,
+.mat-mdc-flat-button.mat-warn,
+a.mat-mdc-button.mat-warn,
+a.mat-mdc-outlined-button.mat-warn,
+a.mat-mdc-unelevated-button.mat-warn,
+a.mat-mdc-raised-button.mat-warn,
+a.mat-mdc-flat-button.mat-warn {
+  --mdc-outlined-button-label-text-color: var(--danger);
+  --mdc-outlined-button-outline-color: var(--danger);
+  --mdc-filled-button-container-color: transparent;
+  --mdc-filled-button-label-text-color: var(--danger);
+  --mdc-protected-button-container-color: transparent;
+  --mdc-protected-button-label-text-color: var(--danger);
+  --mdc-text-button-label-text-color: var(--danger);
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+  background: transparent !important;
 }
 
 .mat-mdc-fab,
 .mat-mdc-mini-fab {
-  --mat-fab-container-shape: var(--radius-md);
-  border-radius: var(--radius-md);
+  --mat-fab-container-shape: var(--radius-button);
+  border-radius: var(--radius-button);
 }
 
 .mat-mdc-tab-group,

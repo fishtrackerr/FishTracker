@@ -15,6 +15,7 @@ import { SecretVaultService } from '../../core/services/secret-vault.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { ImageService } from '../../core/services/image.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
 import { WeatherService } from '../../core/services/weather.service';
 import { LakeService } from '../../core/services/lake.service';
 import { NotificationService } from '../../core/services/notification.service';
@@ -60,6 +61,7 @@ export class SettingsComponent implements OnInit {
   private readonly confirm = inject(ConfirmService);
   private readonly theme = inject(ThemeService);
   private readonly imageService = inject(ImageService);
+  private readonly photoPick = inject(PhotoPickService);
   private readonly weatherService = inject(WeatherService);
   private readonly lakeService = inject(LakeService);
   private readonly notifications = inject(NotificationService);
@@ -78,6 +80,7 @@ export class SettingsComponent implements OnInit {
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
   readonly message = signal('');
   readonly exporting = signal(false);
+  readonly changingHomepage = signal(false);
   readonly fullResetInput = signal('');
   readonly managedOptions = signal<Record<UserOptionCategory, UserOption[]>>({
     species: [],
@@ -223,6 +226,26 @@ export class SettingsComponent implements OnInit {
     void this.vault.clearAiApiKey().then(() => {
       this.notifications.success(this.i18n.t('settings.aiKeyCleared'));
     });
+  }
+
+  async changeHomepageImage(): Promise<void> {
+    if (this.changingHomepage()) {
+      return;
+    }
+    const file = await this.photoPick.pickImage({ capture: false });
+    if (!file) {
+      return;
+    }
+    this.changingHomepage.set(true);
+    try {
+      const id = await this.imageService.processFile(file, 'cover');
+      await this.imageService.setHomepageImage(id);
+      this.notifications.success(this.i18n.t('gallery.homepageUpdated'));
+    } catch {
+      this.notifications.error(this.i18n.t('images.uploadFailed'));
+    } finally {
+      this.changingHomepage.set(false);
+    }
   }
 
   async clearHomepageImage(): Promise<void> {

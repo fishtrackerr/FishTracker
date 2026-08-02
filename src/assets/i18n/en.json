@@ -21,7 +21,8 @@
     "rename": "Rename",
     "retry": "Try again",
     "loading": "Loading...",
-    "errorGeneric": "Something went wrong"
+    "errorGeneric": "Something went wrong",
+    "back": "Back"
   },
   "connectivity": {
     "offlineBanner": "You're offline — catches and sessions still work",
@@ -39,6 +40,7 @@
     "currentWeather": "Current Weather",
     "recentSessions": "Recent Sessions",
     "homepageAlt": "Homepage image",
+    "changeHomepageImage": "Change homepage image",
     "loadError": "Could not load dashboard data. Please try again.",
     "startFailed": "Could not start session. Please try again.",
     "sessionStarted": "Session started",
@@ -108,6 +110,7 @@
     "large": "Large",
     "showFavoritesFirst": "Show favorites first",
     "clearHomepageImage": "Clear homepage image",
+    "changeHomepageImage": "Change homepage image",
     "general": "General",
     "defaultLake": "Default lake",
     "maxRods": "Max rods per session",
@@ -233,7 +236,7 @@
     "settings": "Settings",
     "more": "More",
     "assistant": "Assistant",
-    "shareWhatsApp": "Share via WhatsApp"
+    "shareWhatsApp": "WhatsApp"
   },
   "modeSelect": {
     "title": "Choose fishing mode",
@@ -320,7 +323,9 @@
     "sessionDeleted": "Session deleted"
   },
   "weatherHistory": {
-    "title": "Weather history"
+    "title": "Weather history",
+    "pageTitle": "Weather history",
+    "more": "More weather history"
   },
   "sessionEdit": {
     "title": "Edit Session",

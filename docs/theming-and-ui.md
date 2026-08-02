@@ -61,7 +61,7 @@ Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hard
 
 ## Icons
 
-Material Icons via `@angular/material/icon` only. Icons are self-hosted (`material-icons` package, `filled.css` only) — do not load Google Fonts CDN. Production PWA prefetches `/media/*.woff2` via the service worker; Capacitor Android builds omit the SW and use APK assets.
+Material Icons via `@angular/material/icon` only. Icons are self-hosted (`material-icons` package, `filled.css` only) — do not load Google Fonts CDN. Production PWA prefetches `/media/*.woff2` via the service worker; Capacitor Android builds omit the SW and use APK assets. Critical CSS inlining is disabled (`inlineCritical: false`) so the full stylesheet (including Material Icons `@font-face`) loads under CSP without a blocked `onload` handler.
 
 ## Responsive rules
 
@@ -72,7 +72,10 @@ Material Icons via `@angular/material/icon` only. Icons are self-hosted (`materi
 
 ## Buttons
 
+- Corner radius: `var(--radius-button)` (aliased to `--radius-md` / 12px — same as weather-card and `.app-card`)
 - Primary: filled, `--primary` background
 - Stroked: outline for secondary actions
 - Delete: warn + confirmation dialog
+- `mat-icon-button` stays circular (do not apply `--radius-button`)
 - PIN unlock update check: small `mat-icon-button` with `refresh` icon in the top-right corner
+- Shape is set globally in `material-overrides.css`; feature CSS should not hardcode button `border-radius`

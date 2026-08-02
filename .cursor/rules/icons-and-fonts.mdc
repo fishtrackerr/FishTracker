@@ -16,10 +16,12 @@ alwaysApply: false
 - Keep Roboto self-hosted via `@fontsource/roboto`
 - Put icon/font `woff`/`woff2` under `/media/` in an ngsw **prefetch** asset group (see `ngsw-config.json` `fonts` group) for the GitHub Pages PWA build
 - Keep CSP `font-src 'self' data:` aligned with self-hosted fonts
-- After any font, service worker, or CSP change: verify icons on an **Android install** (PWA and/or Capacitor), not only desktop browser — broken fonts show clipped ligatures (`ho`, `ev`, `wa`, `me`) instead of glyphs
+- Keep production/android `optimization.styles.inlineCritical` set to **false** — CSP `script-src 'self'` blocks the deferred stylesheet `onload` handler, leaving full CSS (including Material Icons `@font-face`) stuck on `media="print"`
+- After any font, service worker, CSP, or optimization change: verify icons on an **Android install** (PWA and/or Capacitor), not only desktop browser — broken fonts show clipped ligatures (`ho`, `ev`, `wa`, `me`) instead of glyphs
 
 ## Must not
 
 - Reintroduce Google Fonts CDN (`fonts.googleapis.com` / `fonts.gstatic.com`) unless CSP **and** ngsw are updated together to allow and cache those URLs
 - Import the full `material-icons/iconfont/material-icons.css` (outlined/round/sharp/two-tone) unless multi-style icons are intentionally adopted — use `filled.css` only
 - Enable `"serviceWorker"` on the Angular **android** build configuration — Capacitor WebView ships assets in the APK; SW interception breaks icon fonts on installed Android builds. Keep SW only on **production** (Pages PWA)
+- Re-enable `inlineCritical: true` while CSP forbids inline event handlers (`onload`)

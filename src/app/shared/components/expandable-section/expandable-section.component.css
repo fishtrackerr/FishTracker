@@ -1,0 +1,90 @@
+:host {
+  display: block;
+}
+
+.expandable {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--background-card);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: 12px 16px;
+}
+
+.header.clickable {
+  cursor: pointer;
+}
+
+.header-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.toggle {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 1rem;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.flat {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.flat .header {
+  padding: 0;
+  align-items: stretch;
+}
+
+.flat .toggle {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: var(--spacing-md) var(--spacing-sm);
+}
+
+.flat .body-inner {
+  padding: 0;
+}
+
+.body {
+  transition: max-height 0.2s ease, opacity 0.2s ease;
+}
+
+.body-inner {
+  padding: 8px 16px 16px;
+}
+
+.body.collapsed {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

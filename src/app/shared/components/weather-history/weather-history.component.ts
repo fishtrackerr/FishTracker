@@ -1,22 +1,28 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { map, of, switchMap } from 'rxjs';
 import { SessionWeatherRecord } from '../../../core/models';
 import { FormatTempPipe } from '../../../core/pipes/format-units.pipe';
 import { SessionWeatherService } from '../../../core/services/session-weather.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
+const PREVIEW_LIMIT = 5;
+
 @Component({
   selector: 'app-weather-history',
   standalone: true,
-  imports: [DatePipe, FormatTempPipe, TranslatePipe],
+  imports: [DatePipe, FormatTempPipe, TranslatePipe, RouterLink, MatButtonModule],
   template: `
     @if (history().length > 1) {
       <section class="weather-history">
-        <h3 class="section-title">{{ 'weatherHistory.title' | tr }} ({{ history().length }})</h3>
+        <h3 class="section-title">
+          {{ 'weatherHistory.title' | tr }} ({{ history().length }})
+        </h3>
         <ul class="history-list">
-          @for (record of history(); track record.id) {
+          @for (record of visibleHistory(); track record.id) {
             <li
               class="history-item"
               [class.selected]="selectedId() === record.id"
@@ -41,6 +47,15 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
             </li>
           }
         </ul>
+        @if (showMoreLink()) {
+          <a
+            mat-stroked-button
+            class="more-btn"
+            [routerLink]="['/sessions', sessionId(), 'weather-history']"
+          >
+            {{ 'weatherHistory.more' | tr }}
+          </a>
+        }
       </section>
     }
   `,
@@ -94,12 +109,18 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       font-size: 0.8rem;
       color: var(--text-muted);
     }
+    .more-btn {
+      width: 100%;
+      margin-top: var(--spacing-md);
+    }
   `,
 })
 export class WeatherHistoryComponent {
   private readonly sessionWeather = inject(SessionWeatherService);
 
   readonly sessionId = input.required<string>();
+  /** When true, list every record (full history page). */
+  readonly showAll = input(false);
   readonly selectedId = signal<string | null>(null);
 
   readonly history = toSignal(
@@ -114,6 +135,18 @@ export class WeatherHistoryComponent {
       ),
     ),
     { initialValue: [] as SessionWeatherRecord[] },
+  );
+
+  readonly visibleHistory = computed(() => {
+    const all = this.history();
+    if (this.showAll() || all.length <= PREVIEW_LIMIT) {
+      return all;
+    }
+    return all.slice(0, PREVIEW_LIMIT);
+  });
+
+  readonly showMoreLink = computed(
+    () => !this.showAll() && this.history().length > PREVIEW_LIMIT,
   );
 
   toggle(id: string): void {

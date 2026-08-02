@@ -113,7 +113,5 @@ p {
   width: 100%;
   max-width: 300px;
   height: var(--input-height) !important;
-  background: var(--primary) !important;
-  color: var(--text-on-primary) !important;
   font-weight: 600 !important;
 }

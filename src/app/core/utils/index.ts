@@ -74,3 +74,8 @@ export {
   DEFAULT_FETCH_TIMEOUT_MS,
   fetchWithTimeout,
 } from './fetch-with-timeout';
+export {
+  pickCatchCoverPhotoId,
+  pickLakeCoverImageId,
+  resolveSessionCoverImageId,
+} from './session-cover.util';

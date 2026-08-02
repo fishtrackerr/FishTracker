@@ -22,6 +22,7 @@ Follow [AGENTS.md](../AGENTS.md) and [docs/development-guidelines.md](../docs/de
 - Use `UserOptionService` and `option-combobox` for custom catch dropdowns
 - Use `ResetService` with confirmation for all reset actions
 - Follow [icons-and-fonts.mdc](./icons-and-fonts.mdc) for Material Icons, self-hosted fonts, and PWA/Capacitor SW rules
+- Follow [button-style.mdc](./button-style.mdc) for action button shape (`--radius-button`) and Material variants
 
 ## Must not
 

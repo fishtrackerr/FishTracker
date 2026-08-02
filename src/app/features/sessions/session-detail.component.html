@@ -70,7 +70,7 @@
     <h2 class="section-title">{{ 'sessionDetail.images' | tr }}</h2>
     <div class="cover-preview">
       <app-image-thumb
-        [imageId]="s.coverImageId ?? s.photoIds[0]"
+        [imageId]="coverImageId() ?? s.photoIds[0]"
         [alt]="s.name + ' ' + ('sessionDetail.images' | tr)"
         placeholder="🎣"
       />

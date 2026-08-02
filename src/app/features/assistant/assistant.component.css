@@ -267,7 +267,6 @@
 
 .send-btn {
   align-self: flex-end;
-  background: var(--primary) !important;
-  color: var(--text-on-primary) !important;
   min-height: var(--button-height);
+  font-weight: 600 !important;
 }

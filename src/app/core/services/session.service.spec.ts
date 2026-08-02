@@ -44,13 +44,13 @@ describe('SessionService.start', () => {
         longitude: 5.1,
       })),
     };
-    lakeRepo = { getById: vi.fn().mockResolvedValue({ id: 'lake-1', name: 'Lake A' }) };
+    lakeRepo = { getById: vi.fn().mockResolvedValue({ id: 'lake-1', name: 'Lake A', photoIds: [] }) };
     geo = { getCurrentPosition: vi.fn().mockResolvedValue(null) };
     weather = {
       getSnapshot: vi.fn().mockResolvedValue(null),
       getCachedSnapshotFor: vi.fn().mockReturnValue(null),
     };
-    image = { createCoverImage: vi.fn().mockResolvedValue(undefined) };
+    image = { createCoverImage: vi.fn().mockResolvedValue(undefined), processFile: vi.fn() };
     settings = { update: vi.fn(), get: vi.fn().mockReturnValue({ maxRodCount: 10 }) };
     fishingMode = {
       updateActivePreferences: vi.fn(),
@@ -66,7 +66,7 @@ describe('SessionService.start', () => {
 
     service = new SessionService(
       sessionRepo as never,
-      {} as never,
+      { getBySession: vi.fn().mockResolvedValue([]) } as never,
       lakeRepo as never,
       geo as never,
       weather as never,
@@ -112,6 +112,40 @@ describe('SessionService.start', () => {
     expect(fishingMode.updateActivePreferences).toHaveBeenCalledWith({ lastLakeId: 'lake-1' });
   });
 
+  it('uses lake cover image when starting at a lake', async () => {
+    lakeRepo.getById.mockResolvedValue({
+      id: 'lake-1',
+      name: 'Lake A',
+      coverImageId: 'lake-cover-1',
+      photoIds: ['lake-photo-2'],
+    });
+
+    const session = await service.start({
+      name: 'Lake Session',
+      startDate: '2026-07-15T08:00:00.000Z',
+      lakeId: 'lake-1',
+    });
+
+    expect(session.coverImageId).toBe('lake-cover-1');
+    expect(image.createCoverImage).not.toHaveBeenCalled();
+  });
+
+  it('falls back to first lake photo when cover is missing', async () => {
+    lakeRepo.getById.mockResolvedValue({
+      id: 'lake-1',
+      name: 'Lake A',
+      photoIds: ['lake-photo-1'],
+    });
+
+    const session = await service.start({
+      name: 'Lake Session',
+      startDate: '2026-07-15T08:00:00.000Z',
+      lakeId: 'lake-1',
+    });
+
+    expect(session.coverImageId).toBe('lake-photo-1');
+  });
+
   it('returns existing active session without creating duplicate', async () => {
     const existing = { id: 's-1', status: 'active' } as FishingSession;
     sessionRepo.getActive.mockResolvedValue(existing);
@@ -123,18 +157,6 @@ describe('SessionService.start', () => {
 
     expect(session).toBe(existing);
     expect(sessionRepo.put).not.toHaveBeenCalled();
-  });
-
-  it('continues when cover image creation fails', async () => {
-    image.createCoverImage.mockRejectedValue(new Error('fetch failed'));
-
-    const session = await service.start({
-      name: 'No Cover',
-      startDate: '2026-07-15T08:00:00.000Z',
-    });
-
-    expect(session.coverImageId).toBeUndefined();
-    expect(sessionRepo.put).toHaveBeenCalled();
   });
 
   it('uses cached weather at start and refreshes live weather asynchronously', async () => {

@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Catch, WeatherSnapshot } from '../models';
-import { generateId, nowIso } from '../utils';
+import { generateId, nowIso, resolveSessionCoverImageId } from '../utils';
 import { CatchRepository } from './catch.repository';
 import { GeolocationService } from './geolocation.service';
 import { I18nService } from './i18n.service';
+import { ImageService } from './image.service';
+import { LakeRepository } from './lake.repository';
 import { SessionEventService } from './session-event.service';
 import { SessionRepository } from './session.repository';
 import { WeatherService } from './weather.service';
-import { ImageService } from './image.service';
 
 export interface QuickCatchInput {
   species: string;
@@ -44,6 +45,7 @@ export class CatchService {
   constructor(
     private readonly catchRepo: CatchRepository,
     private readonly sessionRepo: SessionRepository,
+    private readonly lakeRepo: LakeRepository,
     private readonly geo: GeolocationService,
     private readonly weather: WeatherService,
     private readonly image: ImageService,
@@ -132,7 +134,7 @@ export class CatchService {
 
     catchRecord.isPersonalRecord = await this.checkPersonalRecord(catchRecord);
     await this.catchRepo.put(catchRecord);
-    await this.updateSessionStats(sessionId, photoId);
+    await this.updateSessionStats(sessionId);
     await this.sessionEvents.record({
       sessionId,
       type: 'catch',
@@ -207,10 +209,7 @@ export class CatchService {
     return weightRecord || lengthRecord;
   }
 
-  private async updateSessionStats(
-    sessionId: string,
-    newCoverPhotoId?: string,
-  ): Promise<void> {
+  private async updateSessionStats(sessionId: string): Promise<void> {
     const session = await this.sessionRepo.getById(sessionId);
     if (!session) {
       return;
@@ -221,12 +220,13 @@ export class CatchService {
       (max, c) => Math.max(max, c.weightKg ?? 0),
       0,
     );
+    const lake = session.lakeId ? await this.lakeRepo.getById(session.lakeId) : undefined;
     await this.sessionRepo.put({
       ...session,
       catchCount: catches.length,
       totalCatchWeightKg: totalWeight,
       biggestFishKg: biggest > 0 ? biggest : undefined,
-      ...(newCoverPhotoId ? { coverImageId: newCoverPhotoId } : {}),
+      coverImageId: resolveSessionCoverImageId(catches, lake),
       updatedAt: nowIso(),
     });
   }

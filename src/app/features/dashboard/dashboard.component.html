@@ -1,10 +1,19 @@
 <app-page-title title="common.dashboard" />
 
-@if (homepageUrl(); as hero) {
-  <div class="homepage-hero">
+<button
+  type="button"
+  class="homepage-hero"
+  (click)="changeHomepageImage()"
+  [disabled]="changingHomepage()"
+  [attr.aria-label]="'dashboard.changeHomepageImage' | tr"
+>
+  @if (homepageUrl(); as hero) {
     <img [src]="hero" [alt]="'dashboard.homepageAlt' | tr" />
-  </div>
-}
+  }
+  <span class="hero-hint" aria-hidden="true">
+    <mat-icon>photo_camera</mat-icon>
+  </span>
+</button>
 
 @if (loadError(); as err) {
   <app-error-state [message]="err" (retry)="loadDashboard()" />

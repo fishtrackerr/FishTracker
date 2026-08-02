@@ -129,6 +129,9 @@
       <mat-checkbox [ngModel]="settings().galleryFavoritesFirst" (ngModelChange)="updateSetting('galleryFavoritesFirst', $event)">
         {{ 'settings.showFavoritesFirst' | tr }}
       </mat-checkbox>
+      <button mat-stroked-button type="button" (click)="changeHomepageImage()" [disabled]="changingHomepage()">
+        {{ 'settings.changeHomepageImage' | tr }}
+      </button>
       <button mat-stroked-button type="button" (click)="clearHomepageImage()">{{ 'settings.clearHomepageImage' | tr }}</button>
     </div>
   </app-expandable-section>

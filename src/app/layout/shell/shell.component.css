@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100dvh;
+  overflow: hidden;
   background: var(--background-primary);
   color: var(--text-primary);
 }
@@ -43,7 +44,7 @@
   height: 36px;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-button);
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
@@ -79,7 +80,9 @@
 
 .content {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior-y: none;
   padding: var(--spacing-md);
   padding-bottom: calc(72px + env(safe-area-inset-bottom));
 }
@@ -102,6 +105,10 @@
   background: var(--background-secondary);
   border-top: 1px solid var(--border-primary);
   z-index: 100;
+}
+
+.shell:has(.more-nav-menu) .bottom-nav {
+  z-index: 160;
 }
 
 .bottom-nav a,
@@ -132,6 +139,80 @@
   font-size: 22px;
   width: 22px;
   height: 22px;
+}
+
+.more-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.more-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.more-nav-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  z-index: 160;
+  min-width: 200px;
+  padding: var(--spacing-sm);
+  background: var(--background-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.more-nav-menu a,
+.more-nav-menu button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--spacing-md);
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.more-nav-menu mat-icon {
+  color: var(--primary);
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.more-nav-menu a:hover,
+.more-nav-menu button:hover,
+.more-nav-menu a:focus-visible,
+.more-nav-menu button:focus-visible {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  outline: none;
+  color: var(--text-primary);
 }
 
 .bottom-nav.with-current a,

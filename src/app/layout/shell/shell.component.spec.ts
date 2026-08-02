@@ -117,6 +117,19 @@ describe('ShellComponent', () => {
     expect(more?.textContent).toContain('nav.more');
   });
 
+  it('opens a dashboard-styled More menu from the trigger', () => {
+    const fixture = TestBed.createComponent(ShellComponent);
+    fixture.detectChanges();
+
+    const more = fixture.nativeElement.querySelector('.more-trigger') as HTMLButtonElement;
+    more.click();
+    fixture.detectChanges();
+
+    const menu = fixture.nativeElement.querySelector('.more-nav-menu') as HTMLElement | null;
+    expect(menu).toBeTruthy();
+    expect(menu?.textContent).toContain('nav.settings');
+  });
+
   it('shares the app via WhatsApp from the shell', () => {
     const fixture = TestBed.createComponent(ShellComponent);
     fixture.detectChanges();

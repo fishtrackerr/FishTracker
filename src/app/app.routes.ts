@@ -64,6 +64,13 @@ export const routes: Routes = [
           import('./features/catches/catch-form.component').then((m) => m.CatchFormComponent),
       },
       {
+        path: 'sessions/:id/weather-history',
+        loadComponent: () =>
+          import('./features/sessions/weather-history-page.component').then(
+            (m) => m.WeatherHistoryPageComponent,
+          ),
+      },
+      {
         path: 'sessions/:id',
         loadComponent: () =>
           import('./features/sessions/session-detail.component').then((m) => m.SessionDetailComponent),

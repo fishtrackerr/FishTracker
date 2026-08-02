@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, computed, inject, signal } 
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SessionService } from '../../core/services/session.service';
 import { StatisticsService, DashboardStats } from '../../core/services/statistics.service';
@@ -9,6 +10,9 @@ import { WeatherService } from '../../core/services/weather.service';
 import { GeolocationService } from '../../core/services/geolocation.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { ImageService } from '../../core/services/image.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
+import { NotificationService } from '../../core/services/notification.service';
+import { I18nService } from '../../core/services/i18n.service';
 import { WeatherSnapshot } from '../../core/models';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import { SessionCardComponent } from '../../shared/components/session-card/session-card.component';
@@ -27,6 +31,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
   imports: [
     MatButtonModule,
     MatDialogModule,
+    MatIconModule,
     RouterLink,
     StatCardComponent,
     SessionCardComponent,
@@ -47,6 +52,9 @@ export class DashboardComponent implements OnInit {
   private readonly geo = inject(GeolocationService);
   readonly settings = inject(SettingsService);
   private readonly imageService = inject(ImageService);
+  private readonly photoPick = inject(PhotoPickService);
+  private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
   private readonly sessionStartFlow = inject(SessionStartFlowService);
 
@@ -58,6 +66,7 @@ export class DashboardComponent implements OnInit {
   readonly loadError = signal<string | null>(null);
   readonly loading = signal(true);
   readonly homepageUrl = signal<string | null>(null);
+  readonly changingHomepage = signal(false);
 
   readonly recentSessions = computed(() => this.sessions().slice(0, 5));
 
@@ -98,6 +107,27 @@ export class DashboardComponent implements OnInit {
       }
     } catch {
       this.weather.set(this.weatherService.getCachedSnapshot());
+    }
+  }
+
+  async changeHomepageImage(): Promise<void> {
+    if (this.changingHomepage()) {
+      return;
+    }
+    const file = await this.photoPick.pickImage({ capture: false });
+    if (!file) {
+      return;
+    }
+    this.changingHomepage.set(true);
+    try {
+      const id = await this.imageService.processFile(file, 'cover');
+      await this.imageService.setHomepageImage(id);
+      this.homepageUrl.set(await this.imageService.getHomepageUrl());
+      this.notifications.success(this.i18n.t('gallery.homepageUpdated'));
+    } catch {
+      this.notifications.error(this.i18n.t('images.uploadFailed'));
+    } finally {
+      this.changingHomepage.set(false);
     }
   }
 

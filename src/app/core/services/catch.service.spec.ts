@@ -14,6 +14,7 @@ describe('CatchService', () => {
     getById: ReturnType<typeof vi.fn>;
     put: ReturnType<typeof vi.fn>;
   };
+  let lakeRepo: { getById: ReturnType<typeof vi.fn> };
   let processFile: ReturnType<typeof vi.fn>;
   let sessionEvents: { record: ReturnType<typeof vi.fn> };
   let i18n: { t: ReturnType<typeof vi.fn> };
@@ -38,6 +39,7 @@ describe('CatchService', () => {
     getCachedSnapshotFor?: ReturnType<typeof vi.fn>;
     getSnapshot?: ReturnType<typeof vi.fn>;
     session?: Record<string, unknown>;
+    lake?: Record<string, unknown> | null;
   }): void {
     catchRepo = {
       put: vi.fn().mockResolvedValue(undefined),
@@ -57,12 +59,26 @@ describe('CatchService', () => {
     sessionRepo = {
       getById: vi.fn().mockResolvedValue({
         id: 'session-1',
+        lakeId: 'lake-1',
         catchCount: 0,
         totalCatchWeightKg: 0,
-        coverImageId: 'generated-cover',
+        coverImageId: 'lake-cover',
         ...overrides?.session,
       }),
       put: vi.fn().mockResolvedValue(undefined),
+    };
+    lakeRepo = {
+      getById: vi.fn().mockResolvedValue(
+        overrides?.lake === null
+          ? undefined
+          : {
+              id: 'lake-1',
+              name: 'Lake A',
+              coverImageId: 'lake-cover',
+              photoIds: [],
+              ...overrides?.lake,
+            },
+      ),
     };
 
     service = new CatchService(
@@ -77,6 +93,7 @@ describe('CatchService', () => {
         deleteBySession: vi.fn(),
       } as never,
       sessionRepo as never,
+      lakeRepo as never,
       {
         getCurrentPosition:
           overrides?.getCurrentPosition ?? vi.fn().mockResolvedValue(null),
@@ -97,7 +114,7 @@ describe('CatchService', () => {
   });
 
   describe('createQuick', () => {
-    it('creates catch and updates session stats', async () => {
+    it('creates catch and keeps lake cover when catch has no photo', async () => {
       catchRepo.getBySession.mockResolvedValue([{ weightKg: 8.5 } as Catch]);
 
       const result = await service.createQuick('session-1', {
@@ -113,7 +130,7 @@ describe('CatchService', () => {
           catchCount: 1,
           totalCatchWeightKg: 8.5,
           biggestFishKg: 8.5,
-          coverImageId: 'generated-cover',
+          coverImageId: 'lake-cover',
         }),
       );
     });
@@ -121,7 +138,11 @@ describe('CatchService', () => {
     it('sets catch photo as session coverImageId', async () => {
       processFile.mockResolvedValue('catch-photo-1');
       catchRepo.getBySession.mockResolvedValue([
-        { weightKg: 3, photoId: 'catch-photo-1' } as Catch,
+        {
+          weightKg: 3,
+          photoId: 'catch-photo-1',
+          caughtAt: '2026-07-15T12:00:00.000Z',
+        } as Catch,
       ]);
       const photo = new File(['img'], 'catch.jpg', { type: 'image/jpeg' });
 

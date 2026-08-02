@@ -1,8 +1,6 @@
 .add-btn {
   width: 100%;
   min-height: var(--button-height);
-  background: var(--primary) !important;
-  color: var(--text-on-primary) !important;
   font-weight: 600 !important;
   margin-bottom: var(--spacing-md);
 }

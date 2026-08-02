@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Catch, FishingSession, SessionSpot, WeatherSnapshot } from '../models';
-import { generateId, nowIso } from '../utils';
+import { generateId, nowIso, pickLakeCoverImageId, resolveSessionCoverImageId } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
 import { FishSpottedRepository } from './fish-spotted.repository';
@@ -128,13 +128,6 @@ export class SessionService {
       // GPS is optional
     }
 
-    let coverImageId: string | undefined;
-    try {
-      coverImageId = await this.image.createCoverImage();
-    } catch {
-      // Cover image is optional
-    }
-
     const session = {
       id: sessionId,
       name:
@@ -153,7 +146,7 @@ export class SessionService {
       photoIds: [],
       catchCount: 0,
       totalCatchWeightKg: 0,
-      coverImageId,
+      coverImageId: pickLakeCoverImageId(lake),
       createdAt: now,
       updatedAt: now,
     };
@@ -291,8 +284,18 @@ export class SessionService {
     merged.totalCatchWeightKg = totalWeight;
     merged.biggestFishKg = biggest > 0 ? biggest : undefined;
 
+    const lake = merged.lakeId ? await this.lakeRepo.getById(merged.lakeId) : undefined;
+    merged.coverImageId = resolveSessionCoverImageId(catches, lake);
+
     await this.sessionRepo.put(merged);
     return merged;
+  }
+
+  /** Catch photo if present, otherwise the lake image. */
+  async resolveCoverImageId(session: FishingSession): Promise<string | undefined> {
+    const catches = await this.catchRepo.getBySession(session.id);
+    const lake = session.lakeId ? await this.lakeRepo.getById(session.lakeId) : undefined;
+    return resolveSessionCoverImageId(catches, lake);
   }
 
   async refreshWeather(id: string): Promise<void> {

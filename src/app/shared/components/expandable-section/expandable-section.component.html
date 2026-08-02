@@ -1,0 +1,24 @@
+<section class="expandable" [class.expanded]="expanded()" [class.flat]="flat">
+  <div class="header" [class.clickable]="collapsible" (click)="onHeaderClick($event)">
+    <div class="header-content">
+      <ng-content select="[expandHeader]" />
+    </div>
+    @if (collapsible) {
+      <button
+        type="button"
+        class="toggle"
+        [attr.aria-expanded]="expanded()"
+        [attr.aria-controls]="sectionId"
+        (click)="toggle($event)"
+      >
+        <span class="toggle-icon" aria-hidden="true">{{ expanded() ? '▲' : '▼' }}</span>
+        <span class="sr-only">{{ expanded() ? 'Collapse' : 'Expand' }} {{ label }}</span>
+      </button>
+    }
+  </div>
+  <div [id]="sectionId" class="body" [class.collapsed]="collapsible && !expanded()">
+    <div class="body-inner">
+      <ng-content />
+    </div>
+  </div>
+</section>

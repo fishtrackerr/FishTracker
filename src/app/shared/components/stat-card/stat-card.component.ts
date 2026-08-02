@@ -11,21 +11,22 @@ import { Component, Input } from '@angular/core';
   `,
   styles: `
     .stat-card {
-      background: #1a1a1a;
+      background: var(--background-card);
       border-radius: var(--radius-md);
       padding: 16px;
       text-align: center;
-      border: 1px solid #333;
+      border: 1px solid var(--border-primary);
+      box-shadow: var(--shadow-sm);
     }
     .label {
       font-size: 0.75rem;
-      color: #888;
+      color: var(--text-muted);
       margin-bottom: 4px;
     }
     .value {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #ff6b00;
+      color: var(--primary);
     }
   `,
 })

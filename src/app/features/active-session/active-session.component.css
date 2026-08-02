@@ -204,13 +204,3 @@
   font-size: 1.1rem !important;
   font-weight: 600 !important;
 }
-
-.action-btn.primary {
-  background: var(--primary) !important;
-  color: var(--text-on-primary) !important;
-}
-
-.action-btn.end {
-  color: var(--text-muted) !important;
-  border-color: var(--border-primary) !important;
-}

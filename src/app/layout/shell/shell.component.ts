@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostListener,
   ViewChild,
   computed,
   effect,
@@ -12,8 +13,6 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatButtonModule } from '@angular/material/button';
 import { filter, startWith } from 'rxjs';
 import { ConnectivityService } from '../../core/services/connectivity.service';
 import { FeedbackPromptService } from '../../core/services/feedback-prompt.service';
@@ -31,8 +30,6 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
     RouterLink,
     RouterLinkActive,
     MatIconModule,
-    MatMenuModule,
-    MatButtonModule,
     TranslatePipe,
   ],
   templateUrl: './shell.component.html',
@@ -56,6 +53,7 @@ export class ShellComponent implements AfterViewInit {
   });
 
   readonly currentMode = this.fishingMode.selectedMode;
+  readonly moreMenuOpen = signal(false);
 
   private readonly bannerDismissed = signal(false);
 
@@ -76,7 +74,17 @@ export class ShellComponent implements AfterViewInit {
     this.bannerDismissed.set(true);
   }
 
+  toggleMoreMenu(event: Event): void {
+    event.stopPropagation();
+    this.moreMenuOpen.update((open) => !open);
+  }
+
+  closeMoreMenu(): void {
+    this.moreMenuOpen.set(false);
+  }
+
   shareViaWhatsApp(): void {
+    this.closeMoreMenu();
     this.share.shareAppViaWhatsApp();
   }
 
@@ -93,6 +101,11 @@ export class ShellComponent implements AfterViewInit {
     );
   }
 
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeMoreMenu();
+  }
+
   ngAfterViewInit(): void {
     this.router.events
       .pipe(
@@ -101,6 +114,7 @@ export class ShellComponent implements AfterViewInit {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {
+        this.closeMoreMenu();
         const content = this.contentRef?.nativeElement;
         if (!content) {
           return;

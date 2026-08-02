@@ -93,6 +93,7 @@ export class SessionDetailComponent {
   readonly lakeName = signal('');
   readonly durationText = signal('—');
   readonly sessionImages = signal<GalleryImageItem[]>([]);
+  readonly coverImageId = signal<string | undefined>(undefined);
   notes = '';
   prebait = '';
   private durationIntervalId?: ReturnType<typeof setInterval>;
@@ -135,8 +136,10 @@ export class SessionDetailComponent {
       this.catches();
       if (s) {
         void this.loadSessionImages();
+        void this.refreshCover(s);
       } else {
         this.sessionImages.set([]);
+        this.coverImageId.set(undefined);
       }
     });
   }
@@ -150,6 +153,10 @@ export class SessionDetailComponent {
     }
     this.notes = s.notes ?? '';
     this.prebait = s.prebait ?? '';
+  }
+
+  private async refreshCover(s: FishingSession): Promise<void> {
+    this.coverImageId.set(await this.sessionService.resolveCoverImageId(s));
   }
 
   async loadSessionImages(): Promise<void> {
