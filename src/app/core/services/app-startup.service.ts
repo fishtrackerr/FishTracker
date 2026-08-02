@@ -196,9 +196,13 @@ export class AppStartupService {
   }
 
   private getIntendedPath(): string {
-    const path = window.location.pathname;
+    const path = window.location.pathname || '/';
+    const params = new URLSearchParams(window.location.search);
+    params.delete('_reload');
+    const search = params.toString();
+    const withSearch = search ? `${path}?${search}` : path;
     if (path && path !== '/') {
-      return path + window.location.search;
+      return withSearch;
     }
     return '/';
   }

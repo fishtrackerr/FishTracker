@@ -1,17 +1,24 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { SwUpdate } from '@angular/service-worker';
 import { fetchWithTimeout } from '../utils';
-import { hardReloadApp } from './app-version.service';
+import { isNativeApp } from '../utils/platform';
 
+/**
+ * Detects a newer `version.json` than the one currently controlling the page.
+ * Does **not** hard-reload by itself — that races the service worker and blanks
+ * Android. Instead it asks Angular's SwUpdate to install; SwUpdateService prompts.
+ */
 @Injectable({ providedIn: 'root' })
 export class VersionCheckService {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly swUpdate = inject(SwUpdate);
   private readonly versionUrl = 'assets/version.json';
   private currentVersion: string | null = null;
   private readonly checkIntervalMs = 5 * 60 * 1000;
 
   constructor() {
-    if (!isPlatformBrowser(this.platformId)) {
+    if (!isPlatformBrowser(this.platformId) || isNativeApp()) {
       return;
     }
 
@@ -63,8 +70,17 @@ export class VersionCheckService {
       return;
     }
 
-    if (remoteVersion !== this.currentVersion) {
-      hardReloadApp();
+    if (remoteVersion === this.currentVersion) {
+      return;
+    }
+
+    // Hand off to the service worker update pipeline — never hard-reload here.
+    if (this.swUpdate.isEnabled) {
+      try {
+        await this.swUpdate.checkForUpdate();
+      } catch (err) {
+        console.error('[VersionCheck] SW check failed', err);
+      }
     }
   }
 }

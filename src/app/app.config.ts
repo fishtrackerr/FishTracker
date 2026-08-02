@@ -14,9 +14,18 @@ import { MAT_SELECT_CONFIG } from '@angular/material/select';
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from './core/handlers/global-error.handler';
 import { AppStartupService } from './core/services/app-startup.service';
+import { isNativeApp } from './core/utils/platform';
 
 function initializeApp(startup: AppStartupService): () => Promise<void> {
   return () => startup.initialize();
+}
+
+function serviceWorkerEnabled(): boolean {
+  if (isDevMode()) {
+    return false;
+  }
+  // Capacitor Android/iOS: bundled assets + SW causes blank screens after reload.
+  return !isNativeApp();
 }
 
 export const appConfig: ApplicationConfig = {
@@ -25,7 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
+      enabled: serviceWorkerEnabled(),
       registrationStrategy: 'registerWhenStable:30000',
     }),
     {
