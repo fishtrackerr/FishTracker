@@ -65,7 +65,7 @@ Components must not access `db` directly.
 
 ### PWA
 
-Service worker registered in production via `@angular/service-worker`. Offline data remains available through IndexedDB. Optional network features (weather, geocoding, maps, AI) degrade via `ConnectivityService`, local caches, and snackbars.
+Service worker registered in the **production** (GitHub Pages) build via `@angular/service-worker`. Self-hosted fonts under `/media/` are in a **prefetch** asset group so Material Icons load on installed PWAs. The **android** (Capacitor) build does **not** register a service worker — assets ship in the APK. Offline data remains available through IndexedDB. Optional network features (weather, geocoding, maps, AI) degrade via `ConnectivityService`, local caches, and snackbars.
 
 ## Key files
 

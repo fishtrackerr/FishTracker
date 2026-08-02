@@ -61,7 +61,7 @@ Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hard
 
 ## Icons
 
-Material Icons via `@angular/material/icon` only.
+Material Icons via `@angular/material/icon` only. Icons are self-hosted (`material-icons` package, `filled.css` only) — do not load Google Fonts CDN. Production PWA prefetches `/media/*.woff2` via the service worker; Capacitor Android builds omit the SW and use APK assets.
 
 ## Responsive rules
 

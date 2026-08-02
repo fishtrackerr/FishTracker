@@ -21,7 +21,7 @@ FishTracker ships to Google Play as a **Capacitor Android** app that bundles the
 npm run build-android
 ```
 
-This runs `ng build --configuration android` (`baseHref: /`) and `npx cap sync android`.
+This runs `ng build --configuration android` (`baseHref: /`, **no service worker**) and `npx cap sync android`. The Pages PWA keeps the service worker; Capacitor Android relies on bundled assets instead.
 
 Open in Android Studio:
 

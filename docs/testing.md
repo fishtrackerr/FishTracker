@@ -53,6 +53,8 @@ Verify `document.documentElement` and overlay container attributes after theme c
 
 Manual testing at 375px width. PWA reload with active session should land on `/sessions/active`.
 
+After install or update on Android (PWA or Capacitor), confirm bottom-nav and mode-picker icons are real glyphs — not clipped ligature scraps (`ho`, `ev`, `wa`, `me`). Those scraps mean the Material Icons font failed to load.
+
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`): `npm ci` → lint → `ng test` → production build → icon generation.
