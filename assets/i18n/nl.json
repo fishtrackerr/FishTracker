@@ -608,7 +608,9 @@
     "rain": "Regen",
     "dailyForecast": "Dagelijkse voorspelling",
     "refresh": "Weer vernieuwen",
-    "unavailable": "Weer niet beschikbaar"
+    "updated": "Weer bijgewerkt",
+    "unavailable": "Weer niet beschikbaar",
+    "refreshFailed": "Weer kon niet worden vernieuwd"
   },
   "sessionCard": {
     "start": "Start:",
