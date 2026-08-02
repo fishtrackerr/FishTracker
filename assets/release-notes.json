@@ -1,18 +1,7 @@
 {
-  "version": "0.0.49",
+  "version": "0.0.50",
   "date": "2026-08-02",
-  "sections": [
-    {
-      "category": "New Features",
-      "items": [
-        {
-          "message": "add custom prompts feature for assistant",
-          "shortHash": "7c626a3",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/7c626a3ee33579af3019b57b79418a2c9b7c21cf"
-        }
-      ]
-    }
-  ],
+  "sections": [],
   "releases": [
     {
       "version": "0.0.49",
