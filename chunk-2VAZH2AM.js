@@ -1,1 +1,0 @@
-import{c as r}from"./chunk-KLUAH5YN.js";import{Z as s}from"./chunk-YLCVSZIS.js";var a=class e{async getReleaseNotes(){try{let t=await r("assets/release-notes.json");return t.ok?await t.json():null}catch{return null}}static \u0275fac=function(o){return new(o||e)};static \u0275prov=s({token:e,factory:e.\u0275fac,providedIn:"root"})};export{a};
