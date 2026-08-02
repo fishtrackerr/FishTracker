@@ -1,6 +1,7 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { fetchWithTimeout } from '../utils';
+import { hardReloadApp } from './app-version.service';
 
 @Injectable({ providedIn: 'root' })
 export class VersionCheckService {
@@ -27,7 +28,7 @@ export class VersionCheckService {
 
   private buildVersionUrl(bypassSw: boolean): string {
     if (!bypassSw) {
-      return this.versionUrl;
+      return `${this.versionUrl}?t=${Date.now()}`;
     }
 
     const ts = Date.now();
@@ -63,7 +64,7 @@ export class VersionCheckService {
     }
 
     if (remoteVersion !== this.currentVersion) {
-      window.location.reload();
+      hardReloadApp();
     }
   }
 }

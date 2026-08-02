@@ -50,7 +50,7 @@ describe('SessionService.start', () => {
       getSnapshot: vi.fn().mockResolvedValue(null),
       getCachedSnapshotFor: vi.fn().mockReturnValue(null),
     };
-    image = { createCoverImage: vi.fn().mockResolvedValue(undefined), processFile: vi.fn() };
+    image = { createCoverImage: vi.fn().mockResolvedValue(undefined) };
     settings = { update: vi.fn(), get: vi.fn().mockReturnValue({ maxRodCount: 10 }) };
     fishingMode = {
       updateActivePreferences: vi.fn(),

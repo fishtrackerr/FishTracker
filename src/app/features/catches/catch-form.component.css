@@ -1,4 +1,9 @@
 .full { width: 100%; }
+.rod-required-hint {
+  color: var(--danger);
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.9rem;
+}
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;

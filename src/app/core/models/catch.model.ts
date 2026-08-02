@@ -5,6 +5,7 @@ export interface Catch {
   id: string;
   fishingMode?: FishingMode;
   sessionId: string;
+  /** Required for new catches when the session has rods. */
   rodId?: string;
   sessionSpotId?: string;
   species: string;

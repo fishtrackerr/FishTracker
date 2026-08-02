@@ -21,7 +21,13 @@ describe('visibility.util', () => {
   });
 
   it('stamps visible default and soft-deletes', () => {
-    expect(withVisibleDefault({ id: 'a' })).toEqual({ id: 'a', visible: true });
-    expect(softDeleteRecord({ id: 'a', visible: true })).toEqual({ id: 'a', visible: false });
+    expect(withVisibleDefault({ id: 'a' } as { id: string; visible?: boolean })).toEqual({
+      id: 'a',
+      visible: true,
+    });
+    expect(softDeleteRecord({ id: 'a', visible: true } as { id: string; visible?: boolean })).toEqual({
+      id: 'a',
+      visible: false,
+    });
   });
 });

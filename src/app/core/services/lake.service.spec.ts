@@ -21,7 +21,26 @@ describe('LakeService', () => {
       onLakeRenamed: vi.fn().mockResolvedValue(undefined),
       onLakeSpotUpdated: vi.fn().mockResolvedValue(undefined),
     };
-    service = new LakeService(repo as never, sync as never);
+    const settings = {
+      get: vi.fn().mockReturnValue({ defaultCountry: 'Netherlands' }),
+    };
+    service = new LakeService(repo as never, sync as never, settings as never);
+  });
+
+  it('applies default country from settings when creating a lake', async () => {
+    await service.create({ name: 'New Lake' });
+
+    expect(repo.put).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'New Lake', country: 'Netherlands' }),
+    );
+  });
+
+  it('keeps an explicit country over the settings default', async () => {
+    await service.create({ name: 'French Lake', country: 'France' });
+
+    expect(repo.put).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'French Lake', country: 'France' }),
+    );
   });
 
   it('cascades lake rename to related data', async () => {

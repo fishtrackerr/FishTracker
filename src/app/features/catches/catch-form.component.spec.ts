@@ -154,13 +154,14 @@ describe('CatchFormComponent', () => {
     expect(component.prebait).toBe('Corn');
   });
 
-  it('uses sessionSpotId query param when no rod is selected', async () => {
+  it('defaults to the first rod when no rod query param is set', async () => {
     routeStub.snapshot.queryParamMap = createParamMap({ sessionSpotId: 'spot-2' });
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
 
     await component.loadSession();
 
-    expect(component.rodId).toBe('');
+    expect(component.rodId).toBe('rod-1');
+    expect(component.bait).toBe('Boilie');
     expect(component.sessionSpotId).toBe('spot-2');
   });
 
@@ -191,15 +192,29 @@ describe('CatchFormComponent', () => {
     expect(component.sessionSpotId).toBe('spot-1');
   });
 
+  it('does not save without a selected rod', async () => {
+    const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
+    await component.loadSession();
+
+    component.species = 'Carp';
+    component.rodId = '';
+
+    await component.save();
+
+    expect(createCatch).not.toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
   it('normalizes optional values and navigates after save', async () => {
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
+    await component.loadSession();
 
     component.species = 'Carp';
     component.fishName = '';
     component.bait = '';
     component.rig = 'Spinner';
     component.tags = ['Night'];
-    component.rodId = '';
+    component.rodId = 'rod-2';
     component.sessionSpotId = 'spot-1';
     component.notes = '';
     component.prebait = '';
@@ -215,7 +230,7 @@ describe('CatchFormComponent', () => {
         bait: undefined,
         rig: 'Spinner',
         tags: ['Night'],
-        rodId: undefined,
+        rodId: 'rod-2',
         sessionSpotId: 'spot-1',
         notes: undefined,
         prebait: undefined,
@@ -292,6 +307,7 @@ describe('CatchFormComponent', () => {
 
     component.species = 'Carp';
     component.weightKg = 3.5;
+    component.rodId = 'rod-1';
     await component.save();
 
     expect(updateCatch).toHaveBeenCalledWith(
@@ -299,6 +315,7 @@ describe('CatchFormComponent', () => {
       expect.objectContaining({
         species: 'Carp',
         weightKg: 3.5,
+        rodId: 'rod-1',
         detailsPending: false,
       }),
     );

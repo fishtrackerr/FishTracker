@@ -171,7 +171,9 @@ textarea.mat-mdc-input-element {
   border: 1px solid var(--primary) !important;
   border-radius: var(--radius-button) !important;
   box-shadow: var(--shadow-md) !important;
-  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
   padding: var(--spacing-xs) 0 !important;
 }
 
@@ -209,7 +211,9 @@ textarea.mat-mdc-input-element {
   border: 1px solid var(--primary) !important;
   border-radius: var(--radius-button) !important;
   box-shadow: var(--shadow-md) !important;
-  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mat-datepicker-content {
@@ -241,11 +245,12 @@ textarea.mat-mdc-input-element {
   --mdc-checkbox-selected-hover-icon-color: var(--primary-hover);
   --mdc-checkbox-selected-icon-color: var(--primary);
   --mdc-checkbox-selected-pressed-icon-color: var(--primary-active);
-  --mat-checkbox-label-text-color: var(--primary);
+  --mat-checkbox-label-text-color: var(--text-primary);
 }
 
 .mat-mdc-checkbox .mdc-checkbox__background {
   border-color: var(--primary) !important;
+  background-color: transparent !important;
 }
 
 .mat-mdc-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background,
@@ -254,10 +259,20 @@ textarea.mat-mdc-input-element {
   border-color: var(--primary) !important;
 }
 
+.mat-mdc-checkbox .mdc-checkbox__checkmark,
+.mat-mdc-checkbox .mdc-checkbox__checkmark-path {
+  color: var(--text-on-primary) !important;
+  stroke: var(--text-on-primary) !important;
+}
+
+.mat-mdc-checkbox .mdc-checkbox__mixedmark {
+  border-color: var(--text-on-primary) !important;
+}
+
 .mat-mdc-checkbox label,
 .mat-mdc-checkbox .mdc-label,
 .mat-mdc-checkbox .label-name {
-  color: var(--primary) !important;
+  color: var(--text-primary) !important;
 }
 
 .mat-mdc-slide-toggle {
@@ -265,6 +280,17 @@ textarea.mat-mdc-input-element {
   --mdc-switch-selected-handle-color: var(--text-on-primary);
   --mdc-switch-selected-focus-track-color: var(--primary-hover);
   --mdc-switch-selected-hover-track-color: var(--primary-hover);
+  --mdc-switch-selected-pressed-track-color: var(--primary-active);
+  --mdc-switch-unselected-track-color: color-mix(in srgb, var(--text-muted) 35%, transparent);
+  --mdc-switch-unselected-handle-color: var(--text-secondary);
+  --mdc-switch-unselected-focus-track-color: color-mix(in srgb, var(--text-muted) 45%, transparent);
+  --mdc-switch-unselected-hover-track-color: color-mix(in srgb, var(--text-muted) 45%, transparent);
+  --mdc-switch-unselected-pressed-track-color: color-mix(in srgb, var(--text-muted) 55%, transparent);
+  --mat-switch-label-text-color: var(--text-primary);
+}
+
+.mat-mdc-slide-toggle .mdc-label {
+  color: var(--text-primary) !important;
 }
 
 .mat-mdc-dialog-container,

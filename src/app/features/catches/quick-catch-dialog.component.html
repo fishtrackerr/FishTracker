@@ -1,5 +1,23 @@
 <h2 mat-dialog-title>{{ 'quickCatch.title' | tr }}</h2>
 <mat-dialog-content class="quick-catch-content">
+  @if (rods.length > 0) {
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>{{ 'catchForm.rod' | tr }}</mat-label>
+      <mat-select
+        [(ngModel)]="rodId"
+        [panelClass]="selectPanelClass"
+        (ngModelChange)="onRodChange($event)"
+        required
+      >
+        @for (rod of rods; track rod.id) {
+          <mat-option [value]="rod.id">{{ rod.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  } @else {
+    <p class="rod-required-hint">{{ 'catchForm.rodRequired' | tr }}</p>
+  }
+
   <mat-form-field appearance="outline" class="full">
     <mat-label>{{ 'catchForm.species' | tr }}</mat-label>
     <mat-select [(ngModel)]="species" [panelClass]="selectPanelClass">
@@ -61,7 +79,7 @@
   <button
     mat-flat-button
     type="button"
-    [disabled]="!species.trim() || saving()"
+    [disabled]="!species.trim() || saving() || (rods.length > 0 && !rodId) || rods.length === 0"
     (click)="save()"
   >
     {{ saving() ? ('sessionEdit.saving' | tr) : ('common.save' | tr) }}

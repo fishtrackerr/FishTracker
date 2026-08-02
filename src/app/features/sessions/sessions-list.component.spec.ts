@@ -186,4 +186,23 @@ describe('SessionsListComponent', () => {
     expect(component.showCurrentSession()).toBe(true);
     expect(component.visibleSessionCount()).toBe(1);
   });
+
+  it('opens mobile filters with discrete backdrop class tokens', () => {
+    const bottomSheet = TestBed.inject(MatBottomSheet);
+    const open = vi.mocked(bottomSheet.open);
+    open.mockReturnValue({
+      afterDismissed: () => of(undefined),
+    } as ReturnType<MatBottomSheet['open']>);
+
+    const component = createComponent();
+    component.openMobileFilters();
+
+    expect(open).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        backdropClass: ['themed-backdrop', 'theme-backdrop-dark'],
+        panelClass: ['themed-bottom-sheet', 'theme-dark'],
+      }),
+    );
+  });
 });

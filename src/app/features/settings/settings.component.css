@@ -1,10 +1,110 @@
 .section { margin-bottom: var(--spacing-lg); }
 .full { width: 100%; }
 .action-btn, .import-btn { margin-right: var(--spacing-sm); }
+.profile-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  margin: calc(-1 * var(--spacing-md));
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-md);
+}
+.profile-link:hover,
+.profile-link:focus-visible {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  outline: none;
+}
+.profile-link-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.profile-link-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+.profile-link-hint {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+.profile-link-chevron {
+  flex-shrink: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--primary);
+}
 .submenu-content {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+}
+.submenu-content mat-checkbox {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+}
+.assistant-settings {
+  gap: var(--spacing-md);
+}
+.assistant-guide {
+  gap: var(--spacing-md);
+}
+.guide-lead {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+.guide-block h3 {
+  margin: 0 0 var(--spacing-xs);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-align: left;
+}
+.guide-block p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+.assistant-online-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid var(--border-primary);
+}
+.notice {
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-primary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+  background: var(--background-secondary);
+}
+.notice-warning {
+  border-color: color-mix(in srgb, var(--warning) 55%, var(--border-primary));
+  background: color-mix(in srgb, var(--warning) 14%, var(--background-secondary));
+  color: var(--text-primary);
+}
+.field-hint {
+  margin: calc(-1 * var(--spacing-sm)) 0 0;
+  padding: 0 4px;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+.no-subscript .mat-mdc-form-field-subscript-wrapper {
+  display: none;
 }
 .section-title {
   margin: 0;

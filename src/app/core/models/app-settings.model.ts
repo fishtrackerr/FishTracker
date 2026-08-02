@@ -41,6 +41,8 @@ export interface AppSettings {
   firstDayOfWeek: 0 | 1;
   /** @deprecated Prefer modePreferences[mode].defaultLakeId */
   defaultLakeId?: string;
+  /** Prefills country when creating a new lake. */
+  defaultCountry?: string;
   maxRodCount: number;
   aiChatEnabled: boolean;
   /** @deprecated Plaintext — migrated to encrypted fields on unlock; never persist. */

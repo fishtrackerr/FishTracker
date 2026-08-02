@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { fetchWithTimeout } from '../../../core/utils';
 import { AppStartupService } from '../../../core/services/app-startup.service';
+import { hardReloadApp } from '../../../core/services/app-version.service';
 import { SwUpdateService } from '../../../core/services/sw-update.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -183,22 +184,22 @@ export class StartupSplashComponent {
   async checkForUpdates(): Promise<void> {
     this.checkingUpdates.set(true);
     try {
-      await this.loadVersion(true);
-      this.swUpdate.checkForUpdatesNow();
+      await this.swUpdate.checkForUpdatesNow();
+      await this.loadVersion(false);
     } finally {
       this.checkingUpdates.set(false);
     }
   }
 
   reload(): void {
-    window.location.reload();
+    hardReloadApp();
   }
 
   private async loadVersion(bypassSw = false): Promise<void> {
     try {
       const url = bypassSw
         ? `assets/version.json?ngsw-bypass=true&t=${Date.now()}`
-        : 'assets/version.json';
+        : `assets/version.json?t=${Date.now()}`;
       const response = await fetchWithTimeout(url, {
         cache: 'no-store',
       });

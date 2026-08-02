@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PinUnlockComponent } from './pin-unlock.component';
 import { AppStartupService } from '../../core/services/app-startup.service';
+import { AppVersionService } from '../../core/services/app-version.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { PinLockService } from '../../core/services/pin-lock.service';
 import { Router } from '@angular/router';
@@ -19,18 +20,15 @@ describe('PinUnlockComponent', () => {
   };
 
   let swUpdateService: { checkForUpdatesNow: ReturnType<typeof vi.fn> };
+  let appVersion: { version: ReturnType<typeof signal>; refreshInstalledVersion: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: vi.fn().mockResolvedValue({ version: '2.3.4' }),
-      }),
-    );
-
     swUpdateService = {
-      checkForUpdatesNow: vi.fn(),
+      checkForUpdatesNow: vi.fn().mockResolvedValue(true),
+    };
+    appVersion = {
+      version: signal('2.3.4'),
+      refreshInstalledVersion: vi.fn().mockResolvedValue('2.3.4'),
     };
 
     await TestBed.configureTestingModule({
@@ -74,6 +72,10 @@ describe('PinUnlockComponent', () => {
           provide: SwUpdateService,
           useValue: swUpdateService,
         },
+        {
+          provide: AppVersionService,
+          useValue: appVersion,
+        },
       ],
     }).compileComponents();
   });
@@ -82,7 +84,7 @@ describe('PinUnlockComponent', () => {
     vi.unstubAllGlobals();
   });
 
-  it('shows the current version after a manual refresh', async () => {
+  it('shows the installed version and checks for updates without remote bypass label', async () => {
     const fixture = TestBed.createComponent(PinUnlockComponent);
     fixture.detectChanges();
 
@@ -95,7 +97,7 @@ describe('PinUnlockComponent', () => {
     expect(button.getAttribute('aria-label')).toBe('Check for updates');
 
     expect(swUpdateService.checkForUpdatesNow).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(appVersion.refreshInstalledVersion).toHaveBeenCalled();
   });
 
   it('invokes the update check when the button is pressed', async () => {

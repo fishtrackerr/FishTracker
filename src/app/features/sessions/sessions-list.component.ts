@@ -115,7 +115,9 @@ export class SessionsListComponent {
     const ref = this.bottomSheet.open(FilterSheetComponent, {
       data: { filter: this.activeFilter() },
       panelClass: ['themed-bottom-sheet', themeClass],
-      backdropClass: `themed-backdrop ${backdropThemeClass}`,
+      // MatBottomSheetConfig types this as string, but CDK Overlay accepts string[]
+      // and a space-separated string throws in classList.add.
+      backdropClass: ['themed-backdrop', backdropThemeClass] as unknown as string,
     });
     ref.afterDismissed().subscribe((result: StatisticsFilter | undefined) => {
       if (result) {

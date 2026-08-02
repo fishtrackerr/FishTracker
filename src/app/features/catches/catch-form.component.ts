@@ -95,6 +95,9 @@ export class CatchFormComponent {
       }
       this.existingCatch = catchRecord;
       this.applyCatch(catchRecord);
+      if (!this.rodId && this.rods[0]) {
+        this.onRodChange(this.rods[0].id);
+      }
       return;
     }
 
@@ -107,6 +110,11 @@ export class CatchFormComponent {
         this.bait = rod.bait ?? this.bait;
         this.rig = rod.rig ?? this.rig;
         this.sessionSpotId = sessionSpotId ?? rod.sessionSpotId ?? '';
+      }
+    } else if (this.rods[0]) {
+      this.onRodChange(this.rods[0].id);
+      if (sessionSpotId) {
+        this.sessionSpotId = sessionSpotId;
       }
     } else if (sessionSpotId) {
       this.sessionSpotId = sessionSpotId;
@@ -171,6 +179,9 @@ export class CatchFormComponent {
     if (!this.species.trim() || this.saving()) {
       return;
     }
+    if (this.rods.length === 0 || !this.rodId) {
+      return;
+    }
     this.saving.set(true);
     try {
       if (this.isEdit && this.catchId) {
@@ -191,7 +202,7 @@ export class CatchFormComponent {
           method: this.method || undefined,
           weatherType: this.weatherType || undefined,
           tags: this.tags.length > 0 ? this.tags : undefined,
-          rodId: this.rodId || undefined,
+          rodId: this.rodId,
           sessionSpotId: this.sessionSpotId || undefined,
           distanceM: this.distanceM,
           waterDepthM: this.waterDepthM,
@@ -216,7 +227,7 @@ export class CatchFormComponent {
           method: this.method || undefined,
           weatherType: this.weatherType || undefined,
           tags: this.tags.length > 0 ? this.tags : undefined,
-          rodId: this.rodId || undefined,
+          rodId: this.rodId,
           sessionSpotId: this.sessionSpotId || undefined,
           distanceM: this.distanceM,
           waterDepthM: this.waterDepthM,

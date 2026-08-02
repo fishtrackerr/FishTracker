@@ -3,11 +3,11 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { AppVersionService } from '../../core/services/app-version.service';
 import { PinLockService } from '../../core/services/pin-lock.service';
 import { AppStartupService } from '../../core/services/app-startup.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { SwUpdateService } from '../../core/services/sw-update.service';
-import { fetchWithTimeout } from '../../core/utils';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
@@ -23,17 +23,18 @@ export class PinUnlockComponent {
   private readonly startup = inject(AppStartupService);
   private readonly i18n = inject(I18nService);
   private readonly swUpdate = inject(SwUpdateService);
+  private readonly appVersion = inject(AppVersionService);
   private readonly platformId = inject(PLATFORM_ID);
 
   readonly pin = signal('');
   readonly error = signal('');
-  readonly version = signal('0.0.0');
+  readonly version = this.appVersion.version;
   readonly checkingForUpdates = signal(false);
   readonly lockoutActive = signal(false);
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      void this.loadVersion();
+      void this.appVersion.refreshInstalledVersion();
       this.refreshLockoutMessage();
     }
   }
@@ -65,8 +66,9 @@ export class PinUnlockComponent {
     this.checkingForUpdates.set(true);
 
     try {
-      await this.loadVersion();
-      this.swUpdate.checkForUpdatesNow();
+      // Keep label on the running build; SW prompt handles activate + hard reload.
+      await this.swUpdate.checkForUpdatesNow();
+      await this.appVersion.refreshInstalledVersion();
     } finally {
       this.checkingForUpdates.set(false);
     }
@@ -104,25 +106,6 @@ export class PinUnlockComponent {
           seconds: String(Math.ceil(remaining / 1000)),
         }),
       );
-    }
-  }
-
-  private async loadVersion(): Promise<void> {
-    try {
-      const response = await fetchWithTimeout(
-        `assets/version.json?ngsw-bypass=true&t=${Date.now()}`,
-        { cache: 'no-store' },
-      );
-      if (!response.ok) {
-        return;
-      }
-
-      const payload = (await response.json()) as { version?: unknown };
-      if (typeof payload.version === 'string' && payload.version.trim()) {
-        this.version.set(payload.version);
-      }
-    } catch {
-      // Keep the fallback version when metadata cannot be loaded.
     }
   }
 }

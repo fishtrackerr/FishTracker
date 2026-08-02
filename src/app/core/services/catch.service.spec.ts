@@ -63,6 +63,19 @@ describe('CatchService', () => {
         catchCount: 0,
         totalCatchWeightKg: 0,
         coverImageId: 'lake-cover',
+        rods: [
+          {
+            id: 'rod-1',
+            sessionId: 'session-1',
+            rodNumber: 1,
+            name: 'Rod 1',
+            bait: 'Boilie',
+            rig: 'Hair Rig',
+            biteCount: 0,
+            fishSpottedCount: 0,
+            isActive: true,
+          },
+        ],
         ...overrides?.session,
       }),
       put: vi.fn().mockResolvedValue(undefined),
@@ -120,9 +133,11 @@ describe('CatchService', () => {
       const result = await service.createQuick('session-1', {
         species: 'Catfish',
         weightKg: 8.5,
+        rodId: 'rod-1',
       });
 
       expect(result.species).toBe('Catfish');
+      expect(result.rodId).toBe('rod-1');
       expect(result.sessionId).toBe('session-1');
       expect(catchRepo.put).toHaveBeenCalled();
       expect(sessionRepo.put).toHaveBeenCalledWith(
@@ -150,10 +165,12 @@ describe('CatchService', () => {
         species: 'Carp',
         weightKg: 3,
         photo,
+        rodId: 'rod-1',
       });
 
       expect(processFile).toHaveBeenCalledWith(photo, 'catch', 'session-1');
       expect(result.photoId).toBe('catch-photo-1');
+      expect(result.rodId).toBe('rod-1');
       expect(sessionRepo.put).toHaveBeenCalledWith(
         expect.objectContaining({
           coverImageId: 'catch-photo-1',
@@ -171,9 +188,10 @@ describe('CatchService', () => {
 
       createService({ getCachedSnapshotFor, getSnapshot, getCurrentPosition });
 
-      const result = await service.create('session-1', { species: 'Pike' });
+      const result = await service.create('session-1', { species: 'Pike', rodId: 'rod-1' });
 
       expect(result.weather).toEqual(baseWeather);
+      expect(result.rodId).toBe('rod-1');
       expect(result.weather).not.toBe(baseWeather);
       expect(getCachedSnapshotFor).toHaveBeenCalledWith(52.1, 5.1);
       expect(getSnapshot).not.toHaveBeenCalled();
@@ -189,6 +207,7 @@ describe('CatchService', () => {
       const result = await service.createInstant('session-1');
 
       expect(result.species).toBe('Unknown');
+      expect(result.rodId).toBe('rod-1');
       expect(result.detailsPending).toBe(true);
       expect(result.weather).toEqual(sessionWeather);
       expect(result.weather).not.toBe(sessionWeather);
@@ -198,6 +217,16 @@ describe('CatchService', () => {
         }),
       );
     });
+
+    it('throws when the session has no rods', async () => {
+      createService({ session: { rods: [] } });
+
+      await expect(service.createInstant('session-1')).rejects.toMatchObject({
+        name: 'CatchValidationError',
+        message: 'catchForm.rodRequired',
+      });
+      expect(catchRepo.put).not.toHaveBeenCalled();
+    });
   });
 
   describe('update', () => {
@@ -205,6 +234,7 @@ describe('CatchService', () => {
       const existing: Catch = {
         id: 'catch-1',
         sessionId: 'session-1',
+        rodId: 'rod-1',
         species: 'Unknown',
         caughtAt: '2026-07-15T10:00:00.000Z',
         latitude: 52.1,
@@ -225,6 +255,7 @@ describe('CatchService', () => {
       });
 
       expect(updated?.species).toBe('Carp');
+      expect(updated?.rodId).toBe('rod-1');
       expect(updated?.detailsPending).toBe(false);
       expect(updated?.weather).toEqual(baseWeather);
       expect(updated?.caughtAt).toBe('2026-07-15T10:00:00.000Z');

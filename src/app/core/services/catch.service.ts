@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Catch, WeatherSnapshot } from '../models';
+import { Catch, FishingSession, WeatherSnapshot } from '../models';
 import { generateId, nowIso, resolveSessionCoverImageId } from '../utils';
 import { CatchRepository } from './catch.repository';
 import { GeolocationService } from './geolocation.service';
@@ -40,6 +40,13 @@ export interface FullCatchInput extends QuickCatchInput {
   detailsPending?: boolean;
 }
 
+export class CatchValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CatchValidationError';
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class CatchService {
   constructor(
@@ -69,28 +76,36 @@ export class CatchService {
     return this.create(sessionId, input);
   }
 
-  /** One-tap catch: timestamp + GPS + weather snapshot; fill details later. */
-  async createInstant(sessionId: string): Promise<Catch> {
+  /**
+   * One-tap catch: timestamp + GPS + weather snapshot; fill details later.
+   * Always links to a session rod (preferredRodId or first rod).
+   */
+  async createInstant(sessionId: string, preferredRodId?: string): Promise<Catch> {
     return this.create(sessionId, {
       species: this.i18n.t('common.unknown'),
       detailsPending: true,
+      rodId: preferredRodId,
     });
   }
 
   async create(sessionId: string, input: FullCatchInput): Promise<Catch> {
     const session = await this.sessionRepo.getById(sessionId);
+    if (!session) {
+      throw new CatchValidationError(this.i18n.t('catchForm.sessionNotFound'));
+    }
+
+    const rod = this.resolveRod(session, input.rodId);
+    const sessionSpotId = input.sessionSpotId ?? rod.sessionSpotId;
+
     const position = await this.geo.getCurrentPosition();
-    const lat = position?.latitude ?? session?.latitude;
-    const lng = position?.longitude ?? session?.longitude;
-    let weatherSource = session?.weather;
+    const lat = position?.latitude ?? session.latitude;
+    const lng = position?.longitude ?? session.longitude;
+    let weatherSource = session.weather;
     if (lat != null && lng != null && !weatherSource) {
       // Cache only — never block catch save on a live Open-Meteo round-trip.
       weatherSource = this.weather.getCachedSnapshotFor(lat, lng) ?? undefined;
     }
     const weatherSnapshot = this.cloneWeather(weatherSource);
-
-    const rod = input.rodId ? session?.rods?.find((r) => r.id === input.rodId) : undefined;
-    const sessionSpotId = input.sessionSpotId ?? rod?.sessionSpotId;
 
     let photoId: string | undefined;
     if (input.photo) {
@@ -101,16 +116,16 @@ export class CatchService {
     const catchRecord = {
       id: generateId(),
       sessionId,
-      rodId: input.rodId,
+      rodId: rod.id,
       sessionSpotId,
       species: input.species,
       fishName: input.fishName,
       caughtAt: input.caughtAt ?? now,
       weightKg: input.weightKg,
       lengthCm: input.lengthCm,
-      bait: input.bait ?? rod?.bait,
+      bait: input.bait ?? rod.bait,
       baitFlavor: input.baitFlavor,
-      rig: input.rig ?? rod?.rig,
+      rig: input.rig ?? rod.rig,
       hookSize: input.hookSize,
       line: input.line,
       method: input.method,
@@ -121,7 +136,7 @@ export class CatchService {
       longitude: lng,
       distanceM: input.distanceM,
       waterDepthM: input.waterDepthM,
-      waterTemperatureC: input.waterTemperatureC ?? session?.waterTemperatureC,
+      waterTemperatureC: input.waterTemperatureC ?? session.waterTemperatureC,
       photoId,
       notes: input.notes,
       released: input.released,
@@ -138,7 +153,7 @@ export class CatchService {
     await this.sessionEvents.record({
       sessionId,
       type: 'catch',
-      rodId: input.rodId,
+      rodId: rod.id,
       sessionSpotId,
       description: input.detailsPending
         ? this.i18n.t('activeSession.instantCatchEvent')
@@ -153,6 +168,18 @@ export class CatchService {
     if (!existing) {
       return undefined;
     }
+    const session = await this.sessionRepo.getById(existing.sessionId);
+    const nextRodId = data.rodId !== undefined ? data.rodId : existing.rodId;
+    if (session) {
+      const rod = this.resolveRod(session, nextRodId);
+      data = {
+        ...data,
+        rodId: rod.id,
+        sessionSpotId:
+          data.sessionSpotId !== undefined ? data.sessionSpotId : (existing.sessionSpotId ?? rod.sessionSpotId),
+      };
+    }
+
     const updated = { ...existing, ...data, id, updatedAt: nowIso() };
     // Preserve frozen weather / time / GPS unless explicitly provided.
     if (!('weather' in data)) {
@@ -180,6 +207,19 @@ export class CatchService {
     }
     await this.catchRepo.delete(id);
     await this.updateSessionStats(existing.sessionId);
+  }
+
+  /** Prefer explicit rod; otherwise first visible session rod. */
+  resolveRod(
+    session: Pick<FishingSession, 'rods'>,
+    preferredRodId?: string,
+  ): { id: string; sessionSpotId?: string; bait?: string; rig?: string } {
+    const rods = (session.rods ?? []).filter((r) => r.visible !== false);
+    if (rods.length === 0) {
+      throw new CatchValidationError(this.i18n.t('catchForm.rodRequired'));
+    }
+    const preferred = preferredRodId ? rods.find((r) => r.id === preferredRodId) : undefined;
+    return preferred ?? rods[0];
   }
 
   private cloneWeather(snapshot: WeatherSnapshot | undefined): WeatherSnapshot | undefined {

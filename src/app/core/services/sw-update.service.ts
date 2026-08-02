@@ -2,6 +2,7 @@ import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { SwUpdate, VersionEvent } from '@angular/service-worker';
 import { interval } from 'rxjs';
+import { hardReloadApp } from './app-version.service';
 import { NotificationService } from './notification.service';
 import { I18nService } from './i18n.service';
 
@@ -19,10 +20,10 @@ export class SwUpdateService {
       return;
     }
 
-    this.checkForUpdatesNow();
+    void this.checkForUpdatesNow();
 
     interval(this.checkIntervalMs).subscribe(() => {
-      this.checkForUpdatesNow();
+      void this.checkForUpdatesNow();
     });
 
     this.swUpdate.versionUpdates.subscribe((event) => {
@@ -30,12 +31,19 @@ export class SwUpdateService {
     });
   }
 
-  public checkForUpdatesNow(): void {
-    this.swUpdate
-      .checkForUpdate()
-      .catch((err) => {
-        console.error('[SW] update check failed', err);
-      });
+  /** Returns whether the SW reported that an update check ran (enabled). */
+  public async checkForUpdatesNow(): Promise<boolean> {
+    if (!isPlatformBrowser(this.platformId) || !this.swUpdate.isEnabled) {
+      return false;
+    }
+
+    try {
+      await this.swUpdate.checkForUpdate();
+      return true;
+    } catch (err) {
+      console.error('[SW] update check failed', err);
+      return false;
+    }
   }
 
   private handleVersionEvent(event: VersionEvent): void {
@@ -51,7 +59,7 @@ export class SwUpdateService {
           this.swUpdate
             .activateUpdate()
             .then(() => {
-              window.location.reload();
+              hardReloadApp();
             })
             .catch((err) => {
               this.updatePromptOpen = false;

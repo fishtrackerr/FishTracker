@@ -1,7 +1,17 @@
 <app-page-title title="common.settings" />
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-appearance" persistKey="settings-appearance" label="appearance" [defaultExpanded]="true" [flat]="true">
+  <a routerLink="/profile" class="profile-link">
+    <span class="profile-link-text">
+      <span class="profile-link-title">{{ 'settings.profile' | tr }}</span>
+      <span class="profile-link-hint">{{ 'settings.profileHint' | tr }}</span>
+    </span>
+    <span class="profile-link-chevron" aria-hidden="true">›</span>
+  </a>
+</section>
+
+<section class="section app-card">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-appearance" persistKey="settings-appearance" label="appearance" [defaultExpanded]="true" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.appearance' | tr }}</h2>
     </div>
@@ -30,7 +40,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-units" persistKey="settings-units" label="units" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-units" persistKey="settings-units" label="units" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.units' | tr }}</h2>
     </div>
@@ -68,7 +78,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-general" persistKey="settings-general" label="general" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-general" persistKey="settings-general" label="general" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.general' | tr }}</h2>
     </div>
@@ -79,6 +89,19 @@
           <mat-option value="">{{ 'common.none' | tr }}</mat-option>
           @for (lake of lakes(); track lake.id) {
             <mat-option [value]="lake.id">{{ lake.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.defaultCountry' | tr }}</mat-label>
+        <mat-select
+          [ngModel]="settings().defaultCountry ?? ''"
+          [panelClass]="selectPanelClass"
+          (ngModelChange)="updateDefaultCountry($event)"
+        >
+          <mat-option value="">{{ 'common.none' | tr }}</mat-option>
+          @for (country of countryOptions; track country) {
+            <mat-option [value]="country">{{ country }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -105,7 +128,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-gallery" persistKey="settings-gallery" label="gallery" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-gallery" persistKey="settings-gallery" label="gallery" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.gallery' | tr }}</h2>
     </div>
@@ -138,7 +161,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-weather" persistKey="settings-weather" label="weather" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-weather" persistKey="settings-weather" label="weather" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.weather' | tr }}</h2>
     </div>
@@ -165,54 +188,112 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-assistant" persistKey="settings-assistant" label="assistant" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant-guide" persistKey="settings-assistant-guide" label="assistantGuide" [flat]="true">
     <div expandHeader>
-      <h2 class="section-title">{{ 'settings.assistant' | tr }}</h2>
+      <h2 class="section-title">{{ 'settings.assistantGuide' | tr }}</h2>
     </div>
-    <div class="submenu-content">
-      <p class="hint">{{ 'settings.assistantHint' | tr }}</p>
-      <p class="hint warn-hint">{{ 'settings.assistantPrivacyWarning' | tr }}</p>
-      <mat-slide-toggle
-        [ngModel]="settings().aiChatEnabled"
-        (ngModelChange)="updateSetting('aiChatEnabled', $event)"
-      >
-        {{ 'settings.enableAiChat' | tr }}
-      </mat-slide-toggle>
-      <mat-form-field appearance="outline" class="full">
-        <mat-label>{{ 'settings.aiApiKey' | tr }}</mat-label>
-        <input
-          matInput
-          type="password"
-          autocomplete="off"
-          [ngModel]="aiApiKey() ?? ''"
-          (ngModelChange)="updateAiApiKey($event)"
-        />
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="full">
-        <mat-label>{{ 'settings.aiBaseUrl' | tr }}</mat-label>
-        <input
-          matInput
-          [ngModel]="settings().aiBaseUrl ?? ''"
-          (ngModelChange)="updateSetting('aiBaseUrl', $event || undefined)"
-        />
-        <mat-hint>{{ 'settings.aiBaseUrlHint' | tr }}</mat-hint>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="full">
-        <mat-label>{{ 'settings.aiModel' | tr }}</mat-label>
-        <input
-          matInput
-          [ngModel]="settings().aiModel ?? ''"
-          (ngModelChange)="updateSetting('aiModel', $event || undefined)"
-        />
-      </mat-form-field>
-      <button mat-stroked-button type="button" (click)="clearAiKey()">{{ 'settings.clearAiKey' | tr }}</button>
-      <a mat-stroked-button routerLink="/assistant">{{ 'settings.openAssistant' | tr }}</a>
+    <div class="submenu-content assistant-guide">
+      <p class="guide-lead">{{ 'settings.assistantGuideLead' | tr }}</p>
+
+      <div class="guide-block">
+        <h3>{{ 'settings.assistantGuideWhatTitle' | tr }}</h3>
+        <p>{{ 'settings.assistantGuideWhatBody' | tr }}</p>
+      </div>
+
+      <div class="guide-block">
+        <h3>{{ 'settings.assistantGuideOfflineTitle' | tr }}</h3>
+        <p>{{ 'settings.assistantGuideOfflineBody' | tr }}</p>
+      </div>
+
+      <div class="guide-block">
+        <h3>{{ 'settings.assistantGuideOnlineTitle' | tr }}</h3>
+        <p>{{ 'settings.assistantGuideOnlineBody' | tr }}</p>
+      </div>
+
+      <div class="guide-block">
+        <h3>{{ 'settings.assistantGuideKeyTitle' | tr }}</h3>
+        <p>{{ 'settings.assistantGuideKeyBody' | tr }}</p>
+      </div>
+
+      <div class="guide-block">
+        <h3>{{ 'settings.assistantGuidePrivacyTitle' | tr }}</h3>
+        <p>{{ 'settings.assistantGuidePrivacyBody' | tr }}</p>
+      </div>
+
+      <div class="notice">
+        {{ 'settings.assistantGuideSkip' | tr }}
+      </div>
     </div>
   </app-expandable-section>
 </section>
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-security" persistKey="settings-security" label="security" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant" persistKey="settings-assistant" label="assistant" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.assistant' | tr }}</h2>
+    </div>
+    <div class="submenu-content assistant-settings">
+      <p class="hint">{{ 'settings.assistantHint' | tr }}</p>
+
+      <div class="notice notice-warning" role="note">
+        {{ 'settings.assistantPrivacyWarning' | tr }}
+      </div>
+
+      <mat-checkbox
+        [ngModel]="settings().aiChatEnabled"
+        (ngModelChange)="updateSetting('aiChatEnabled', $event)"
+      >
+        {{ 'settings.enableAiChat' | tr }}
+      </mat-checkbox>
+
+      @if (settings().aiChatEnabled) {
+        <div class="assistant-online-fields">
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>{{ 'settings.aiApiKey' | tr }}</mat-label>
+            <input
+              matInput
+              type="password"
+              autocomplete="off"
+              [ngModel]="aiApiKey() ?? ''"
+              (ngModelChange)="updateAiApiKey($event)"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full no-subscript">
+            <mat-label>{{ 'settings.aiBaseUrl' | tr }}</mat-label>
+            <input
+              matInput
+              [ngModel]="settings().aiBaseUrl ?? ''"
+              (ngModelChange)="updateSetting('aiBaseUrl', $event || undefined)"
+            />
+          </mat-form-field>
+          <p class="field-hint">{{ 'settings.aiBaseUrlHint' | tr }}</p>
+
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>{{ 'settings.aiModel' | tr }}</mat-label>
+            <input
+              matInput
+              [ngModel]="settings().aiModel ?? ''"
+              (ngModelChange)="updateSetting('aiModel', $event || undefined)"
+            />
+          </mat-form-field>
+
+          <div class="action-row">
+            <button mat-stroked-button type="button" (click)="clearAiKey()">
+              {{ 'settings.clearAiKey' | tr }}
+            </button>
+            <a mat-stroked-button routerLink="/assistant">{{ 'settings.openAssistant' | tr }}</a>
+          </div>
+        </div>
+      } @else {
+        <a mat-stroked-button routerLink="/assistant">{{ 'settings.openAssistant' | tr }}</a>
+      }
+    </div>
+  </app-expandable-section>
+</section>
+
+<section class="section app-card">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-security" persistKey="settings-security" label="security" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.security' | tr }}</h2>
     </div>
@@ -243,7 +324,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-data" persistKey="settings-data" label="data" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-data" persistKey="settings-data" label="data" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.data' | tr }}</h2>
     </div>
@@ -269,7 +350,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-reset" persistKey="settings-reset" label="reset" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-reset" persistKey="settings-reset" label="reset" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.resetSection' | tr }}</h2>
     </div>
@@ -328,7 +409,7 @@
 </section>
 
 <section class="section app-card about">
-  <app-expandable-section sectionId="settings-about" persistKey="settings-about" label="about" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-about" persistKey="settings-about" label="about" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.about' | tr }}</h2>
     </div>
@@ -342,8 +423,6 @@
       }
       <button mat-stroked-button type="button" (click)="shareViaWhatsApp()">{{ 'settings.shareWhatsApp' | tr }}</button>
       <button mat-stroked-button type="button" (click)="sendFeedback()">{{ 'settings.sendFeedback' | tr }}</button>
-      <a routerLink="/profile">{{ 'settings.profile' | tr }}</a>
-      ·
       <a routerLink="/profile/documents">{{ 'settings.documents' | tr }}</a>
       ·
       <a routerLink="/privacy">{{ 'settings.privacy' | tr }}</a>
@@ -354,7 +433,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section sectionId="settings-changelog" persistKey="settings-changelog" label="changelog" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-changelog" persistKey="settings-changelog" label="changelog" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.changelog' | tr }}</h2>
     </div>

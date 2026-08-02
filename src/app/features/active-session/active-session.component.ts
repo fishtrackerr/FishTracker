@@ -186,10 +186,16 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
     const ref = this.dialog.open(QuickCatchDialogComponent, {
       width: '100%',
       maxWidth: '480px',
+      data: { session: s },
     });
     const result = await firstValueFrom(ref.afterClosed()) as QuickCatchInput | undefined;
     if (result?.species) {
-      await this.catchService.createQuick(s.id, result);
+      try {
+        await this.catchService.createQuick(s.id, result);
+      } catch (error) {
+        console.error('[ActiveSession] Failed to log quick catch', error);
+        this.notifications.error(this.i18n.t('activeSession.instantCatchFailed'));
+      }
     }
   }
 
@@ -198,9 +204,13 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
   async instantCatch(): Promise<void> {
     const s = this.session();
     if (!s || this.instantSaving) return;
+    if (!s.rods?.length) {
+      this.notifications.error(this.i18n.t('catchForm.rodRequired'));
+      return;
+    }
     this.instantSaving = true;
     try {
-      const created = await this.catchService.createInstant(s.id);
+      const created = await this.catchService.createInstant(s.id, s.rods[0].id);
       this.notifications.withAction(
         this.i18n.t('activeSession.instantCatchLogged'),
         this.i18n.t('activeSession.addDetails'),

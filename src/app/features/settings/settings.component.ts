@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SettingsService } from '../../core/services/settings.service';
 import { BackupService } from '../../core/services/backup.service';
 import { PinLockService } from '../../core/services/pin-lock.service';
@@ -28,6 +27,7 @@ import { UserOptionService } from '../../core/services/user-option.service';
 import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { BackupData, ThemeMode, UserOption, UserOptionCategory, AppLanguage } from '../../core/models';
 import { openFeedbackMailto } from '../../core/constants/feedback';
+import { EU_COUNTRIES } from '../../core/constants/eu-countries';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -46,7 +46,6 @@ const MAX_BACKUP_FILE_BYTES = 50 * 1024 * 1024;
     MatSelectModule,
     MatInputModule,
     MatCheckboxModule,
-    MatSlideToggleModule,
     PageTitleComponent,
     ExpandableSectionComponent,
     TranslatePipe,
@@ -80,6 +79,8 @@ export class SettingsComponent implements OnInit {
   readonly aiApiKey = this.vault.aiApiKey;
   readonly supportedLanguages = this.i18n.supportedLanguages;
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
+  readonly selectPanelClass = this.theme.getSelectPanelClass();
+  readonly countryOptions = EU_COUNTRIES;
   readonly message = signal('');
   readonly exporting = signal(false);
   readonly generatingDemo = signal(false);
@@ -149,6 +150,10 @@ export class SettingsComponent implements OnInit {
 
   updateDefaultLake(lakeId: string | undefined): void {
     this.fishingMode.updateActivePreferences({ defaultLakeId: lakeId });
+  }
+
+  updateDefaultCountry(country: string): void {
+    this.settingsService.update({ defaultCountry: country || undefined });
   }
 
   updateLockTimeout(value: number): void {

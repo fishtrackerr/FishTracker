@@ -1,3 +1,7 @@
+h1 {
+  margin: 0 0 var(--spacing-sm);
+}
+
 .title-input {
   background: transparent;
   border: none;
@@ -7,6 +11,12 @@
   width: 100%;
   outline: none;
 }
+
+mat-checkbox {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
 .full { width: 100%; }
 .lookup-btn {
   width: 100%;
@@ -20,7 +30,25 @@
   align-items: center;
   margin-bottom: 12px;
 }
-.section h2 { margin: 0; font-size: 1rem; color: var(--primary); }
+.section h2,
+.section-title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: var(--primary);
+}
+.images-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0 24px;
+}
+.cover-preview {
+  width: 100%;
+  max-width: 320px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+}
 .spot-card {
   padding: 12px;
   background: var(--background-card);

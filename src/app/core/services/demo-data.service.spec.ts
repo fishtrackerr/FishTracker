@@ -53,5 +53,10 @@ describe('DemoDataService', () => {
     expect(sampleSession?.rods?.length).toBeGreaterThanOrEqual(3);
     expect(sampleSession?.sessionSpots?.length).toBeGreaterThan(0);
     expect(fishingMode.updateActivePreferences).toHaveBeenCalled();
+
+    for (const [catchRecord] of catches.put.mock.calls) {
+      expect(catchRecord.rodId).toBeTruthy();
+      expect(typeof catchRecord.rodId).toBe('string');
+    }
   });
 });

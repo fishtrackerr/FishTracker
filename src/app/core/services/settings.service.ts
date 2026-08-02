@@ -18,6 +18,7 @@ const OPTIONAL_SETTINGS_KEYS: (keyof AppSettings)[] = [
   'lastLakeId',
   'homepageImageId',
   'defaultLakeId',
+  'defaultCountry',
   'aiApiKey',
   'aiApiKeyEncrypted',
   'aiApiKeyIv',

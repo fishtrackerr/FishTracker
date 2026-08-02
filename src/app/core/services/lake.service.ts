@@ -4,12 +4,14 @@ import { FishingSpot, Lake } from '../models';
 import { generateId, nowIso, onlyVisibleRecords, softDeleteRecord } from '../utils';
 import { LakeRepository } from './lake.repository';
 import { RelatedDataSyncService } from './related-data-sync.service';
+import { SettingsService } from './settings.service';
 
 @Injectable({ providedIn: 'root' })
 export class LakeService {
   constructor(
     private readonly lakeRepo: LakeRepository,
     private readonly sync: RelatedDataSyncService,
+    private readonly settings: SettingsService,
   ) {}
 
   watchAll(): Observable<Lake[]> {
@@ -34,11 +36,13 @@ export class LakeService {
 
   async create(data: Partial<Lake>): Promise<Lake> {
     const now = nowIso();
+    const country = data.country ?? this.settings.get().defaultCountry;
     const lake = {
       id: generateId(),
       name: data.name ?? 'New Lake',
       description: data.description,
       address: data.address,
+      country,
       latitude: data.latitude,
       longitude: data.longitude,
       isFavorite: data.isFavorite ?? false,

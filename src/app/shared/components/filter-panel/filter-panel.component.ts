@@ -36,8 +36,12 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         </mat-form-field>
         <mat-form-field appearance="outline" class="full">
           <mat-label>{{ 'filters.sessionStatus' | tr }}</mat-label>
-          <mat-select [(ngModel)]="filter.sessionStatus" [panelClass]="selectPanelClass" (ngModelChange)="emitChange()">
-            <mat-option [value]="undefined">{{ 'filters.any' | tr }}</mat-option>
+          <mat-select
+            [(ngModel)]="sessionStatus"
+            [panelClass]="selectPanelClass"
+            (ngModelChange)="onSessionStatusChange($event)"
+          >
+            <mat-option value="">{{ 'filters.any' | tr }}</mat-option>
             <mat-option value="active">{{ 'sessionStatus.active' | tr }}</mat-option>
             <mat-option value="completed">{{ 'sessionStatus.completed' | tr }}</mat-option>
             <mat-option value="planned">{{ 'sessionStatus.planned' | tr }}</mat-option>
@@ -101,11 +105,25 @@ export class FilterPanelComponent implements OnInit {
   readonly filterChange = output<StatisticsFilter>();
   readonly selectPanelClass = this.theme.getSelectPanelClass();
 
+  /** Empty string = any status (mat-option cannot use undefined). */
+  sessionStatus = '';
+
   readonly presets = signal(this.filterService.getPresets());
   readonly activeCount = signal(0);
 
   ngOnInit(): void {
+    this.sessionStatus = this.filter.sessionStatus ?? '';
     this.activeCount.set(this.filterService.countActive(this.filter));
+  }
+
+  onSessionStatusChange(value: string): void {
+    this.sessionStatus = value;
+    if (value) {
+      this.filter.sessionStatus = value as NonNullable<StatisticsFilter['sessionStatus']>;
+    } else {
+      delete this.filter.sessionStatus;
+    }
+    this.emitChange();
   }
 
   emitChange(): void {
@@ -116,6 +134,7 @@ export class FilterPanelComponent implements OnInit {
 
   clear(): void {
     this.filter = {};
+    this.sessionStatus = '';
     this.filterService.clearActive();
     this.activeCount.set(0);
     this.filterChange.emit({});
@@ -131,6 +150,7 @@ export class FilterPanelComponent implements OnInit {
 
   applyPreset(filter: StatisticsFilter): void {
     this.filter = { ...filter };
+    this.sessionStatus = filter.sessionStatus ?? '';
     this.emitChange();
   }
 
