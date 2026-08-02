@@ -1,15 +1,11 @@
 {
-  "version": "0.0.29",
+  "version": "0.0.30",
   "date": "2026-08-02",
   "sections": [
     {
-      "category": "New Features",
+      "category": "Notes",
       "items": [
-        {
-          "message": "update project rules and documentation for self-hosted Material Icons and fonts, improve service worker configuration, and increment version to 0.0.28",
-          "shortHash": "da80773",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/da80773a1309cc50f55988bc8f67b4478cbe3d36"
-        }
+        "No conventional commits found since last tag."
       ]
     }
   ]
