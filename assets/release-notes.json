@@ -1,15 +1,11 @@
 {
-  "version": "0.0.42",
+  "version": "0.0.43",
   "date": "2026-08-02",
   "sections": [
     {
-      "category": "New Features",
+      "category": "Notes",
       "items": [
-        {
-          "message": "update English and Dutch translations with new keys and corrections",
-          "shortHash": "9c30f2e",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/9c30f2e7d773ecf2c23af8f42c6f6af8fa2a2235"
-        }
+        "No conventional commits found since last tag."
       ]
     }
   ]
