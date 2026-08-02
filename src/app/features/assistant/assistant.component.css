@@ -36,7 +36,7 @@
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--text-muted);
+  color: var(--primary);
 }
 
 .prompt-grid {

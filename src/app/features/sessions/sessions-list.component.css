@@ -55,5 +55,5 @@
   margin: 0 0 var(--spacing-sm);
   text-align: center;
   font-size: 0.95rem;
-  color: var(--text-secondary);
+  color: var(--primary);
 }
