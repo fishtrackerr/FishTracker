@@ -1,19 +1,35 @@
 {
-  "version": "0.0.45",
+  "version": "0.0.46",
   "date": "2026-08-02",
   "sections": [
     {
       "category": "New Features",
       "items": [
         {
-          "message": "update version to 0.0.44 and enhance release notes with new features",
-          "shortHash": "15eee41",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/15eee410f58b19446722e40b1b84c36351b98341"
+          "message": "update version to 0.0.45 and enhance release notes with new features",
+          "shortHash": "6efc4a5",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/6efc4a5899ab3b09291825346b12bc86e76bdf4a"
         }
       ]
     }
   ],
   "releases": [
+    {
+      "version": "0.0.46",
+      "date": "2026-08-02",
+      "sections": [
+        {
+          "category": "New Features",
+          "items": [
+            {
+              "message": "update version to 0.0.45 and enhance release notes with new features",
+              "shortHash": "6efc4a5",
+              "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/6efc4a5899ab3b09291825346b12bc86e76bdf4a"
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.0.45",
       "date": "2026-08-02",
