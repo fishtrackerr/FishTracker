@@ -608,7 +608,9 @@
     "rain": "Rain",
     "dailyForecast": "Daily Forecast",
     "refresh": "Refresh weather",
-    "unavailable": "Weather unavailable"
+    "updated": "Weather updated",
+    "unavailable": "Weather unavailable",
+    "refreshFailed": "Could not refresh weather"
   },
   "sessionCard": {
     "start": "Start:",

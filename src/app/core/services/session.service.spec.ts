@@ -155,7 +155,7 @@ describe('SessionService.start', () => {
       startDate: '2026-07-15T08:00:00.000Z',
     });
 
-    expect(session).toBe(existing);
+    expect(session).toEqual(expect.objectContaining({ id: 's-1', status: 'active' }));
     expect(sessionRepo.put).not.toHaveBeenCalled();
   });
 

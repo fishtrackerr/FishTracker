@@ -4,15 +4,18 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs';
+import { countrySelectOptions } from '../../core/constants/eu-countries';
 import { LakeService } from '../../core/services/lake.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { ImageRepository } from '../../core/services/image.repository';
 import { ImageService } from '../../core/services/image.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { LakeGeocodingService } from '../../core/services/lake-geocoding.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { FishingSpot } from '../../core/models';
 import { ImageThumbComponent } from '../../shared/components/image-thumb/image-thumb.component';
 import { ImagePickerComponent } from '../../shared/components/image-picker/image-picker.component';
@@ -31,6 +34,7 @@ import { I18nService } from '../../core/services/i18n.service';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatCheckboxModule,
     FormsModule,
     ImageThumbComponent,
@@ -48,9 +52,13 @@ export class LakeDetailComponent {
   private readonly confirm = inject(ConfirmService);
   private readonly imageRepo = inject(ImageRepository);
   private readonly imageService = inject(ImageService);
-  private readonly geocoding = inject(LakeGeocodingService);
   private readonly notifications = inject(NotificationService);
+  private readonly geocoding = inject(LakeGeocodingService);
   private readonly i18n = inject(I18nService);
+  private readonly theme = inject(ThemeService);
+
+  readonly selectPanelClass = this.theme.getSelectPanelClass();
+  readonly countryOptions = countrySelectOptions;
 
   readonly lake = toSignal(
     this.route.paramMap.pipe(
@@ -167,6 +175,11 @@ export class LakeDetailComponent {
     if (l) {
       (l as unknown as Record<string, unknown>)[field] = value;
     }
+  }
+
+  async updateCountry(value: string): Promise<void> {
+    this.updateField('country', value || undefined);
+    await this.saveLake();
   }
 
   async addSpot(): Promise<void> {

@@ -7,4 +7,6 @@ export interface RodSpotHistory {
   fromSessionSpotId?: string;
   toSessionSpotId: string;
   changedAt: string;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
 }

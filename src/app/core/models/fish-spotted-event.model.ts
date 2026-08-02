@@ -10,4 +10,6 @@ export interface FishSpottedEvent {
   longitude?: number;
   spottedAt: string;
   notes?: string;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
 }

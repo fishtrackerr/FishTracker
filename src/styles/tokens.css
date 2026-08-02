@@ -1,6 +1,7 @@
 /* Design tokens — dark theme (default) */
 :root,
 [data-theme='dark'] {
+  color-scheme: dark;
   --background-primary: #0b0b0b;
   --background-secondary: #151515;
   --background-card: #1c1c1c;
@@ -48,6 +49,7 @@
 
 /* Light theme */
 [data-theme='light'] {
+  color-scheme: light;
   --background-primary: #f7faff;
   --background-secondary: #edf4fb;
   --background-card: #ffffff;

@@ -79,3 +79,10 @@ export {
   pickLakeCoverImageId,
   resolveSessionCoverImageId,
 } from './session-cover.util';
+export {
+  isVisibleRecord,
+  onlyVisibleRecords,
+  softDeleteRecord,
+  withVisibleDefault,
+  type WithVisibility,
+} from './visibility.util';

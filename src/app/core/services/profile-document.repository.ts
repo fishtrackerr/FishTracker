@@ -3,28 +3,37 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { ProfileDocument } from '../models';
-import { generateId, nowIso } from '../utils';
+import { generateId, isVisibleRecord, nowIso, onlyVisibleRecords, withVisibleDefault } from '../utils';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileDocumentRepository {
   watchAll(): Observable<ProfileDocument[]> {
-    return from(liveQuery(() => db.profileDocuments.orderBy('title').toArray()));
+    return from(
+      liveQuery(async () =>
+        onlyVisibleRecords(await db.profileDocuments.orderBy('title').toArray()),
+      ),
+    );
   }
 
   async getAll(): Promise<ProfileDocument[]> {
-    return db.profileDocuments.orderBy('title').toArray();
+    return onlyVisibleRecords(await db.profileDocuments.orderBy('title').toArray());
   }
 
   async getById(id: string): Promise<ProfileDocument | undefined> {
-    return db.profileDocuments.get(id);
+    const doc = await db.profileDocuments.get(id);
+    return isVisibleRecord(doc) ? doc : undefined;
   }
 
   async put(doc: ProfileDocument): Promise<void> {
-    await db.profileDocuments.put(doc);
+    await db.profileDocuments.put(withVisibleDefault(doc));
   }
 
   async delete(id: string): Promise<void> {
-    await db.profileDocuments.delete(id);
+    const row = await db.profileDocuments.get(id);
+    if (!row) {
+      return;
+    }
+    await db.profileDocuments.put({ ...row, visible: false, updatedAt: nowIso() });
   }
 
   async create(data: Partial<ProfileDocument>): Promise<ProfileDocument> {
@@ -37,6 +46,7 @@ export class ProfileDocumentRepository {
       issueDate: data.issueDate,
       expiryDate: data.expiryDate,
       imageIds: data.imageIds ?? [],
+      visible: true,
       createdAt: now,
       updatedAt: now,
     };

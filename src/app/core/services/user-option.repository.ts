@@ -3,6 +3,7 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { UserOption, UserOptionCategory } from '../models';
+import { nowIso } from '../utils';
 import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -14,7 +15,11 @@ export class UserOptionRepository extends ModeScopedRepository {
         if (!mode) {
           return [];
         }
-        return db.userOptions.where('[fishingMode+category]').equals([mode, category]).toArray();
+        const rows = await db.userOptions
+          .where('[fishingMode+category]')
+          .equals([mode, category])
+          .toArray();
+        return this.onlyVisible(rows);
       }),
     );
   }
@@ -26,7 +31,7 @@ export class UserOptionRepository extends ModeScopedRepository {
         if (!mode) {
           return [];
         }
-        return db.userOptions.where('fishingMode').equals(mode).toArray();
+        return this.onlyVisible(await db.userOptions.where('fishingMode').equals(mode).toArray());
       }),
     );
   }
@@ -36,7 +41,9 @@ export class UserOptionRepository extends ModeScopedRepository {
     if (!mode) {
       return [];
     }
-    return db.userOptions.where('[fishingMode+category]').equals([mode, category]).toArray();
+    return this.onlyVisible(
+      await db.userOptions.where('[fishingMode+category]').equals([mode, category]).toArray(),
+    );
   }
 
   async getAll(): Promise<UserOption[]> {
@@ -44,7 +51,7 @@ export class UserOptionRepository extends ModeScopedRepository {
     if (!mode) {
       return [];
     }
-    return db.userOptions.where('fishingMode').equals(mode).toArray();
+    return this.onlyVisible(await db.userOptions.where('fishingMode').equals(mode).toArray());
   }
 
   async getAllAcrossModes(): Promise<UserOption[]> {
@@ -56,9 +63,14 @@ export class UserOptionRepository extends ModeScopedRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await db.userOptions.delete(id);
+    const row = await db.userOptions.get(id);
+    if (!row) {
+      return;
+    }
+    await db.userOptions.put({ ...row, visible: false, updatedAt: nowIso() });
   }
 
+  /** Hard-delete category rows (used when regenerating defaults). */
   async deleteByCategory(category: UserOptionCategory): Promise<void> {
     const mode = this.activeMode();
     await db.userOptions.where('[fishingMode+category]').equals([mode, category]).delete();
@@ -66,8 +78,12 @@ export class UserOptionRepository extends ModeScopedRepository {
 
   async deleteNonDefaults(): Promise<void> {
     const all = await this.getAll();
-    const toDelete = all.filter((o) => !o.isDefault);
-    await db.userOptions.bulkDelete(toDelete.map((o) => o.id));
+    const now = nowIso();
+    await Promise.all(
+      all
+        .filter((o) => !o.isDefault)
+        .map((o) => db.userOptions.put({ ...o, visible: false, updatedAt: now })),
+    );
   }
 
   async clearCurrentMode(): Promise<void> {

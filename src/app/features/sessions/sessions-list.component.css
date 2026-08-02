@@ -13,6 +13,9 @@
   width: 150px;
   flex-shrink: 0;
 }
+.sort-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
 .filter-btn {
   flex-shrink: 0;
 }

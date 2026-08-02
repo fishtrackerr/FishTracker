@@ -17,7 +17,7 @@ const PREVIEW_LIMIT = 5;
   imports: [DatePipe, FormatTempPipe, TranslatePipe, RouterLink, MatButtonModule],
   template: `
     @if (history().length > 1) {
-      <section class="weather-history">
+      <section class="weather-history app-card">
         <h3 class="section-title">
           {{ 'weatherHistory.title' | tr }} ({{ history().length }})
         </h3>
@@ -74,12 +74,19 @@ const PREVIEW_LIMIT = 5;
       margin: 0;
     }
     .history-item {
-      padding: var(--spacing-sm);
+      padding: var(--spacing-sm) 0;
       border-bottom: 1px solid var(--border-primary);
       cursor: pointer;
     }
+    .history-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
     .history-item.selected {
       background: color-mix(in srgb, var(--primary) 8%, transparent);
+      margin-inline: calc(-1 * var(--spacing-sm));
+      padding-inline: var(--spacing-sm);
+      border-radius: var(--radius-sm);
     }
     .row {
       display: flex;

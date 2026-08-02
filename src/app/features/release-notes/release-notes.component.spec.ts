@@ -90,11 +90,23 @@ describe('ReleaseNotesComponent', () => {
     expect(fixture.nativeElement.querySelector('a.commit-link')).toBeNull();
   });
 
-  it('shows plain message text for legacy string-based notes', async () => {
+  it('renders multiple releases from history', async () => {
     getReleaseNotes.mockResolvedValue({
-      version: '0.0.22',
-      date: '2026-07-23',
-      sections: [{ category: 'Notes', items: ['legacy note'] }],
+      version: '0.0.43',
+      date: '2026-08-02',
+      sections: [],
+      releases: [
+        {
+          version: '0.0.42',
+          date: '2026-08-02',
+          sections: [{ category: 'New Features', items: ['i18n updates'] }],
+        },
+        {
+          version: '0.0.29',
+          date: '2026-08-01',
+          sections: [{ category: 'New Features', items: ['icons and fonts'] }],
+        },
+      ],
     } as ReleaseNotesData);
 
     const fixture = TestBed.createComponent(ReleaseNotesComponent);
@@ -103,8 +115,30 @@ describe('ReleaseNotesComponent', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('legacy note');
-    const commitLink = fixture.nativeElement.querySelector('a.commit-link');
-    expect(commitLink).toBeNull();
+    expect(text).toContain('0.0.42');
+    expect(text).toContain('i18n updates');
+    expect(text).toContain('0.0.29');
+    expect(text).toContain('icons and fonts');
+    expect(fixture.nativeElement.querySelectorAll('.release-notes').length).toBe(2);
+  });
+
+  it('hides placeholder-only notes', async () => {
+    getReleaseNotes.mockResolvedValue({
+      version: '0.0.43',
+      date: '2026-08-02',
+      sections: [
+        {
+          category: 'Notes',
+          items: ['No conventional commits found since last tag.'],
+        },
+      ],
+    } as ReleaseNotesData);
+
+    const fixture = TestBed.createComponent(ReleaseNotesComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('releaseNotes.empty');
   });
 });

@@ -9,17 +9,19 @@ import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 export class BiteEventRepository extends ModeScopedRepository {
   watchBySession(sessionId: string): Observable<BiteEvent[]> {
     return from(
-      liveQuery(() =>
-        db.biteEvents.where('sessionId').equals(sessionId).sortBy('occurredAt'),
-      ),
+      liveQuery(async () => {
+        const rows = await db.biteEvents.where('sessionId').equals(sessionId).sortBy('occurredAt');
+        return this.onlyVisible(rows);
+      }),
     );
   }
 
   watchByRod(rodId: string): Observable<BiteEvent[]> {
     return from(
-      liveQuery(() =>
-        db.biteEvents.where('rodId').equals(rodId).sortBy('occurredAt'),
-      ),
+      liveQuery(async () => {
+        const rows = await db.biteEvents.where('rodId').equals(rodId).sortBy('occurredAt');
+        return this.onlyVisible(rows);
+      }),
     );
   }
 
@@ -28,7 +30,7 @@ export class BiteEventRepository extends ModeScopedRepository {
     if (!mode) {
       return [];
     }
-    return db.biteEvents.where('fishingMode').equals(mode).toArray();
+    return this.onlyVisible(await db.biteEvents.where('fishingMode').equals(mode).toArray());
   }
 
   async getAllAcrossModes(): Promise<BiteEvent[]> {
@@ -36,15 +38,17 @@ export class BiteEventRepository extends ModeScopedRepository {
   }
 
   async getBySession(sessionId: string): Promise<BiteEvent[]> {
-    return db.biteEvents.where('sessionId').equals(sessionId).sortBy('occurredAt');
+    return this.onlyVisible(
+      await db.biteEvents.where('sessionId').equals(sessionId).sortBy('occurredAt'),
+    );
   }
 
   async getByRod(rodId: string): Promise<BiteEvent[]> {
-    return db.biteEvents.where('rodId').equals(rodId).sortBy('occurredAt');
+    return this.onlyVisible(await db.biteEvents.where('rodId').equals(rodId).sortBy('occurredAt'));
   }
 
   async countByRod(rodId: string): Promise<number> {
-    return db.biteEvents.where('rodId').equals(rodId).count();
+    return (await this.getByRod(rodId)).length;
   }
 
   async getById(id: string): Promise<BiteEvent | undefined> {
@@ -52,7 +56,7 @@ export class BiteEventRepository extends ModeScopedRepository {
   }
 
   async getLatestByRod(rodId: string): Promise<BiteEvent | undefined> {
-    const events = await db.biteEvents.where('rodId').equals(rodId).sortBy('occurredAt');
+    const events = await this.getByRod(rodId);
     return events.at(-1);
   }
 
@@ -61,15 +65,21 @@ export class BiteEventRepository extends ModeScopedRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await db.biteEvents.delete(id);
+    const row = await db.biteEvents.get(id);
+    if (!row) {
+      return;
+    }
+    await db.biteEvents.put({ ...row, visible: false });
   }
 
   async deleteBySession(sessionId: string): Promise<void> {
-    await db.biteEvents.where('sessionId').equals(sessionId).delete();
+    const rows = await db.biteEvents.where('sessionId').equals(sessionId).toArray();
+    await Promise.all(rows.map((row) => db.biteEvents.put({ ...row, visible: false })));
   }
 
   async deleteByRod(rodId: string): Promise<void> {
-    await db.biteEvents.where('rodId').equals(rodId).delete();
+    const rows = await db.biteEvents.where('rodId').equals(rodId).toArray();
+    await Promise.all(rows.map((row) => db.biteEvents.put({ ...row, visible: false })));
   }
 
   async clearCurrentMode(): Promise<void> {

@@ -52,7 +52,14 @@ export class WhatsNewService {
   }
 
   private hasContent(notes: ReleaseNotesData): boolean {
-    return notes.sections.some((section) => section.items.length > 0);
+    return notes.sections.some((section) =>
+      section.items.some((item) => {
+        const message = typeof item === 'string' ? item : item.message;
+        return (
+          !!message && message !== 'No conventional commits found since last tag.'
+        );
+      }),
+    );
   }
 
   private readLastSeenVersion(): string | null {

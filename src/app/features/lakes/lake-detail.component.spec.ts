@@ -11,6 +11,7 @@ import { ImageService } from '../../core/services/image.service';
 import { LakeGeocodingService } from '../../core/services/lake-geocoding.service';
 import { LakeService } from '../../core/services/lake.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { LakeDetailComponent } from './lake-detail.component';
 
 describe('LakeDetailComponent', () => {
@@ -93,6 +94,12 @@ describe('LakeDetailComponent', () => {
             t: (key: string) => key,
             language: signal('en'),
             dictionary: signal({}),
+          },
+        },
+        {
+          provide: ThemeService,
+          useValue: {
+            getSelectPanelClass: () => 'theme-light-select-panel',
           },
         },
       ],

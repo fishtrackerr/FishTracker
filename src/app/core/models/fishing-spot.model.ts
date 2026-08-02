@@ -11,4 +11,6 @@ export interface FishingSpot {
   recommendedBait?: string;
   notes?: string;
   isFavorite: boolean;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
 }

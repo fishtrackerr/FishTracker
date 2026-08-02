@@ -3,6 +3,7 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { FishingSession } from '../models';
+import { nowIso } from '../utils';
 import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +16,7 @@ export class SessionRepository extends ModeScopedRepository {
           return [];
         }
         const rows = await db.sessions.where('fishingMode').equals(mode).toArray();
-        return rows.sort(
+        return this.onlyVisible(rows).sort(
           (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
         );
       }),
@@ -35,7 +36,11 @@ export class SessionRepository extends ModeScopedRepository {
         if (!mode) {
           return undefined;
         }
-        return db.sessions.where('[fishingMode+status]').equals([mode, 'active']).first();
+        const rows = await db.sessions
+          .where('[fishingMode+status]')
+          .equals([mode, 'active'])
+          .toArray();
+        return this.onlyVisible(rows)[0];
       }),
     );
   }
@@ -46,7 +51,7 @@ export class SessionRepository extends ModeScopedRepository {
       return [];
     }
     const rows = await db.sessions.where('fishingMode').equals(mode).toArray();
-    return rows.sort(
+    return this.onlyVisible(rows).sort(
       (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
     );
   }
@@ -64,7 +69,11 @@ export class SessionRepository extends ModeScopedRepository {
     if (!mode) {
       return undefined;
     }
-    return db.sessions.where('[fishingMode+status]').equals([mode, 'active']).first();
+    const rows = await db.sessions
+      .where('[fishingMode+status]')
+      .equals([mode, 'active'])
+      .toArray();
+    return this.onlyVisible(rows)[0];
   }
 
   async getAllActive(): Promise<FishingSession[]> {
@@ -72,7 +81,11 @@ export class SessionRepository extends ModeScopedRepository {
     if (!mode) {
       return [];
     }
-    return db.sessions.where('[fishingMode+status]').equals([mode, 'active']).toArray();
+    const rows = await db.sessions
+      .where('[fishingMode+status]')
+      .equals([mode, 'active'])
+      .toArray();
+    return this.onlyVisible(rows);
   }
 
   async put(session: NewModeEntity<FishingSession>): Promise<void> {
@@ -80,7 +93,11 @@ export class SessionRepository extends ModeScopedRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await db.sessions.delete(id);
+    const row = await db.sessions.get(id);
+    if (!row) {
+      return;
+    }
+    await db.sessions.put({ ...row, visible: false, updatedAt: nowIso() });
   }
 
   async clearCurrentMode(): Promise<void> {

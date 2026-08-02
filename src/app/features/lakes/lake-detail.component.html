@@ -38,7 +38,16 @@
 
   <mat-form-field appearance="outline" class="full">
     <mat-label>{{ 'lakes.country' | tr }}</mat-label>
-    <input matInput [ngModel]="l.country" (ngModelChange)="updateField('country', $event)" (blur)="saveLake()" />
+    <mat-select
+      [ngModel]="l.country ?? ''"
+      [panelClass]="selectPanelClass"
+      (ngModelChange)="updateCountry($event)"
+    >
+      <mat-option value="">{{ 'common.none' | tr }}</mat-option>
+      @for (country of countryOptions(l.country); track country) {
+        <mat-option [value]="country">{{ country }}</mat-option>
+      }
+    </mat-select>
   </mat-form-field>
 
   <button

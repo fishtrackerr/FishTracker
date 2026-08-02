@@ -4,6 +4,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormatTempPipe } from '../../../core/pipes/format-units.pipe';
 import { WeatherService } from '../../../core/services/weather.service';
 import { GeolocationService } from '../../../core/services/geolocation.service';
+import { I18nService } from '../../../core/services/i18n.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { SettingsService } from '../../../core/services/settings.service';
 import { WeatherSnapshot, WeatherWarning } from '../../../core/models';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -146,6 +148,8 @@ export class WeatherCardComponent {
   private readonly weatherService = inject(WeatherService);
   private readonly geo = inject(GeolocationService);
   private readonly settings = inject(SettingsService);
+  private readonly notifications = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
 
   @Input() detailed = false;
   @Input() showRefresh = false;
@@ -181,19 +185,29 @@ export class WeatherCardComponent {
   }
 
   async refresh(): Promise<void> {
-    const pos = await this.geo.getCurrentPosition();
-    if (!pos) {
-      this.displayWeather.set(this.weatherService.getCachedSnapshot());
-      return;
-    }
-    const useDetailed = this.settings.get().detailedWeatherEnabled;
-    const snapshot = useDetailed
-      ? await this.weatherService.getDetailedForecast(pos.latitude, pos.longitude)
-      : await this.weatherService.getSnapshot(pos.latitude, pos.longitude);
-    this.applyWeather(
-      snapshot ??
+    try {
+      const pos = await this.geo.getCurrentPosition();
+      if (!pos) {
+        this.displayWeather.set(this.weatherService.getCachedSnapshot());
+        this.notifications.error(this.i18n.t('weather.refreshFailed'));
+        return;
+      }
+      const useDetailed = this.settings.get().detailedWeatherEnabled;
+      const snapshot = useDetailed
+        ? await this.weatherService.getDetailedForecast(pos.latitude, pos.longitude)
+        : await this.weatherService.getSnapshot(pos.latitude, pos.longitude);
+      const next =
+        snapshot ??
         this.weatherService.getCachedSnapshotFor(pos.latitude, pos.longitude) ??
-        undefined,
-    );
+        undefined;
+      this.applyWeather(next);
+      if (next) {
+        this.notifications.success(this.i18n.t('weather.updated'));
+      } else {
+        this.notifications.error(this.i18n.t('weather.refreshFailed'));
+      }
+    } catch {
+      this.notifications.error(this.i18n.t('weather.refreshFailed'));
+    }
   }
 }

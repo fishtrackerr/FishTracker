@@ -3,6 +3,7 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { ImageType, StoredImage } from '../models';
+import { isVisibleRecord } from '../utils';
 import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +16,7 @@ export class ImageRepository extends ModeScopedRepository {
           return [];
         }
         const rows = await db.images.where('fishingMode').equals(mode).toArray();
-        return rows
+        return this.onlyVisible(rows)
           .filter((img) => img.type !== 'cover')
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       }),
@@ -24,9 +25,10 @@ export class ImageRepository extends ModeScopedRepository {
 
   watchByParent(parentId: string): Observable<StoredImage[]> {
     return from(
-      liveQuery(() =>
-        db.images.where('parentId').equals(parentId).sortBy('createdAt'),
-      ),
+      liveQuery(async () => {
+        const rows = await db.images.where('parentId').equals(parentId).sortBy('createdAt');
+        return this.onlyVisible(rows);
+      }),
     );
   }
 
@@ -39,7 +41,7 @@ export class ImageRepository extends ModeScopedRepository {
     if (!mode) {
       return [];
     }
-    return db.images.where('fishingMode').equals(mode).toArray();
+    return this.onlyVisible(await db.images.where('fishingMode').equals(mode).toArray());
   }
 
   async getAllAcrossModes(): Promise<StoredImage[]> {
@@ -51,11 +53,8 @@ export class ImageRepository extends ModeScopedRepository {
     if (!mode) {
       return [];
     }
-    return db.images
-      .where('fishingMode')
-      .equals(mode)
-      .filter((img) => img.type !== 'cover')
-      .toArray();
+    const rows = await db.images.where('fishingMode').equals(mode).toArray();
+    return this.onlyVisible(rows).filter((img) => img.type !== 'cover');
   }
 
   async getFavorites(): Promise<StoredImage[]> {
@@ -63,11 +62,8 @@ export class ImageRepository extends ModeScopedRepository {
     if (!mode) {
       return [];
     }
-    return db.images
-      .where('fishingMode')
-      .equals(mode)
-      .filter((img) => img.isFavorite)
-      .toArray();
+    const rows = await db.images.where('fishingMode').equals(mode).toArray();
+    return this.onlyVisible(rows).filter((img) => img.isFavorite);
   }
 
   async getHomepageImage(): Promise<StoredImage | undefined> {
@@ -75,11 +71,8 @@ export class ImageRepository extends ModeScopedRepository {
     if (!mode) {
       return undefined;
     }
-    return db.images
-      .where('fishingMode')
-      .equals(mode)
-      .filter((img) => img.isHomepageImage)
-      .first();
+    const rows = await db.images.where('fishingMode').equals(mode).toArray();
+    return this.onlyVisible(rows).find((img) => img.isHomepageImage);
   }
 
   async clearHomepageFlags(): Promise<void> {
@@ -90,7 +83,7 @@ export class ImageRepository extends ModeScopedRepository {
     const homepageImages = await db.images
       .where('fishingMode')
       .equals(mode)
-      .filter((img) => img.isHomepageImage)
+      .filter((img) => img.isHomepageImage && isVisibleRecord(img))
       .toArray();
     await Promise.all(
       homepageImages.map((img) =>
@@ -104,7 +97,11 @@ export class ImageRepository extends ModeScopedRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await db.images.delete(id);
+    const row = await db.images.get(id);
+    if (!row) {
+      return;
+    }
+    await db.images.put({ ...row, visible: false });
   }
 
   async clearCurrentMode(): Promise<void> {
@@ -121,10 +118,7 @@ export class ImageRepository extends ModeScopedRepository {
     if (!mode) {
       return [];
     }
-    return db.images
-      .where('fishingMode')
-      .equals(mode)
-      .filter((img) => img.type === type)
-      .toArray();
+    const rows = await db.images.where('fishingMode').equals(mode).toArray();
+    return this.onlyVisible(rows).filter((img) => img.type === type);
   }
 }

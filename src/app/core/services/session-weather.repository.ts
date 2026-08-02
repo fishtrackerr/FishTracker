@@ -9,9 +9,13 @@ import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 export class SessionWeatherRepository extends ModeScopedRepository {
   watchBySession(sessionId: string): Observable<SessionWeatherRecord[]> {
     return from(
-      liveQuery(() =>
-        db.sessionWeather.where('sessionId').equals(sessionId).sortBy('capturedAt'),
-      ),
+      liveQuery(async () => {
+        const rows = await db.sessionWeather
+          .where('sessionId')
+          .equals(sessionId)
+          .sortBy('capturedAt');
+        return this.onlyVisible(rows);
+      }),
     );
   }
 
@@ -20,7 +24,7 @@ export class SessionWeatherRepository extends ModeScopedRepository {
     if (!mode) {
       return [];
     }
-    return db.sessionWeather.where('fishingMode').equals(mode).toArray();
+    return this.onlyVisible(await db.sessionWeather.where('fishingMode').equals(mode).toArray());
   }
 
   async getAllAcrossModes(): Promise<SessionWeatherRecord[]> {
@@ -28,7 +32,9 @@ export class SessionWeatherRepository extends ModeScopedRepository {
   }
 
   async getBySession(sessionId: string): Promise<SessionWeatherRecord[]> {
-    return db.sessionWeather.where('sessionId').equals(sessionId).sortBy('capturedAt');
+    return this.onlyVisible(
+      await db.sessionWeather.where('sessionId').equals(sessionId).sortBy('capturedAt'),
+    );
   }
 
   async getById(id: string): Promise<SessionWeatherRecord | undefined> {
@@ -40,11 +46,16 @@ export class SessionWeatherRepository extends ModeScopedRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await db.sessionWeather.delete(id);
+    const row = await db.sessionWeather.get(id);
+    if (!row) {
+      return;
+    }
+    await db.sessionWeather.put({ ...row, visible: false });
   }
 
   async deleteBySession(sessionId: string): Promise<void> {
-    await db.sessionWeather.where('sessionId').equals(sessionId).delete();
+    const rows = await db.sessionWeather.where('sessionId').equals(sessionId).toArray();
+    await Promise.all(rows.map((row) => db.sessionWeather.put({ ...row, visible: false })));
   }
 
   async clearCurrentMode(): Promise<void> {

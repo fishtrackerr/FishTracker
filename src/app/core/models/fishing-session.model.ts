@@ -31,6 +31,8 @@ export interface FishingSession {
   catchCount: number;
   biggestFishKg?: number;
   totalCatchWeightKg: number;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
   createdAt: string;
   updatedAt: string;
 }

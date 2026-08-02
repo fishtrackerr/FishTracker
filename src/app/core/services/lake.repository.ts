@@ -3,6 +3,7 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { Lake } from '../models';
+import { nowIso } from '../utils';
 import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +16,7 @@ export class LakeRepository extends ModeScopedRepository {
           return [];
         }
         const rows = await db.lakes.where('fishingMode').equals(mode).toArray();
-        return rows.sort((a, b) => a.name.localeCompare(b.name));
+        return this.onlyVisible(rows).sort((a, b) => a.name.localeCompare(b.name));
       }),
     );
   }
@@ -30,7 +31,7 @@ export class LakeRepository extends ModeScopedRepository {
       return [];
     }
     const rows = await db.lakes.where('fishingMode').equals(mode).toArray();
-    return rows.sort((a, b) => a.name.localeCompare(b.name));
+    return this.onlyVisible(rows).sort((a, b) => a.name.localeCompare(b.name));
   }
 
   async getAllAcrossModes(): Promise<Lake[]> {
@@ -46,7 +47,11 @@ export class LakeRepository extends ModeScopedRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await db.lakes.delete(id);
+    const row = await db.lakes.get(id);
+    if (!row) {
+      return;
+    }
+    await db.lakes.put({ ...row, visible: false, updatedAt: nowIso() });
   }
 
   async clearCurrentMode(): Promise<void> {

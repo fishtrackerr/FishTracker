@@ -6,7 +6,7 @@ import {
   SessionRod,
   SessionSpot,
 } from '../models';
-import { generateId, nowIso } from '../utils';
+import { generateId, nowIso, onlyVisibleRecords, softDeleteRecord } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
 import { FishSpottedRepository } from './fish-spotted.repository';
@@ -47,33 +47,54 @@ export class RodService {
         biteCount: 0,
         fishSpottedCount: 0,
         isActive: true,
+        visible: true,
       });
     }
     return rods;
   }
 
   async ensureRods(session: FishingSession, count: number): Promise<FishingSession> {
-    const rods = session.rods ?? [];
-    if (rods.length === count) {
-      return session;
+    const full = await this.loadFull(session);
+    const rods = full.rods ?? [];
+    const visible = onlyVisibleRecords(rods);
+    if (visible.length === count) {
+      return full;
     }
-    if (rods.length < count) {
-      const newRods = [...rods];
-      for (let i = rods.length + 1; i <= count; i++) {
-        const rod = this.createRodRecords(session.id, 1)[0];
-        rod.rodNumber = i;
-        rod.name = `Rod ${i}`;
+    if (visible.length < count) {
+      let need = count - visible.length;
+      let newRods = rods.map((rod) => ({ ...rod }));
+      const hidden = newRods
+        .filter((r) => r.visible === false)
+        .sort((a, b) => a.rodNumber - b.rodNumber);
+      for (const hiddenRod of hidden) {
+        if (need <= 0) {
+          break;
+        }
+        newRods = newRods.map((r) =>
+          r.id === hiddenRod.id ? { ...r, visible: true, isActive: true } : r,
+        );
+        need -= 1;
+      }
+      const visibleAfterRevive = onlyVisibleRecords(newRods);
+      let nextNumber =
+        Math.max(0, ...newRods.map((r) => r.rodNumber), visibleAfterRevive.length) + 1;
+      while (need > 0) {
+        const rod = this.createRodRecords(full.id, 1)[0];
+        rod.rodNumber = nextNumber;
+        rod.name = `Rod ${nextNumber}`;
+        nextNumber += 1;
         newRods.push(rod);
+        need -= 1;
         await this.sessionEvents.record({
-          sessionId: session.id,
+          sessionId: full.id,
           type: 'rod-created',
           rodId: rod.id,
           description: `${rod.name} created`,
         });
       }
-      return this.saveSessionRods(session, newRods);
+      return this.saveSessionRods(full, newRods);
     }
-    return session;
+    return full;
   }
 
   async resizeRodCount(
@@ -81,21 +102,23 @@ export class RodService {
     newCount: number,
     force = false,
   ): Promise<{ session: FishingSession; requiresConfirm: boolean; affectedRodIds: string[] }> {
-    const rods = session.rods ?? [];
+    const full = await this.loadFull(session);
+    const rods = full.rods ?? [];
+    const visible = onlyVisibleRecords(rods).sort((a, b) => a.rodNumber - b.rodNumber);
     if (newCount < 1) {
       throw new Error('Rod count must be at least 1');
     }
-    if (newCount >= rods.length) {
-      const updated = await this.ensureRods(session, newCount);
+    if (newCount >= visible.length) {
+      const updated = await this.ensureRods(full, newCount);
       return { session: updated, requiresConfirm: false, affectedRodIds: [] };
     }
 
-    const removed = rods.slice(newCount);
+    const removed = visible.slice(newCount);
     const affectedRodIds: string[] = [];
     for (const rod of removed) {
       const bites = await this.biteRepo.countByRod(rod.id);
       const spotted = await this.fishSpottedRepo.countByRod(rod.id);
-      const catches = (await this.catchRepo.getBySession(session.id)).filter(
+      const catches = (await this.catchRepo.getBySession(full.id)).filter(
         (c) => c.rodId === rod.id,
       );
       if (bites > 0 || spotted > 0 || catches.length > 0) {
@@ -104,11 +127,14 @@ export class RodService {
     }
 
     if (affectedRodIds.length > 0 && !force) {
-      return { session, requiresConfirm: true, affectedRodIds };
+      return { session: full, requiresConfirm: true, affectedRodIds };
     }
 
-    const kept = rods.slice(0, newCount);
-    const updated = await this.saveSessionRods(session, kept);
+    const hideIds = new Set(removed.map((r) => r.id));
+    const updatedRods = rods.map((rod) =>
+      hideIds.has(rod.id) ? softDeleteRecord(rod) : rod,
+    );
+    const updated = await this.saveSessionRods(full, updatedRods);
     return { session: updated, requiresConfirm: false, affectedRodIds };
   }
 
@@ -117,21 +143,22 @@ export class RodService {
     rodId: string,
     sessionSpotId?: string,
   ): Promise<FishingSession> {
-    const rods = session.rods ?? [];
+    const full = await this.loadFull(session);
+    const rods = full.rods ?? [];
     const rod = rods.find((r) => r.id === rodId);
     if (!rod) {
-      return session;
+      return full;
     }
     const fromSpotId = rod.sessionSpotId;
     if (fromSpotId === sessionSpotId) {
-      return session;
+      return full;
     }
 
     const updatedRod: SessionRod = { ...rod, sessionSpotId };
     const updatedRods = rods.map((r) => (r.id === rodId ? updatedRod : r));
-    const updatedSession = await this.saveSessionRods(session, updatedRods);
+    const updatedSession = await this.saveSessionRods(full, updatedRods);
 
-    const history = {
+    const history: RodSpotHistory = {
       id: generateId(),
       rodId,
       fromSessionSpotId: fromSpotId,
@@ -142,9 +169,11 @@ export class RodService {
       await this.historyRepo.put(history);
     }
 
-    const spotName = session.sessionSpots?.find((s) => s.id === sessionSpotId)?.name ?? 'unassigned';
+    const spotName =
+      onlyVisibleRecords(full.sessionSpots ?? []).find((s) => s.id === sessionSpotId)?.name ??
+      'unassigned';
     await this.sessionEvents.record({
-      sessionId: session.id,
+      sessionId: full.id,
       type: 'rod-moved',
       rodId,
       sessionSpotId,
@@ -163,13 +192,14 @@ export class RodService {
     rodId: string,
     sessionSpotId?: string,
   ): Promise<FishingSession> {
-    const rod = (session.rods ?? []).find((r) => r.id === rodId);
+    const full = await this.loadFull(session);
+    const rod = (full.rods ?? []).find((r) => r.id === rodId);
     if (!rod) {
-      return session;
+      return full;
     }
 
     const nextSpotId = sessionSpotId || undefined;
-    let updated = session;
+    let updated = full;
     if ((rod.sessionSpotId ?? '') !== (nextSpotId ?? '')) {
       updated = await this.assignSpot(updated, rodId, nextSpotId);
     }
@@ -185,20 +215,22 @@ export class RodService {
     rodId: string,
     options: UpdateRodOptions,
   ): Promise<FishingSession> {
-    const rods = session.rods ?? [];
+    const full = await this.loadFull(session);
+    const rods = full.rods ?? [];
     const existing = rods.find((r) => r.id === rodId);
     const updatedRods = rods.map((rod) =>
-      rod.id === rodId ? { ...rod, ...options, id: rodId, sessionId: session.id } : rod,
+      rod.id === rodId ? { ...rod, ...options, id: rodId, sessionId: full.id } : rod,
     );
-    const updated = await this.saveSessionRods(session, updatedRods);
+    const updated = await this.saveSessionRods(full, updatedRods);
 
     if (options.castAt) {
       const rodName = existing?.name ?? rodId;
       const spotId = options.sessionSpotId ?? existing?.sessionSpotId;
       const spotName =
-        session.sessionSpots?.find((s) => s.id === spotId)?.name ?? 'unassigned';
+        onlyVisibleRecords(full.sessionSpots ?? []).find((s) => s.id === spotId)?.name ??
+        'unassigned';
       await this.sessionEvents.record({
-        sessionId: session.id,
+        sessionId: full.id,
         type: 'rod-cast',
         rodId,
         sessionSpotId: spotId,
@@ -211,14 +243,15 @@ export class RodService {
   }
 
   async syncRodCounts(session: FishingSession): Promise<FishingSession> {
-    const rods = session.rods ?? [];
+    const full = await this.loadFull(session);
+    const rods = full.rods ?? [];
     const updatedRods: SessionRod[] = [];
     for (const rod of rods) {
       const biteCount = await this.biteRepo.countByRod(rod.id);
       const fishSpottedCount = await this.fishSpottedRepo.countByRod(rod.id);
       updatedRods.push({ ...rod, biteCount, fishSpottedCount });
     }
-    return this.saveSessionRods(session, updatedRods);
+    return this.saveSessionRods(full, updatedRods);
   }
 
   snapshotFromLakeSpot(spot: FishingSpot): SessionSpot {
@@ -231,6 +264,7 @@ export class RodService {
       depth: spot.waterDepthM,
       bottomType: spot.bottomType,
       notes: spot.notes,
+      visible: true,
     };
   }
 
@@ -245,8 +279,9 @@ export class RodService {
   }
 
   async saveSessionSpots(session: FishingSession, sessionSpots: SessionSpot[]): Promise<FishingSession> {
+    const full = await this.loadFull(session);
     const updated: FishingSession = {
-      ...session,
+      ...full,
       sessionSpots,
       updatedAt: nowIso(),
     };
@@ -256,5 +291,10 @@ export class RodService {
 
   getRodCatchCount(sessionId: string, rodId: string, catches: { rodId?: string }[]): number {
     return catches.filter((c) => c.rodId === rodId).length;
+  }
+
+  /** Prefer DB row so soft-deleted nested rods/spots are not dropped on save. */
+  private async loadFull(session: FishingSession): Promise<FishingSession> {
+    return (await this.sessionRepo.getById(session.id)) ?? session;
   }
 }

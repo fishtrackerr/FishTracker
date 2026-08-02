@@ -18,6 +18,8 @@ export interface UserOption {
   value: string;
   isFavorite: boolean;
   isDefault: boolean;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
   createdAt: string;
   updatedAt: string;
 }

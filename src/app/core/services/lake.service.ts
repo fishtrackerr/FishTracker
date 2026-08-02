@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
+import { map, Observable } from 'rxjs';
 import { FishingSpot, Lake } from '../models';
-import { generateId, nowIso } from '../utils';
+import { generateId, nowIso, onlyVisibleRecords, softDeleteRecord } from '../utils';
 import { LakeRepository } from './lake.repository';
 import { RelatedDataSyncService } from './related-data-sync.service';
 
@@ -11,20 +12,24 @@ export class LakeService {
     private readonly sync: RelatedDataSyncService,
   ) {}
 
-  watchAll() {
-    return this.lakeRepo.watchAll();
+  watchAll(): Observable<Lake[]> {
+    return this.lakeRepo.watchAll().pipe(map((lakes) => lakes.map((l) => this.withVisibleSpots(l))));
   }
 
-  watchById(id: string) {
-    return this.lakeRepo.watchById(id);
+  watchById(id: string): Observable<Lake | undefined> {
+    return this.lakeRepo
+      .watchById(id)
+      .pipe(map((lake) => (lake ? this.withVisibleSpots(lake) : undefined)));
   }
 
   async getAll(): Promise<Lake[]> {
-    return this.lakeRepo.getAll();
+    const lakes = await this.lakeRepo.getAll();
+    return lakes.map((l) => this.withVisibleSpots(l));
   }
 
   async getById(id: string): Promise<Lake | undefined> {
-    return this.lakeRepo.getById(id);
+    const lake = await this.lakeRepo.getById(id);
+    return lake ? this.withVisibleSpots(lake) : undefined;
   }
 
   async create(data: Partial<Lake>): Promise<Lake> {
@@ -65,7 +70,7 @@ export class LakeService {
     if (data.name !== undefined && data.name !== existing.name) {
       await this.sync.onLakeRenamed(id, existing.name, data.name);
     }
-    return updated;
+    return this.withVisibleSpots(updated);
   }
 
   async delete(id: string): Promise<void> {
@@ -97,6 +102,7 @@ export class LakeService {
       recommendedBait: data.recommendedBait,
       notes: data.notes,
       isFavorite: data.isFavorite ?? false,
+      visible: true,
     };
     lake.spots.push(spot);
     await this.update(lakeId, { spots: lake.spots });
@@ -134,7 +140,7 @@ export class LakeService {
     if (!lake) {
       return;
     }
-    lake.spots = lake.spots.filter((s) => s.id !== spotId);
+    lake.spots = lake.spots.map((s) => (s.id === spotId ? softDeleteRecord(s) : s));
     await this.update(lakeId, { spots: lake.spots });
   }
 
@@ -145,5 +151,10 @@ export class LakeService {
       }
       return a.name.localeCompare(b.name);
     });
+  }
+
+  /** Hide soft-deleted spots for UI reads; storage keeps the full list. */
+  private withVisibleSpots(lake: Lake): Lake {
+    return { ...lake, spots: onlyVisibleRecords(lake.spots ?? []) };
   }
 }

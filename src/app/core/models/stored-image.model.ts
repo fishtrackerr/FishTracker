@@ -22,4 +22,6 @@ export interface StoredImage {
   isFavorite: boolean;
   isHomepageImage: boolean;
   thumbnailId?: string;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
 }

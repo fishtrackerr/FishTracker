@@ -9,14 +9,20 @@ import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 export class SessionEventRepository extends ModeScopedRepository {
   watchBySession(sessionId: string): Observable<SessionEvent[]> {
     return from(
-      liveQuery(() =>
-        db.sessionEvents.where('sessionId').equals(sessionId).sortBy('occurredAt'),
-      ),
+      liveQuery(async () => {
+        const rows = await db.sessionEvents
+          .where('sessionId')
+          .equals(sessionId)
+          .sortBy('occurredAt');
+        return this.onlyVisible(rows);
+      }),
     );
   }
 
   async getBySession(sessionId: string): Promise<SessionEvent[]> {
-    return db.sessionEvents.where('sessionId').equals(sessionId).sortBy('occurredAt');
+    return this.onlyVisible(
+      await db.sessionEvents.where('sessionId').equals(sessionId).sortBy('occurredAt'),
+    );
   }
 
   async getAllAcrossModes(): Promise<SessionEvent[]> {
@@ -28,7 +34,8 @@ export class SessionEventRepository extends ModeScopedRepository {
   }
 
   async deleteBySession(sessionId: string): Promise<void> {
-    await db.sessionEvents.where('sessionId').equals(sessionId).delete();
+    const rows = await db.sessionEvents.where('sessionId').equals(sessionId).toArray();
+    await Promise.all(rows.map((row) => db.sessionEvents.put({ ...row, visible: false })));
   }
 
   async clearCurrentMode(): Promise<void> {

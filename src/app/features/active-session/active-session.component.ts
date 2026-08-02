@@ -171,7 +171,13 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
 
   async refreshWeather(): Promise<void> {
     const s = this.session();
-    if (s) await this.sessionService.refreshWeather(s.id);
+    if (!s) return;
+    try {
+      await this.sessionService.refreshWeather(s.id);
+      this.notifications.success(this.i18n.t('weather.updated'));
+    } catch {
+      this.notifications.error(this.i18n.t('weather.refreshFailed'));
+    }
   }
 
   async quickCatch(): Promise<void> {

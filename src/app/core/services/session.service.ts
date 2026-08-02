@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
+import { map, Observable } from 'rxjs';
 import { Catch, FishingSession, SessionSpot, WeatherSnapshot } from '../models';
-import { generateId, nowIso, pickLakeCoverImageId, resolveSessionCoverImageId } from '../utils';
+import {
+  generateId,
+  nowIso,
+  onlyVisibleRecords,
+  pickLakeCoverImageId,
+  resolveSessionCoverImageId,
+} from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
 import { CatchRepository } from './catch.repository';
 import { FishSpottedRepository } from './fish-spotted.repository';
@@ -70,30 +77,41 @@ export class SessionService {
     private readonly i18n: I18nService,
   ) {}
 
-  watchAll() {
-    return this.sessionRepo.watchAll();
+  watchAll(): Observable<FishingSession[]> {
+    return this.sessionRepo.watchAll().pipe(map((rows) => rows.map((s) => this.projectSession(s))));
   }
 
-  watchById(id: string) {
+  watchById(id: string): Observable<FishingSession | undefined> {
+    return this.sessionRepo
+      .watchById(id)
+      .pipe(map((session) => (session ? this.projectSession(session) : undefined)));
+  }
+
+  /** Full nested rods/spots including soft-deleted — for edit forms that round-trip arrays. */
+  watchByIdIncludingHidden(id: string): Observable<FishingSession | undefined> {
     return this.sessionRepo.watchById(id);
   }
 
-  watchActive() {
-    return this.sessionRepo.watchActive();
+  watchActive(): Observable<FishingSession | undefined> {
+    return this.sessionRepo
+      .watchActive()
+      .pipe(map((session) => (session ? this.projectSession(session) : undefined)));
   }
 
   async getActive(): Promise<FishingSession | undefined> {
-    return this.sessionRepo.getActive();
+    const session = await this.sessionRepo.getActive();
+    return session ? this.projectSession(session) : undefined;
   }
 
   async getById(id: string): Promise<FishingSession | undefined> {
-    return this.sessionRepo.getById(id);
+    const session = await this.sessionRepo.getById(id);
+    return session ? this.projectSession(session) : undefined;
   }
 
   async start(options: StartSessionOptions): Promise<FishingSession> {
     const existing = await this.sessionRepo.getActive();
     if (existing) {
-      return existing;
+      return this.projectSession(existing);
     }
 
     const { name, startDate, lakeId, sessionSpots } = options;
@@ -178,7 +196,7 @@ export class SessionService {
       void this.refreshWeather(session.id);
     }
 
-    return session as unknown as FishingSession;
+    return this.projectSession(session as unknown as FishingSession);
   }
 
   async complete(id: string): Promise<FishingSession | undefined> {
@@ -210,7 +228,7 @@ export class SessionService {
       type: 'session-end',
       description: `${session.name} completed`,
     });
-    return updated;
+    return this.projectSession(updated);
   }
 
   async update(id: string, data: Partial<FishingSession>): Promise<FishingSession | undefined> {
@@ -220,7 +238,7 @@ export class SessionService {
     }
     const updated = { ...existing, ...data, id, updatedAt: nowIso() };
     await this.sessionRepo.put(updated);
-    return updated;
+    return this.projectSession(updated);
   }
 
   async updateSession(
@@ -288,7 +306,7 @@ export class SessionService {
     merged.coverImageId = resolveSessionCoverImageId(catches, lake);
 
     await this.sessionRepo.put(merged);
-    return merged;
+    return this.projectSession(merged);
   }
 
   /** Catch photo if present, otherwise the lake image. */
@@ -369,5 +387,14 @@ export class SessionService {
   getDurationMs(session: FishingSession): number {
     const end = session.endDate ? new Date(session.endDate).getTime() : Date.now();
     return end - new Date(session.startDate).getTime();
+  }
+
+  /** Hide soft-deleted nested rods/spots for UI reads; storage keeps the full lists. */
+  private projectSession(session: FishingSession): FishingSession {
+    return {
+      ...session,
+      rods: onlyVisibleRecords(session.rods ?? []),
+      sessionSpots: onlyVisibleRecords(session.sessionSpots ?? []),
+    };
   }
 }

@@ -23,6 +23,8 @@ export interface Lake {
   spots: FishingSpot[];
   photoIds: string[];
   coverImageId?: string;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
   createdAt: string;
   updatedAt: string;
 }

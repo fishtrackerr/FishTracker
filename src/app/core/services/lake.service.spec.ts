@@ -83,4 +83,48 @@ describe('LakeService', () => {
       expect.objectContaining({ name: 'New Spot', depth: 2 }),
     );
   });
+
+  it('soft-deletes spots instead of removing them', async () => {
+    repo.getById.mockResolvedValue({
+      id: 'lake-1',
+      name: 'Lake',
+      spots: [
+        { id: 'spot-1', name: 'Keep', isFavorite: false },
+        { id: 'spot-2', name: 'Hide', isFavorite: false },
+      ],
+      photoIds: [],
+      isFavorite: false,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    });
+
+    await service.deleteSpot('lake-1', 'spot-2');
+
+    expect(repo.put).toHaveBeenCalledWith(
+      expect.objectContaining({
+        spots: [
+          { id: 'spot-1', name: 'Keep', isFavorite: false },
+          { id: 'spot-2', name: 'Hide', isFavorite: false, visible: false },
+        ],
+      }),
+    );
+  });
+
+  it('hides soft-deleted spots on getById', async () => {
+    repo.getById.mockResolvedValue({
+      id: 'lake-1',
+      name: 'Lake',
+      spots: [
+        { id: 'spot-1', name: 'Keep', isFavorite: false },
+        { id: 'spot-2', name: 'Hide', isFavorite: false, visible: false },
+      ],
+      photoIds: [],
+      isFavorite: false,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    });
+
+    const lake = await service.getById('lake-1');
+    expect(lake?.spots).toEqual([{ id: 'spot-1', name: 'Keep', isFavorite: false }]);
+  });
 });

@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { FishingMode } from '../models';
+import { isVisibleRecord, onlyVisibleRecords, WithVisibility } from '../utils';
 import { FishingModeService } from './fishing-mode.service';
 
 /** Entity that may omit fishingMode; repositories stamp the active mode on write. */
@@ -18,18 +19,23 @@ export abstract class ModeScopedRepository {
     return this.fishingMode.getMode();
   }
 
-  protected withMode<T extends { fishingMode?: FishingMode }>(
+  protected withMode<T extends { fishingMode?: FishingMode } & WithVisibility>(
     entity: T,
-  ): T & { fishingMode: FishingMode } {
+  ): T & { fishingMode: FishingMode; visible: boolean } {
     return {
       ...entity,
       fishingMode: entity.fishingMode ?? this.activeMode(),
+      visible: entity.visible !== false,
     };
   }
 
-  /** Returns the entity only when it belongs to the active fishing mode. */
-  protected forActiveMode<T extends { fishingMode?: FishingMode }>(
+  /**
+   * Returns the entity only when it belongs to the active fishing mode
+   * and is not soft-deleted (unless includeHidden).
+   */
+  protected forActiveMode<T extends { fishingMode?: FishingMode } & WithVisibility>(
     entity: T | undefined,
+    options?: { includeHidden?: boolean },
   ): T | undefined {
     if (!entity) {
       return undefined;
@@ -38,6 +44,13 @@ export abstract class ModeScopedRepository {
     if (!mode || !entity.fishingMode || entity.fishingMode !== mode) {
       return undefined;
     }
+    if (!options?.includeHidden && !isVisibleRecord(entity)) {
+      return undefined;
+    }
     return entity;
+  }
+
+  protected onlyVisible<T extends WithVisibility>(rows: T[]): T[] {
+    return onlyVisibleRecords(rows);
   }
 }

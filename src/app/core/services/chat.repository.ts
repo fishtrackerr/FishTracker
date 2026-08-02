@@ -3,6 +3,7 @@ import { liveQuery } from 'dexie';
 import { from, Observable } from 'rxjs';
 import { db } from '../db/fish-db';
 import { ChatMessage, ChatThread } from '../models';
+import { isVisibleRecord, nowIso, withVisibleDefault } from '../utils';
 import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +16,7 @@ export class ChatRepository extends ModeScopedRepository {
           return [];
         }
         const rows = await db.chatThreads.where('fishingMode').equals(mode).toArray();
-        return rows.sort(
+        return this.onlyVisible(rows).sort(
           (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
         );
       }),
@@ -24,9 +25,10 @@ export class ChatRepository extends ModeScopedRepository {
 
   watchMessages(threadId: string): Observable<ChatMessage[]> {
     return from(
-      liveQuery(() =>
-        db.chatMessages.where('threadId').equals(threadId).sortBy('createdAt'),
-      ),
+      liveQuery(async () => {
+        const rows = await db.chatMessages.where('threadId').equals(threadId).sortBy('createdAt');
+        return rows.filter(isVisibleRecord);
+      }),
     );
   }
 
@@ -36,7 +38,7 @@ export class ChatRepository extends ModeScopedRepository {
       return [];
     }
     const rows = await db.chatThreads.where('fishingMode').equals(mode).toArray();
-    return rows.sort(
+    return this.onlyVisible(rows).sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
     );
   }
@@ -49,7 +51,7 @@ export class ChatRepository extends ModeScopedRepository {
     const threads = await this.getAllThreads();
     const threadIds = new Set(threads.map((t) => t.id));
     const all = await db.chatMessages.toArray();
-    return all.filter((m) => threadIds.has(m.threadId));
+    return all.filter((m) => threadIds.has(m.threadId) && isVisibleRecord(m));
   }
 
   async getAllMessagesAcrossModes(): Promise<ChatMessage[]> {
@@ -61,14 +63,12 @@ export class ChatRepository extends ModeScopedRepository {
   }
 
   async getMessages(threadId: string): Promise<ChatMessage[]> {
-    return db.chatMessages.where('threadId').equals(threadId).sortBy('createdAt');
+    const rows = await db.chatMessages.where('threadId').equals(threadId).sortBy('createdAt');
+    return rows.filter(isVisibleRecord);
   }
 
   async getLatestMessage(threadId: string): Promise<ChatMessage | undefined> {
-    const messages = await db.chatMessages
-      .where('threadId')
-      .equals(threadId)
-      .sortBy('createdAt');
+    const messages = await this.getMessages(threadId);
     return messages.at(-1);
   }
 
@@ -77,13 +77,21 @@ export class ChatRepository extends ModeScopedRepository {
   }
 
   async putMessage(message: ChatMessage): Promise<void> {
-    await db.chatMessages.put(message);
+    await db.chatMessages.put(withVisibleDefault(message));
   }
 
   async deleteThread(id: string): Promise<void> {
+    const thread = await db.chatThreads.get(id);
+    if (!thread) {
+      return;
+    }
+    const now = nowIso();
+    const messages = await db.chatMessages.where('threadId').equals(id).toArray();
     await db.transaction('rw', [db.chatThreads, db.chatMessages], async () => {
-      await db.chatMessages.where('threadId').equals(id).delete();
-      await db.chatThreads.delete(id);
+      await Promise.all(
+        messages.map((m) => db.chatMessages.put({ ...m, visible: false })),
+      );
+      await db.chatThreads.put({ ...thread, visible: false, updatedAt: now });
     });
   }
 

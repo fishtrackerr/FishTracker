@@ -51,6 +51,7 @@ export class SessionsListComponent {
   private readonly sessionStartFlow = inject(SessionStartFlowService);
   private readonly bottomSheet = inject(MatBottomSheet);
   private readonly theme = inject(ThemeService);
+  readonly selectPanelClass = this.theme.getSelectPanelClass();
 
   readonly allSessions = toSignal(this.sessionService.watchAll(), { initialValue: [] });
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });

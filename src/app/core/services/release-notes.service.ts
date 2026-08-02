@@ -7,10 +7,15 @@ export interface ReleaseNoteItem {
   commitUrl?: string;
 }
 
-export interface ReleaseNotesData {
+export interface ReleaseNotesEntry {
   version: string;
   date: string;
   sections: { category: string; items: Array<string | ReleaseNoteItem> }[];
+}
+
+/** Current package version notes + optional full history (`releases`). */
+export interface ReleaseNotesData extends ReleaseNotesEntry {
+  releases?: ReleaseNotesEntry[];
 }
 
 @Injectable({ providedIn: 'root' })

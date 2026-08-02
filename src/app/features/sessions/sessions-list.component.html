@@ -12,7 +12,11 @@
   </button>
   <mat-form-field appearance="outline" class="sort-field">
     <mat-label>{{ 'sessions.sort' | tr }}</mat-label>
-    <mat-select [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+    <mat-select
+      [ngModel]="sortBy()"
+      (ngModelChange)="sortBy.set($event)"
+      [panelClass]="selectPanelClass"
+    >
       <mat-option value="newest">{{ 'sessions.sortNewest' | tr }}</mat-option>
       <mat-option value="oldest">{{ 'sessions.sortOldest' | tr }}</mat-option>
       <mat-option value="name-asc">{{ 'sessions.sortNameAsc' | tr }}</mat-option>

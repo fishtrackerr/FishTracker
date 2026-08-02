@@ -608,7 +608,9 @@
     "rain": "Regen",
     "dailyForecast": "Tagesvorhersage",
     "refresh": "Wetter aktualisieren",
-    "unavailable": "Wetter nicht verfügbar"
+    "updated": "Wetter aktualisiert",
+    "unavailable": "Wetter nicht verfügbar",
+    "refreshFailed": "Wetter konnte nicht aktualisiert werden"
   },
   "sessionCard": {
     "start": "Start:",

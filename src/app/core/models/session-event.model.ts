@@ -21,4 +21,6 @@ export interface SessionEvent {
   sessionSpotId?: string;
   occurredAt: string;
   description?: string;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
 }

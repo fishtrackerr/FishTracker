@@ -20,7 +20,7 @@ import { NotificationService } from '../../core/services/notification.service';
 import { RodService } from '../../core/services/rod.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { FishingSession, FishingSpot, Lake, SessionSpot, SessionStatus } from '../../core/models';
-import { fromLocalDatetimeInput, toLocalDatetimeInput } from '../../core/utils';
+import { fromLocalDatetimeInput, isVisibleRecord, onlyVisibleRecords, softDeleteRecord, toLocalDatetimeInput } from '../../core/utils';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { MapsLinkButtonComponent } from '../../shared/components/maps-link-button/maps-link-button.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -58,7 +58,7 @@ export class SessionEditComponent {
 
   readonly session = toSignal(
     this.route.paramMap.pipe(
-      switchMap((p) => this.sessionService.watchById(p.get('id')!)),
+      switchMap((p) => this.sessionService.watchByIdIncludingHidden(p.get('id')!)),
     ),
   );
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] as Lake[] });
@@ -110,12 +110,14 @@ export class SessionEditComponent {
     this.prebait = s.prebait ?? '';
     this.notes = s.notes ?? '';
     this.tags = s.tags ?? [];
-    this.rodCount = s.rods?.length ?? 1;
+    this.rodCount = onlyVisibleRecords(s.rods ?? []).length || 1;
     this.latitude = s.latitude;
     this.longitude = s.longitude;
     this.waterTemperatureC = s.waterTemperatureC;
     this.sessionSpots.set(s.sessionSpots ?? []);
-    this.selectedSpotIds.set((s.sessionSpots ?? []).map((sp) => sp.id));
+    this.selectedSpotIds.set(
+      onlyVisibleRecords(s.sessionSpots ?? []).map((sp) => sp.id),
+    );
     void this.loadLakeSpots(this.lakeId);
   }
 
@@ -130,7 +132,7 @@ export class SessionEditComponent {
         this.lakeId = this.previousLakeId;
         return;
       }
-      this.sessionSpots.set([]);
+      this.sessionSpots.set(this.sessionSpots().map((s) => softDeleteRecord(s)));
       this.selectedSpotIds.set([]);
     }
     this.previousLakeId = newLakeId;
@@ -149,23 +151,32 @@ export class SessionEditComponent {
   toggleSpot(spot: FishingSpot, selected: boolean): void {
     const current = this.sessionSpots();
     if (selected) {
-      if (current.some((s) => s.lakeSpotId === spot.id)) {
+      const existing = current.find((s) => s.lakeSpotId === spot.id);
+      if (existing) {
+        this.sessionSpots.set(
+          current.map((s) => (s.id === existing.id ? { ...s, visible: true } : s)),
+        );
+        if (!this.selectedSpotIds().includes(existing.id)) {
+          this.selectedSpotIds.set([...this.selectedSpotIds(), existing.id]);
+        }
         return;
       }
       const snapshot = this.rodService.snapshotFromLakeSpot(spot);
       this.sessionSpots.set([...current, snapshot]);
       this.selectedSpotIds.set([...this.selectedSpotIds(), snapshot.id]);
     } else {
-      const snapshot = current.find((s) => s.lakeSpotId === spot.id);
+      const snapshot = current.find((s) => s.lakeSpotId === spot.id && isVisibleRecord(s));
       if (snapshot) {
-        this.sessionSpots.set(current.filter((s) => s.id !== snapshot.id));
+        this.sessionSpots.set(
+          current.map((s) => (s.id === snapshot.id ? softDeleteRecord(s) : s)),
+        );
         this.selectedSpotIds.set(this.selectedSpotIds().filter((id) => id !== snapshot.id));
       }
     }
   }
 
   isSpotSelected(spot: FishingSpot): boolean {
-    return this.sessionSpots().some((s) => s.lakeSpotId === spot.id);
+    return this.sessionSpots().some((s) => s.lakeSpotId === spot.id && isVisibleRecord(s));
   }
 
   async addNewLakeSpot(): Promise<void> {
@@ -281,7 +292,7 @@ export class SessionEditComponent {
         this.latitude = updated.latitude;
         this.longitude = updated.longitude;
       }
-      this.notify.success(this.i18n.t('sessionEdit.weatherRefreshed'));
+      this.notify.success(this.i18n.t('weather.updated'));
     }
   }
 }

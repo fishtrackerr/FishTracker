@@ -13,6 +13,8 @@ export interface ChatThread {
   fishingMode?: FishingMode;
   title: string;
   promptId?: InsightPromptId;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,5 +25,7 @@ export interface ChatMessage {
   role: ChatRole;
   content: string;
   source?: 'local' | 'llm' | 'system';
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
   createdAt: string;
 }

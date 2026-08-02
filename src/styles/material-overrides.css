@@ -24,14 +24,17 @@
 .mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__notch,
 .mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__trailing {
   border-color: var(--primary) !important;
+  border-width: 1px !important;
 }
 
 .mat-mdc-form-field.mat-focused .mdc-notched-outline .mdc-notched-outline__leading,
 .mat-mdc-form-field.mat-focused .mdc-notched-outline .mdc-notched-outline__notch,
 .mat-mdc-form-field.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing {
   border-color: var(--primary) !important;
+  border-width: 1px !important;
 }
 
+/* Explicit radii — Android WebView often ignores MDC shape CSS variables */
 .mat-mdc-form-field .mdc-notched-outline__leading {
   border-top-left-radius: var(--radius-button) !important;
   border-bottom-left-radius: var(--radius-button) !important;
@@ -40,6 +43,11 @@
 .mat-mdc-form-field .mdc-notched-outline__trailing {
   border-top-right-radius: var(--radius-button) !important;
   border-bottom-right-radius: var(--radius-button) !important;
+}
+
+.mat-mdc-form-field .mdc-text-field--outlined,
+.mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  border-radius: var(--radius-button) !important;
 }
 
 .mat-mdc-form-field .mat-mdc-form-field-focus-overlay {
@@ -104,30 +112,45 @@ textarea.mat-mdc-input-element {
   background: color-mix(in srgb, var(--primary) 8%, var(--background-card)) !important;
 }
 
+.cdk-overlay-pane:has(.mat-mdc-select-panel) {
+  border-radius: var(--radius-button);
+  overflow: hidden;
+}
+
 .mat-mdc-select-panel,
+.app-select-panel,
 .theme-dark-select-panel,
 .theme-light-select-panel {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-button);
+  border: 1px solid var(--primary) !important;
+  border-radius: var(--radius-button) !important;
+  box-shadow: var(--shadow-md) !important;
+  overflow: hidden !important;
+  padding: var(--spacing-xs) 0 !important;
 }
 
 .cdk-overlay-container[data-theme='dark'] .mat-mdc-select-panel,
-.cdk-overlay-container.theme-dark .mat-mdc-select-panel {
+.cdk-overlay-container.theme-dark .mat-mdc-select-panel,
+.cdk-overlay-container[data-theme='dark'] .app-select-panel,
+.cdk-overlay-container.theme-dark .app-select-panel {
   background: var(--background-card) !important;
 }
 
 .cdk-overlay-container[data-theme='light'] .mat-mdc-select-panel,
-.cdk-overlay-container.theme-light .mat-mdc-select-panel {
+.cdk-overlay-container.theme-light .mat-mdc-select-panel,
+.cdk-overlay-container[data-theme='light'] .app-select-panel,
+.cdk-overlay-container.theme-light .app-select-panel {
   background: var(--background-card) !important;
 }
 
 .mat-mdc-autocomplete-panel {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-button);
+  border: 1px solid var(--primary) !important;
+  border-radius: var(--radius-button) !important;
+  box-shadow: var(--shadow-md) !important;
+  overflow: hidden !important;
 }
 
 .mat-datepicker-content {
@@ -345,9 +368,11 @@ a.mat-mdc-flat-button.mat-warn {
 }
 
 .mat-mdc-snack-bar-container {
-  --mat-snack-bar-container-color: var(--snackbar-bg, var(--background-card));
+  --mat-snack-bar-container-color: transparent;
   --mat-snack-bar-supporting-text-color: var(--snackbar-text, var(--text-primary));
   --mat-snack-bar-button-color: var(--snackbar-action, var(--primary));
+  --mdc-snackbar-container-shape: var(--radius-md);
+  --mat-snack-bar-container-shape: var(--radius-md);
 }
 
 .mat-mdc-chip.mat-mdc-standard-chip {

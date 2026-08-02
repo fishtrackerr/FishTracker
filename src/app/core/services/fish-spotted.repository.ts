@@ -9,22 +9,29 @@ import { ModeScopedRepository, NewModeEntity } from './mode-scoped.repository';
 export class FishSpottedRepository extends ModeScopedRepository {
   watchBySession(sessionId: string): Observable<FishSpottedEvent[]> {
     return from(
-      liveQuery(() =>
-        db.fishSpottedEvents.where('sessionId').equals(sessionId).sortBy('spottedAt'),
-      ),
+      liveQuery(async () => {
+        const rows = await db.fishSpottedEvents
+          .where('sessionId')
+          .equals(sessionId)
+          .sortBy('spottedAt');
+        return this.onlyVisible(rows);
+      }),
     );
   }
 
   watchByRod(rodId: string): Observable<FishSpottedEvent[]> {
     return from(
-      liveQuery(() =>
-        db.fishSpottedEvents.where('rodId').equals(rodId).sortBy('spottedAt'),
-      ),
+      liveQuery(async () => {
+        const rows = await db.fishSpottedEvents.where('rodId').equals(rodId).sortBy('spottedAt');
+        return this.onlyVisible(rows);
+      }),
     );
   }
 
   async getBySession(sessionId: string): Promise<FishSpottedEvent[]> {
-    return db.fishSpottedEvents.where('sessionId').equals(sessionId).sortBy('spottedAt');
+    return this.onlyVisible(
+      await db.fishSpottedEvents.where('sessionId').equals(sessionId).sortBy('spottedAt'),
+    );
   }
 
   async getAllAcrossModes(): Promise<FishSpottedEvent[]> {
@@ -32,7 +39,8 @@ export class FishSpottedRepository extends ModeScopedRepository {
   }
 
   async countByRod(rodId: string): Promise<number> {
-    return db.fishSpottedEvents.where('rodId').equals(rodId).count();
+    const rows = await db.fishSpottedEvents.where('rodId').equals(rodId).toArray();
+    return this.onlyVisible(rows).length;
   }
 
   async put(event: NewModeEntity<FishSpottedEvent>): Promise<void> {
@@ -40,11 +48,16 @@ export class FishSpottedRepository extends ModeScopedRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await db.fishSpottedEvents.delete(id);
+    const row = await db.fishSpottedEvents.get(id);
+    if (!row) {
+      return;
+    }
+    await db.fishSpottedEvents.put({ ...row, visible: false });
   }
 
   async deleteBySession(sessionId: string): Promise<void> {
-    await db.fishSpottedEvents.where('sessionId').equals(sessionId).delete();
+    const rows = await db.fishSpottedEvents.where('sessionId').equals(sessionId).toArray();
+    await Promise.all(rows.map((row) => db.fishSpottedEvents.put({ ...row, visible: false })));
   }
 
   async clearCurrentMode(): Promise<void> {

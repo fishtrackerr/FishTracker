@@ -44,11 +44,13 @@ export class ThemeService {
         : mode;
     this.resolvedTheme.set(resolved);
     document.documentElement.setAttribute('data-theme', resolved);
+    document.documentElement.style.colorScheme = resolved;
 
     const overlayEl = this.overlayContainer.getContainerElement();
     overlayEl.classList.remove('theme-dark', 'theme-light', 'dark-theme', 'light-theme');
     overlayEl.classList.add(resolved === 'dark' ? 'theme-dark' : 'theme-light');
     overlayEl.setAttribute('data-theme', resolved);
+    overlayEl.style.colorScheme = resolved;
 
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {

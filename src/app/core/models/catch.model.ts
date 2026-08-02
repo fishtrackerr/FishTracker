@@ -35,6 +35,8 @@ export interface Catch {
   weather?: WeatherSnapshot;
   /** True when logged instantly; details still need to be filled in. */
   detailsPending?: boolean;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
   createdAt: string;
   updatedAt: string;
 }

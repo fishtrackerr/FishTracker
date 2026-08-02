@@ -12,4 +12,6 @@ export interface SessionRod {
   fishSpottedCount: number;
   isActive: boolean;
   notes?: string;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
 }

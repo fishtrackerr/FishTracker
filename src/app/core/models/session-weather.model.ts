@@ -9,4 +9,6 @@ export interface SessionWeatherRecord {
   /** ISO timestamp; mirrors weather.capturedAt for indexing. */
   capturedAt: string;
   weather: WeatherSnapshot;
+  /** Soft-delete: false hides from UI; omit/true = visible. */
+  visible?: boolean;
 }
