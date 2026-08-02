@@ -150,9 +150,16 @@
     "resetDesc": "Jede Rücksetzung erfordert eine Bestätigung. Einstellungen löschen keine Angeldaten.",
     "customOptions": "Benutzerdefinierte Optionen",
     "manageOptions": "Optionen verwalten",
-    "manageOptionsDesc": "Benenne eine Option um, um sie überall in Fängen, Ruten, Filtern und Favoriten zu aktualisieren.",
+    "manageOptionsDesc": "Füge Optionen hinzu, benenne sie um oder lösche sie für Fang-Dropdowns. Umbenennen aktualisiert passende Werte in Fängen, Ruten, Filtern und Favoriten.",
     "renameOptionPrompt": "Neuer Name für \"{{value}}\"",
     "optionRenamed": "Option umbenannt",
+    "addOption": "Hinzufügen",
+    "addOptionPrompt": "Neuer Wert für {{category}}",
+    "optionAdded": "Option hinzugefügt",
+    "optionDeleted": "Option gelöscht",
+    "deleteOptionTitle": "Diese Option löschen?",
+    "deleteOptionMessage": "“{{value}}” aus der Liste entfernen? Bestehende Fänge behalten den alten Text.",
+    "noOptionsInCategory": "Noch keine Optionen — füge eine hinzu oder setze auf Standardwerte zurück.",
     "resetAllCustom": "Alle benutzerdefinierten Optionen zurücksetzen",
     "preferences": "Voreinstellungen",
     "resetFilters": "Filter zurücksetzen",
@@ -730,6 +737,13 @@
     "message": "Hast du Feedback oder Funktionsideen? Schick sie per E-Mail — so verbessern wir Fish Tracker.",
     "send": "Feedback senden",
     "notNow": "Nicht jetzt"
+  },
+  "privacyWelcome": {
+    "title": "Deine Daten bleiben hier",
+    "lead": "Nichts, was du in Fish Tracker einträgst, wird geteilt.",
+    "body": "Sitzungen, Fänge, Fotos und Notizen bleiben nur auf diesem Gerät. Es gibt keine Konten und kein Cloud-Logbuch für deine Angeldaten.",
+    "note": "Optionale Funktionen wie Wetter können das Netzwerk nutzen, aber deine Fanghistorie wird nie hochgeladen.",
+    "gotIt": "Verstanden"
   },
   "privacy": {
     "title": "Datenschutz & Daten",

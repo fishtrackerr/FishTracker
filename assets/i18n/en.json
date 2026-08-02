@@ -150,9 +150,16 @@
     "resetDesc": "Every reset requires confirmation. Settings resets do not delete fishing records.",
     "customOptions": "Custom options",
     "manageOptions": "Manage options",
-    "manageOptionsDesc": "Rename an option to update it everywhere it appears in catches, rods, filters, and favorites.",
+    "manageOptionsDesc": "Add, rename, or delete options used in catch dropdowns. Renaming updates matching values in catches, rods, filters, and favorites.",
     "renameOptionPrompt": "New name for \"{{value}}\"",
     "optionRenamed": "Option renamed",
+    "addOption": "Add",
+    "addOptionPrompt": "New {{category}} value",
+    "optionAdded": "Option added",
+    "optionDeleted": "Option deleted",
+    "deleteOptionTitle": "Delete this option?",
+    "deleteOptionMessage": "Remove “{{value}}” from the list? Existing catches keep the old text.",
+    "noOptionsInCategory": "No options yet — add one or reset to defaults.",
     "resetAllCustom": "Reset all custom options",
     "preferences": "Preferences",
     "resetFilters": "Reset filters",
@@ -730,6 +737,13 @@
     "message": "Have feedback or feature ideas? Send them by email — it helps improve Fish Tracker.",
     "send": "Send feedback",
     "notNow": "Not now"
+  },
+  "privacyWelcome": {
+    "title": "Your data stays here",
+    "lead": "Nothing you enter in Fish Tracker is shared.",
+    "body": "Sessions, catches, photos, and notes stay on this device only. There are no accounts and no cloud logbook for your fishing data.",
+    "note": "Optional features like weather may use the network, but your catch history is never uploaded.",
+    "gotIt": "Got it"
   },
   "privacy": {
     "title": "Privacy & data",
