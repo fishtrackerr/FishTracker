@@ -81,6 +81,46 @@
   padding-top: var(--spacing-xs);
   border-top: 1px solid var(--border-primary);
 }
+.empty-prompts {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.prompt-list {
+  margin-top: var(--spacing-xs);
+}
+.prompt-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border-primary);
+}
+.prompt-row:last-child {
+  border-bottom: none;
+}
+.prompt-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.prompt-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+.prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+.danger-btn {
+  color: var(--danger, #c62828);
+}
 .notice {
   margin: 0;
   padding: var(--spacing-sm) var(--spacing-md);

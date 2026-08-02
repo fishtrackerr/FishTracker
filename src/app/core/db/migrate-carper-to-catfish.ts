@@ -23,6 +23,7 @@ export const CARPER_TO_CATFISH_TABLES = [
   'sessionWeather',
   'userOptions',
   'chatThreads',
+  'assistantPrompts',
 ] as const;
 
 type ModeScopedRow = {

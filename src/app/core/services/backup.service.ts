@@ -11,6 +11,7 @@ import {
 import { DEFAULT_FISHING_MODE, isFishingMode } from '../models/fishing-mode.model';
 import { blobToBase64, base64ToBlob, nowIso } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
+import { AssistantPromptRepository } from './assistant-prompt.repository';
 import { CatchRepository } from './catch.repository';
 import { ChatRepository } from './chat.repository';
 import { FishSpottedRepository } from './fish-spotted.repository';
@@ -58,6 +59,7 @@ export class BackupService {
     private readonly sessionWeatherRepo: SessionWeatherRepository,
     private readonly userOptionRepo: UserOptionRepository,
     private readonly chatRepo: ChatRepository,
+    private readonly assistantPromptRepo: AssistantPromptRepository,
   ) {}
 
   async export(): Promise<BackupData> {
@@ -73,6 +75,7 @@ export class BackupService {
     const userOptions = await this.userOptionRepo.getAllAcrossModes();
     const chatThreads = await this.chatRepo.getAllThreadsAcrossModes();
     const chatMessages = await this.chatRepo.getAllMessagesAcrossModes();
+    const assistantPrompts = await this.assistantPromptRepo.getAllAcrossModes();
     const profile = await this.profileRepo.get();
     const profileDocuments = await this.profileDocumentRepo.getAll();
 
@@ -107,6 +110,7 @@ export class BackupService {
       userOptions,
       chatThreads,
       chatMessages,
+      assistantPrompts,
       profiles: [profile],
       profileDocuments,
     };
@@ -147,6 +151,7 @@ export class BackupService {
       'userOptions',
       'chatThreads',
       'chatMessages',
+      'assistantPrompts',
       'profiles',
       'profileDocuments',
     ] as const) {
@@ -230,6 +235,7 @@ export class BackupService {
         db.userOptions,
         db.chatThreads,
         db.chatMessages,
+        db.assistantPrompts,
       ],
       async () => {
         await this.sessionRepo.clear();
@@ -245,6 +251,7 @@ export class BackupService {
         await this.sessionWeatherRepo.clear();
         await this.userOptionRepo.clear();
         await this.chatRepo.clear();
+        await this.assistantPromptRepo.clear();
 
         for (const lake of data.lakes) {
           await this.lakeRepo.put(ensureMode(lake));
@@ -328,6 +335,11 @@ export class BackupService {
         }
         for (const message of data.chatMessages ?? []) {
           await this.chatRepo.putMessage(message);
+        }
+        for (const prompt of data.assistantPrompts ?? []) {
+          if (prompt && typeof prompt.id === 'string') {
+            await this.assistantPromptRepo.put(ensureMode(prompt));
+          }
         }
         for (const profile of data.profiles ?? []) {
           if (profile && typeof profile.id === 'string') {

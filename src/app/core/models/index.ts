@@ -14,6 +14,7 @@ export * from './user-option.model';
 export * from './catch.model';
 export * from './stored-image.model';
 export * from './app-settings.model';
+export * from './assistant-prompt.model';
 export * from './backup.model';
 export * from './user-profile.model';
 export * from './profile-document.model';

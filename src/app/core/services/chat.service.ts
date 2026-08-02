@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ChatMessage, ChatThread, InsightPromptId } from '../models';
+import { ChatMessage, ChatThread, isBuiltinInsightPromptId } from '../models';
 import { generateId, nowIso } from '../utils';
+import { AssistantPromptRepository } from './assistant-prompt.repository';
 import { ChatRepository } from './chat.repository';
 import { FishingDataContextService } from './fishing-data-context.service';
 import { I18nService } from './i18n.service';
@@ -18,6 +19,7 @@ export class ChatService {
     private readonly llm: LlmService,
     private readonly i18n: I18nService,
     private readonly notifications: NotificationService,
+    private readonly assistantPrompts: AssistantPromptRepository,
   ) {}
 
   watchThreads(): Observable<ChatThread[]> {
@@ -48,10 +50,13 @@ export class ChatService {
     return thread as ChatThread;
   }
 
-  async startPromptThread(promptId: InsightPromptId): Promise<ChatThread> {
-    const prompt = INSIGHT_PROMPTS.find((p) => p.id === promptId);
+  async startPromptThread(promptId: string): Promise<ChatThread> {
+    const builtin = INSIGHT_PROMPTS.find((p) => p.id === promptId);
+    const custom = builtin ? undefined : await this.assistantPrompts.getById(promptId);
     const now = nowIso();
-    const title = prompt ? this.i18n.t(prompt.titleKey) : this.i18n.t('assistant.newChat');
+    const title = builtin
+      ? this.i18n.t(builtin.titleKey)
+      : (custom?.title ?? this.i18n.t('assistant.newChat'));
     const thread = {
       id: generateId(),
       title,
@@ -61,9 +66,9 @@ export class ChatService {
     };
     await this.chatRepo.putThread(thread);
 
-    const userText = prompt
-      ? this.i18n.t(prompt.userMessageKey)
-      : this.i18n.t('assistant.newChat');
+    const userText = builtin
+      ? this.i18n.t(builtin.userMessageKey)
+      : (custom?.userMessage ?? this.i18n.t('assistant.newChat'));
     await this.appendMessage(thread.id, 'user', userText);
 
     const answer = await this.resolveAnswer(userText, promptId);
@@ -100,7 +105,7 @@ export class ChatService {
 
   private async resolveAnswer(
     userText: string,
-    promptId: InsightPromptId | undefined,
+    promptId: string | undefined,
     threadId?: string,
   ): Promise<{ text: string; source: 'local' | 'llm' | 'system' }> {
     if (this.llm.isConfigured()) {
@@ -109,7 +114,7 @@ export class ChatService {
         return { text, source: 'llm' };
       } catch (err) {
         this.notifyLlmError(err);
-        if (promptId) {
+        if (isBuiltinInsightPromptId(promptId)) {
           const local = await this.localInsights.answer(promptId);
           return { text: local, source: 'local' };
         }
@@ -120,7 +125,7 @@ export class ChatService {
       }
     }
 
-    if (promptId) {
+    if (isBuiltinInsightPromptId(promptId)) {
       const local = await this.localInsights.answer(promptId);
       return { text: local, source: 'local' };
     }
@@ -142,7 +147,6 @@ export class ChatService {
           history.push({ role: msg.role, content: msg.content });
         }
       }
-      // Last user message already appended; keep prior turns only
       if (history.length > 0 && history[history.length - 1].role === 'user') {
         history.pop();
       }

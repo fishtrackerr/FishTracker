@@ -1,3 +1,4 @@
+import { AssistantPrompt } from './assistant-prompt.model';
 import { BiteEvent } from './bite-event.model';
 import { Catch } from './catch.model';
 import { ChatMessage, ChatThread } from './chat.model';
@@ -40,6 +41,7 @@ export interface BackupData {
   userOptions?: UserOption[];
   chatThreads?: ChatThread[];
   chatMessages?: ChatMessage[];
+  assistantPrompts?: AssistantPrompt[];
   profiles?: UserProfile[];
   profileDocuments?: ProfileDocument[];
 }
@@ -57,7 +59,7 @@ export interface BackupPreview {
 }
 
 /** Current backup format version written by export(). */
-export const BACKUP_EXPORT_VERSION = 7;
+export const BACKUP_EXPORT_VERSION = 8;
 
 /** Versions accepted by import() (legacy + current). */
-export const SUPPORTED_BACKUP_VERSIONS = [4, 5, 6, 7] as const;
+export const SUPPORTED_BACKUP_VERSIONS = [4, 5, 6, 7, 8] as const;

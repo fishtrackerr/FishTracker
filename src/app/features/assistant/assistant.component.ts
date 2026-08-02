@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, ViewChild, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,17 +7,26 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
-import { ChatMessage, ChatThread, InsightPromptId } from '../../core/models';
+import { ChatMessage, ChatThread } from '../../core/models';
+import { AssistantPromptService } from '../../core/services/assistant-prompt.service';
 import { ChatService } from '../../core/services/chat.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { I18nService } from '../../core/services/i18n.service';
-import { INSIGHT_PROMPTS, InsightPromptDef } from '../../core/services/local-insight.service';
+import { INSIGHT_PROMPTS } from '../../core/services/local-insight.service';
 import { LlmService } from '../../core/services/llm.service';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 const ACTIVE_THREAD_KEY = 'ft.assistant.activeThreadId';
 const PREVIEW_MAX_LEN = 80;
+
+export interface StarterPromptCard {
+  id: string;
+  title: string;
+  description: string;
+  custom: boolean;
+}
+
 
 @Component({
   selector: 'app-assistant',
@@ -38,13 +47,31 @@ const PREVIEW_MAX_LEN = 80;
 })
 export class AssistantComponent {
   private readonly chatService = inject(ChatService);
+  private readonly assistantPromptService = inject(AssistantPromptService);
   private readonly confirm = inject(ConfirmService);
   private readonly i18n = inject(I18nService);
   private readonly llm = inject(LlmService);
 
   @ViewChild('messageList') private messageList?: ElementRef<HTMLElement>;
 
-  readonly prompts: InsightPromptDef[] = INSIGHT_PROMPTS;
+  private readonly customPrompts = toSignal(this.assistantPromptService.watchAll(), {
+    initialValue: [],
+  });
+  readonly prompts = computed<StarterPromptCard[]>(() => {
+    const builtin = INSIGHT_PROMPTS.map((prompt) => ({
+      id: prompt.id,
+      title: this.i18n.t(prompt.titleKey),
+      description: this.i18n.t(prompt.descriptionKey),
+      custom: false,
+    }));
+    const custom = this.customPrompts().map((prompt) => ({
+      id: prompt.id,
+      title: prompt.title,
+      description: prompt.description,
+      custom: true,
+    }));
+    return [...builtin, ...custom];
+  });
   readonly threads = toSignal(this.chatService.watchThreads(), { initialValue: [] as ChatThread[] });
   readonly activeThreadId = signal<string | null>(null);
   readonly messages = signal<ChatMessage[]>([]);
@@ -94,7 +121,7 @@ export class AssistantComponent {
     });
   }
 
-  async startPrompt(promptId: InsightPromptId): Promise<void> {
+  async startPrompt(promptId: string): Promise<void> {
     if (this.sending()) {
       return;
     }

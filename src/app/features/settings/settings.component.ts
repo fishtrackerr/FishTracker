@@ -3,34 +3,38 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { SettingsService } from '../../core/services/settings.service';
-import { BackupService } from '../../core/services/backup.service';
-import { PinLockService } from '../../core/services/pin-lock.service';
-import { SecretVaultService } from '../../core/services/secret-vault.service';
-import { ConfirmService } from '../../core/services/confirm.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { ImageService } from '../../core/services/image.service';
-import { PhotoPickService } from '../../core/services/photo-pick.service';
-import { WeatherService } from '../../core/services/weather.service';
-import { LakeService } from '../../core/services/lake.service';
-import { NotificationService } from '../../core/services/notification.service';
-import { ResetService } from '../../core/services/reset.service';
-import { DemoDataService } from '../../core/services/demo-data.service';
-import { I18nService } from '../../core/services/i18n.service';
-import { PwaInstallService } from '../../core/services/pwa-install.service';
-import { ShareService } from '../../core/services/share.service';
-import { UserOptionService } from '../../core/services/user-option.service';
-import { FishingModeService } from '../../core/services/fishing-mode.service';
-import { BackupData, ThemeMode, UserOption, UserOptionCategory, AppLanguage } from '../../core/models';
+import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { firstValueFrom } from 'rxjs';
+import { AssistantPrompt, BackupData, ThemeMode, UserOption, UserOptionCategory, AppLanguage } from '../../core/models';
 import { openFeedbackMailto } from '../../core/constants/feedback';
 import { EU_COUNTRIES } from '../../core/constants/eu-countries';
-import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
+import { AssistantPromptService } from '../../core/services/assistant-prompt.service';
+import { BackupService } from '../../core/services/backup.service';
+import { ConfirmService } from '../../core/services/confirm.service';
+import { DemoDataService } from '../../core/services/demo-data.service';
+import { FishingModeService } from '../../core/services/fishing-mode.service';
+import { I18nService } from '../../core/services/i18n.service';
+import { ImageService } from '../../core/services/image.service';
+import { LakeService } from '../../core/services/lake.service';
+import { NotificationService } from '../../core/services/notification.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
+import { PinLockService } from '../../core/services/pin-lock.service';
+import { PwaInstallService } from '../../core/services/pwa-install.service';
+import { ResetService } from '../../core/services/reset.service';
+import { SecretVaultService } from '../../core/services/secret-vault.service';
+import { SettingsService } from '../../core/services/settings.service';
+import { ShareService } from '../../core/services/share.service';
+import { ThemeService } from '../../core/services/theme.service';
+import { UserOptionService } from '../../core/services/user-option.service';
+import { WeatherService } from '../../core/services/weather.service';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
+import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { AssistantPromptDialogComponent } from '../assistant/assistant-prompt-dialog.component';
 
 /** Reject backup files larger than this before parsing. */
 const MAX_BACKUP_FILE_BYTES = 50 * 1024 * 1024;
@@ -72,6 +76,8 @@ export class SettingsComponent implements OnInit {
   private readonly share = inject(ShareService);
   private readonly userOptions = inject(UserOptionService);
   private readonly fishingMode = inject(FishingModeService);
+  private readonly assistantPrompts = inject(AssistantPromptService);
+  private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
 
   readonly settings = this.settingsService.settings;
@@ -79,6 +85,7 @@ export class SettingsComponent implements OnInit {
   readonly aiApiKey = this.vault.aiApiKey;
   readonly supportedLanguages = this.i18n.supportedLanguages;
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
+  readonly customPrompts = toSignal(this.assistantPrompts.watchAll(), { initialValue: [] as AssistantPrompt[] });
   readonly selectPanelClass = this.theme.getSelectPanelClass();
   readonly countryOptions = EU_COUNTRIES;
   readonly message = signal('');
@@ -331,6 +338,64 @@ export class SettingsComponent implements OnInit {
       this.notifications.success(this.i18n.t('settings.optionRenamed'));
     } catch (error) {
       console.error('[Settings] rename option failed', error);
+      this.notifications.error(this.i18n.t('common.errorGeneric'));
+    }
+  }
+
+  async addPrompt(): Promise<void> {
+    const result = await firstValueFrom(
+      this.dialog.open(AssistantPromptDialogComponent, {
+        data: {},
+        width: '420px',
+        maxWidth: '95vw',
+      }).afterClosed(),
+    );
+    if (!result) {
+      return;
+    }
+    try {
+      await this.assistantPrompts.create(result);
+      this.notifications.success(this.i18n.t('settings.promptSaved'));
+    } catch (error) {
+      console.error('[Settings] create prompt failed', error);
+      this.notifications.error(this.i18n.t('common.errorGeneric'));
+    }
+  }
+
+  async editPrompt(prompt: AssistantPrompt): Promise<void> {
+    const result = await firstValueFrom(
+      this.dialog.open(AssistantPromptDialogComponent, {
+        data: { prompt },
+        width: '420px',
+        maxWidth: '95vw',
+      }).afterClosed(),
+    );
+    if (!result) {
+      return;
+    }
+    try {
+      await this.assistantPrompts.update(prompt.id, result);
+      this.notifications.success(this.i18n.t('settings.promptSaved'));
+    } catch (error) {
+      console.error('[Settings] update prompt failed', error);
+      this.notifications.error(this.i18n.t('common.errorGeneric'));
+    }
+  }
+
+  async deletePrompt(prompt: AssistantPrompt): Promise<void> {
+    const ok = await this.confirm.confirm({
+      title: this.i18n.t('settings.deletePromptTitle'),
+      message: this.i18n.t('settings.deletePromptMessage', { title: prompt.title }),
+      confirmLabel: this.i18n.t('common.delete'),
+    });
+    if (!ok) {
+      return;
+    }
+    try {
+      await this.assistantPrompts.delete(prompt.id);
+      this.notifications.success(this.i18n.t('settings.promptDeleted'));
+    } catch (error) {
+      console.error('[Settings] delete prompt failed', error);
       this.notifications.error(this.i18n.t('common.errorGeneric'));
     }
   }

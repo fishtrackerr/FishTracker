@@ -185,6 +185,9 @@ describe('ChatService resolve paths', () => {
       t: (key: string) => key,
     };
     const notifications = { error: vi.fn() };
+    const assistantPrompts = {
+      getById: vi.fn().mockResolvedValue(undefined),
+    };
 
     const { ChatService } = await import('./chat.service');
     const service = new ChatService(
@@ -194,6 +197,7 @@ describe('ChatService resolve paths', () => {
       llm as never,
       i18n as never,
       notifications as never,
+      assistantPrompts as never,
     );
 
     await service.startPromptThread('best-time');

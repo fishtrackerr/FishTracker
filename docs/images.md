@@ -6,7 +6,9 @@
 
 ## Compression
 
-`ImageService.processFile()` resizes and compresses before IndexedDB storage.
+`ImageService.processFile()` stores the original JPEG/PNG/WebP when the longest edge is ≤4096px and the file is ≤15 MB. Larger images are resized to 4096px at JPEG quality 0.95. List thumbnails are generated at 480px (quality 0.85) for sharp retina tiles.
+
+The homepage hero loads the full-size blob (`getFullObjectUrl`), not the thumbnail.
 
 ## Thumbnails
 

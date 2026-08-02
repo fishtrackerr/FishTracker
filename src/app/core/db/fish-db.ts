@@ -1,5 +1,6 @@
 import Dexie, { Table } from 'dexie';
 import {
+  AssistantPrompt,
   BiteEvent,
   Catch,
   ChatMessage,
@@ -37,6 +38,7 @@ export class FishDb extends Dexie {
   userOptions!: Table<UserOption, string>;
   chatThreads!: Table<ChatThread, string>;
   chatMessages!: Table<ChatMessage, string>;
+  assistantPrompts!: Table<AssistantPrompt, string>;
 
   constructor() {
     super('FishTrackerDb');
@@ -292,6 +294,24 @@ export class FishDb extends Dexie {
       .upgrade(async (tx) => {
         await migrateCarperToCatfish(tx);
       });
+
+    this.version(9).stores({
+      sessions: 'id, fishingMode, [fishingMode+status], lakeId, startDate',
+      catches: 'id, fishingMode, sessionId, rodId, sessionSpotId, species, caughtAt',
+      lakes: 'id, fishingMode, name, isFavorite',
+      images: 'id, fishingMode, type, parentId, isFavorite, isHomepageImage',
+      profiles: 'id',
+      profileDocuments: 'id, type, title',
+      biteEvents: 'id, fishingMode, sessionId, rodId, occurredAt',
+      fishSpottedEvents: 'id, fishingMode, sessionId, rodId, spottedAt',
+      rodSpotHistory: 'id, fishingMode, rodId, changedAt',
+      sessionEvents: 'id, fishingMode, sessionId, type, occurredAt',
+      sessionWeather: 'id, fishingMode, sessionId, capturedAt',
+      userOptions: 'id, fishingMode, [fishingMode+category], category, value',
+      chatThreads: 'id, fishingMode, updatedAt',
+      chatMessages: 'id, threadId, createdAt',
+      assistantPrompts: 'id, fishingMode, title',
+    });
   }
 }
 

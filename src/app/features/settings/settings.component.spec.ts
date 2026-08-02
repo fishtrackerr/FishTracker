@@ -9,6 +9,7 @@ import { PinLockService } from '../../core/services/pin-lock.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { ImageService } from '../../core/services/image.service';
+import { PhotoPickService } from '../../core/services/photo-pick.service';
 import { WeatherService } from '../../core/services/weather.service';
 import { LakeService } from '../../core/services/lake.service';
 import { NotificationService } from '../../core/services/notification.service';
@@ -20,6 +21,8 @@ import { ShareService } from '../../core/services/share.service';
 import { SecretVaultService } from '../../core/services/secret-vault.service';
 import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { UserOptionService } from '../../core/services/user-option.service';
+import { AssistantPromptService } from '../../core/services/assistant-prompt.service';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 const settingsState = signal({
@@ -91,12 +94,19 @@ describe('SettingsComponent', () => {
           provide: ThemeService,
           useValue: {
             setTheme: vi.fn(),
+            getSelectPanelClass: () => '',
           },
         },
         {
           provide: ImageService,
           useValue: {
             clearHomepageImage: vi.fn(),
+          },
+        },
+        {
+          provide: PhotoPickService,
+          useValue: {
+            pickImage: vi.fn(),
           },
         },
         {
@@ -109,6 +119,21 @@ describe('SettingsComponent', () => {
           provide: LakeService,
           useValue: {
             watchAll: vi.fn().mockReturnValue(of([])),
+          },
+        },
+        {
+          provide: AssistantPromptService,
+          useValue: {
+            watchAll: vi.fn().mockReturnValue(of([])),
+            create: vi.fn(),
+            update: vi.fn(),
+            delete: vi.fn(),
+          },
+        },
+        {
+          provide: MatDialog,
+          useValue: {
+            open: vi.fn(),
           },
         },
         {

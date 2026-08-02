@@ -293,6 +293,46 @@
 </section>
 
 <section class="section app-card">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-prompts" persistKey="settings-prompts" label="customPrompts" [flat]="true">
+    <div expandHeader>
+      <h2 class="section-title">{{ 'settings.customPrompts' | tr }}</h2>
+    </div>
+    <div class="submenu-content assistant-settings">
+      <p class="hint">{{ 'settings.customPromptsHint' | tr }}</p>
+
+      <button mat-stroked-button type="button" (click)="addPrompt()">
+        {{ 'settings.addPrompt' | tr }}
+      </button>
+
+      @if (customPrompts().length === 0) {
+        <p class="empty-prompts">{{ 'settings.noCustomPrompts' | tr }}</p>
+      } @else {
+        <ul class="option-list prompt-list">
+          @for (prompt of customPrompts(); track prompt.id) {
+            <li class="prompt-row">
+              <div class="prompt-meta">
+                <span class="option-value">{{ prompt.title }}</span>
+                @if (prompt.description) {
+                  <span class="prompt-desc">{{ prompt.description }}</span>
+                }
+              </div>
+              <div class="prompt-actions">
+                <button mat-stroked-button type="button" (click)="editPrompt(prompt)">
+                  {{ 'common.edit' | tr }}
+                </button>
+                <button mat-stroked-button type="button" class="danger-btn" (click)="deletePrompt(prompt)">
+                  {{ 'common.delete' | tr }}
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </app-expandable-section>
+</section>
+
+<section class="section app-card">
   <app-expandable-section accordionGroup="settings" sectionId="settings-security" persistKey="settings-security" label="security" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.security' | tr }}</h2>

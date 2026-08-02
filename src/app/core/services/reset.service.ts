@@ -10,6 +10,7 @@ import {
   WEATHER_CACHE_KEY,
 } from '../constants/storage-keys';
 import { BiteEventRepository } from './bite-event.repository';
+import { AssistantPromptRepository } from './assistant-prompt.repository';
 import { CatchRepository } from './catch.repository';
 import { ChatRepository } from './chat.repository';
 import { FilterService } from './filter.service';
@@ -48,6 +49,7 @@ export class ResetService {
   private readonly sessionWeatherRepo = inject(SessionWeatherRepository);
   private readonly userOptionRepo = inject(UserOptionRepository);
   private readonly chatRepo = inject(ChatRepository);
+  private readonly assistantPromptRepo = inject(AssistantPromptRepository);
 
   async resetCustomOptionsCategory(
     category: UserOptionCategory,
@@ -138,6 +140,7 @@ export class ResetService {
         db.userOptions,
         db.chatThreads,
         db.chatMessages,
+        db.assistantPrompts,
       ],
       async () => {
         await this.sessionRepo.clearCurrentMode();
@@ -151,6 +154,7 @@ export class ResetService {
         await this.sessionWeatherRepo.clearCurrentMode();
         await this.userOptionRepo.clearCurrentMode();
         await this.chatRepo.clearCurrentMode();
+        await this.assistantPromptRepo.clearCurrentMode();
       },
     );
     this.filterService.clearActive();
@@ -177,6 +181,7 @@ export class ResetService {
         db.userOptions,
         db.chatThreads,
         db.chatMessages,
+        db.assistantPrompts,
       ],
       async () => {
         await this.sessionRepo.clear();
@@ -192,6 +197,7 @@ export class ResetService {
         await this.sessionWeatherRepo.clear();
         await this.userOptionRepo.clear();
         await this.chatRepo.clear();
+        await this.assistantPromptRepo.clear();
       },
     );
     this.clearFilterPresetKeys();

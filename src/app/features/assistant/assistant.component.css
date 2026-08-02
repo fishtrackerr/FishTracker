@@ -39,6 +39,29 @@
   color: var(--primary);
 }
 
+.starters-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.starters-header .section-title {
+  margin-bottom: 0;
+}
+
+.manage-link {
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.manage-link:hover {
+  text-decoration: underline;
+}
+
 .prompt-grid {
   display: grid;
   grid-template-columns: 1fr;

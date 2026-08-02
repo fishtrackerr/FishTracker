@@ -87,10 +87,19 @@ export class DemoDataService {
       },
     ] as const;
 
-    const createdLakes: Lake[] = [];
+    const existingLakes = await this.lakes.getAll();
+    const demoLakes: Lake[] = [];
+    let lakesCreated = 0;
+
     for (const def of lakeDefs) {
+      const existing = existingLakes.find((lake) => lake.name === def.name);
+      if (existing) {
+        demoLakes.push(existing);
+        continue;
+      }
+
       const lakeId = generateId();
-      const createdAt = isoDaysAgo(now, 40 + createdLakes.length * 3);
+      const createdAt = isoDaysAgo(now, 40 + demoLakes.length * 3);
       const spots = def.spots.map((s) => ({
         id: generateId(),
         name: s.name,
@@ -110,7 +119,7 @@ export class DemoDataService {
         description: `Sample ${mode} venue for AI testing`,
         averageDepthM: 2.5,
         maximumDepthM: 5,
-        surfaceAreaHa: 12 + createdLakes.length * 4,
+        surfaceAreaHa: 12 + demoLakes.length * 4,
         spots,
         photoIds: [],
         visible: true,
@@ -118,10 +127,19 @@ export class DemoDataService {
         updatedAt: createdAt,
       };
       await this.lakes.put(lake);
-      createdLakes.push(lake);
+      demoLakes.push(lake);
+      lakesCreated += 1;
     }
 
-    this.fishingMode.updateActivePreferences({ lastLakeId: createdLakes[0].id });
+    const modePrefs = this.fishingMode.getActivePreferences();
+    if (!modePrefs.lastLakeId && demoLakes[0]) {
+      this.fishingMode.updateActivePreferences({ lastLakeId: demoLakes[0].id });
+    }
+
+    const existingDemoSessions = (await this.sessions.getAll()).filter((session) =>
+      session.tags?.includes('demo'),
+    ).length;
+    const batch = Math.floor(existingDemoSessions / 6) + 1;
 
     const sessionPlans: Array<{
       lake: Lake;
@@ -133,7 +151,7 @@ export class DemoDataService {
       status: FishingSession['status'];
     }> = [
       {
-        lake: createdLakes[0],
+        lake: demoLakes[0],
         daysAgo: 28,
         durationHours: 48,
         rodCount: 3,
@@ -142,7 +160,7 @@ export class DemoDataService {
         status: 'completed',
       },
       {
-        lake: createdLakes[0],
+        lake: demoLakes[0],
         daysAgo: 18,
         durationHours: 12,
         rodCount: 2,
@@ -151,7 +169,7 @@ export class DemoDataService {
         status: 'completed',
       },
       {
-        lake: createdLakes[1],
+        lake: demoLakes[1],
         daysAgo: 12,
         durationHours: 36,
         rodCount: 4,
@@ -160,7 +178,7 @@ export class DemoDataService {
         status: 'completed',
       },
       {
-        lake: createdLakes[2],
+        lake: demoLakes[2],
         daysAgo: 6,
         durationHours: 8,
         rodCount: 2,
@@ -169,7 +187,7 @@ export class DemoDataService {
         status: 'completed',
       },
       {
-        lake: createdLakes[1],
+        lake: demoLakes[1],
         daysAgo: 2,
         durationHours: 24,
         rodCount: 3,
@@ -178,7 +196,7 @@ export class DemoDataService {
         status: 'completed',
       },
       {
-        lake: createdLakes[0],
+        lake: demoLakes[0],
         daysAgo: 0,
         durationHours: 0,
         rodCount: 2,
@@ -195,14 +213,15 @@ export class DemoDataService {
 
     for (const plan of sessionPlans) {
       const sessionId = generateId();
-      const startMs = now - plan.daysAgo * 24 * 60 * 60 * 1000;
+      // Offset each batch so repeated generates stay visibly newer, not overlapping.
+      const startMs = now - (plan.daysAgo + (batch - 1) * 35) * 24 * 60 * 60 * 1000;
       const startDate = new Date(startMs).toISOString();
       const endDate =
         plan.status === 'completed'
           ? new Date(startMs + plan.durationHours * 60 * 60 * 1000).toISOString()
           : undefined;
 
-      const lakeSpots = plan.lake.spots;
+      const lakeSpots = plan.lake.spots ?? [];
       const sessionSpots: SessionSpot[] = lakeSpots.slice(0, Math.min(2, lakeSpots.length)).map(
         (spot) => ({
           id: generateId(),
@@ -241,7 +260,7 @@ export class DemoDataService {
         const caughtAt = new Date(
           startMs + ((c + 1) / (plan.catchCount + 1)) * plan.durationHours * 60 * 60 * 1000,
         ).toISOString();
-        const weightKg = round1(1.2 + ((c * 1.7 + plan.rodCount) % 9));
+        const weightKg = round1(1.2 + ((c * 1.7 + plan.rodCount + batch) % 9));
         const catchRecord: Catch = {
           id: generateId(),
           sessionId,
@@ -321,14 +340,15 @@ export class DemoDataService {
 
       const totalWeight = sessionCatches.reduce((sum, c) => sum + (c.weightKg ?? 0), 0);
       const biggest = sessionCatches.reduce((max, c) => Math.max(max, c.weightKg ?? 0), 0);
+      const sessionName = batch > 1 ? `${plan.name} #${batch}` : plan.name;
       const session: FishingSession = {
         id: sessionId,
-        name: plan.name,
+        name: sessionName,
         lakeId: plan.lake.id,
         status: plan.status,
         startDate:
           plan.status === 'planned'
-            ? new Date(now + 3 * 24 * 60 * 60 * 1000).toISOString()
+            ? new Date(now + (3 + (batch - 1) * 7) * 24 * 60 * 60 * 1000).toISOString()
             : startDate,
         endDate,
         latitude: plan.lake.latitude,
@@ -371,7 +391,7 @@ export class DemoDataService {
     }
 
     return {
-      lakes: createdLakes.length,
+      lakes: lakesCreated,
       sessions: sessionTotal,
       catches: catchTotal,
       bites: biteTotal,

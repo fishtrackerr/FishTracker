@@ -14,6 +14,17 @@ const COVER_IMAGES = [
 
 const PLACEHOLDER = 'assets/images/img-not-found.svg';
 
+/** Longest edge for stored full-size photos (covers modern phone sensors). */
+const FULL_MAX_EDGE = 4096;
+/** JPEG quality when re-encoding is required (near-lossless for photos). */
+const FULL_JPEG_QUALITY = 0.95;
+/** Longest edge for list/grid thumbnails (sharp on retina). */
+const THUMB_MAX_EDGE = 480;
+const THUMB_JPEG_QUALITY = 0.85;
+/** Prefer keeping the original file when under this size. */
+const KEEP_ORIGINAL_MAX_BYTES = 15 * 1024 * 1024;
+const KEEP_ORIGINAL_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
 @Injectable({ providedIn: 'root' })
 export class ImageService {
   private readonly urlCache = new Map<string, string>();
@@ -37,7 +48,7 @@ export class ImageService {
     if (file.size > maxBytes) {
       throw new Error('Image exceeds 20 MB limit');
     }
-    const { blob, thumbnailBlob } = await this.compressImage(file);
+    const { blob, thumbnailBlob, mimeType } = await this.compressImage(file);
     const id = generateId();
     const image = {
       id,
@@ -46,7 +57,7 @@ export class ImageService {
       fileName: file.name,
       blob,
       thumbnailBlob,
-      mimeType: 'image/jpeg',
+      mimeType,
       createdAt: nowIso(),
       isFavorite: false,
       isHomepageImage: false,
@@ -63,7 +74,7 @@ export class ImageService {
         return undefined;
       }
       const svgBlob = await response.blob();
-      const { blob, thumbnailBlob } = await this.compressImage(
+      const { blob, thumbnailBlob, mimeType } = await this.compressImage(
         new File([svgBlob], 'cover.svg', { type: svgBlob.type || 'image/svg+xml' }),
       );
       if (!blob || blob.size === 0) {
@@ -76,7 +87,7 @@ export class ImageService {
         fileName: 'cover.jpg',
         blob,
         thumbnailBlob,
-        mimeType: 'image/jpeg',
+        mimeType,
         createdAt: nowIso(),
         isFavorite: false,
         isHomepageImage: false,
@@ -120,12 +131,12 @@ export class ImageService {
   async getHomepageUrl(): Promise<string> {
     const homepageId = this.fishingMode.getActivePreferences().homepageImageId;
     if (homepageId) {
-      const url = await this.getObjectUrl(homepageId);
+      const url = await this.getFullObjectUrl(homepageId);
       if (url) return url;
     }
     const homepageImage = await this.imageRepo.getHomepageImage();
     if (homepageImage) {
-      const url = await this.getObjectUrl(homepageImage.id);
+      const url = await this.getFullObjectUrl(homepageImage.id);
       if (url) return url;
     }
     return PLACEHOLDER;
@@ -191,11 +202,22 @@ export class ImageService {
 
   private async compressImage(
     file: File,
-  ): Promise<{ blob: Blob; thumbnailBlob: Blob }> {
+  ): Promise<{ blob: Blob; thumbnailBlob: Blob; mimeType: string }> {
     const img = await this.loadImage(file);
-    const blob = await this.resizeToBlob(img, 1200, 0.8);
-    const thumbnailBlob = await this.resizeToBlob(img, 200, 0.7);
-    return { blob, thumbnailBlob };
+    const thumbnailBlob = await this.resizeToBlob(img, THUMB_MAX_EDGE, THUMB_JPEG_QUALITY);
+
+    const needsResize = img.width > FULL_MAX_EDGE || img.height > FULL_MAX_EDGE;
+    const keepOriginal =
+      !needsResize &&
+      file.size <= KEEP_ORIGINAL_MAX_BYTES &&
+      KEEP_ORIGINAL_MIME.has(file.type);
+
+    if (keepOriginal) {
+      return { blob: file, thumbnailBlob, mimeType: file.type };
+    }
+
+    const blob = await this.resizeToBlob(img, FULL_MAX_EDGE, FULL_JPEG_QUALITY);
+    return { blob, thumbnailBlob, mimeType: 'image/jpeg' };
   }
 
   private loadImage(file: File): Promise<HTMLImageElement> {
@@ -230,9 +252,17 @@ export class ImageService {
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d')!;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, 0, 0, width, height);
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', quality);
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Failed to encode image'));
+          return;
+        }
+        resolve(blob);
+      }, 'image/jpeg', quality);
     });
   }
 }

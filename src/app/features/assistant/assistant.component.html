@@ -102,17 +102,20 @@
   </section>
 
   <section class="starters">
-    <h2 class="section-title">{{ 'assistant.starterTitle' | tr }}</h2>
+    <div class="starters-header">
+      <h2 class="section-title">{{ 'assistant.starterTitle' | tr }}</h2>
+      <a routerLink="/settings" class="manage-link">{{ 'assistant.managePrompts' | tr }}</a>
+    </div>
     <div class="prompt-grid">
-      @for (prompt of prompts; track prompt.id) {
+      @for (prompt of prompts(); track prompt.id) {
         <button
           type="button"
           class="prompt-card"
           (click)="startPrompt(prompt.id)"
           [disabled]="sending()"
         >
-          <strong>{{ prompt.titleKey | tr }}</strong>
-          <span>{{ prompt.descriptionKey | tr }}</span>
+          <strong>{{ prompt.title }}</strong>
+          <span>{{ prompt.description }}</span>
         </button>
       }
       <button type="button" class="prompt-card new" (click)="startBlankChat()" [disabled]="sending()">
