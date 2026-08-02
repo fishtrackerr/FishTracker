@@ -1,19 +1,35 @@
 {
-  "version": "0.0.47",
+  "version": "0.0.48",
   "date": "2026-08-02",
   "sections": [
     {
       "category": "New Features",
       "items": [
         {
-          "message": "update version to 0.0.46, enhance release notes, and add demo data generation feature",
-          "shortHash": "1c8423a",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/1c8423a9ccc514f9b19f2046d7ad48c25abd72d6"
+          "message": "enhance settings page with profile link and default country selection",
+          "shortHash": "96cd8fe",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/96cd8febf4a998afef4adc72ed190deb4c84cbb8"
         }
       ]
     }
   ],
   "releases": [
+    {
+      "version": "0.0.48",
+      "date": "2026-08-02",
+      "sections": [
+        {
+          "category": "New Features",
+          "items": [
+            {
+              "message": "enhance settings page with profile link and default country selection",
+              "shortHash": "96cd8fe",
+              "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/96cd8febf4a998afef4adc72ed190deb4c84cbb8"
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.0.47",
       "date": "2026-08-02",

@@ -1,0 +1,1 @@
+var a=["Austria","Belgium","Bulgaria","Croatia","Cyprus","Czechia","Denmark","Estonia","Finland","France","Germany","Greece","Hungary","Ireland","Italy","Latvia","Lithuania","Luxembourg","Malta","Netherlands","Poland","Portugal","Romania","Slovakia","Slovenia","Spain","Sweden"];function t(n){return!!n&&a.includes(n)}function e(n){return n&&!t(n)?[n,...a]:[...a]}export{a,e as b};
