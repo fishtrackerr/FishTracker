@@ -1,79 +1,14 @@
 {
-  "version": "0.0.28",
-  "date": "2026-08-01",
+  "version": "0.0.29",
+  "date": "2026-08-02",
   "sections": [
     {
       "category": "New Features",
       "items": [
         {
-          "message": "introduce fishing mode selection and preferences management",
-          "shortHash": "f9ea076",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/f9ea076b800a7fc94d817a09a6ca6dde49e703aa"
-        },
-        {
-          "message": "update recast rod dialog styles and button types for improved UI",
-          "shortHash": "82d9d0b",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/82d9d0b49df85b926bd9cf5a0836717c318ac893"
-        },
-        {
-          "message": "add fetchWithTimeout utility for network requests with timeout handling",
-          "shortHash": "fc7d799",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/fc7d79980a31ca0bebf0ad11abc6689c3b83eefb"
-        },
-        {
-          "message": "update active session page with direct actions for viewing and editing session details, enhance session navigation, and update version to 0.0.23",
-          "shortHash": "6de58b6",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/6de58b6441a34cc516577005541167e47abfe00e"
-        },
-        {
-          "message": "enhance sessions list and shell components with current session handling",
-          "shortHash": "652e479",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/652e4794928515bd8546f0697db7695162b339fd"
-        },
-        {
-          "message": "add rod setup callout in session detail with finish button",
-          "shortHash": "0741f6f",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/0741f6f4382d7531b5df0b438dd8116e937050fa"
-        },
-        {
-          "message": "enhance app functionality with version check and update services",
-          "shortHash": "88a11ad",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/88a11adbe9919d06897229423129dc4cdf8f2014"
-        },
-        {
-          "message": "update version to 0.0.22, enhance pin lock service, and improve initial route resolution logic",
-          "shortHash": "e037b96",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/e037b96a637b4c3cbdb460c9e8b1cc2c278cb90e"
-        },
-        {
-          "message": "update version to 0.0.20, enhance i18n service with fallback language, and improve version display in pin setup",
-          "shortHash": "713dbd2",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/713dbd2f176281ce77d3067adc0c27143d3af84b"
-        },
-        {
-          "message": "update version to 0.0.17 and add language switch feature in settings",
-          "shortHash": "af4b3ae",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/af4b3ae62062ce024088b0778e863c0a0ca9a49f"
-        },
-        {
-          "message": "add new components for search bar, session card, timeline, splash screen, stat card, and weather card",
-          "shortHash": "18c05da",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/18c05daa78ba80cc8ee65c0bbf7bce35e0fd843c"
-        },
-        {
-          "message": "initialize Angular application with routing and SSR support",
-          "shortHash": "3432007",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/3432007fc35608fab384d59f5164b8abc4a78515"
-        }
-      ]
-    },
-    {
-      "category": "Maintenance",
-      "items": [
-        {
-          "message": "bump version to 0.0.2 and add version management scripts",
-          "shortHash": "d84ed97",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/d84ed97764179bcb867c541ac8f25eb15868599f"
+          "message": "update project rules and documentation for self-hosted Material Icons and fonts, improve service worker configuration, and increment version to 0.0.28",
+          "shortHash": "da80773",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/da80773a1309cc50f55988bc8f67b4478cbe3d36"
         }
       ]
     }

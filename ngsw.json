@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1785592688023,
+  "timestamp": 1785672387230,
   "index": "/FishTracker/index.html",
   "assetGroups": [
     {
@@ -94,45 +94,20 @@
         "/FishTracker/index.html",
         "/FishTracker/main-3Z42HHAN.js",
         "/FishTracker/manifest.webmanifest",
-        "/FishTracker/styles-FP5ISTVR.css"
+        "/FishTracker/styles-I527R6OV.css"
       ],
       "patterns": []
     },
     {
-      "name": "assets",
-      "installMode": "lazy",
+      "name": "fonts",
+      "installMode": "prefetch",
       "updateMode": "prefetch",
       "cacheQueryOptions": {
         "ignoreVary": true
       },
       "urls": [
-        "/FishTracker/assets/images/covers/cover-1.svg",
-        "/FishTracker/assets/images/covers/cover-2.svg",
-        "/FishTracker/assets/images/covers/cover-3.svg",
-        "/FishTracker/assets/images/covers/cover-4.svg",
-        "/FishTracker/assets/images/img-not-found.svg",
-        "/FishTracker/icons/apple-touch-icon.png",
-        "/FishTracker/icons/fishtracker-logo.svg",
-        "/FishTracker/icons/icon-128x128.png",
-        "/FishTracker/icons/icon-144x144.png",
-        "/FishTracker/icons/icon-152x152.png",
-        "/FishTracker/icons/icon-192x192.png",
-        "/FishTracker/icons/icon-384x384.png",
-        "/FishTracker/icons/icon-512x512.png",
-        "/FishTracker/icons/icon-72x72.png",
-        "/FishTracker/icons/icon-96x96.png",
-        "/FishTracker/icons/icon-maskable-192x192.png",
-        "/FishTracker/icons/icon-maskable-512x512.png",
         "/FishTracker/media/material-icons-JLIDJUWE.woff",
         "/FishTracker/media/material-icons-LEZCGFVT.woff2",
-        "/FishTracker/media/material-icons-outlined-7BWLPMFK.woff2",
-        "/FishTracker/media/material-icons-outlined-PCUTWIDZ.woff",
-        "/FishTracker/media/material-icons-round-SLOHZIXU.woff",
-        "/FishTracker/media/material-icons-round-WEHMTW23.woff2",
-        "/FishTracker/media/material-icons-sharp-HCCYMPXE.woff2",
-        "/FishTracker/media/material-icons-sharp-U4OLFP3G.woff",
-        "/FishTracker/media/material-icons-two-tone-LCGWGE2N.woff",
-        "/FishTracker/media/material-icons-two-tone-M5N5K6F5.woff2",
         "/FishTracker/media/roboto-cyrillic-400-normal-6JW3Q6UL.woff",
         "/FishTracker/media/roboto-cyrillic-400-normal-V3H5IIDP.woff2",
         "/FishTracker/media/roboto-cyrillic-500-normal-AWMCDHTT.woff",
@@ -205,6 +180,34 @@
         "/FishTracker/media/roboto-vietnamese-600-normal-TLUHKVRE.woff",
         "/FishTracker/media/roboto-vietnamese-700-normal-LA5HL3OG.woff2",
         "/FishTracker/media/roboto-vietnamese-700-normal-SU7RGW3X.woff"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/FishTracker/assets/images/covers/cover-1.svg",
+        "/FishTracker/assets/images/covers/cover-2.svg",
+        "/FishTracker/assets/images/covers/cover-3.svg",
+        "/FishTracker/assets/images/covers/cover-4.svg",
+        "/FishTracker/assets/images/img-not-found.svg",
+        "/FishTracker/icons/apple-touch-icon.png",
+        "/FishTracker/icons/fishtracker-logo.svg",
+        "/FishTracker/icons/icon-128x128.png",
+        "/FishTracker/icons/icon-144x144.png",
+        "/FishTracker/icons/icon-152x152.png",
+        "/FishTracker/icons/icon-192x192.png",
+        "/FishTracker/icons/icon-384x384.png",
+        "/FishTracker/icons/icon-512x512.png",
+        "/FishTracker/icons/icon-72x72.png",
+        "/FishTracker/icons/icon-96x96.png",
+        "/FishTracker/icons/icon-maskable-192x192.png",
+        "/FishTracker/icons/icon-maskable-512x512.png"
       ],
       "patterns": []
     }
@@ -337,19 +340,11 @@
     "/FishTracker/icons/icon-96x96.png": "28d349eb587e78898183519d3b65d234e2b38f15",
     "/FishTracker/icons/icon-maskable-192x192.png": "3ac83cd9aa2609602adcff69b699f9f6b1452019",
     "/FishTracker/icons/icon-maskable-512x512.png": "25a051eed38b04423c61c6824c7b725d06a3296f",
-    "/FishTracker/index.html": "907ba7cd698080a1cb7017bb617d9ac19577ab3d",
+    "/FishTracker/index.html": "5aa18733b2eaa6246923f317d495c0d765c89866",
     "/FishTracker/main-3Z42HHAN.js": "75ef01572612bf496e34566472426e0af5e108b4",
     "/FishTracker/manifest.webmanifest": "412640ae551f39b71a00c78177879193e1439d85",
     "/FishTracker/media/material-icons-JLIDJUWE.woff": "e4bb7c1e40d3febee58df963db276b2bf68c117b",
     "/FishTracker/media/material-icons-LEZCGFVT.woff2": "0bc0c675480d94ec7e8609dda6227f88c5d08d2c",
-    "/FishTracker/media/material-icons-outlined-7BWLPMFK.woff2": "2f9e28ab559782402f27332633c843c40209d95a",
-    "/FishTracker/media/material-icons-outlined-PCUTWIDZ.woff": "b52ccd8fca4199d257b2a9fe377db29862f2853e",
-    "/FishTracker/media/material-icons-round-SLOHZIXU.woff": "c41bfee3f01218e18d53f4f4cac00f385ac9fbb1",
-    "/FishTracker/media/material-icons-round-WEHMTW23.woff2": "abe05e0641f1050fbe00ef0dbb10c5ea72c26cff",
-    "/FishTracker/media/material-icons-sharp-HCCYMPXE.woff2": "cf1c7b4d066d18af44cf7bc664dd2e46652a3a30",
-    "/FishTracker/media/material-icons-sharp-U4OLFP3G.woff": "829cb48cb2dd17ae5e425b82dc186eb670694a10",
-    "/FishTracker/media/material-icons-two-tone-LCGWGE2N.woff": "02225d888afe4eebc7312b7432878dc8aef1f50f",
-    "/FishTracker/media/material-icons-two-tone-M5N5K6F5.woff2": "296ff0bff395a77c2e33e7e31fffe73980bd93cf",
     "/FishTracker/media/roboto-cyrillic-400-normal-6JW3Q6UL.woff": "411da4b98f9a976833ccc172f8ee84c167146949",
     "/FishTracker/media/roboto-cyrillic-400-normal-V3H5IIDP.woff2": "434b09ddfb018ba62d43d260cd535f05f8622379",
     "/FishTracker/media/roboto-cyrillic-500-normal-AWMCDHTT.woff": "2567c5c2ccd9307532166062cfdda7faf3f03270",
@@ -422,7 +417,7 @@
     "/FishTracker/media/roboto-vietnamese-600-normal-TLUHKVRE.woff": "5bdd66f65ce9edeac1b5fb52ebd78e4adaed0b58",
     "/FishTracker/media/roboto-vietnamese-700-normal-LA5HL3OG.woff2": "86c5991362d7165d2344493c8969362bb32b9f1d",
     "/FishTracker/media/roboto-vietnamese-700-normal-SU7RGW3X.woff": "9a9db67d5acfe4006082fe753af1852e65d0fd48",
-    "/FishTracker/styles-FP5ISTVR.css": "f75ae4c91ea17a4f07e3c1c5372de18a32be5391"
+    "/FishTracker/styles-I527R6OV.css": "2a4e7a7a0a71f6ce8dfcc15b55e12bbbf8421c82"
   },
   "navigationUrls": [
     {
