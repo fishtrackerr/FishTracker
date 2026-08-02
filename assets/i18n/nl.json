@@ -21,7 +21,8 @@
     "rename": "Hernoemen",
     "retry": "Opnieuw proberen",
     "loading": "Laden...",
-    "errorGeneric": "Er is iets misgegaan"
+    "errorGeneric": "Er is iets misgegaan",
+    "back": "Terug"
   },
   "connectivity": {
     "offlineBanner": "Je bent offline — vangsten en sessies blijven werken",
@@ -320,7 +321,9 @@
     "sessionDeleted": "Sessie verwijderd"
   },
   "weatherHistory": {
-    "title": "Weergeschiedenis"
+    "title": "Weergeschiedenis",
+    "pageTitle": "Weergeschiedenis",
+    "more": "Meer weergegevens"
   },
   "sessionEdit": {
     "title": "Sessie bewerken",

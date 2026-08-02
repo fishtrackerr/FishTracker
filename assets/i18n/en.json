@@ -21,7 +21,8 @@
     "rename": "Rename",
     "retry": "Try again",
     "loading": "Loading...",
-    "errorGeneric": "Something went wrong"
+    "errorGeneric": "Something went wrong",
+    "back": "Back"
   },
   "connectivity": {
     "offlineBanner": "You're offline — catches and sessions still work",
@@ -320,7 +321,9 @@
     "sessionDeleted": "Session deleted"
   },
   "weatherHistory": {
-    "title": "Weather history"
+    "title": "Weather history",
+    "pageTitle": "Weather history",
+    "more": "More weather history"
   },
   "sessionEdit": {
     "title": "Edit Session",

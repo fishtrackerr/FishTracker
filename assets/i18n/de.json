@@ -21,7 +21,8 @@
     "rename": "Umbenennen",
     "retry": "Erneut versuchen",
     "loading": "Wird geladen...",
-    "errorGeneric": "Etwas ist schiefgelaufen"
+    "errorGeneric": "Etwas ist schiefgelaufen",
+    "back": "Zurück"
   },
   "connectivity": {
     "offlineBanner": "Du bist offline — Fänge und Sessions funktionieren weiter",
@@ -320,7 +321,9 @@
     "sessionDeleted": "Sitzung gelöscht"
   },
   "weatherHistory": {
-    "title": "Wetterverlauf"
+    "title": "Wetterverlauf",
+    "pageTitle": "Wetterverlauf",
+    "more": "Mehr Wetterdaten"
   },
   "sessionEdit": {
     "title": "Sitzung bearbeiten",
