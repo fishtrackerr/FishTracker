@@ -23,7 +23,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       margin-bottom: 16px;
     }
     h3 {
-      color: var(--text-primary);
+      color: var(--primary);
       margin: 0 0 8px;
     }
     p {

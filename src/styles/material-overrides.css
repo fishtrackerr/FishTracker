@@ -106,17 +106,55 @@ textarea.mat-mdc-input-element {
 }
 
 .mat-mdc-option {
-  color: var(--text-primary);
+  --mat-option-label-text-color: var(--text-primary);
+  --mat-option-selected-state-label-text-color: var(--primary);
+  --mat-option-focus-state-layer-color: color-mix(in srgb, var(--primary) 12%, transparent);
+  --mat-option-hover-state-layer-color: color-mix(in srgb, var(--primary) 8%, transparent);
+  color: var(--text-primary) !important;
   background: var(--background-card);
 }
 
-.mat-mdc-option.mdc-list-item--selected {
+.mat-mdc-option .mdc-list-item__primary-text {
+  color: inherit !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  --mat-option-label-text-color: var(--primary);
+  color: var(--primary) !important;
   background: color-mix(in srgb, var(--primary) 12%, var(--background-card)) !important;
 }
 
 .mat-mdc-option:hover:not(.mdc-list-item--disabled),
 .mat-mdc-option.mat-mdc-option-active {
   background: color-mix(in srgb, var(--primary) 8%, var(--background-card)) !important;
+}
+
+/* Selected checkmark in mat-select / mat-option (not a real checkbox) */
+.mat-mdc-option .mat-pseudo-checkbox,
+.mat-mdc-option .mat-mdc-option-pseudo-checkbox {
+  --mat-pseudo-checkbox-full-selected-icon-color: var(--primary);
+  --mat-minimal-pseudo-checkbox-selected-checkmark-color: var(--primary);
+  --mat-full-pseudo-checkbox-selected-icon-color: var(--primary);
+  color: var(--primary) !important;
+}
+
+.mat-mdc-option .mat-pseudo-checkbox-checked.mat-pseudo-checkbox-minimal::after,
+.mat-mdc-option .mat-pseudo-checkbox-checked::after {
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+.mat-mdc-option .mat-pseudo-checkbox-checked.mat-pseudo-checkbox-full {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+.mat-mdc-option .mat-pseudo-checkbox-checkmark,
+.mat-mdc-option .mat-pseudo-checkbox svg,
+.mat-mdc-option .mat-pseudo-checkbox path {
+  color: var(--primary) !important;
+  fill: var(--primary) !important;
+  stroke: var(--primary) !important;
 }
 
 .cdk-overlay-pane:has(.mat-mdc-select-panel) {
@@ -135,6 +173,20 @@ textarea.mat-mdc-input-element {
   box-shadow: var(--shadow-md) !important;
   overflow: hidden !important;
   padding: var(--spacing-xs) 0 !important;
+}
+
+.mat-mdc-select-panel .mat-mdc-option,
+.app-select-panel .mat-mdc-option,
+.theme-dark-select-panel .mat-mdc-option,
+.theme-light-select-panel .mat-mdc-option {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item--selected,
+.app-select-panel .mat-mdc-option.mdc-list-item--selected,
+.theme-dark-select-panel .mat-mdc-option.mdc-list-item--selected,
+.theme-light-select-panel .mat-mdc-option.mdc-list-item--selected {
+  color: var(--primary) !important;
 }
 
 .cdk-overlay-container[data-theme='dark'] .mat-mdc-select-panel,

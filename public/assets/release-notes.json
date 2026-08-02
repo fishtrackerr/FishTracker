@@ -1,19 +1,35 @@
 {
-  "version": "0.0.44",
+  "version": "0.0.45",
   "date": "2026-08-02",
   "sections": [
     {
       "category": "New Features",
       "items": [
         {
-          "message": "replace country input with a select dropdown and update related logic",
-          "shortHash": "2939dfc",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/2939dfce507f11537221a14fc5c149612d29e47a"
+          "message": "update version to 0.0.44 and enhance release notes with new features",
+          "shortHash": "15eee41",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/15eee410f58b19446722e40b1b84c36351b98341"
         }
       ]
     }
   ],
   "releases": [
+    {
+      "version": "0.0.45",
+      "date": "2026-08-02",
+      "sections": [
+        {
+          "category": "New Features",
+          "items": [
+            {
+              "message": "update version to 0.0.44 and enhance release notes with new features",
+              "shortHash": "15eee41",
+              "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/15eee410f58b19446722e40b1b84c36351b98341"
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.0.44",
       "date": "2026-08-02",
