@@ -1,19 +1,35 @@
 {
-  "version": "0.0.48",
+  "version": "0.0.49",
   "date": "2026-08-02",
   "sections": [
     {
       "category": "New Features",
       "items": [
         {
-          "message": "enhance settings page with profile link and default country selection",
-          "shortHash": "96cd8fe",
-          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/96cd8febf4a998afef4adc72ed190deb4c84cbb8"
+          "message": "add custom prompts feature for assistant",
+          "shortHash": "7c626a3",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/7c626a3ee33579af3019b57b79418a2c9b7c21cf"
         }
       ]
     }
   ],
   "releases": [
+    {
+      "version": "0.0.49",
+      "date": "2026-08-02",
+      "sections": [
+        {
+          "category": "New Features",
+          "items": [
+            {
+              "message": "add custom prompts feature for assistant",
+              "shortHash": "7c626a3",
+              "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/7c626a3ee33579af3019b57b79418a2c9b7c21cf"
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.0.48",
       "date": "2026-08-02",
