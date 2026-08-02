@@ -3,12 +3,11 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { AppVersionService, hardReloadApp } from '../../core/services/app-version.service';
+import { AppVersionService } from '../../core/services/app-version.service';
 import { PinLockService } from '../../core/services/pin-lock.service';
 import { AppStartupService } from '../../core/services/app-startup.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { SwUpdateService } from '../../core/services/sw-update.service';
-import { isNativeApp } from '../../core/utils/platform';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
@@ -68,12 +67,8 @@ export class PinUnlockComponent {
 
     try {
       // Keep label on the running build; SW prompt handles activate + hard reload.
-      const checked = await this.swUpdate.checkForUpdatesNow();
+      await this.swUpdate.checkForUpdatesNow();
       await this.appVersion.refreshInstalledVersion();
-      // Capacitor has no SW updates — refresh the WebView via a clean entry load.
-      if (!checked && isNativeApp()) {
-        hardReloadApp();
-      }
     } finally {
       this.checkingForUpdates.set(false);
     }

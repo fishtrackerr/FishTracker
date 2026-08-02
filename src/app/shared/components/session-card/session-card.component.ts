@@ -348,6 +348,7 @@ export class SessionCardComponent implements OnInit, OnChanges, OnDestroy {
   onEdit(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+    void this.router.navigate(['/sessions', this.session.id, 'edit']);
     this.editSession.emit(this.session);
   }
 }

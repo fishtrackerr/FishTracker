@@ -1,30 +1,20 @@
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { fetchWithTimeout } from '../utils';
-import { isNativeApp } from '../utils/platform';
 
 /**
- * Force a full document navigation so WebView / SW pick up new assets.
- * Always reloads the app entry (`<base href>`) — deep-link + `?_reload=`
- * replace() leaves Android WebViews on a blank black screen.
+ * Force a full document reload so WebView / SW pick up new assets.
+ * Use reload() — navigating to base with ?_reload= blanks Android WebViews.
  */
 export function hardReloadApp(): void {
   if (typeof window === 'undefined') {
     return;
   }
-
-  const baseAttr = document.querySelector('base')?.getAttribute('href') || '/';
-  const entry = new URL(baseAttr, window.location.origin);
-
-  if (isNativeApp()) {
-    // Capacitor serves bundled assets; a clean entry load is enough.
-    // Avoid cache-bust query params — they break Android WebView navigation.
-    window.location.replace(entry.toString());
-    return;
+  try {
+    window.location.reload();
+  } catch {
+    window.location.href = window.location.href;
   }
-
-  entry.searchParams.set('_reload', String(Date.now()));
-  window.location.replace(entry.toString());
 }
 
 /**

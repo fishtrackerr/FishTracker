@@ -7,6 +7,8 @@ import { hardReloadApp } from './app-version.service';
 import { I18nService } from './i18n.service';
 import { NotificationService } from './notification.service';
 
+const NATIVE_SW_CLEARED_KEY = 'ft.nativeSwCleared';
+
 @Injectable({ providedIn: 'root' })
 export class SwUpdateService {
   private readonly swUpdate = inject(SwUpdate);
@@ -19,7 +21,7 @@ export class SwUpdateService {
   constructor() {
     if (!isPlatformBrowser(this.platformId) || isNativeApp() || !this.swUpdate.isEnabled) {
       if (isPlatformBrowser(this.platformId) && isNativeApp()) {
-        void this.unregisterStaleServiceWorkers();
+        void this.unregisterStaleServiceWorkersOnce();
       }
       return;
     }
@@ -82,7 +84,6 @@ export class SwUpdateService {
         this.notifier.warning(this.i18n.t('pwa.updateFailed'));
         return;
       }
-      // Give the new SW time to claim before navigation (avoids blank Android screens).
       await new Promise((resolve) => setTimeout(resolve, 250));
       hardReloadApp();
     } catch (err) {
@@ -92,20 +93,27 @@ export class SwUpdateService {
     }
   }
 
-  /** Capacitor builds must not keep a browser SW controlling the WebView. */
-  private async unregisterStaleServiceWorkers(): Promise<void> {
+  /**
+   * One-time cleanup if a browser SW was left controlling the Capacitor WebView.
+   * Never wipe Cache Storage on every launch — that can blank the WebView.
+   */
+  private async unregisterStaleServiceWorkersOnce(): Promise<void> {
     if (!('serviceWorker' in navigator)) {
       return;
     }
     try {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map((registration) => registration.unregister()));
-      if ('caches' in window) {
-        const keys = await caches.keys();
-        await Promise.all(keys.map((key) => caches.delete(key)));
+      if (localStorage.getItem(NATIVE_SW_CLEARED_KEY) === '1') {
+        return;
       }
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      if (registrations.length === 0) {
+        localStorage.setItem(NATIVE_SW_CLEARED_KEY, '1');
+        return;
+      }
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+      localStorage.setItem(NATIVE_SW_CLEARED_KEY, '1');
     } catch (err) {
-      console.warn('[SW] failed to clear native service workers', err);
+      console.warn('[SW] failed to unregister native service workers', err);
     }
   }
 }
