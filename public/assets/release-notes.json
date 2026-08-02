@@ -1,8 +1,45 @@
 {
-  "version": "0.0.50",
+  "version": "0.0.51",
   "date": "2026-08-02",
-  "sections": [],
+  "sections": [
+    {
+      "category": "New Features",
+      "items": [
+        {
+          "message": "enhance app reload mechanism and improve service worker handling",
+          "shortHash": "97bc848",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/97bc8489a8eb1f925219f6bfe38a24970057e5f9"
+        },
+        {
+          "message": "update version to 0.0.50 and enhance service worker handling for native apps",
+          "shortHash": "bf8eb73",
+          "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/bf8eb736fc2613480115306f0e7e1ed92b62bc19"
+        }
+      ]
+    }
+  ],
   "releases": [
+    {
+      "version": "0.0.51",
+      "date": "2026-08-02",
+      "sections": [
+        {
+          "category": "New Features",
+          "items": [
+            {
+              "message": "enhance app reload mechanism and improve service worker handling",
+              "shortHash": "97bc848",
+              "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/97bc8489a8eb1f925219f6bfe38a24970057e5f9"
+            },
+            {
+              "message": "update version to 0.0.50 and enhance service worker handling for native apps",
+              "shortHash": "bf8eb73",
+              "commitUrl": "https://github.com/fishtrackerr/FishTracker/commit/bf8eb736fc2613480115306f0e7e1ed92b62bc19"
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.0.49",
       "date": "2026-08-02",

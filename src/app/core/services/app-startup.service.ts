@@ -63,7 +63,12 @@ export class AppStartupService {
 
   private async tryOpenDb(): Promise<boolean> {
     try {
-      await db.open();
+      await Promise.race([
+        db.open(),
+        new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('IndexedDB open timed out')), 8_000);
+        }),
+      ]);
       this.dbOpenErrorSignal.set(null);
       this.dbRecoveryKindSignal.set(null);
       return true;
@@ -80,6 +85,10 @@ export class AppStartupService {
   }
 
   private classifyDbOpenError(err: unknown): DbRecoveryKind {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes('timed out')) {
+      return 'unknown';
+    }
     const name = err instanceof Error ? err.name : '';
     if (name === 'VersionError') {
       return 'versionMismatch';
