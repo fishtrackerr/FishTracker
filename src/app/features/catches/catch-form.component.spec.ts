@@ -6,6 +6,7 @@ import { CatchService } from '../../core/services/catch.service';
 import { SessionService } from '../../core/services/session.service';
 import { ImageService } from '../../core/services/image.service';
 import { PhotoPickService } from '../../core/services/photo-pick.service';
+import { UserOptionService } from '../../core/services/user-option.service';
 import type { Catch, FishingSession } from '../../core/models';
 
 function createParamMap(values: Record<string, string | undefined>) {
@@ -126,6 +127,12 @@ describe('CatchFormComponent', () => {
           provide: PhotoPickService,
           useValue: {
             pickImage,
+          },
+        },
+        {
+          provide: UserOptionService,
+          useValue: {
+            ensureDefaultsForCurrentMode: vi.fn().mockResolvedValue(undefined),
           },
         },
       ],

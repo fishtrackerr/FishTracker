@@ -7,6 +7,7 @@ import { FishingSession } from '../../core/models';
 import { ConnectivityService } from '../../core/services/connectivity.service';
 import { FeedbackPromptService } from '../../core/services/feedback-prompt.service';
 import { I18nService } from '../../core/services/i18n.service';
+import { PrivacyWelcomeService } from '../../core/services/privacy-welcome.service';
 import { SessionService } from '../../core/services/session.service';
 import { ShareService } from '../../core/services/share.service';
 import { WhatsNewService } from '../../core/services/whats-new.service';
@@ -16,6 +17,7 @@ describe('ShellComponent', () => {
   const activeSession$ = new BehaviorSubject<FishingSession | undefined>(undefined);
   const isOnline = signal(true);
   const shareAppViaWhatsApp = vi.fn();
+  const maybeShowPrivacyWelcome = vi.fn().mockResolvedValue(undefined);
   const maybeShowWhatsNew = vi.fn().mockResolvedValue(undefined);
   const maybeShowFeedback = vi.fn().mockResolvedValue(undefined);
 
@@ -23,6 +25,7 @@ describe('ShellComponent', () => {
     activeSession$.next(undefined);
     isOnline.set(true);
     shareAppViaWhatsApp.mockClear();
+    maybeShowPrivacyWelcome.mockClear();
     maybeShowWhatsNew.mockClear();
     maybeShowFeedback.mockClear();
 
@@ -49,6 +52,12 @@ describe('ShellComponent', () => {
           },
         },
         {
+          provide: PrivacyWelcomeService,
+          useValue: {
+            maybeShow: maybeShowPrivacyWelcome,
+          },
+        },
+        {
           provide: WhatsNewService,
           useValue: {
             maybeShow: maybeShowWhatsNew,
@@ -72,9 +81,10 @@ describe('ShellComponent', () => {
     }).compileComponents();
   });
 
-  it('asks WhatsNew then feedback prompt on init', async () => {
+  it('asks privacy welcome, WhatsNew, then feedback prompt on init', async () => {
     TestBed.createComponent(ShellComponent);
-    expect(maybeShowWhatsNew).toHaveBeenCalledTimes(1);
+    expect(maybeShowPrivacyWelcome).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(maybeShowWhatsNew).toHaveBeenCalledTimes(1));
     await vi.waitFor(() => expect(maybeShowFeedback).toHaveBeenCalledTimes(1));
   });
 

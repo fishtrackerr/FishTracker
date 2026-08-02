@@ -76,4 +76,21 @@ describe('UserOptionService', () => {
     );
     expect(sync.onOptionRenamed).toHaveBeenCalledWith('bait', 'Corn', 'Maize');
   });
+
+  it('ensureDefaultsForCurrentMode seeds missing defaults across categories', async () => {
+    repo.getByCategory.mockResolvedValue([]);
+    await service.ensureDefaultsForCurrentMode();
+    expect(repo.put.mock.calls.length).toBeGreaterThan(20);
+    expect(repo.put).toHaveBeenCalledWith(
+      expect.objectContaining({ category: 'method', value: 'Bottom', isDefault: true }),
+    );
+    expect(repo.put).toHaveBeenCalledWith(
+      expect.objectContaining({ category: 'weatherType', value: 'Sunny', isDefault: true }),
+    );
+  });
+
+  it('deleteOption removes by id', async () => {
+    await service.deleteOption('opt-1');
+    expect(repo.delete).toHaveBeenCalledWith('opt-1');
+  });
 });

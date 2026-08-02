@@ -150,9 +150,16 @@
     "resetDesc": "Elke reset vereist bevestiging. Instellingen resetten verwijdert geen visgegevens.",
     "customOptions": "Aangepaste opties",
     "manageOptions": "Opties beheren",
-    "manageOptionsDesc": "Hernoem een optie om deze overal bij te werken in vangsten, hengels, filters en favorieten.",
+    "manageOptionsDesc": "Hernoem, voeg toe of verwijder opties die in vangst-dropdowns staan. Hernoemen werkt door in vangsten, hengels, filters en favorieten.",
     "renameOptionPrompt": "Nieuwe naam voor \"{{value}}\"",
     "optionRenamed": "Optie hernoemd",
+    "addOption": "Toevoegen",
+    "addOptionPrompt": "Nieuwe waarde voor {{category}}",
+    "optionAdded": "Optie toegevoegd",
+    "optionDeleted": "Optie verwijderd",
+    "deleteOptionTitle": "Deze optie verwijderen?",
+    "deleteOptionMessage": "“{{value}}” uit de lijst verwijderen? Bestaande vangsten behouden de oude tekst.",
+    "noOptionsInCategory": "Nog geen opties — voeg er een toe of reset naar standaardwaarden.",
     "resetAllCustom": "Alle aangepaste opties resetten",
     "preferences": "Voorkeuren",
     "resetFilters": "Filters resetten",
@@ -730,6 +737,13 @@
     "message": "Heb je feedback of ideeën voor functies? Stuur ze per e-mail — zo verbeteren we Fish Tracker.",
     "send": "Feedback sturen",
     "notNow": "Niet nu"
+  },
+  "privacyWelcome": {
+    "title": "Jouw gegevens blijven hier",
+    "lead": "Niets wat je in Fish Tracker invoert wordt gedeeld.",
+    "body": "Sessies, vangsten, foto’s en notities blijven alleen op dit apparaat. Er zijn geen accounts en geen cloud-logboek voor jouw visdata.",
+    "note": "Optionele functies zoals weer kunnen het netwerk gebruiken, maar je vangstgeschiedenis wordt nooit geüpload.",
+    "gotIt": "Begrepen"
   },
   "privacy": {
     "title": "Privacy & gegevens",

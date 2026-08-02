@@ -35,29 +35,6 @@ function runGit(command) {
   }).trim();
 }
 
-function getRepositoryBaseUrl() {
-  try {
-    const remote = runGit('git config --get remote.origin.url');
-    if (!remote) {
-      return undefined;
-    }
-
-    const sshMatch = remote.match(/^git@github\.com:(.+?)(?:\.git)?$/);
-    if (sshMatch) {
-      return `https://github.com/${sshMatch[1]}`;
-    }
-
-    const httpsMatch = remote.match(/^https:\/\/github\.com\/(.+?)(?:\.git)?$/);
-    if (httpsMatch) {
-      return `https://github.com/${httpsMatch[1]}`;
-    }
-
-    return undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 function parseSemver(version) {
   const match = String(version)
     .replace(/^v/, '')
@@ -108,24 +85,24 @@ function tagDate(tag) {
 function parseCommitLines(raw) {
   return raw
     .split('\n')
+    .map((line) => line.trim())
     .filter(Boolean)
-    .filter((line) => !line.includes('\tMerge '));
+    .filter((line) => !/^Merge /i.test(line));
 }
 
 function commitsInRange(fromExclusive, toInclusive) {
   try {
     const range = fromExclusive ? `${fromExclusive}..${toInclusive}` : toInclusive;
-    return parseCommitLines(runGit(`git log ${range} --pretty=format:%h%x09%H%x09%s`));
+    return parseCommitLines(runGit(`git log ${range} --pretty=format:%s`));
   } catch {
     return [];
   }
 }
 
-function categorize(commits, repositoryBaseUrl) {
+function categorize(commits) {
   const sections = new Map();
-  for (const commit of commits) {
-    const [shortHash, fullHash, subject] = commit.split('\t');
-    if (!shortHash || !fullHash || !subject) {
+  for (const subject of commits) {
+    if (!subject) {
       continue;
     }
 
@@ -138,23 +115,19 @@ function categorize(commits, repositoryBaseUrl) {
     if (!sections.has(category)) {
       sections.set(category, []);
     }
-    sections.get(category).push({
-      message,
-      shortHash,
-      commitUrl: repositoryBaseUrl ? `${repositoryBaseUrl}/commit/${fullHash}` : undefined,
-    });
+    sections.get(category).push(message);
   }
   return [...sections.entries()].map(([category, items]) => ({ category, items }));
 }
 
-function buildReleases(repositoryBaseUrl) {
+function buildReleases() {
   const tags = listVersionTags();
   const releases = [];
 
   for (let i = 0; i < tags.length; i++) {
     const tag = tags[i];
     const prev = i > 0 ? tags[i - 1] : null;
-    const sections = categorize(commitsInRange(prev, tag), repositoryBaseUrl);
+    const sections = categorize(commitsInRange(prev, tag));
     if (sections.length === 0) {
       continue;
     }
@@ -169,8 +142,8 @@ function buildReleases(repositoryBaseUrl) {
   const latestTag = tags.at(-1) ?? null;
   const unreleased = latestTag
     ? commitsInRange(latestTag, 'HEAD')
-    : parseCommitLines(runGit('git log --pretty=format:%h%x09%H%x09%s'));
-  const unreleasedSections = categorize(unreleased, repositoryBaseUrl);
+    : parseCommitLines(runGit('git log --pretty=format:%s'));
+  const unreleasedSections = categorize(unreleased);
   if (unreleasedSections.length > 0) {
     const already = releases.some((r) => r.version === pkgVersion);
     if (!already) {
@@ -191,8 +164,7 @@ function sectionsForCurrentVersion(releases, version) {
 }
 
 const version = getVersion();
-const repositoryBaseUrl = getRepositoryBaseUrl();
-const releases = buildReleases(repositoryBaseUrl);
+const releases = buildReleases();
 const currentSections = sectionsForCurrentVersion(releases, version);
 
 const output = {

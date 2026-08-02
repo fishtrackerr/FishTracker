@@ -35,20 +35,14 @@ describe('ReleaseNotesComponent', () => {
     }).compileComponents();
   });
 
-  it('renders commit links when changelog items include commit URLs', async () => {
+  it('renders changelog messages only', async () => {
     getReleaseNotes.mockResolvedValue({
       version: '0.0.22',
       date: '2026-07-23',
       sections: [
         {
           category: 'New Features',
-          items: [
-            {
-              message: 'add focused navigation behavior',
-              shortHash: 'abc1234',
-              commitUrl: 'https://github.com/example/repo/commit/abc1234full',
-            },
-          ],
+          items: [{ message: 'add focused navigation behavior' }],
         },
       ],
     } as ReleaseNotesData);
@@ -58,36 +52,9 @@ describe('ReleaseNotesComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    const commitLink = fixture.nativeElement.querySelector('a.commit-link') as HTMLAnchorElement;
-    expect(commitLink).toBeTruthy();
-    expect(commitLink.getAttribute('href')).toBe('https://github.com/example/repo/commit/abc1234full');
-    expect(commitLink.textContent).toContain('abc1234');
-  });
-
-  it('suppresses non-github commit URLs', async () => {
-    getReleaseNotes.mockResolvedValue({
-      version: '0.0.22',
-      date: '2026-07-23',
-      sections: [
-        {
-          category: 'Notes',
-          items: [
-            {
-              message: 'bad link',
-              shortHash: 'abc',
-              commitUrl: 'javascript:alert(1)',
-            },
-          ],
-        },
-      ],
-    } as ReleaseNotesData);
-
-    const fixture = TestBed.createComponent(ReleaseNotesComponent);
-    fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.detectChanges();
-
-    expect(fixture.nativeElement.querySelector('a.commit-link')).toBeNull();
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain('add focused navigation behavior');
+    expect(fixture.nativeElement.querySelectorAll('a').length).toBe(0);
   });
 
   it('renders multiple releases from history', async () => {

@@ -24,15 +24,8 @@ import {
           @for (section of n.sections; track section.category) {
             <h3>{{ section.category }}</h3>
             <ul>
-              @for (item of section.items; track item) {
-                <li>
-                  {{ noteMessage(item) }}
-                  @if (noteCommitUrl(item); as url) {
-                    <a class="commit-link" [href]="url" target="_blank" rel="noopener noreferrer">
-                      ({{ noteCommitLabel(item) }})
-                    </a>
-                  }
-                </li>
+              @for (item of section.items; track noteMessage(item)) {
+                <li>{{ noteMessage(item) }}</li>
               }
             </ul>
           }
@@ -50,7 +43,6 @@ import {
     .date { text-align: center; color: var(--text-muted); }
     h3 { color: var(--text-primary); margin-top: var(--spacing-md); }
     li { color: var(--text-secondary); margin-bottom: var(--spacing-xs); }
-    .commit-link { margin-left: 6px; color: var(--primary); text-decoration: underline; }
   `,
 })
 export class ReleaseNotesComponent implements OnInit {
@@ -67,36 +59,6 @@ export class ReleaseNotesComponent implements OnInit {
 
   noteMessage(item: string | ReleaseNoteItem): string {
     return typeof item === 'string' ? item : item.message;
-  }
-
-  noteCommitUrl(item: string | ReleaseNoteItem): string | undefined {
-    if (typeof item === 'string') {
-      return undefined;
-    }
-    const url = item.commitUrl;
-    if (!url || typeof url !== 'string') {
-      return undefined;
-    }
-    try {
-      const parsed = new URL(url);
-      if (parsed.protocol !== 'https:') {
-        return undefined;
-      }
-      const host = parsed.hostname.toLowerCase();
-      if (host !== 'github.com' && host !== 'www.github.com') {
-        return undefined;
-      }
-      return url;
-    } catch {
-      return undefined;
-    }
-  }
-
-  noteCommitLabel(item: string | ReleaseNoteItem): string {
-    if (typeof item === 'string') {
-      return '';
-    }
-    return item.shortHash ?? 'commit';
   }
 
   private toEntries(notes: ReleaseNotesData | null): ReleaseNotesEntry[] {

@@ -212,6 +212,8 @@ describe('SettingsComponent', () => {
             saveOption: vi.fn(),
             toggleFavorite: vi.fn(),
             rename: vi.fn(),
+            deleteOption: vi.fn(),
+            ensureDefaultsForCurrentMode: vi.fn().mockResolvedValue(undefined),
           },
         },
         {

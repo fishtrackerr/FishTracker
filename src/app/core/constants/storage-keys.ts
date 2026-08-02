@@ -10,6 +10,8 @@ export const WEATHER_CACHE_KEY = 'fish-tracker-weather-cache';
 export const GEOCODE_CACHE_KEY = 'fish-tracker-geocode-cache';
 /** Last app version for which the What's New dialog was shown (or seeded). */
 export const LAST_SEEN_VERSION_KEY = 'fish-tracker-last-seen-version';
+/** Set after the first-open local-data privacy welcome is acknowledged. */
+export const PRIVACY_WELCOME_SEEN_KEY = 'fish-tracker-privacy-welcome-seen';
 /** Local calendar date (YYYY-MM-DD) when the feedback prompt was last shown. */
 export const FEEDBACK_PROMPT_DATE_KEY = 'fish-tracker-feedback-prompt-date';
 /** Statistics filter presets; suffixed with fishing mode at runtime. */

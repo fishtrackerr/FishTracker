@@ -42,6 +42,9 @@ describe('DemoDataService', () => {
       fishSpotted as never,
       sessionEvents as never,
       fishingMode as never,
+      {
+        ensureDefaultsForCurrentMode: vi.fn().mockResolvedValue(undefined),
+      } as never,
     );
   });
 

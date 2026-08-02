@@ -180,13 +180,26 @@
   margin-bottom: var(--spacing-md);
 }
 .manage-category-title {
-  margin: 0 0 var(--spacing-xs);
+  margin: 0;
   font-size: 0.9rem;
   color: var(--text-secondary);
+  text-transform: capitalize;
+}
+.manage-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+.empty-options {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 .option-list {
   list-style: none;
-  margin: 0;
+  margin: 0 0 var(--spacing-md);
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -197,6 +210,12 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-sm);
+}
+.option-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
 }
 .option-value {
   overflow: hidden;

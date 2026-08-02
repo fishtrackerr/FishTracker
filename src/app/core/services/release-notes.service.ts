@@ -3,8 +3,6 @@ import { fetchWithTimeout } from '../utils';
 
 export interface ReleaseNoteItem {
   message: string;
-  shortHash?: string;
-  commitUrl?: string;
 }
 
 export interface ReleaseNotesEntry {

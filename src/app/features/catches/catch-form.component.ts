@@ -10,6 +10,7 @@ import { CatchService } from '../../core/services/catch.service';
 import { SessionService } from '../../core/services/session.service';
 import { ImageService } from '../../core/services/image.service';
 import { PhotoPickService } from '../../core/services/photo-pick.service';
+import { UserOptionService } from '../../core/services/user-option.service';
 import { OptionComboboxComponent } from '../../shared/components/option-combobox/option-combobox.component';
 import { Catch, FishingSession } from '../../core/models';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -38,6 +39,7 @@ export class CatchFormComponent {
   private readonly sessionService = inject(SessionService);
   private readonly imageService = inject(ImageService);
   private readonly photoPick = inject(PhotoPickService);
+  private readonly userOptions = inject(UserOptionService);
 
   sessionId = this.route.snapshot.paramMap.get('id')!;
   catchId = this.route.snapshot.paramMap.get('catchId');
@@ -78,6 +80,7 @@ export class CatchFormComponent {
   }
 
   async load(): Promise<void> {
+    await this.userOptions.ensureDefaultsForCurrentMode();
     this.session = await this.sessionService.getById(this.sessionId);
     if (!this.session) {
       return;

@@ -17,6 +17,7 @@ import { filter, startWith } from 'rxjs';
 import { ConnectivityService } from '../../core/services/connectivity.service';
 import { FeedbackPromptService } from '../../core/services/feedback-prompt.service';
 import { FishingModeService } from '../../core/services/fishing-mode.service';
+import { PrivacyWelcomeService } from '../../core/services/privacy-welcome.service';
 import { SessionService } from '../../core/services/session.service';
 import { ShareService } from '../../core/services/share.service';
 import { WhatsNewService } from '../../core/services/whats-new.service';
@@ -42,6 +43,7 @@ export class ShellComponent implements AfterViewInit {
   private readonly fishingMode = inject(FishingModeService);
   private readonly connectivity = inject(ConnectivityService);
   private readonly share = inject(ShareService);
+  private readonly privacyWelcome = inject(PrivacyWelcomeService);
   private readonly whatsNew = inject(WhatsNewService);
   private readonly feedbackPrompt = inject(FeedbackPromptService);
 
@@ -67,7 +69,10 @@ export class ShellComponent implements AfterViewInit {
         this.bannerDismissed.set(false);
       }
     });
-    void this.whatsNew.maybeShow().then(() => this.feedbackPrompt.maybeShow());
+    void this.privacyWelcome
+      .maybeShow()
+      .then(() => this.whatsNew.maybeShow())
+      .then(() => this.feedbackPrompt.maybeShow());
   }
 
   dismissOfflineBanner(): void {

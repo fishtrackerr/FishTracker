@@ -33,19 +33,15 @@ Prefer committing real changes before deploy so each tag range has notes.
 
 JSON consumed by `ReleaseNotesComponent` at `/release-notes`.
 
-Items can include commit metadata:
+Items are plain message strings (or `{ "message": "..." }` objects). Commit hashes and URLs are not included.
 
-- `message`: human-readable change text
-- `shortHash`: short commit hash shown in UI
-- `commitUrl`: external commit link (GitHub) when `remote.origin.url` can be resolved
+Legacy object items with unused commit fields are still readable; only `message` is shown.
 
-Legacy string-only items are still supported. Older JSON without `releases` still renders as a single entry.
+Older JSON without `releases` still renders as a single entry.
 
 ## UI integration
 
 Release notes are loaded from `/assets/release-notes.json` at runtime and shown as **Changelog** in Settings (all `releases`).
-
-When commit metadata is present, the changelog shows a clickable hash next to each item.
 
 After unlock, `WhatsNewService` compares the notes `version` to `fish-tracker-last-seen-version` in `localStorage`. It only opens when the **current** version has real `sections` content. First visit seeds the key without showing the dialog.
 

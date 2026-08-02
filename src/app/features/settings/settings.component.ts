@@ -121,7 +121,16 @@ export class SettingsComponent implements OnInit {
   confirmPin = '';
 
   ngOnInit(): void {
-    void this.reloadManagedOptions();
+    void this.bootstrapOptions();
+  }
+
+  private async bootstrapOptions(): Promise<void> {
+    try {
+      await this.userOptions.ensureDefaultsForCurrentMode();
+    } catch (error) {
+      console.error('[Settings] ensure option defaults failed', error);
+    }
+    await this.reloadManagedOptions();
   }
 
   updateUnits(field: 'weightUnit' | 'lengthUnit' | 'temperatureUnit' | 'distanceUnit', value: string): void {
@@ -338,6 +347,44 @@ export class SettingsComponent implements OnInit {
       this.notifications.success(this.i18n.t('settings.optionRenamed'));
     } catch (error) {
       console.error('[Settings] rename option failed', error);
+      this.notifications.error(this.i18n.t('common.errorGeneric'));
+    }
+  }
+
+  async addOption(category: UserOptionCategory): Promise<void> {
+    const next = window.prompt(this.i18n.t('settings.addOptionPrompt', { category: this.categoryLabel(category) }));
+    if (next == null) {
+      return;
+    }
+    const trimmed = next.trim();
+    if (!trimmed) {
+      return;
+    }
+    try {
+      await this.userOptions.saveOption(category, trimmed);
+      await this.reloadManagedOptions();
+      this.notifications.success(this.i18n.t('settings.optionAdded'));
+    } catch (error) {
+      console.error('[Settings] add option failed', error);
+      this.notifications.error(this.i18n.t('common.errorGeneric'));
+    }
+  }
+
+  async deleteOption(option: UserOption): Promise<void> {
+    const ok = await this.confirm.confirm({
+      title: this.i18n.t('settings.deleteOptionTitle'),
+      message: this.i18n.t('settings.deleteOptionMessage', { value: option.value }),
+      confirmLabel: this.i18n.t('common.delete'),
+    });
+    if (!ok) {
+      return;
+    }
+    try {
+      await this.userOptions.deleteOption(option.id);
+      await this.reloadManagedOptions();
+      this.notifications.success(this.i18n.t('settings.optionDeleted'));
+    } catch (error) {
+      console.error('[Settings] delete option failed', error);
       this.notifications.error(this.i18n.t('common.errorGeneric'));
     }
   }

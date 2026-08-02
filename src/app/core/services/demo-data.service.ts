@@ -5,9 +5,9 @@ import {
   FishSpottedEvent,
   FishingSession,
   Lake,
-  MODE_DEFAULT_PREFERENCES,
   SessionRod,
   SessionSpot,
+  defaultValuesForCategory,
 } from '../models';
 import { generateId } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
@@ -17,6 +17,7 @@ import { FishingModeService } from './fishing-mode.service';
 import { LakeRepository } from './lake.repository';
 import { SessionEventRepository } from './session-event.repository';
 import { SessionRepository } from './session.repository';
+import { UserOptionService } from './user-option.service';
 
 export interface DemoDataResult {
   lakes: number;
@@ -37,14 +38,22 @@ export class DemoDataService {
     private readonly fishSpotted: FishSpottedRepository,
     private readonly sessionEvents: SessionEventRepository,
     private readonly fishingMode: FishingModeService,
+    private readonly userOptions: UserOptionService,
   ) {}
 
   async generateForActiveMode(): Promise<DemoDataResult> {
     const mode = this.fishingMode.requireMode();
-    const prefs = MODE_DEFAULT_PREFERENCES[mode];
-    const species = prefs.favoriteSpecies;
-    const baits = prefs.favoriteBaits;
-    const rigs = prefs.favoriteRigs;
+    await this.userOptions.ensureDefaultsForCurrentMode();
+
+    const species = defaultValuesForCategory('species', mode);
+    const baits = defaultValuesForCategory('bait', mode);
+    const rigs = defaultValuesForCategory('rig', mode);
+    const flavors = defaultValuesForCategory('baitFlavor', mode);
+    const hookSizes = defaultValuesForCategory('hookSize', mode);
+    const lines = defaultValuesForCategory('lineType', mode);
+    const methods = defaultValuesForCategory('method', mode);
+    const weatherTypes = defaultValuesForCategory('weatherType', mode);
+    const tags = defaultValuesForCategory('tag', mode);
     const now = Date.now();
 
     const lakeDefs = [
@@ -271,8 +280,13 @@ export class DemoDataService {
           weightKg,
           lengthCm: Math.round(35 + weightKg * 8),
           bait: rod.bait ?? baits[c % baits.length],
+          baitFlavor: flavors[c % flavors.length],
           rig: rod.rig ?? rigs[c % rigs.length],
-          method: c % 2 === 0 ? 'Bottom' : 'Margin',
+          hookSize: hookSizes[c % hookSizes.length],
+          line: lines[c % lines.length],
+          method: methods[c % methods.length],
+          weatherType: weatherTypes[(c + plan.daysAgo) % weatherTypes.length],
+          tags: [tags[c % tags.length], mode].filter(Boolean),
           released: c % 3 !== 0,
           isPersonalRecord: c === 0 && plan.catchCount >= 3,
           notes: `Demo catch on ${rod.name} for AI context`,

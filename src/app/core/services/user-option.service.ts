@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { UserOption, UserOptionCategory } from '../models';
+import {
+  USER_OPTION_CATEGORIES,
+  UserOption,
+  UserOptionCategory,
+  defaultValuesForCategory,
+} from '../models';
 import { generateId, nowIso } from '../utils';
 import { FishingModeService } from './fishing-mode.service';
 import { RelatedDataSyncService } from './related-data-sync.service';
@@ -122,6 +127,10 @@ export class UserOptionService {
     return survivor;
   }
 
+  async deleteOption(id: string): Promise<void> {
+    await this.repo.delete(id);
+  }
+
   async resetCategory(category: UserOptionCategory, keepFavorites = true): Promise<void> {
     const options = await this.repo.getByCategory(category);
     const defaults = this.getDefaultValues(category);
@@ -143,18 +152,7 @@ export class UserOptionService {
   }
 
   async resetAllCustom(keepFavorites = true): Promise<void> {
-    const categories: UserOptionCategory[] = [
-      'species',
-      'bait',
-      'baitFlavor',
-      'rig',
-      'hookSize',
-      'lineType',
-      'method',
-      'weatherType',
-      'tag',
-    ];
-    for (const category of categories) {
+    for (const category of USER_OPTION_CATEGORIES) {
       await this.resetCategory(category, keepFavorites);
     }
   }
@@ -168,40 +166,30 @@ export class UserOptionService {
       return;
     }
     await this.repo.clearCurrentMode();
-    const categories: UserOptionCategory[] = ['species', 'bait', 'rig'];
-    for (const cat of categories) {
+    for (const cat of USER_OPTION_CATEGORIES) {
       for (const value of this.getDefaultValues(cat)) {
         await this.saveDefault(cat, value);
       }
     }
   }
 
-  /** Seeds species/bait/rig defaults when the current mode has no options yet. */
+  /**
+   * Seeds missing defaults for every category in the current mode.
+   * Safe to call repeatedly — existing values are left alone.
+   */
   async ensureDefaultsForCurrentMode(): Promise<void> {
-    const existing = await this.repo.getAll();
-    if (existing.length > 0) {
-      return;
-    }
-    const categories: UserOptionCategory[] = ['species', 'bait', 'rig'];
-    for (const cat of categories) {
+    for (const cat of USER_OPTION_CATEGORIES) {
       for (const value of this.getDefaultValues(cat)) {
-        await this.saveDefault(cat, value);
+        const existing = await this.findByValue(cat, value);
+        if (!existing) {
+          await this.saveDefault(cat, value);
+        }
       }
     }
   }
 
   private getDefaultValues(category: UserOptionCategory): string[] {
-    const prefs = this.fishingMode.getActivePreferences();
-    switch (category) {
-      case 'species':
-        return prefs.favoriteSpecies;
-      case 'bait':
-        return prefs.favoriteBaits;
-      case 'rig':
-        return prefs.favoriteRigs;
-      default:
-        return [];
-    }
+    return defaultValuesForCategory(category, this.fishingMode.requireMode());
   }
 
   private async saveDefault(category: UserOptionCategory, value: string): Promise<void> {

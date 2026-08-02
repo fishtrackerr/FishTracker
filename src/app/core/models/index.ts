@@ -11,6 +11,7 @@ export * from './bite-event.model';
 export * from './fish-spotted-event.model';
 export * from './session-event.model';
 export * from './user-option.model';
+export * from './user-option-defaults';
 export * from './catch.model';
 export * from './stored-image.model';
 export * from './app-settings.model';

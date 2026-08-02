@@ -11,7 +11,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-appearance" persistKey="settings-appearance" label="appearance" [defaultExpanded]="true" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-appearance" label="appearance" [defaultExpanded]="true" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.appearance' | tr }}</h2>
     </div>
@@ -40,7 +40,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-units" persistKey="settings-units" label="units" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-units" label="units" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.units' | tr }}</h2>
     </div>
@@ -78,7 +78,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-general" persistKey="settings-general" label="general" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-general" label="general" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.general' | tr }}</h2>
     </div>
@@ -128,7 +128,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-gallery" persistKey="settings-gallery" label="gallery" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-gallery" label="gallery" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.gallery' | tr }}</h2>
     </div>
@@ -161,7 +161,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-weather" persistKey="settings-weather" label="weather" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-weather" label="weather" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.weather' | tr }}</h2>
     </div>
@@ -188,7 +188,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant-guide" persistKey="settings-assistant-guide" label="assistantGuide" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant-guide" label="assistantGuide" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.assistantGuide' | tr }}</h2>
     </div>
@@ -228,7 +228,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant" persistKey="settings-assistant" label="assistant" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant" label="assistant" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.assistant' | tr }}</h2>
     </div>
@@ -293,7 +293,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-prompts" persistKey="settings-prompts" label="customPrompts" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-prompts" label="customPrompts" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.customPrompts' | tr }}</h2>
     </div>
@@ -333,7 +333,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-security" persistKey="settings-security" label="security" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-security" label="security" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.security' | tr }}</h2>
     </div>
@@ -364,7 +364,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-data" persistKey="settings-data" label="data" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-data" label="data" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.data' | tr }}</h2>
     </div>
@@ -390,7 +390,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-reset" persistKey="settings-reset" label="reset" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-reset" label="reset" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.resetSection' | tr }}</h2>
     </div>
@@ -401,21 +401,33 @@
       <p class="reset-desc">{{ 'settings.manageOptionsDesc' | tr }}</p>
       <div class="manage-options">
         @for (cat of optionCategories; track cat) {
-          @if (managedOptions()[cat].length > 0) {
-            <div class="manage-category">
+          <div class="manage-category">
+            <div class="manage-category-header">
               <h4 class="manage-category-title">{{ categoryLabel(cat) }}</h4>
+              <button mat-stroked-button type="button" (click)="addOption(cat)">
+                {{ 'settings.addOption' | tr }}
+              </button>
+            </div>
+            @if (managedOptions()[cat].length === 0) {
+              <p class="empty-options">{{ 'settings.noOptionsInCategory' | tr }}</p>
+            } @else {
               <ul class="option-list">
                 @for (opt of managedOptions()[cat]; track opt.id) {
                   <li class="option-row">
                     <span class="option-value">{{ opt.value }}</span>
-                    <button mat-stroked-button type="button" (click)="renameOption(opt)">
-                      {{ 'common.rename' | tr }}
-                    </button>
+                    <div class="option-actions">
+                      <button mat-stroked-button type="button" (click)="renameOption(opt)">
+                        {{ 'common.rename' | tr }}
+                      </button>
+                      <button mat-stroked-button type="button" class="danger-btn" (click)="deleteOption(opt)">
+                        {{ 'common.delete' | tr }}
+                      </button>
+                    </div>
                   </li>
                 }
               </ul>
-            </div>
-          }
+            }
+          </div>
         }
       </div>
       <div class="reset-actions">
@@ -449,7 +461,7 @@
 </section>
 
 <section class="section app-card about">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-about" persistKey="settings-about" label="about" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-about" label="about" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.about' | tr }}</h2>
     </div>
@@ -473,7 +485,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-changelog" persistKey="settings-changelog" label="changelog" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-changelog" label="changelog" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.changelog' | tr }}</h2>
     </div>
