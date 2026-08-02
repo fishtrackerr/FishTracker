@@ -20,6 +20,7 @@ import { WeatherService } from '../../core/services/weather.service';
 import { LakeService } from '../../core/services/lake.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ResetService } from '../../core/services/reset.service';
+import { DemoDataService } from '../../core/services/demo-data.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { PwaInstallService } from '../../core/services/pwa-install.service';
 import { ShareService } from '../../core/services/share.service';
@@ -66,6 +67,7 @@ export class SettingsComponent implements OnInit {
   private readonly lakeService = inject(LakeService);
   private readonly notifications = inject(NotificationService);
   private readonly resetService = inject(ResetService);
+  private readonly demoData = inject(DemoDataService);
   private readonly i18n = inject(I18nService);
   readonly pwaInstall = inject(PwaInstallService);
   private readonly share = inject(ShareService);
@@ -80,6 +82,7 @@ export class SettingsComponent implements OnInit {
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
   readonly message = signal('');
   readonly exporting = signal(false);
+  readonly generatingDemo = signal(false);
   readonly changingHomepage = signal(false);
   readonly fullResetInput = signal('');
   readonly managedOptions = signal<Record<UserOptionCategory, UserOption[]>>({
@@ -176,6 +179,33 @@ export class SettingsComponent implements OnInit {
       this.message.set(this.i18n.t('messages.exportFailed'));
     } finally {
       this.exporting.set(false);
+    }
+  }
+
+  async generateDemoData(): Promise<void> {
+    const ok = await this.confirm.confirm({
+      title: this.i18n.t('settings.generateDemoTitle'),
+      message: this.i18n.t('settings.generateDemoMessage'),
+      confirmLabel: this.i18n.t('settings.generateDemoConfirm'),
+    });
+    if (!ok) {
+      return;
+    }
+    this.generatingDemo.set(true);
+    try {
+      const result = await this.demoData.generateForActiveMode();
+      this.notifications.success(
+        this.i18n.t('settings.generateDemoSuccess', {
+          lakes: String(result.lakes),
+          sessions: String(result.sessions),
+          catches: String(result.catches),
+        }),
+      );
+    } catch (error) {
+      console.error('[Settings] Demo data generation failed', error);
+      this.notifications.error(this.i18n.t('settings.generateDemoFailed'));
+    } finally {
+      this.generatingDemo.set(false);
     }
   }
 

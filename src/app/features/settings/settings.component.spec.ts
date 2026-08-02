@@ -13,6 +13,7 @@ import { WeatherService } from '../../core/services/weather.service';
 import { LakeService } from '../../core/services/lake.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ResetService } from '../../core/services/reset.service';
+import { DemoDataService } from '../../core/services/demo-data.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { PwaInstallService } from '../../core/services/pwa-install.service';
 import { ShareService } from '../../core/services/share.service';
@@ -128,6 +129,12 @@ describe('SettingsComponent', () => {
             resetSecurity: vi.fn(),
             resetAllSettings: vi.fn(),
             resetFullApplication: vi.fn(),
+          },
+        },
+        {
+          provide: DemoDataService,
+          useValue: {
+            generateForActiveMode: vi.fn(),
           },
         },
         {

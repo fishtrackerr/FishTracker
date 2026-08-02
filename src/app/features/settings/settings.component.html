@@ -255,6 +255,15 @@
         <input type="file" accept=".json" (change)="importBackup($event)" hidden />
         <span mat-stroked-button>{{ 'settings.importJson' | tr }}</span>
       </label>
+      <p class="reset-desc">{{ 'settings.generateDemoDesc' | tr }}</p>
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="generateDemoData()"
+        [disabled]="generatingDemo()"
+      >
+        {{ generatingDemo() ? ('settings.generatingDemo' | tr) : ('settings.generateDemo' | tr) }}
+      </button>
     </div>
   </app-expandable-section>
 </section>
