@@ -69,4 +69,26 @@ describe('PrivacyWelcomeService', () => {
     afterClosed$.complete();
     await first;
   });
+
+  it('does not reopen in the same session when localStorage write fails', async () => {
+    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota');
+    });
+    const service = TestBed.inject(PrivacyWelcomeService);
+
+    const pending = service.maybeShow();
+    await vi.waitFor(() => expect(open).toHaveBeenCalledTimes(1));
+    afterClosed$.next();
+    afterClosed$.complete();
+    await pending;
+
+    open.mockClear();
+    afterClosed$ = new Subject<void>();
+    open.mockReturnValue({ afterClosed: () => afterClosed$.asObservable() });
+
+    await service.maybeShow();
+    expect(open).not.toHaveBeenCalled();
+
+    setItem.mockRestore();
+  });
 });

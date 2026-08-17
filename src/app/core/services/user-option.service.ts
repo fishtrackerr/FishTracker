@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   USER_OPTION_CATEGORIES,
+  USER_OPTION_VALUE_MAX_LENGTH,
   UserOption,
   UserOptionCategory,
   defaultValuesForCategory,
@@ -50,12 +51,20 @@ export class UserOptionService {
     value: string,
     isFavorite = false,
   ): Promise<UserOption> {
-    const trimmed = this.normalize(value);
-    if (!trimmed) {
-      throw new Error('Option value cannot be empty');
-    }
-    const existing = await this.findByValue(category, trimmed);
+    const trimmed = this.requireValue(value);
+    const existing = await this.findIncludingHidden(category, trimmed);
     if (existing) {
+      if (existing.visible === false) {
+        const revived: UserOption = {
+          ...existing,
+          value: trimmed,
+          visible: true,
+          isFavorite: isFavorite || existing.isFavorite,
+          updatedAt: nowIso(),
+        };
+        await this.repo.put(revived);
+        return revived;
+      }
       return existing;
     }
     const now = nowIso();
@@ -97,26 +106,25 @@ export class UserOptionService {
       return undefined;
     }
 
-    const trimmed = this.normalize(newValue);
-    if (!trimmed) {
-      throw new Error('Option value cannot be empty');
-    }
-
+    const trimmed = this.requireValue(newValue);
     const oldValue = option.value;
     if (oldValue === trimmed) {
       return option;
     }
 
-    const conflict = await this.findByValue(option.category, trimmed);
+    const conflict = await this.findIncludingHidden(option.category, trimmed);
     let survivor: UserOption;
 
     if (conflict && conflict.id !== option.id) {
-      if (option.isFavorite && !conflict.isFavorite) {
-        survivor = { ...conflict, isFavorite: true, updatedAt: nowIso() };
-        await this.repo.put(survivor);
-      } else {
-        survivor = conflict;
-      }
+      survivor = {
+        ...conflict,
+        // Keep existing casing when merging into a visible option; use typed value when reviving.
+        value: conflict.visible === false ? trimmed : conflict.value,
+        visible: true,
+        isFavorite: option.isFavorite || conflict.isFavorite,
+        updatedAt: nowIso(),
+      };
+      await this.repo.put(survivor);
       await this.repo.delete(option.id);
     } else {
       survivor = { ...option, value: trimmed, updatedAt: nowIso() };
@@ -186,6 +194,26 @@ export class UserOptionService {
         }
       }
     }
+  }
+
+  private requireValue(value: string): string {
+    const trimmed = this.normalize(value);
+    if (!trimmed) {
+      throw new Error('Option value cannot be empty');
+    }
+    if (trimmed.length > USER_OPTION_VALUE_MAX_LENGTH) {
+      throw new Error(`Option value cannot exceed ${USER_OPTION_VALUE_MAX_LENGTH} characters`);
+    }
+    return trimmed;
+  }
+
+  private async findIncludingHidden(
+    category: UserOptionCategory,
+    value: string,
+  ): Promise<UserOption | undefined> {
+    const normalized = this.normalize(value).toLowerCase();
+    const options = await this.repo.getByCategoryAll(category);
+    return options.find((o) => o.value.toLowerCase() === normalized);
   }
 
   private getDefaultValues(category: UserOptionCategory): string[] {

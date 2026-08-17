@@ -740,9 +740,9 @@
   },
   "privacyWelcome": {
     "title": "Jouw gegevens blijven hier",
-    "lead": "Niets wat je in Fish Tracker invoert wordt gedeeld.",
-    "body": "Sessies, vangsten, foto’s en notities blijven alleen op dit apparaat. Er zijn geen accounts en geen cloud-logboek voor jouw visdata.",
-    "note": "Optionele functies zoals weer kunnen het netwerk gebruiken, maar je vangstgeschiedenis wordt nooit geüpload.",
+    "lead": "Je vislogboek blijft standaard op dit apparaat.",
+    "body": "Er zijn geen accounts en geen cloud-logboek. Sessies, vangsten, foto’s en notities worden lokaal opgeslagen, tenzij je een back-up exporteert of een optionele online functie gebruikt.",
+    "note": "Weer, plaatszoeken en optionele AI kunnen het netwerk gebruiken. AI stuurt alleen een statistieksamenvatting (geen foto’s) als jij die inschakelt. Zie Privacy & gegevens voor details.",
     "gotIt": "Begrepen"
   },
   "privacy": {

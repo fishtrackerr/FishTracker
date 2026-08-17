@@ -8,6 +8,8 @@ import { DialogService } from './dialog.service';
 export class PrivacyWelcomeService {
   private readonly dialog = inject(DialogService);
   private dialogOpen = false;
+  /** Session fallback when localStorage is unavailable (private mode / quota). */
+  private seenInMemory = false;
 
   async maybeShow(): Promise<void> {
     if (this.dialogOpen || this.hasSeen()) {
@@ -30,6 +32,9 @@ export class PrivacyWelcomeService {
   }
 
   private hasSeen(): boolean {
+    if (this.seenInMemory) {
+      return true;
+    }
     try {
       return localStorage.getItem(PRIVACY_WELCOME_SEEN_KEY) === '1';
     } catch {
@@ -38,10 +43,11 @@ export class PrivacyWelcomeService {
   }
 
   private markSeen(): void {
+    this.seenInMemory = true;
     try {
       localStorage.setItem(PRIVACY_WELCOME_SEEN_KEY, '1');
     } catch {
-      // Ignore quota / private-mode failures; dialog may reappear next visit.
+      // Persist for this JS session via seenInMemory; may reappear after a full reload.
     }
   }
 }

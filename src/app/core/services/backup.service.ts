@@ -1,12 +1,17 @@
 import { Injectable, inject } from '@angular/core';
 import { db } from '../db/fish-db';
 import {
+  ASSISTANT_PROMPT_DESCRIPTION_MAX_LENGTH,
+  ASSISTANT_PROMPT_MESSAGE_MAX_LENGTH,
+  ASSISTANT_PROMPT_TITLE_MAX_LENGTH,
   BackupData,
   BackupPreview,
   BACKUP_EXPORT_VERSION,
   FishingMode,
+  isUserOptionCategory,
   StoredImage,
   SUPPORTED_BACKUP_VERSIONS,
+  USER_OPTION_VALUE_MAX_LENGTH,
 } from '../models';
 import { DEFAULT_FISHING_MODE, isFishingMode } from '../models/fishing-mode.model';
 import { blobToBase64, base64ToBlob, nowIso } from '../utils';
@@ -30,6 +35,66 @@ const ALLOWED_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 function hasStringId(entry: unknown): boolean {
   return !!entry && typeof entry === 'object' && typeof (entry as { id?: unknown }).id === 'string';
+}
+
+function isNonEmptyString(value: unknown, maxLength: number): value is string {
+  return typeof value === 'string' && value.trim().length > 0 && value.length <= maxLength;
+}
+
+function isOptionalBoundedString(value: unknown, maxLength: number): boolean {
+  return value === undefined || (typeof value === 'string' && value.length <= maxLength);
+}
+
+function assertValidUserOption(entry: unknown): void {
+  if (!hasStringId(entry)) {
+    throw new Error('Invalid backup file: userOption entries must have an id');
+  }
+  const option = entry as {
+    category?: unknown;
+    value?: unknown;
+    fishingMode?: unknown;
+  };
+  if (!isUserOptionCategory(option.category)) {
+    throw new Error('Invalid backup file: userOption category is invalid');
+  }
+  if (!isNonEmptyString(option.value, USER_OPTION_VALUE_MAX_LENGTH)) {
+    throw new Error(
+      `Invalid backup file: userOption value must be 1–${USER_OPTION_VALUE_MAX_LENGTH} characters`,
+    );
+  }
+  if (option.fishingMode !== undefined && !isFishingMode(option.fishingMode)) {
+    throw new Error('Invalid backup file: userOption fishingMode is invalid');
+  }
+}
+
+function assertValidAssistantPrompt(entry: unknown): void {
+  if (!hasStringId(entry)) {
+    throw new Error('Invalid backup file: assistantPrompt entries must have an id');
+  }
+  const prompt = entry as {
+    title?: unknown;
+    description?: unknown;
+    userMessage?: unknown;
+    fishingMode?: unknown;
+  };
+  if (!isNonEmptyString(prompt.title, ASSISTANT_PROMPT_TITLE_MAX_LENGTH)) {
+    throw new Error(
+      `Invalid backup file: assistantPrompt title must be 1–${ASSISTANT_PROMPT_TITLE_MAX_LENGTH} characters`,
+    );
+  }
+  if (!isOptionalBoundedString(prompt.description, ASSISTANT_PROMPT_DESCRIPTION_MAX_LENGTH)) {
+    throw new Error(
+      `Invalid backup file: assistantPrompt description must be at most ${ASSISTANT_PROMPT_DESCRIPTION_MAX_LENGTH} characters`,
+    );
+  }
+  if (!isNonEmptyString(prompt.userMessage, ASSISTANT_PROMPT_MESSAGE_MAX_LENGTH)) {
+    throw new Error(
+      `Invalid backup file: assistantPrompt userMessage must be 1–${ASSISTANT_PROMPT_MESSAGE_MAX_LENGTH} characters`,
+    );
+  }
+  if (prompt.fishingMode !== undefined && !isFishingMode(prompt.fishingMode)) {
+    throw new Error('Invalid backup file: assistantPrompt fishingMode is invalid');
+  }
 }
 
 function ensureMode<T extends { fishingMode?: FishingMode | string }>(
@@ -183,6 +248,12 @@ export class BackupService {
       if (typeof mime === 'string' && mime && !ALLOWED_IMAGE_MIME.has(mime)) {
         throw new Error('Invalid backup file: unsupported image mime type');
       }
+    }
+    for (const option of backup.userOptions ?? []) {
+      assertValidUserOption(option);
+    }
+    for (const prompt of backup.assistantPrompts ?? []) {
+      assertValidAssistantPrompt(prompt);
     }
 
     return {

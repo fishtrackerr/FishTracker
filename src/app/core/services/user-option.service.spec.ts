@@ -5,6 +5,7 @@ describe('UserOptionService', () => {
   let service: UserOptionService;
   let repo: {
     getByCategory: ReturnType<typeof vi.fn>;
+    getByCategoryAll: ReturnType<typeof vi.fn>;
     put: ReturnType<typeof vi.fn>;
     getAll: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
@@ -12,10 +13,12 @@ describe('UserOptionService', () => {
   let sync: { onOptionRenamed: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
+    const defaultOptions = [
+      { id: '1', category: 'bait', value: 'Corn', isFavorite: false, isDefault: true },
+    ];
     repo = {
-      getByCategory: vi.fn().mockResolvedValue([
-        { id: '1', category: 'bait', value: 'Corn', isFavorite: false, isDefault: true },
-      ]),
+      getByCategory: vi.fn().mockResolvedValue(defaultOptions),
+      getByCategoryAll: vi.fn().mockResolvedValue(defaultOptions),
       put: vi.fn(),
       getAll: vi.fn().mockResolvedValue([]),
       delete: vi.fn(),
@@ -46,9 +49,11 @@ describe('UserOptionService', () => {
     repo.getAll.mockResolvedValue([
       { id: '1', category: 'bait', value: 'Corn', isFavorite: false, isDefault: true },
     ]);
-    repo.getByCategory.mockResolvedValue([
+    const options = [
       { id: '1', category: 'bait', value: 'Corn', isFavorite: false, isDefault: true },
-    ]);
+    ];
+    repo.getByCategory.mockResolvedValue(options);
+    repo.getByCategoryAll.mockResolvedValue(options);
 
     const result = await service.rename('1', 'Maize');
 
@@ -62,10 +67,12 @@ describe('UserOptionService', () => {
       { id: '1', category: 'bait', value: 'Corn', isFavorite: true, isDefault: false },
       { id: '2', category: 'bait', value: 'Maize', isFavorite: false, isDefault: true },
     ]);
-    repo.getByCategory.mockResolvedValue([
+    const options = [
       { id: '1', category: 'bait', value: 'Corn', isFavorite: true, isDefault: false },
       { id: '2', category: 'bait', value: 'Maize', isFavorite: false, isDefault: true },
-    ]);
+    ];
+    repo.getByCategory.mockResolvedValue(options);
+    repo.getByCategoryAll.mockResolvedValue(options);
 
     const result = await service.rename('1', 'maize');
 
@@ -79,6 +86,7 @@ describe('UserOptionService', () => {
 
   it('ensureDefaultsForCurrentMode seeds missing defaults across categories', async () => {
     repo.getByCategory.mockResolvedValue([]);
+    repo.getByCategoryAll.mockResolvedValue([]);
     await service.ensureDefaultsForCurrentMode();
     expect(repo.put.mock.calls.length).toBeGreaterThan(20);
     expect(repo.put).toHaveBeenCalledWith(
@@ -92,5 +100,30 @@ describe('UserOptionService', () => {
   it('deleteOption removes by id', async () => {
     await service.deleteOption('opt-1');
     expect(repo.delete).toHaveBeenCalledWith('opt-1');
+  });
+
+  it('rejects option values that exceed the max length', async () => {
+    await expect(service.saveOption('bait', 'x'.repeat(81))).rejects.toThrow(/cannot exceed/);
+  });
+
+  it('revives a soft-deleted option instead of creating a duplicate', async () => {
+    repo.getByCategory.mockResolvedValue([]);
+    repo.getByCategoryAll.mockResolvedValue([
+      {
+        id: 'hidden-1',
+        category: 'bait',
+        value: 'Corn',
+        isFavorite: false,
+        isDefault: false,
+        visible: false,
+      },
+    ]);
+
+    const result = await service.saveOption('bait', 'corn');
+
+    expect(result.id).toBe('hidden-1');
+    expect(repo.put).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'hidden-1', value: 'corn', visible: true }),
+    );
   });
 });

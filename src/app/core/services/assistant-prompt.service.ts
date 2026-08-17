@@ -1,6 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AssistantPrompt } from '../models';
+import {
+  ASSISTANT_PROMPT_DESCRIPTION_MAX_LENGTH,
+  ASSISTANT_PROMPT_MESSAGE_MAX_LENGTH,
+  ASSISTANT_PROMPT_TITLE_MAX_LENGTH,
+  AssistantPrompt,
+} from '../models';
 import { generateId, nowIso } from '../utils';
 import { AssistantPromptRepository } from './assistant-prompt.repository';
 
@@ -27,12 +32,11 @@ export class AssistantPromptService {
   }
 
   async create(input: AssistantPromptInput): Promise<AssistantPrompt> {
+    const fields = this.requireFields(input);
     const now = nowIso();
     const prompt: AssistantPrompt = {
       id: generateId(),
-      title: input.title.trim(),
-      description: input.description.trim(),
-      userMessage: input.userMessage.trim(),
+      ...fields,
       visible: true,
       createdAt: now,
       updatedAt: now,
@@ -46,11 +50,10 @@ export class AssistantPromptService {
     if (!existing) {
       return undefined;
     }
+    const fields = this.requireFields(input);
     const updated: AssistantPrompt = {
       ...existing,
-      title: input.title.trim(),
-      description: input.description.trim(),
-      userMessage: input.userMessage.trim(),
+      ...fields,
       updatedAt: nowIso(),
     };
     await this.repo.put(updated);
@@ -59,5 +62,35 @@ export class AssistantPromptService {
 
   async delete(id: string): Promise<void> {
     await this.repo.delete(id);
+  }
+
+  private requireFields(input: AssistantPromptInput): {
+    title: string;
+    description: string;
+    userMessage: string;
+  } {
+    const title = input.title.trim();
+    const description = input.description.trim();
+    const userMessage = input.userMessage.trim();
+    if (!title) {
+      throw new Error('Prompt title cannot be empty');
+    }
+    if (!userMessage) {
+      throw new Error('Prompt message cannot be empty');
+    }
+    if (title.length > ASSISTANT_PROMPT_TITLE_MAX_LENGTH) {
+      throw new Error(`Prompt title cannot exceed ${ASSISTANT_PROMPT_TITLE_MAX_LENGTH} characters`);
+    }
+    if (description.length > ASSISTANT_PROMPT_DESCRIPTION_MAX_LENGTH) {
+      throw new Error(
+        `Prompt description cannot exceed ${ASSISTANT_PROMPT_DESCRIPTION_MAX_LENGTH} characters`,
+      );
+    }
+    if (userMessage.length > ASSISTANT_PROMPT_MESSAGE_MAX_LENGTH) {
+      throw new Error(
+        `Prompt message cannot exceed ${ASSISTANT_PROMPT_MESSAGE_MAX_LENGTH} characters`,
+      );
+    }
+    return { title, description, userMessage };
   }
 }

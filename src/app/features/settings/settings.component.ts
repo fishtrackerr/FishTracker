@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { firstValueFrom } from 'rxjs';
-import { AssistantPrompt, BackupData, ThemeMode, UserOption, UserOptionCategory, AppLanguage } from '../../core/models';
+import { AssistantPrompt, BackupData, ThemeMode, USER_OPTION_VALUE_MAX_LENGTH, UserOption, UserOptionCategory, AppLanguage } from '../../core/models';
 import { openFeedbackMailto } from '../../core/constants/feedback';
 import { EU_COUNTRIES } from '../../core/constants/eu-countries';
 import { AssistantPromptService } from '../../core/services/assistant-prompt.service';
@@ -337,7 +337,7 @@ export class SettingsComponent implements OnInit {
     if (next == null) {
       return;
     }
-    const trimmed = next.trim();
+    const trimmed = next.trim().slice(0, USER_OPTION_VALUE_MAX_LENGTH);
     if (!trimmed || trimmed === option.value) {
       return;
     }
@@ -356,7 +356,7 @@ export class SettingsComponent implements OnInit {
     if (next == null) {
       return;
     }
-    const trimmed = next.trim();
+    const trimmed = next.trim().slice(0, USER_OPTION_VALUE_MAX_LENGTH);
     if (!trimmed) {
       return;
     }

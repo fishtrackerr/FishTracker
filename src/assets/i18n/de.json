@@ -740,9 +740,9 @@
   },
   "privacyWelcome": {
     "title": "Deine Daten bleiben hier",
-    "lead": "Nichts, was du in Fish Tracker einträgst, wird geteilt.",
-    "body": "Sitzungen, Fänge, Fotos und Notizen bleiben nur auf diesem Gerät. Es gibt keine Konten und kein Cloud-Logbuch für deine Angeldaten.",
-    "note": "Optionale Funktionen wie Wetter können das Netzwerk nutzen, aber deine Fanghistorie wird nie hochgeladen.",
+    "lead": "Dein Angel-Logbuch bleibt standardmäßig auf diesem Gerät.",
+    "body": "Es gibt keine Konten und kein Cloud-Logbuch. Sessions, Fänge, Fotos und Notizen werden lokal gespeichert, es sei denn, du exportierst ein Backup oder nutzt eine optionale Online-Funktion.",
+    "note": "Wetter, Ortssuche und optionale KI können das Netzwerk nutzen. KI sendet nur dann eine Statistik-Zusammenfassung (keine Fotos), wenn du sie aktivierst. Details unter Datenschutz & Daten.",
     "gotIt": "Verstanden"
   },
   "privacy": {

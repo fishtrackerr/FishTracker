@@ -90,6 +90,70 @@ describe('BackupService.validate', () => {
       }),
     ).toThrow(/unsupported image mime type/);
   });
+
+  it('rejects invalid userOptions', () => {
+    expect(() =>
+      service.validate({
+        version: SUPPORTED_BACKUP_VERSIONS[0],
+        sessions: [],
+        catches: [],
+        lakes: [],
+        userOptions: [{ id: 'o1', category: 'not-a-category', value: 'x' }],
+      }),
+    ).toThrow(/userOption category/);
+
+    expect(() =>
+      service.validate({
+        version: SUPPORTED_BACKUP_VERSIONS[0],
+        sessions: [],
+        catches: [],
+        lakes: [],
+        userOptions: [{ id: 'o1', category: 'bait', value: 'x'.repeat(81) }],
+      }),
+    ).toThrow(/userOption value/);
+  });
+
+  it('rejects invalid assistantPrompts', () => {
+    expect(() =>
+      service.validate({
+        version: SUPPORTED_BACKUP_VERSIONS[0],
+        sessions: [],
+        catches: [],
+        lakes: [],
+        assistantPrompts: [{ id: 'p1', title: '', userMessage: 'hi' }],
+      }),
+    ).toThrow(/assistantPrompt title/);
+
+    expect(() =>
+      service.validate({
+        version: SUPPORTED_BACKUP_VERSIONS[0],
+        sessions: [],
+        catches: [],
+        lakes: [],
+        assistantPrompts: [{ id: 'p1', title: 'Ask', userMessage: 'x'.repeat(501) }],
+      }),
+    ).toThrow(/assistantPrompt userMessage/);
+  });
+
+  it('accepts well-formed userOptions and assistantPrompts', () => {
+    const preview = service.validate({
+      version: SUPPORTED_BACKUP_VERSIONS[0],
+      sessions: [],
+      catches: [],
+      lakes: [],
+      userOptions: [{ id: 'o1', category: 'bait', value: 'Corn', fishingMode: 'carper' }],
+      assistantPrompts: [
+        {
+          id: 'p1',
+          title: 'Best bait',
+          description: 'optional',
+          userMessage: 'What bait works best?',
+          fishingMode: 'carper',
+        },
+      ],
+    });
+    expect(preview.sessionCount).toBe(0);
+  });
 });
 
 describe('LlmService.resolveBaseUrl', () => {

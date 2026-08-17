@@ -46,6 +46,15 @@ export class UserOptionRepository extends ModeScopedRepository {
     );
   }
 
+  /** Includes soft-deleted rows (for revive-on-readd). */
+  async getByCategoryAll(category: UserOptionCategory): Promise<UserOption[]> {
+    const mode = this.tryActiveMode();
+    if (!mode) {
+      return [];
+    }
+    return db.userOptions.where('[fishingMode+category]').equals([mode, category]).toArray();
+  }
+
   async getAll(): Promise<UserOption[]> {
     const mode = this.tryActiveMode();
     if (!mode) {

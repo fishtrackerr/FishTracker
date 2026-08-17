@@ -740,9 +740,9 @@
   },
   "privacyWelcome": {
     "title": "Your data stays here",
-    "lead": "Nothing you enter in Fish Tracker is shared.",
-    "body": "Sessions, catches, photos, and notes stay on this device only. There are no accounts and no cloud logbook for your fishing data.",
-    "note": "Optional features like weather may use the network, but your catch history is never uploaded.",
+    "lead": "Your fishing log stays on this device by default.",
+    "body": "There are no accounts and no cloud logbook. Sessions, catches, photos, and notes are stored locally unless you export a backup or use an optional online feature.",
+    "note": "Weather, place lookup, and optional AI may use the network. AI sends a stats summary (not photos) only if you enable it. See Privacy & data for details.",
     "gotIt": "Got it"
   },
   "privacy": {

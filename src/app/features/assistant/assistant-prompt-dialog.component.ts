@@ -8,7 +8,12 @@ import {
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { AssistantPrompt } from '../../core/models';
+import {
+  ASSISTANT_PROMPT_DESCRIPTION_MAX_LENGTH,
+  ASSISTANT_PROMPT_MESSAGE_MAX_LENGTH,
+  ASSISTANT_PROMPT_TITLE_MAX_LENGTH,
+  AssistantPrompt,
+} from '../../core/models';
 import { AssistantPromptInput } from '../../core/services/assistant-prompt.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
@@ -34,17 +39,23 @@ export interface AssistantPromptDialogData {
     <mat-dialog-content>
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'settings.promptTitle' | tr }}</mat-label>
-        <input matInput [(ngModel)]="title" maxlength="80" required />
+        <input matInput [(ngModel)]="title" [maxlength]="titleMax" required />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'settings.promptDescription' | tr }}</mat-label>
-        <input matInput [(ngModel)]="description" maxlength="160" />
+        <input matInput [(ngModel)]="description" [maxlength]="descriptionMax" />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'settings.promptQuestion' | tr }}</mat-label>
-        <textarea matInput rows="3" [(ngModel)]="userMessage" maxlength="500" required></textarea>
+        <textarea
+          matInput
+          rows="3"
+          [(ngModel)]="userMessage"
+          [maxlength]="messageMax"
+          required
+        ></textarea>
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
@@ -75,6 +86,10 @@ export interface AssistantPromptDialogData {
 export class AssistantPromptDialogComponent {
   readonly data = inject<AssistantPromptDialogData>(MAT_DIALOG_DATA);
   private readonly ref = inject(MatDialogRef<AssistantPromptDialogComponent, AssistantPromptInput | undefined>);
+
+  readonly titleMax = ASSISTANT_PROMPT_TITLE_MAX_LENGTH;
+  readonly descriptionMax = ASSISTANT_PROMPT_DESCRIPTION_MAX_LENGTH;
+  readonly messageMax = ASSISTANT_PROMPT_MESSAGE_MAX_LENGTH;
 
   title = this.data.prompt?.title ?? '';
   description = this.data.prompt?.description ?? '';

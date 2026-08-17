@@ -1,15 +1,27 @@
 {
-  "version": "0.0.52",
+  "version": "0.0.53",
   "date": "2026-08-02",
   "sections": [
     {
       "category": "New Features",
       "items": [
-        "implement splash screen handling and update app theme colors"
+        "implement user option management and privacy welcome dialog"
       ]
     }
   ],
   "releases": [
+    {
+      "version": "0.0.53",
+      "date": "2026-08-02",
+      "sections": [
+        {
+          "category": "New Features",
+          "items": [
+            "implement user option management and privacy welcome dialog"
+          ]
+        }
+      ]
+    },
     {
       "version": "0.0.52",
       "date": "2026-08-02",
