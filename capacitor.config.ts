@@ -10,6 +10,13 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https',
   },
+  plugins: {
+    // Capacitor 8 edge-to-edge: index.html uses viewport-fit=cover and pads with
+    // env(safe-area-inset-*); the hint avoids a layout jump while it is detected.
+    SystemBars: {
+      initialViewportFitValueHint: 'cover',
+    },
+  },
 };
 
 export default config;
