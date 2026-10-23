@@ -8,7 +8,7 @@ Defined in `src/app/app.routes.ts`.
 |------|-----------|--------|
 | `/pin/setup` | PinSetupComponent | `pinSetupGuard` |
 | `/pin/unlock` | PinUnlockComponent | `pinUnlockGuard` |
-| `/mode-select` | ModeSelectComponent | `pinLockGuard` |
+| `/mode-select` | ModeSelectComponent | `pinLockGuard`, `modeNotSelectedGuard` (redirects to the unlocked destination once a mode is set) |
 | `/` | DashboardComponent | `pinLockGuard`, `fishingModeGuard` |
 | `/sessions` | SessionsListComponent | `pinLockGuard`, `fishingModeGuard` |
 | `/sessions/active` | ActiveSessionComponent | `pinLockGuard`, `fishingModeGuard`, `activeSessionGuard` |

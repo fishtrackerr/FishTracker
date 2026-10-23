@@ -49,7 +49,8 @@ export class ModeSelectComponent {
       await this.userOptions.ensureDefaultsForCurrentMode();
       const returnUrl = this.startup.consumeReturnUrl();
       const target = await this.startup.resolveUnlockedDestination(returnUrl);
-      await this.router.navigateByUrl(target);
+      // Replace so Back doesn't return to the mode picker.
+      await this.router.navigateByUrl(target, { replaceUrl: true });
     } finally {
       this.selecting.set(false);
     }

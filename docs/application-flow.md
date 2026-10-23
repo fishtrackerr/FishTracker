@@ -15,7 +15,7 @@
 
 ## Fishing mode
 
-1. After PIN unlock, user picks one mode on `/mode-select`: carper, catfish, pike, bass, feeder, or general.
+1. After PIN unlock, user picks one mode on `/mode-select`: carper, catfish, pike, bass, feeder, or general. The picker replaces itself in history and can't be reopened in the same run (`modeNotSelectedGuard`).
 2. Choice is kept in memory and `sessionStorage` (`fish-tracker-fishing-mode`) until the app process restarts (or full application reset). Soft browser refresh keeps the mode.
 3. Lakes, sessions, catches, user options, images, AI chats, and filter presets are scoped to that mode.
 4. PIN, theme, units, language, and AI API key/config remain shared across modes.
@@ -33,7 +33,7 @@
 
 1. User chooses a fishing mode.
 2. `FishingModeService.setMode()` persists the choice and seeds `modePreferences` defaults if needed.
-3. `UserOptionService.ensureDefaultsForCurrentMode()` seeds species/bait/rig options when the mode has none.
+3. `UserOptionService.ensureDefaultsForCurrentMode()` seeds defaults per option category that has never had rows in this mode. Deleted or renamed defaults are not re-added; Settings reset restores them.
 4. Navigation uses `consumeReturnUrl()` then `resolveUnlockedDestination` (preserves deep links stored by the PIN/mode guards or startup, else active session in that mode, else home).
 
 ## Active session flow

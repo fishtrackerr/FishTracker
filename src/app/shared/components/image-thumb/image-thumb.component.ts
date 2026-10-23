@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
 import { ImageService } from '../../../core/services/image.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -61,7 +61,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     }
   `,
 })
-export class ImageThumbComponent implements OnInit {
+export class ImageThumbComponent implements OnChanges {
   private readonly imageService = inject(ImageService);
 
   @Input() imageId?: string;
@@ -74,17 +74,31 @@ export class ImageThumbComponent implements OnInit {
   readonly loading = signal(true);
   readonly fallbackUrl = this.imageService.getPlaceholderUrl();
 
-  async ngOnInit(): Promise<void> {
-    if (this.imageId) {
-      try {
-        const url = await this.imageService.getObjectUrl(this.imageId);
-        this.url.set(url ?? this.imageService.getPlaceholderUrl());
-      } catch {
-        this.url.set(this.imageService.getPlaceholderUrl());
-      }
-    } else {
-      this.url.set(this.imageService.getPlaceholderUrl());
+  /** Guards against an older, slower load overwriting a newer image. */
+  private loadToken = 0;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['imageId']) {
+      void this.loadUrl();
     }
+  }
+
+  private async loadUrl(): Promise<void> {
+    const token = ++this.loadToken;
+    const imageId = this.imageId;
+    let url = this.imageService.getPlaceholderUrl();
+    if (imageId) {
+      this.loading.set(true);
+      try {
+        url = (await this.imageService.getObjectUrl(imageId)) ?? url;
+      } catch {
+        // keep placeholder
+      }
+    }
+    if (token !== this.loadToken) {
+      return;
+    }
+    this.url.set(url);
     this.loading.set(false);
   }
 

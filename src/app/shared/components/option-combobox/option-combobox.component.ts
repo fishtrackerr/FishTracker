@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -59,7 +59,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     .custom-prompt p { margin: 0; flex: 1; font-size: 0.9rem; }
   `,
 })
-export class OptionComboboxComponent {
+export class OptionComboboxComponent implements OnChanges {
   private readonly userOptions = inject(UserOptionService);
 
   @Input({ required: true }) category!: UserOptionCategory;
@@ -72,8 +72,11 @@ export class OptionComboboxComponent {
   readonly showCustomPrompt = signal(false);
   readonly pendingCustom = signal('');
 
-  constructor() {
-    void this.loadOptions();
+  ngOnChanges(changes: SimpleChanges): void {
+    // Inputs are not set yet in the constructor; load once `category` is known.
+    if (changes['category'] && this.category) {
+      void this.loadOptions();
+    }
   }
 
   async loadOptions(): Promise<void> {

@@ -1,3 +1,4 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -55,6 +56,7 @@ describe('QuickCatchDialogComponent', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        { provide: ChangeDetectorRef, useValue: { markForCheck: vi.fn() } },
         {
           provide: MatDialogRef,
           useValue: {

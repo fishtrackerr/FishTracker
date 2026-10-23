@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { pinLockGuard } from './core/guards/pin-lock.guard';
-import { fishingModeGuard } from './core/guards/fishing-mode.guard';
+import { fishingModeGuard, modeNotSelectedGuard } from './core/guards/fishing-mode.guard';
 import { activeSessionGuard } from './core/guards/active-session.guard';
 import { pinSetupGuard } from './core/guards/pin-setup.guard';
 import { pinUnlockGuard } from './core/guards/pin-unlock.guard';
@@ -22,7 +22,7 @@ export const routes: Routes = [
     path: 'mode-select',
     loadComponent: () =>
       import('./features/mode-select/mode-select.component').then((m) => m.ModeSelectComponent),
-    canActivate: [pinLockGuard],
+    canActivate: [pinLockGuard, modeNotSelectedGuard],
   },
   {
     path: '',

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -44,6 +44,7 @@ export class QuickCatchDialogComponent {
   private readonly data = inject<QuickCatchDialogData>(MAT_DIALOG_DATA);
   private readonly fishingMode = inject(FishingModeService);
   private readonly photoPick = inject(PhotoPickService);
+  private readonly cdr = inject(ChangeDetectorRef);
   readonly theme = inject(ThemeService);
 
   readonly rods = (this.data.session.rods ?? []).map((r) => ({
@@ -84,6 +85,7 @@ export class QuickCatchDialogComponent {
 
   async pickPhoto(useCamera: boolean): Promise<void> {
     this.photo = (await this.photoPick.pickImage({ capture: useCamera })) ?? undefined;
+    this.cdr.markForCheck();
   }
 
   save(): void {

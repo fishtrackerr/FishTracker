@@ -33,6 +33,7 @@ export class NotificationService {
     onAction: () => void,
     variant: SnackbarVariant = 'info',
     duration = 0,
+    onDismissWithoutAction?: () => void,
   ): void {
     const config: MatSnackBarConfig = {
       duration,
@@ -42,6 +43,13 @@ export class NotificationService {
     };
     const ref = this.snackBar.open(message, action, config);
     ref.onAction().subscribe(() => onAction());
+    if (onDismissWithoutAction) {
+      ref.afterDismissed().subscribe(({ dismissedByAction }) => {
+        if (!dismissedByAction) {
+          onDismissWithoutAction();
+        }
+      });
+    }
   }
 
   offline(message: string): void {

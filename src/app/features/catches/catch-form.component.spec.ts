@@ -1,3 +1,4 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -93,6 +94,7 @@ describe('CatchFormComponent', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        { provide: ChangeDetectorRef, useValue: { markForCheck: vi.fn() } },
         {
           provide: ActivatedRoute,
           useValue: routeStub,
@@ -159,6 +161,17 @@ describe('CatchFormComponent', () => {
     expect(component.sessionSpotId).toBe('spot-2');
     expect(component.waterTemperatureC).toBe(18.5);
     expect(component.prebait).toBe('Corn');
+  });
+
+  it('refreshes the OnPush view after loading and picking a photo', async () => {
+    const markForCheck = TestBed.inject(ChangeDetectorRef).markForCheck as ReturnType<typeof vi.fn>;
+    const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
+    await component.load();
+    markForCheck.mockClear();
+
+    await component.pickPhoto(false);
+
+    expect(markForCheck).toHaveBeenCalled();
   });
 
   it('defaults to the first rod when no rod query param is set', async () => {

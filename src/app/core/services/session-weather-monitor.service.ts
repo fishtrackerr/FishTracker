@@ -1,7 +1,9 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
-import { Subscription, distinctUntilChanged, filter, skip } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Subscription, distinctUntilChanged, filter, skip, switchMap } from 'rxjs';
 import { FishingSession, WeatherSnapshot, WeatherWarning } from '../models';
 import { ConnectivityService } from './connectivity.service';
+import { FishingModeService } from './fishing-mode.service';
 import { NotificationService } from './notification.service';
 import { SessionEventService } from './session-event.service';
 import { SessionService } from './session.service';
@@ -57,6 +59,13 @@ export class SessionWeatherMonitorService implements OnDestroy {
   private readonly notifications = inject(NotificationService);
   private readonly sessionEvents = inject(SessionEventService);
   private readonly connectivity = inject(ConnectivityService);
+  /**
+   * Re-subscribes when the fishing mode changes: the active-session liveQuery
+   * returns nothing before a mode is chosen and Dexie won't re-run it on its own.
+   */
+  private readonly activeSession$ = toObservable(inject(FishingModeService).selectedMode).pipe(
+    switchMap(() => this.sessionService.watchActive()),
+  );
 
   private started = false;
   private sessionSub?: Subscription;
@@ -72,7 +81,7 @@ export class SessionWeatherMonitorService implements OnDestroy {
       return;
     }
     this.started = true;
-    this.sessionSub = this.sessionService.watchActive().subscribe((session) => {
+    this.sessionSub = this.activeSession$.subscribe((session) => {
       void this.onActiveSession(session);
     });
     this.connectivitySub = this.connectivity.online$

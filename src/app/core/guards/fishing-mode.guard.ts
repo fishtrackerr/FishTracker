@@ -25,3 +25,20 @@ export const fishingModeGuard: CanActivateFn = async (_route, state) => {
   }
   return true;
 };
+
+/**
+ * `/mode-select` is only for the first choice of an app run: once a mode is
+ * set (Back button, typed URL), go to the normal unlocked destination.
+ */
+export const modeNotSelectedGuard: CanActivateFn = async () => {
+  const startup = inject(AppStartupService);
+  const fishingMode = inject(FishingModeService);
+  const router = inject(Router);
+
+  await startup.waitUntilReady();
+
+  if (!fishingMode.hasMode()) {
+    return true;
+  }
+  return router.parseUrl(await startup.resolveUnlockedDestination('/'));
+};

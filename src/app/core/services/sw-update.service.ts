@@ -7,6 +7,7 @@ import { hardReloadApp } from './app-version.service';
 import { I18nService } from './i18n.service';
 import { NotificationService } from './notification.service';
 
+const UPDATE_PROMPT_RESHOW_MS = 10_000;
 const NATIVE_SW_CLEARED_KEY = 'ft.nativeSwCleared';
 
 @Injectable({ providedIn: 'root' })
@@ -52,21 +53,33 @@ export class SwUpdateService {
     }
   }
 
+  /**
+   * VERSION_READY fires once per version, so when another snackbar replaces the
+   * prompt it is shown again shortly after.
+   */
+  private showUpdatePrompt(): void {
+    if (this.updatePromptOpen) {
+      return;
+    }
+    this.updatePromptOpen = true;
+    this.notifier.withAction(
+      this.i18n.t('pwa.updateAvailable'),
+      this.i18n.t('pwa.updateNow'),
+      () => {
+        void this.applyUpdate();
+      },
+      'info',
+      0,
+      () => {
+        this.updatePromptOpen = false;
+        setTimeout(() => this.showUpdatePrompt(), UPDATE_PROMPT_RESHOW_MS);
+      },
+    );
+  }
+
   private handleVersionEvent(event: VersionEvent): void {
     if (event.type === 'VERSION_READY') {
-      if (this.updatePromptOpen) {
-        return;
-      }
-      this.updatePromptOpen = true;
-      this.notifier.withAction(
-        this.i18n.t('pwa.updateAvailable'),
-        this.i18n.t('pwa.updateNow'),
-        () => {
-          void this.applyUpdate();
-        },
-        'info',
-        0,
-      );
+      this.showUpdatePrompt();
       return;
     }
 

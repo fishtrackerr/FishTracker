@@ -97,6 +97,18 @@ describe('UserOptionService', () => {
     );
   });
 
+  it('ensureDefaultsForCurrentMode leaves categories that already have options alone', async () => {
+    // A deleted or renamed default must not come back on the next form load.
+    repo.getByCategoryAll.mockImplementation(async (category: string) =>
+      category === 'bait'
+        ? [{ id: 'b1', category: 'bait', value: 'Sweetcorn', isDefault: true, visible: true }]
+        : [],
+    );
+    await service.ensureDefaultsForCurrentMode();
+    expect(repo.put).not.toHaveBeenCalledWith(expect.objectContaining({ category: 'bait' }));
+    expect(repo.put).toHaveBeenCalledWith(expect.objectContaining({ category: 'method' }));
+  });
+
   it('deleteOption removes by id', async () => {
     await service.deleteOption('opt-1');
     expect(repo.delete).toHaveBeenCalledWith('opt-1');

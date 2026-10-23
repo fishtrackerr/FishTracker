@@ -1,5 +1,15 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Injector,
+  ViewChild,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -51,6 +61,7 @@ export class AssistantComponent {
   private readonly confirm = inject(ConfirmService);
   private readonly i18n = inject(I18nService);
   private readonly llm = inject(LlmService);
+  private readonly injector = inject(Injector);
 
   @ViewChild('messageList') private messageList?: ElementRef<HTMLElement>;
 
@@ -93,7 +104,8 @@ export class AssistantComponent {
       }
       const sub = this.chatService.watchMessages(threadId).subscribe((msgs) => {
         this.messages.set(msgs);
-        queueMicrotask(() => this.scrollToBottom());
+        // Wait until the new messages are rendered before measuring scrollHeight.
+        afterNextRender(() => this.scrollToBottom(), { injector: this.injector });
       });
       onCleanup(() => sub.unsubscribe());
     });

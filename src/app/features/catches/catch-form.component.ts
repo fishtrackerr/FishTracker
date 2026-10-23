@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -40,6 +40,7 @@ export class CatchFormComponent {
   private readonly imageService = inject(ImageService);
   private readonly photoPick = inject(PhotoPickService);
   private readonly userOptions = inject(UserOptionService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   sessionId = this.route.snapshot.paramMap.get('id')!;
   catchId = this.route.snapshot.paramMap.get('catchId');
@@ -80,6 +81,15 @@ export class CatchFormComponent {
   }
 
   async load(): Promise<void> {
+    try {
+      await this.loadForm();
+    } finally {
+      // Plain fields set after awaits: tell the OnPush/zoneless view to refresh.
+      this.cdr.markForCheck();
+    }
+  }
+
+  private async loadForm(): Promise<void> {
     await this.userOptions.ensureDefaultsForCurrentMode();
     this.session = await this.sessionService.getById(this.sessionId);
     if (!this.session) {
@@ -166,6 +176,7 @@ export class CatchFormComponent {
 
   async pickPhoto(useCamera: boolean): Promise<void> {
     this.photo = (await this.photoPick.pickImage({ capture: useCamera })) ?? undefined;
+    this.cdr.markForCheck();
   }
 
   onRodChange(rodId: string): void {

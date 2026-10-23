@@ -71,8 +71,13 @@ export class SecretVaultService {
       return;
     }
 
-    // Prefer session copy if ciphertext missing (e.g. mid-migration).
+    // Ciphertext missing (key changed after an in-tab refresh, or mid-migration):
+    // take the session copy and encrypt it now that the wrap key is known.
     this.restoreFromSession();
+    const pending = this.memoryAiKey();
+    if (pending) {
+      await this.persistEncrypted(pending);
+    }
   }
 
   /** Clear in-memory secrets (call on lock). Does not wipe ciphertext. */
@@ -93,7 +98,14 @@ export class SecretVaultService {
       return;
     }
     if (!this.wrapKey) {
-      // Unlocked via session restore without PIN wrap key — keep ephemeral until next PIN unlock.
+      // Unlocked via session restore without the PIN wrap key: drop the old
+      // ciphertext so the previous key can't come back; the session copy is
+      // encrypted on the next PIN unlock.
+      this.settings.update({
+        aiApiKey: undefined,
+        aiApiKeyEncrypted: undefined,
+        aiApiKeyIv: undefined,
+      });
       return;
     }
     await this.persistEncrypted(trimmed);

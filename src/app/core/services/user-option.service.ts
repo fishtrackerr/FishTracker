@@ -182,16 +182,18 @@ export class UserOptionService {
   }
 
   /**
-   * Seeds missing defaults for every category in the current mode.
-   * Safe to call repeatedly — existing values are left alone.
+   * Seeds defaults for categories that have never had options in the current
+   * mode. Safe to call repeatedly: once a category has rows (even deleted or
+   * renamed defaults), it is left alone; Settings reset restores defaults.
    */
   async ensureDefaultsForCurrentMode(): Promise<void> {
     for (const cat of USER_OPTION_CATEGORIES) {
+      const existing = await this.repo.getByCategoryAll(cat);
+      if (existing.length > 0) {
+        continue;
+      }
       for (const value of this.getDefaultValues(cat)) {
-        const existing = await this.findByValue(cat, value);
-        if (!existing) {
-          await this.saveDefault(cat, value);
-        }
+        await this.saveDefault(cat, value);
       }
     }
   }

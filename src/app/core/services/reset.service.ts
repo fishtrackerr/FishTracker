@@ -113,6 +113,9 @@ export class ResetService {
       pinSalt,
       pinEnabled,
       modePreferences,
+      // The vault's in-memory wrap key is derived from this salt; dropping it
+      // would make the next saved AI key undecryptable after a restart.
+      aiKeySalt: current.aiKeySalt,
     });
     await this.vault.clearAiApiKey();
     this.resetFilters();

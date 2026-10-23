@@ -26,6 +26,8 @@ After **5** consecutive failed unlock attempts, a lockout is applied starting at
 
 On successful unlock, `SecretVaultService.unlockWithPin()` derives an AES-GCM wrapping key from the PIN and decrypts the AI API key into memory (and a tab-scoped sessionStorage copy for in-tab refresh). `lock()` clears both.
 
+After an in-tab refresh only the plaintext comes back (not the wrap key). Changing the key then removes the old ciphertext, and the new key is encrypted on the next PIN unlock in that tab. "Reset all settings" keeps `aiKeySalt` so the in-memory wrap key stays valid.
+
 ## Auto-lock
 
 Inactivity checked every 30 seconds. Activity tracked on pointer and keyboard events. On tab visibility → visible, inactivity is checked **before** refreshing activity so backgrounded tabs still lock.
