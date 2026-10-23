@@ -13,7 +13,7 @@ import { AssistantPrompt, BackupData, ThemeMode, USER_OPTION_VALUE_MAX_LENGTH, U
 import { openFeedbackMailto } from '../../core/constants/feedback';
 import { EU_COUNTRIES } from '../../core/constants/eu-countries';
 import { AssistantPromptService } from '../../core/services/assistant-prompt.service';
-import { BackupService } from '../../core/services/backup.service';
+import { BackupService, BackupSaveCancelledError } from '../../core/services/backup.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { DemoDataService } from '../../core/services/demo-data.service';
 import { FishingModeService } from '../../core/services/fishing-mode.service';
@@ -190,14 +190,22 @@ export class SettingsComponent implements OnInit {
     this.pinLock.lock();
   }
 
-  async exportBackup(): Promise<void> {
+  /** Exports and saves a backup file. Returns false when nothing was saved. */
+  async exportBackup(): Promise<boolean> {
     this.exporting.set(true);
     try {
       const data = await this.backupService.export();
-      this.backupService.downloadJson(data);
+      await this.backupService.saveToFile(data);
       this.message.set(this.i18n.t('messages.backupExported'));
-    } catch {
-      this.message.set(this.i18n.t('messages.exportFailed'));
+      return true;
+    } catch (error) {
+      if (error instanceof BackupSaveCancelledError) {
+        this.message.set(this.i18n.t('messages.exportCancelled'));
+      } else {
+        console.error('[Settings] backup export failed', error);
+        this.message.set(this.i18n.t('messages.exportFailed'));
+      }
+      return false;
     } finally {
       this.exporting.set(false);
     }
@@ -523,17 +531,18 @@ export class SettingsComponent implements OnInit {
   }
 
   async resetFullApplication(): Promise<void> {
+    const typed = this.fullResetInput().trim();
+    if (typed !== 'RESET') {
+      this.notifications.error(this.i18n.t('messages.fullResetTypeReset'));
+      return;
+    }
     const exportFirst = await this.confirm.confirm({
       title: this.i18n.t('settings.exportBeforeResetTitle'),
       message: this.i18n.t('settings.exportBeforeResetMessage'),
       confirmLabel: this.i18n.t('settings.exportBackupConfirm'),
     });
-    if (exportFirst) {
-      await this.exportBackup();
-    }
-    const typed = this.fullResetInput().trim();
-    if (typed !== 'RESET') {
-      this.notifications.error(this.i18n.t('messages.fullResetTypeReset'));
+    if (exportFirst && !(await this.exportBackup())) {
+      this.notifications.error(this.i18n.t('messages.fullResetExportFailed'));
       return;
     }
     const ok = await this.confirm.confirm({

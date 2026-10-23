@@ -101,7 +101,7 @@ export class SessionStartFlowService {
     try {
       const data = await this.backupService.export();
       const date = new Date().toISOString().slice(0, 10);
-      this.backupService.downloadJson(data, `fish-tracker-pre-session-${date}.json`);
+      await this.backupService.saveToFile(data, `fish-tracker-pre-session-${date}.json`);
       this.notifications.success(this.i18n.t('sessions.backupSaved'));
       return true;
     } catch (error) {

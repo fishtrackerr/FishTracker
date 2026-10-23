@@ -1,4 +1,6 @@
 import { Injectable, inject } from '@angular/core';
+import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import { db } from '../db/fish-db';
 import {
   ASSISTANT_PROMPT_DESCRIPTION_MAX_LENGTH,
@@ -15,6 +17,7 @@ import {
 } from '../models';
 import { DEFAULT_FISHING_MODE, isFishingMode } from '../models/fishing-mode.model';
 import { blobToBase64, base64ToBlob, nowIso } from '../utils';
+import { isNativeApp } from '../utils/platform';
 import { BiteEventRepository } from './bite-event.repository';
 import { AssistantPromptRepository } from './assistant-prompt.repository';
 import { CatchRepository } from './catch.repository';
@@ -32,6 +35,54 @@ import { UserOptionRepository } from './user-option.repository';
 
 const MAX_BACKUP_IMAGES = 5000;
 const ALLOWED_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+/** Backups older than this predate the Dexie v8 carper → catfish move. */
+const FIRST_CATFISH_BACKUP_VERSION = 8;
+/** Characters per Filesystem write on native; keeps each bridge call small. */
+const NATIVE_WRITE_CHUNK = 4 * 1024 * 1024;
+
+/** Thrown when the user closes the share sheet without saving the backup. */
+export class BackupSaveCancelledError extends Error {
+  constructor() {
+    super('Backup save cancelled');
+    this.name = 'BackupSaveCancelledError';
+  }
+}
+
+/**
+ * Serializes a backup as JSON fragments (one per record) so large galleries
+ * never have to fit in a single string.
+ */
+export function serializeBackup(data: BackupData): string[] {
+  const parts: string[] = ['{'];
+  let first = true;
+  for (const [key, value] of Object.entries(data)) {
+    if (value === undefined) {
+      continue;
+    }
+    const prefix = `${first ? '' : ','}${JSON.stringify(key)}:`;
+    first = false;
+    if (Array.isArray(value)) {
+      parts.push(`${prefix}[`);
+      value.forEach((item, index) => {
+        parts.push(`${index === 0 ? '' : ','}${JSON.stringify(item) ?? 'null'}`);
+      });
+      parts.push(']');
+    } else {
+      parts.push(`${prefix}${JSON.stringify(value)}`);
+    }
+  }
+  parts.push('}');
+  return parts;
+}
+
+function defaultBackupFileName(): string {
+  return `fish-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
+}
+
+function isShareCancel(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /cancel/i.test(message);
+}
 
 function hasStringId(entry: unknown): boolean {
   return !!entry && typeof entry === 'object' && typeof (entry as { id?: unknown }).id === 'string';
@@ -97,13 +148,17 @@ function assertValidAssistantPrompt(entry: unknown): void {
   }
 }
 
-function ensureMode<T extends { fishingMode?: FishingMode | string }>(
-  entity: T,
-  fallback: FishingMode = DEFAULT_FISHING_MODE,
-): T & { fishingMode: FishingMode } {
-  return {
-    ...entity,
-    fishingMode: isFishingMode(entity.fishingMode) ? entity.fishingMode : fallback,
+/**
+ * Resolves the mode a backup row is restored into. Pre-v8 backups map
+ * carper/unscoped rows to catfish, matching the Dexie v8 migration.
+ */
+function modeResolver(backupVersion: number): (mode: unknown) => FishingMode {
+  const legacy = backupVersion < FIRST_CATFISH_BACKUP_VERSION;
+  return (mode) => {
+    if (legacy && (mode === 'carper' || !isFishingMode(mode))) {
+      return 'catfish';
+    }
+    return isFishingMode(mode) ? mode : DEFAULT_FISHING_MODE;
   };
 }
 
@@ -157,6 +212,7 @@ export class BackupService {
         createdAt: img.createdAt,
         isFavorite: img.isFavorite,
         isHomepageImage: img.isHomepageImage,
+        visible: img.visible !== false,
       })),
     );
 
@@ -270,16 +326,21 @@ export class BackupService {
 
   async import(data: BackupData): Promise<BackupPreview> {
     const preview = this.validate(data);
+    const resolveMode = modeResolver(data.version);
+    const ensureMode = <T extends { fishingMode?: FishingMode | string }>(
+      entity: T,
+    ): T & { fishingMode: FishingMode } => ({
+      ...entity,
+      fishingMode: resolveMode(entity.fishingMode),
+    });
 
-    // Allow one active session per fishing mode.
+    // Allow one active session per fishing mode (soft-deleted sessions don't count).
     const activeByMode = new Map<string, number>();
     for (const session of data.sessions) {
-      if (session.status !== 'active') {
+      if (session.status !== 'active' || session.visible === false) {
         continue;
       }
-      const mode = isFishingMode(session.fishingMode)
-        ? session.fishingMode
-        : DEFAULT_FISHING_MODE;
+      const mode = resolveMode(session.fishingMode);
       const count = activeByMode.get(mode) ?? 0;
       if (count >= 1) {
         session.status = 'completed';
@@ -360,6 +421,7 @@ export class BackupService {
               createdAt: img.createdAt,
               isFavorite: img.isFavorite ?? false,
               isHomepageImage: img.isHomepageImage ?? false,
+              visible: img.visible !== false,
             }),
           );
         }
@@ -428,16 +490,61 @@ export class BackupService {
     return preview;
   }
 
-  downloadJson(data: BackupData, filename?: string): void {
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: 'application/json',
-    });
+  /**
+   * Saves the backup as a JSON file: a browser download on the web, or a file
+   * in the app cache handed to the Android share sheet in the native app.
+   * Throws {@link BackupSaveCancelledError} when the share sheet is dismissed.
+   */
+  async saveToFile(data: BackupData, filename = defaultBackupFileName()): Promise<void> {
+    const parts = serializeBackup(data);
+    if (isNativeApp()) {
+      await this.saveNative(parts, filename);
+    } else {
+      this.downloadInBrowser(parts, filename);
+    }
+  }
+
+  private downloadInBrowser(parts: string[], filename: string): void {
+    const blob = new Blob(parts, { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download =
-      filename ?? `fish-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = filename;
     a.click();
-    URL.revokeObjectURL(url);
+    // Revoking synchronously can abort the download in some browsers.
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  }
+
+  private async saveNative(parts: string[], filename: string): Promise<void> {
+    const path = `backups/${filename}`;
+    let chunk = '';
+    let written = false;
+    const flush = async (): Promise<void> => {
+      const options = { path, data: chunk, directory: Directory.Cache, encoding: Encoding.UTF8 };
+      if (written) {
+        await Filesystem.appendFile(options);
+      } else {
+        await Filesystem.writeFile({ ...options, recursive: true });
+        written = true;
+      }
+      chunk = '';
+    };
+    for (const part of parts) {
+      chunk += part;
+      if (chunk.length >= NATIVE_WRITE_CHUNK) {
+        await flush();
+      }
+    }
+    await flush();
+
+    const { uri } = await Filesystem.getUri({ path, directory: Directory.Cache });
+    try {
+      await Share.share({ title: filename, files: [uri] });
+    } catch (error) {
+      if (isShareCancel(error)) {
+        throw new BackupSaveCancelledError();
+      }
+      throw error;
+    }
   }
 }

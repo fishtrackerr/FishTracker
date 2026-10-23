@@ -24,6 +24,8 @@ export interface BackupImage {
   createdAt: string;
   isFavorite?: boolean;
   isHomepageImage?: boolean;
+  /** Soft-delete flag; omitted in backups made before it was exported. */
+  visible?: boolean;
 }
 
 export interface BackupData {

@@ -262,6 +262,8 @@
     "pinIncorrect": "Huidige pincode onjuist",
     "backupExported": "Back-up geëxporteerd",
     "exportFailed": "Export mislukt",
+    "exportCancelled": "Export geannuleerd",
+    "fullResetExportFailed": "Volledige reset gestopt: de back-up is niet opgeslagen.",
     "backupRestored": "Back-up succesvol hersteld",
     "importFailed": "Import mislukt — ongeldig back-upbestand",
     "weatherCacheCleared": "Weercache gewist",

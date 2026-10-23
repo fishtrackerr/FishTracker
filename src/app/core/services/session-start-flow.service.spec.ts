@@ -33,7 +33,7 @@ describe('SessionStartFlowService', () => {
   let getActive: ReturnType<typeof vi.fn>;
   let startSession: ReturnType<typeof vi.fn>;
   let exportBackup: ReturnType<typeof vi.fn>;
-  let downloadJson: ReturnType<typeof vi.fn>;
+  let saveToFile: ReturnType<typeof vi.fn>;
   let confirm: ReturnType<typeof vi.fn>;
   let promptAfterSessionCreate: ReturnType<typeof vi.fn>;
   let navigate: ReturnType<typeof vi.fn>;
@@ -46,7 +46,7 @@ describe('SessionStartFlowService', () => {
     getActive = vi.fn().mockResolvedValue(undefined);
     startSession = vi.fn().mockResolvedValue(newSession);
     exportBackup = vi.fn().mockResolvedValue({ version: 6, sessions: [] });
-    downloadJson = vi.fn();
+    saveToFile = vi.fn().mockResolvedValue(undefined);
     confirm = vi.fn();
     promptAfterSessionCreate = vi.fn().mockResolvedValue(newSession);
     navigate = vi.fn().mockResolvedValue(true);
@@ -104,7 +104,7 @@ describe('SessionStartFlowService', () => {
         },
         {
           provide: BackupService,
-          useValue: { export: exportBackup, downloadJson },
+          useValue: { export: exportBackup, saveToFile },
         },
         {
           provide: ConfirmService,
@@ -120,7 +120,7 @@ describe('SessionStartFlowService', () => {
 
     expect(ok).toBe(true);
     expect(exportBackup).toHaveBeenCalledOnce();
-    expect(downloadJson).toHaveBeenCalledWith(
+    expect(saveToFile).toHaveBeenCalledWith(
       expect.anything(),
       expect.stringMatching(/^fish-tracker-pre-session-\d{4}-\d{2}-\d{2}\.json$/),
     );
@@ -142,7 +142,7 @@ describe('SessionStartFlowService', () => {
 
     expect(ok).toBe(true);
     expect(exportBackup).not.toHaveBeenCalled();
-    expect(downloadJson).not.toHaveBeenCalled();
+    expect(saveToFile).not.toHaveBeenCalled();
     expect(promptAfterSessionCreate).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith(['/sessions/active'], {
       queryParams: { id: 's-active' },

@@ -2,8 +2,18 @@
 
 ## When backups are created
 
-- **Settings → Export JSON Backup** — manual download (`fish-tracker-backup-YYYY-MM-DD.json`).
-- **Start Session** — before creating a new fishing session (when none is active **in the current mode**), the app downloads a full backup as `fish-tracker-pre-session-YYYY-MM-DD.json`. If export fails, the user can skip and start anyway, or cancel. Restore remains **Settings → Import JSON Backup**.
+- **Settings → Export JSON Backup** — manual export (`fish-tracker-backup-YYYY-MM-DD.json`).
+- **Start Session** — before creating a new fishing session (when none is active **in the current mode**), the app saves a full backup as `fish-tracker-pre-session-YYYY-MM-DD.json`. If export fails or the share sheet is dismissed, the user can skip and start anyway, or cancel. Restore remains **Settings → Import JSON Backup**.
+- **Full application reset** — optionally exports first. If that export fails or is cancelled, the reset stops.
+
+## Saving the file
+
+`BackupService.saveToFile(data, filename?)`:
+
+- **Web / PWA:** browser download of a `Blob`.
+- **Android app (Capacitor):** writes the file to the app cache (`backups/`) with `@capacitor/filesystem`, then opens the Android share sheet (`@capacitor/share`) so the user can save it to Files, Drive, mail, etc. Dismissing the sheet throws `BackupSaveCancelledError`.
+
+The JSON is built in fragments (`serializeBackup`, one per record, no indentation) so large galleries never have to fit in one string.
 
 ## Export format
 
@@ -11,12 +21,12 @@ JSON file via `BackupService.export()` — exports **all fishing modes** in one 
 
 ```typescript
 interface BackupData {
-  version: number; // current export version: 7
+  version: number; // current export version: 8
   exportedAt: string;
   sessions: FishingSession[];
   catches: Catch[];
   lakes: Lake[];
-  images: BackupImage[]; // base64 encoded blobs; optional fishingMode
+  images: BackupImage[]; // base64 encoded blobs; optional fishingMode and visible
   biteEvents?: BiteEvent[];
   fishSpottedEvents?: FishSpottedEvent[];
   rodSpotHistory?: RodSpotHistory[];
@@ -34,7 +44,7 @@ interface BackupData {
 
 `BackupService.validate()` runs before any write:
 
-- `version` must be in `SUPPORTED_BACKUP_VERSIONS` (4, 5, 6, 7)
+- `version` must be in `SUPPORTED_BACKUP_VERSIONS` (4, 5, 6, 7, 8)
 - `sessions`, `catches`, `lakes` must be arrays; optional collections must be arrays when present
 - Session, catch, lake, and image entries must include a string `id`
 - Image count capped at 5000; mime types limited to `image/jpeg`, `image/png`, `image/webp`
@@ -45,8 +55,10 @@ interface BackupData {
 
 On import:
 
-- Missing `fishingMode` on fishing rows defaults to **`carper`**
-- At most **one active session per fishing mode** (extras completed)
+- Backups **before version 8**: `carper` and missing `fishingMode` restore into **`catfish`** (same as the Dexie v8 migration)
+- Version 8+: missing `fishingMode` defaults to **`carper`**
+- At most **one active session per fishing mode** (extras completed); soft-deleted sessions don't count
+- Soft-deleted images (`visible: false`) stay hidden; older backups without the flag restore as visible
 - Legacy backups without weather history still seed from embedded `session.weather`
 
 ## Image backup

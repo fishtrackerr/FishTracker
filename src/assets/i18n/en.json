@@ -262,6 +262,8 @@
     "pinIncorrect": "Current PIN incorrect",
     "backupExported": "Backup exported",
     "exportFailed": "Export failed",
+    "exportCancelled": "Export cancelled",
+    "fullResetExportFailed": "Full reset stopped: the backup was not saved.",
     "backupRestored": "Backup restored successfully",
     "importFailed": "Import failed — invalid backup file",
     "weatherCacheCleared": "Weather cache cleared",

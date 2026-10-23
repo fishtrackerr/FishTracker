@@ -1,7 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { BackupService } from './backup.service';
-import { BACKUP_EXPORT_VERSION, SUPPORTED_BACKUP_VERSIONS } from '../models';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { BackupService, serializeBackup } from './backup.service';
+import { BackupData, BACKUP_EXPORT_VERSION, SUPPORTED_BACKUP_VERSIONS } from '../models';
+import { db } from '../db/fish-db';
+import { ProfileDocumentRepository } from './profile-document.repository';
+import { ProfileRepository } from './profile.repository';
 import { LlmError, LlmService } from './llm.service';
 import { SecretVaultService } from './secret-vault.service';
 import { SettingsService } from './settings.service';
@@ -177,5 +180,170 @@ describe('LlmService.resolveBaseUrl', () => {
     expect(() => llm.resolveBaseUrl('https://evil.example/v1')).toThrow(LlmError);
     expect(() => llm.resolveBaseUrl('https://evil.api.openai.com/v1')).toThrow(LlmError);
     expect(() => llm.resolveBaseUrl('https://user:pass@api.openai.com/v1')).toThrow(LlmError);
+  });
+});
+
+describe('serializeBackup', () => {
+  it('joins into the same JSON as JSON.stringify', () => {
+    const data = {
+      version: BACKUP_EXPORT_VERSION,
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      sessions: [{ id: 's1', notes: 'a "quoted" note', optional: undefined }],
+      catches: [],
+      lakes: [{ id: 'l1' }, { id: 'l2' }],
+      images: [],
+      profiles: [undefined],
+      profileDocuments: undefined,
+    } as unknown as BackupData;
+
+    const parsed = JSON.parse(serializeBackup(data).join(''));
+
+    expect(parsed).toEqual(JSON.parse(JSON.stringify(data)));
+  });
+});
+
+describe('BackupService export/import', () => {
+  type Row = Record<string, unknown>;
+  const repoMock = () => ({
+    getAllAcrossModes: vi.fn().mockResolvedValue([]),
+    clear: vi.fn().mockResolvedValue(undefined),
+    put: vi.fn().mockResolvedValue(undefined),
+  });
+  let repos: Record<string, ReturnType<typeof repoMock>>;
+  let chatRepo: Record<string, ReturnType<typeof vi.fn>>;
+  let service: BackupService;
+
+  const putRows = (name: string): Row[] => repos[name].put.mock.calls.map(([row]) => row as Row);
+
+  beforeEach(() => {
+    repos = Object.fromEntries(
+      [
+        'session',
+        'catch',
+        'lake',
+        'image',
+        'bite',
+        'spotted',
+        'rodSpot',
+        'sessionEvent',
+        'weather',
+        'option',
+        'prompt',
+      ].map((name) => [name, repoMock()]),
+    );
+    chatRepo = {
+      getAllThreadsAcrossModes: vi.fn().mockResolvedValue([]),
+      getAllMessagesAcrossModes: vi.fn().mockResolvedValue([]),
+      clear: vi.fn().mockResolvedValue(undefined),
+      putThread: vi.fn().mockResolvedValue(undefined),
+      putMessage: vi.fn().mockResolvedValue(undefined),
+    };
+    vi.spyOn(db, 'transaction').mockImplementation(((...args: unknown[]) =>
+      (args[args.length - 1] as () => Promise<unknown>)()) as never);
+    vi.spyOn(db.profiles, 'clear').mockResolvedValue(undefined as never);
+    vi.spyOn(db.profileDocuments, 'clear').mockResolvedValue(undefined as never);
+
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: ProfileRepository, useValue: { get: vi.fn(), put: vi.fn() } },
+        { provide: ProfileDocumentRepository, useValue: { getAll: vi.fn(), put: vi.fn() } },
+      ],
+    });
+    service = TestBed.runInInjectionContext(
+      () =>
+        new BackupService(
+          repos['session'] as never,
+          repos['catch'] as never,
+          repos['lake'] as never,
+          repos['image'] as never,
+          repos['bite'] as never,
+          repos['spotted'] as never,
+          repos['rodSpot'] as never,
+          repos['sessionEvent'] as never,
+          repos['weather'] as never,
+          repos['option'] as never,
+          chatRepo as never,
+          repos['prompt'] as never,
+        ),
+    );
+  });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  const backup = (version: number, extra: Partial<BackupData> = {}): BackupData =>
+    ({ version, exportedAt: '', sessions: [], catches: [], lakes: [], images: [], ...extra }) as BackupData;
+
+  const image = (id: string, visible?: boolean) => ({
+    id,
+    fishingMode: 'catfish',
+    type: 'catch',
+    mimeType: 'image/jpeg',
+    data: 'AAAA',
+    thumbnail: 'AAAA',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    visible,
+  });
+
+  it('exports the soft-delete flag of images', async () => {
+    repos['image'].getAllAcrossModes.mockResolvedValue([
+      { id: 'i1', blob: new Blob(['a']), thumbnailBlob: new Blob(['a']) },
+      { id: 'i2', blob: new Blob(['a']), thumbnailBlob: new Blob(['a']), visible: false },
+    ]);
+
+    const data = await service.export();
+
+    expect(data.images.map((img) => img.visible)).toEqual([true, false]);
+  });
+
+  it('keeps deleted images hidden on restore', async () => {
+    await service.import(
+      backup(BACKUP_EXPORT_VERSION, {
+        images: [image('i1'), image('i2', false)] as BackupData['images'],
+      }),
+    );
+
+    expect(putRows('image').map((row) => row['visible'])).toEqual([true, false]);
+  });
+
+  it('restores pre-v8 carper and unscoped rows into catfish', async () => {
+    await service.import(
+      backup(7, {
+        sessions: [
+          { id: 's1', fishingMode: 'carper' },
+          { id: 's2' },
+          { id: 's3', fishingMode: 'pike' },
+        ] as BackupData['sessions'],
+      }),
+    );
+
+    expect(putRows('session').map((row) => row['fishingMode'])).toEqual([
+      'catfish',
+      'catfish',
+      'pike',
+    ]);
+  });
+
+  it('keeps carper rows in carper for current backups', async () => {
+    await service.import(
+      backup(BACKUP_EXPORT_VERSION, {
+        sessions: [{ id: 's1', fishingMode: 'carper' }] as BackupData['sessions'],
+      }),
+    );
+
+    expect(putRows('session')[0]['fishingMode']).toBe('carper');
+  });
+
+  it('does not let a deleted active session demote the real one', async () => {
+    await service.import(
+      backup(BACKUP_EXPORT_VERSION, {
+        sessions: [
+          { id: 'deleted', fishingMode: 'pike', status: 'active', visible: false },
+          { id: 'real', fishingMode: 'pike', status: 'active' },
+        ] as BackupData['sessions'],
+      }),
+    );
+
+    const real = putRows('session').find((row) => row['id'] === 'real');
+    expect(real?.['status']).toBe('active');
   });
 });

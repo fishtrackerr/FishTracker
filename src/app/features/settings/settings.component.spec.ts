@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 import { SettingsComponent } from './settings.component';
 import { SettingsService } from '../../core/services/settings.service';
-import { BackupService } from '../../core/services/backup.service';
+import { BackupService, BackupSaveCancelledError } from '../../core/services/backup.service';
 import { PinLockService } from '../../core/services/pin-lock.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { ThemeService } from '../../core/services/theme.service';
@@ -73,7 +73,7 @@ describe('SettingsComponent', () => {
           provide: BackupService,
           useValue: {
             export: vi.fn(),
-            downloadJson: vi.fn(),
+            saveToFile: vi.fn().mockResolvedValue(undefined),
             import: vi.fn(),
           },
         },
@@ -221,6 +221,68 @@ describe('SettingsComponent', () => {
           useValue: { navigateByUrl: vi.fn() },
         },
       ],
+    });
+  });
+
+  describe('resetFullApplication', () => {
+    function setup(confirmAnswers: boolean[]) {
+      const confirm = TestBed.inject(ConfirmService).confirm as ReturnType<typeof vi.fn>;
+      confirmAnswers.forEach((answer) => confirm.mockResolvedValueOnce(answer));
+      const backup = TestBed.inject(BackupService);
+      vi.mocked(backup.export).mockResolvedValue({} as never);
+      const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+      component.fullResetInput.set('RESET');
+      return { component, confirm, backup, reset: TestBed.inject(ResetService) };
+    }
+
+    it('asks nothing when RESET was not typed', async () => {
+      const { component, confirm, reset } = setup([]);
+      component.fullResetInput.set('reset?');
+
+      await component.resetFullApplication();
+
+      expect(confirm).not.toHaveBeenCalled();
+      expect(reset.resetFullApplication).not.toHaveBeenCalled();
+    });
+
+    it('stops when the requested backup could not be saved', async () => {
+      const { component, backup, reset } = setup([true, true]);
+      vi.mocked(backup.saveToFile).mockRejectedValueOnce(new Error('disk full'));
+
+      await component.resetFullApplication();
+
+      expect(reset.resetFullApplication).not.toHaveBeenCalled();
+      expect(TestBed.inject(NotificationService).error).toHaveBeenCalledWith(
+        'messages.fullResetExportFailed',
+      );
+    });
+
+    it('stops when the share sheet is dismissed', async () => {
+      const { component, backup, reset } = setup([true, true]);
+      vi.mocked(backup.saveToFile).mockRejectedValueOnce(new BackupSaveCancelledError());
+
+      await component.resetFullApplication();
+
+      expect(reset.resetFullApplication).not.toHaveBeenCalled();
+      expect(component.message()).toBe('messages.exportCancelled');
+    });
+
+    it('resets after a saved backup and the final confirm', async () => {
+      const { component, backup, reset } = setup([true, true]);
+
+      await component.resetFullApplication();
+
+      expect(backup.saveToFile).toHaveBeenCalledTimes(1);
+      expect(reset.resetFullApplication).toHaveBeenCalledTimes(1);
+    });
+
+    it('resets without a backup when export is declined', async () => {
+      const { component, backup, reset } = setup([false, true]);
+
+      await component.resetFullApplication();
+
+      expect(backup.saveToFile).not.toHaveBeenCalled();
+      expect(reset.resetFullApplication).toHaveBeenCalledTimes(1);
     });
   });
 
