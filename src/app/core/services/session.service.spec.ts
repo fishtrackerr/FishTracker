@@ -104,6 +104,34 @@ describe('SessionService.start', () => {
     expect(sessionRepo.put).toHaveBeenCalledOnce();
   });
 
+  it('creates rods on the chosen session spot and stores the prebait', async () => {
+    const spot = { id: 'ss-1', name: 'Point', visible: true };
+
+    const session = await service.start({
+      name: 'With rods',
+      startDate: '2026-07-15T08:00:00.000Z',
+      rodCount: 1,
+      sessionSpots: [spot],
+      rodSpotId: 'ss-1',
+      prebait: ' Boilies ',
+    });
+
+    expect(session.sessionSpots).toEqual([spot]);
+    expect(session.rods?.map((r) => r.sessionSpotId)).toEqual(['ss-1']);
+    expect(session.prebait).toBe('Boilies');
+  });
+
+  it('ignores a rod spot id that is not one of the session spots', async () => {
+    const session = await service.start({
+      name: 'Unknown spot',
+      startDate: '2026-07-15T08:00:00.000Z',
+      rodCount: 1,
+      rodSpotId: 'ghost',
+    });
+
+    expect(session.rods?.[0].sessionSpotId).toBeUndefined();
+  });
+
   it('creates session with lake', async () => {
     const session = await service.start({
       name: 'Lake Session',

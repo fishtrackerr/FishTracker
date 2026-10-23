@@ -55,8 +55,6 @@ When an active session exists for the current mode, startup may route `/` to `/s
 
 Paths like `/sessions/:id`, `/settings`, `/lakes/:id` are preserved when unlocked unless the app is locked. After mode select, the stored return URL is restored when valid. Entities belonging to another fishing mode are not returned by repositories (`getById` / `watchById`).
 
-`/sessions/:id` also supports the query `setupRods=1` to enable a first-run rod setup mode after starting a new session.
-
 `/sessions` displays current/history sections when active data exists; `/sessions/active` remains the focused live-session screen.
 
 ## PIN unlock redirect

@@ -46,7 +46,7 @@ Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hard
 - Form fields inside dialogs use shared Material overrides (`--border-primary` outline, `--text-secondary` labels)
 - Cancel actions use stroked buttons; primary/confirm actions use filled (`--cta`) buttons
 - Single text input (add/rename option, preset name): `promptForText(dialogService, data)` opens `TextPromptDialogComponent` and resolves to the trimmed value or `undefined`. Do not use `window.prompt`
-- Bottom sheets (e.g. mobile filters) should include `themed-bottom-sheet` plus `theme-dark|theme-light` and a themed backdrop class, matching `DialogService`
+- Bottom sheets (e.g. mobile filters) should include `themed-bottom-sheet` plus `theme-dark|theme-light` and a themed backdrop class, matching `DialogService`. Use `themedBottomSheetConfig(resolvedTheme, data)` (`shared/utils/themed-bottom-sheet.ts`) instead of repeating the class lists (filter sheet, start-session sheet)
 
 ## Shared components
 

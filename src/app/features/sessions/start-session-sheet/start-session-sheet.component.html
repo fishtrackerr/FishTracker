@@ -1,0 +1,125 @@
+<div class="sheet">
+  <div class="sheet-header">
+    <h3>{{ 'startSheet.title' | tr }}</h3>
+    <button mat-button type="button" (click)="close()">{{ 'common.close' | tr }}</button>
+  </div>
+
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>{{ 'startSheet.lake' | tr }}</mat-label>
+    <mat-select
+      [value]="lakeId()"
+      (selectionChange)="onLakeChange($event.value)"
+      [panelClass]="selectPanelClass"
+    >
+      <mat-option value="">{{ 'common.none' | tr }}</mat-option>
+      @for (lake of data.lakes; track lake.id) {
+        <mat-option [value]="lake.id">
+          @if (lake.isFavorite) {
+            <mat-icon class="inline-icon" aria-hidden="true">star</mat-icon>
+          }
+          {{ lake.name }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <div class="field-row">
+    <span class="field-label" id="start-sheet-rods">{{ 'startSheet.rods' | tr }}</span>
+    <div class="stepper" role="group" aria-labelledby="start-sheet-rods">
+      <button
+        mat-stroked-button
+        type="button"
+        class="step-btn rods-decrease"
+        [attr.aria-label]="'startSheet.rodsDecrease' | tr"
+        [disabled]="rodCount() <= 1"
+        (click)="decrementRods()"
+      >
+        <mat-icon aria-hidden="true">remove</mat-icon>
+      </button>
+      <span class="stepper-value" aria-live="polite">{{ rodCount() }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        class="step-btn rods-increase"
+        [attr.aria-label]="'startSheet.rodsIncrease' | tr"
+        [disabled]="rodCount() >= data.maxRodCount"
+        (click)="incrementRods()"
+      >
+        <mat-icon aria-hidden="true">add</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <span class="field-label" id="start-sheet-swim">{{ 'startSheet.swim' | tr }}</span>
+    <div class="chips" role="group" aria-labelledby="start-sheet-swim">
+      @for (spot of lakeSpots(); track spot.id) {
+        <button
+          type="button"
+          class="chip spot-chip"
+          [class.selected]="swim()?.lakeSpotId === spot.id"
+          [attr.aria-pressed]="swim()?.lakeSpotId === spot.id"
+          (click)="toggleSpot(spot)"
+        >
+          {{ spot.name }}
+        </button>
+      }
+      @if (swim()?.newName; as newName) {
+        <button
+          type="button"
+          class="chip new-swim-chip selected"
+          aria-pressed="true"
+          (click)="swim.set(undefined)"
+        >
+          {{ newName }}
+        </button>
+      }
+      <button type="button" class="chip add-chip" (click)="addSwim()">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        {{ 'startSheet.newSwim' | tr }}
+      </button>
+    </div>
+  </div>
+
+  <button
+    type="button"
+    class="more-toggle"
+    [attr.aria-expanded]="moreOpen()"
+    (click)="moreOpen.set(!moreOpen())"
+  >
+    <mat-icon aria-hidden="true">{{ moreOpen() ? 'expand_less' : 'expand_more' }}</mat-icon>
+    {{ 'startSheet.moreOptions' | tr }}
+  </button>
+
+  @if (moreOpen()) {
+    <div class="more">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'sessionEdit.sessionName' | tr }}</mat-label>
+        <input matInput [ngModel]="name" (ngModelChange)="onNameChange($event)" required />
+      </mat-form-field>
+      @if (!name.trim()) {
+        <p class="field-error">{{ 'sessionEdit.nameRequired' | tr }}</p>
+      }
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'sessionEdit.startDateTime' | tr }}</mat-label>
+        <input matInput type="datetime-local" [(ngModel)]="startDateLocal" required />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'sessionDetail.prebait' | tr }}</mat-label>
+        <input matInput [(ngModel)]="prebait" />
+      </mat-form-field>
+    </div>
+  }
+
+  <div class="sheet-actions">
+    <button
+      mat-flat-button
+      type="button"
+      class="start-btn"
+      [disabled]="!canStart()"
+      (click)="start()"
+    >
+      {{ 'startSheet.start' | tr }}
+    </button>
+  </div>
+</div>

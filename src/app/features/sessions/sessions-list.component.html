@@ -42,9 +42,15 @@
   </app-expandable-section>
 </div>
 
-<button mat-flat-button class="start-btn" type="button" (click)="startSession()" [disabled]="starting()">
-  {{ starting() ? ('sessions.starting' | tr) : ('sessions.startSession' | tr) }}
-</button>
+@if (currentSession()) {
+  <button mat-flat-button class="start-btn continue-btn" type="button" (click)="continueSession()">
+    {{ 'sessions.continueSession' | tr }}
+  </button>
+} @else {
+  <button mat-flat-button class="start-btn" type="button" (click)="startSession()" [disabled]="starting()">
+    {{ starting() ? ('sessions.starting' | tr) : ('sessions.startSession' | tr) }}
+  </button>
+}
 
 @if (!showCurrentSession() && historySessions().length === 0) {
   <app-empty-state

@@ -38,9 +38,9 @@
 
 ## Active session flow
 
-1. Start session from dashboard or sessions list (create dialog). Only one **active** session per fishing mode.
-2. `SessionService.start()` creates active session with optional GPS/weather/cover (stamped with current `fishingMode`).
-3. User lands on `/sessions/active` with timer, weather, catch list, Quick Catch.
+1. Start session from dashboard or sessions list: one bottom sheet (lake, rods stepper, optional swim, more options) → optional pre-session backup. Only one **active** session per fishing mode; while one is active both screens show **Continue session** (`/sessions/active`) instead of Start.
+2. `SessionService.start()` creates the active session with its rods, session spot and optional GPS/weather/cover (stamped with current `fishingMode`).
+3. The user lands on `/sessions/:id` (session detail); `/sessions/active` shows the live view with timer, weather, catch list, Quick Catch.
 4. End session via **End Session** → `SessionService.complete()`.
 
 ## Add catch flow

@@ -356,15 +356,13 @@
     "backupFailedMessage": "Kon geen back-up op dit apparaat opslaan. Sessie starten zonder back-up? Je kunt later nog herstellen via Instellingen → Importeren als je een eerdere file hebt.",
     "backupSkippedTitle": "Back-up niet opgeslagen",
     "backupSkippedMessage": "Het deelmenu is gesloten, dus er is geen back-up opgeslagen. Sessie starten zonder back-up?",
-    "startWithoutBackup": "Starten zonder back-up"
+    "startWithoutBackup": "Starten zonder back-up",
+    "continueSession": "Sessie hervatten"
   },
   "sessionDetail": {
     "prebait": "Voorvoeren",
     "rodsAndSpots": "Hengels en stekken",
     "moreInfoRodsSpots": "Meer info - Hengels en stekken",
-    "rodSetupTitle": "Hengeldetails instellen",
-    "rodSetupMessage": "Vul aas, rig, notities en actieve status per hengel in voordat je naar de actieve sessieweergave gaat.",
-    "finishRodSetup": "Hengelsetup afronden",
     "rods": "hengels",
     "active": "actief",
     "bites": "beten",
@@ -683,14 +681,6 @@
     "deletePreset": "Preset verwijderen",
     "apply": "Toepassen"
   },
-  "rodSetup": {
-    "title": "Hengels instellen",
-    "introNew": "Hoeveel hengels gebruik je voor deze sessie?",
-    "introExisting": "Deze sessie heeft nog geen hengels. Hoeveel hengels gebruik je?",
-    "defaultSpotOptional": "Standaardstek (optioneel)",
-    "skipForNow": "Nu overslaan",
-    "setUp": "Instellen"
-  },
   "weather": {
     "cachedOffline": "Gecachte / offline gegevens",
     "feelsLike": "Voelt als",
@@ -891,5 +881,18 @@
       "catchLocation": "vanglocatie",
       "session": "sessie"
     }
+  },
+  "startSheet": {
+    "title": "Start met vissen",
+    "lake": "Water",
+    "rods": "Hengels",
+    "rodsDecrease": "Minder hengels",
+    "rodsIncrease": "Meer hengels",
+    "swim": "Stek (optioneel)",
+    "newSwim": "Nieuwe stek",
+    "newSwimTitle": "Nieuwe stek",
+    "newSwimLabel": "Naam van de stek",
+    "moreOptions": "Meer opties",
+    "start": "Start met vissen"
   }
 }

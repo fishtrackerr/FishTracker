@@ -15,7 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
-import { map, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { SessionService } from '../../core/services/session.service';
 import { CatchService } from '../../core/services/catch.service';
 import { LakeService } from '../../core/services/lake.service';
@@ -89,10 +89,6 @@ export class SessionDetailComponent {
   readonly catches = toSignal(
     this.route.paramMap.pipe(switchMap((p) => this.catchService.watchBySession(p.get('id')!))),
     { initialValue: [] },
-  );
-  readonly setupRodsMode = toSignal(
-    this.route.queryParamMap.pipe(map((params) => params.get('setupRods') === '1')),
-    { initialValue: false },
   );
 
   readonly lakeName = signal('');
@@ -262,16 +258,6 @@ export class SessionDetailComponent {
       await this.sessionService.complete(s.id);
       await this.router.navigate(['/sessions']);
     }
-  }
-
-  async finishRodSetup(): Promise<void> {
-    const s = this.session();
-    if (!s) {
-      return;
-    }
-    await this.router.navigate(['/sessions/active'], {
-      queryParams: { id: s.id },
-    });
   }
 
   spotName(sessionSpotId?: string): string {

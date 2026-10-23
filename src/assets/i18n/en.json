@@ -356,15 +356,13 @@
     "backupFailedMessage": "Could not save a backup to this device. Start the session without a backup? You can still restore from Settings → Import if you have an earlier file.",
     "backupSkippedTitle": "Backup not saved",
     "backupSkippedMessage": "The share sheet was closed, so no backup was saved. Start the session without a backup?",
-    "startWithoutBackup": "Start without backup"
+    "startWithoutBackup": "Start without backup",
+    "continueSession": "Continue session"
   },
   "sessionDetail": {
     "prebait": "Prebait",
     "rodsAndSpots": "Rods and spots",
     "moreInfoRodsSpots": "More info - Rods & Spots",
-    "rodSetupTitle": "Set up rod details",
-    "rodSetupMessage": "Add bait, rig, notes, and active status for each rod before switching to the active session view.",
-    "finishRodSetup": "Finish rod setup",
     "rods": "rods",
     "active": "active",
     "bites": "bites",
@@ -683,14 +681,6 @@
     "deletePreset": "Delete preset",
     "apply": "Apply"
   },
-  "rodSetup": {
-    "title": "Set up rods",
-    "introNew": "How many rods are you using for this session?",
-    "introExisting": "This session has no rods yet. How many rods are you using?",
-    "defaultSpotOptional": "Default spot (optional)",
-    "skipForNow": "Skip for now",
-    "setUp": "Set up"
-  },
   "weather": {
     "cachedOffline": "Cached / offline data",
     "feelsLike": "Feels like",
@@ -891,5 +881,18 @@
       "catchLocation": "catch location",
       "session": "session"
     }
+  },
+  "startSheet": {
+    "title": "Start fishing",
+    "lake": "Lake",
+    "rods": "Rods",
+    "rodsDecrease": "Fewer rods",
+    "rodsIncrease": "More rods",
+    "swim": "Swim (optional)",
+    "newSwim": "New swim",
+    "newSwimTitle": "New swim",
+    "newSwimLabel": "Swim name",
+    "moreOptions": "More options",
+    "start": "Start fishing"
   }
 }

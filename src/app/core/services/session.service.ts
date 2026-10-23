@@ -31,6 +31,9 @@ export interface StartSessionOptions {
   lakeId?: string;
   rodCount?: number;
   sessionSpots?: SessionSpot[];
+  prebait?: string;
+  /** Id of one of `sessionSpots`; every created rod starts on this spot. */
+  rodSpotId?: string;
 }
 
 export interface UpdateSessionOptions {
@@ -119,13 +122,17 @@ export class SessionService {
     const now = nowIso();
     const sessionId = generateId();
     const maxRodCount = this.settings.get().maxRodCount ?? 10;
-    const rods =
+    const rodSpotId = sessionSpots?.some((spot) => spot.id === options.rodSpotId)
+      ? options.rodSpotId
+      : undefined;
+    const rods = (
       options.rodCount != null
         ? this.rodService.createRodRecords(
             sessionId,
             Math.min(Math.max(1, options.rodCount), maxRodCount),
           )
-        : [];
+        : []
+    ).map((rod) => (rodSpotId ? { ...rod, sessionSpotId: rodSpotId } : rod));
 
     let latitude: number | undefined;
     let longitude: number | undefined;
@@ -154,6 +161,7 @@ export class SessionService {
           ? this.i18n.t('sessions.defaultNameAtLake', { lake: lake.name })
           : this.i18n.t('sessions.defaultName')),
       lakeId,
+      prebait: options.prebait?.trim() || undefined,
       status: 'active' as const,
       startDate,
       latitude,

@@ -18,6 +18,8 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
 import { FilterPanelComponent } from '../../shared/components/filter-panel/filter-panel.component';
 import { FilterSheetComponent } from '../../shared/components/filter-panel/filter-sheet.component';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
+import { themedBottomSheetConfig } from '../../shared/utils/themed-bottom-sheet';
+import { Router } from '@angular/router';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
@@ -46,6 +48,7 @@ export class SessionsListComponent {
   private readonly searchService = inject(SearchService);
   private readonly filterService = inject(FilterService);
   private readonly sessionStartFlow = inject(SessionStartFlowService);
+  private readonly router = inject(Router);
   private readonly bottomSheet = inject(MatBottomSheet);
   private readonly theme = inject(ThemeService);
   readonly selectPanelClass = this.theme.getSelectPanelClass();
@@ -106,21 +109,22 @@ export class SessionsListComponent {
   }
 
   openMobileFilters(): void {
-    const themeClass = this.theme.resolvedTheme() === 'dark' ? 'theme-dark' : 'theme-light';
-    const backdropThemeClass =
-      this.theme.resolvedTheme() === 'dark' ? 'theme-backdrop-dark' : 'theme-backdrop-light';
-    const ref = this.bottomSheet.open(FilterSheetComponent, {
-      data: { filter: this.activeFilter() },
-      panelClass: ['themed-bottom-sheet', themeClass],
-      // MatBottomSheetConfig types this as string, but CDK Overlay accepts string[]
-      // and a space-separated string throws in classList.add.
-      backdropClass: ['themed-backdrop', backdropThemeClass] as unknown as string,
-    });
+    const ref = this.bottomSheet.open(
+      FilterSheetComponent,
+      themedBottomSheetConfig(this.theme.resolvedTheme(), { filter: this.activeFilter() }),
+    );
     ref.afterDismissed().subscribe((result: StatisticsFilter | undefined) => {
       if (result) {
         this.onFilterChange(result);
       }
     });
+  }
+
+  continueSession(): void {
+    const current = this.currentSession();
+    if (current) {
+      void this.router.navigate(['/sessions/active'], { queryParams: { id: current.id } });
+    }
   }
 
   async startSession(): Promise<void> {

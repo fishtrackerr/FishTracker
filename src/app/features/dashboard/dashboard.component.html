@@ -20,13 +20,13 @@
 } @else if (loading()) {
   <app-loading-state />
 } @else {
-  <button mat-flat-button class="start-btn" (click)="startSession()" [disabled]="starting() || loading()">
-    {{ starting() ? ('dashboard.starting' | tr) : ('dashboard.startSession' | tr) }}
-  </button>
-
   @if (activeSession(); as active) {
-    <button mat-stroked-button class="continue-btn" (click)="continueSession()">
+    <button mat-flat-button class="start-btn continue-btn" (click)="continueSession()">
       {{ 'dashboard.continueActive' | tr: { count: active.catchCount } }}
+    </button>
+  } @else {
+    <button mat-flat-button class="start-btn" (click)="startSession()" [disabled]="starting() || loading()">
+      {{ starting() ? ('dashboard.starting' | tr) : ('dashboard.startSession' | tr) }}
     </button>
   }
 

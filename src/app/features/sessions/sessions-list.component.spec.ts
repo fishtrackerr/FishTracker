@@ -1,3 +1,4 @@
+import { Component, input } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
@@ -9,12 +10,19 @@ import { FilterService } from '../../core/services/filter.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { LakeService } from '../../core/services/lake.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { RodSetupFlowService } from '../../core/services/rod-setup-flow.service';
 import { SearchService } from '../../core/services/search.service';
 import { SessionService } from '../../core/services/session.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { ThemeService } from '../../core/services/theme.service';
+import { SessionCardComponent } from '../../shared/components/session-card/session-card.component';
 import { SessionsListComponent } from './sessions-list.component';
+
+@Component({ selector: 'app-session-card', standalone: true, template: '' })
+class StubSessionCardComponent {
+  readonly session = input<unknown>();
+  readonly lakeName = input<string>();
+  readonly defaultExpanded = input<boolean>();
+}
 
 describe('SessionsListComponent', () => {
   const sessions$ = new BehaviorSubject<FishingSession[]>([]);
@@ -64,6 +72,8 @@ describe('SessionsListComponent', () => {
           provide: I18nService,
           useValue: {
             t: vi.fn((key: string) => key),
+            language: () => 'en',
+            dictionary: () => ({}),
           },
         },
         {
@@ -74,12 +84,6 @@ describe('SessionsListComponent', () => {
           provide: DialogService,
           useValue: {
             open: vi.fn(),
-          },
-        },
-        {
-          provide: RodSetupFlowService,
-          useValue: {
-            promptAfterSessionCreate: vi.fn(),
           },
         },
         {
@@ -204,5 +208,59 @@ describe('SessionsListComponent', () => {
         panelClass: ['themed-bottom-sheet', 'theme-dark'],
       }),
     );
+  });
+
+  const activeSession = {
+    id: 'active-1',
+    name: 'Current Session',
+    status: 'active',
+    startDate: '2026-07-23T08:00:00.000Z',
+    photoIds: [],
+    catchCount: 0,
+    totalCatchWeightKg: 0,
+    createdAt: '2026-07-23T08:00:00.000Z',
+    updatedAt: '2026-07-23T08:00:00.000Z',
+  } as FishingSession;
+
+  function renderedButtons(): { start: HTMLElement | null; continueBtn: HTMLElement | null } {
+    // Session cards need router providers that are irrelevant to the button under test.
+    TestBed.overrideComponent(SessionsListComponent, {
+      remove: { imports: [SessionCardComponent] },
+      add: { imports: [StubSessionCardComponent] },
+    });
+    const fixture = TestBed.createComponent(SessionsListComponent);
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    return {
+      start: root.querySelector('button.start-btn:not(.continue-btn)'),
+      continueBtn: root.querySelector('button.continue-btn'),
+    };
+  }
+
+  it('offers Start session when no session is active', () => {
+    const { start, continueBtn } = renderedButtons();
+
+    expect(start?.textContent).toContain('sessions.startSession');
+    expect(continueBtn).toBeNull();
+  });
+
+  it('offers Continue session instead of Start when a session is active', () => {
+    sessions$.next([activeSession]);
+
+    const { start, continueBtn } = renderedButtons();
+
+    expect(start).toBeNull();
+    expect(continueBtn?.textContent).toContain('sessions.continueSession');
+  });
+
+  it('continues the active session on /sessions/active', () => {
+    sessions$.next([activeSession]);
+    const component = createComponent();
+
+    component.continueSession();
+
+    expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/sessions/active'], {
+      queryParams: { id: 'active-1' },
+    });
   });
 });
