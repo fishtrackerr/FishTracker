@@ -66,7 +66,7 @@ export function defaultValuesForCategory(
   mode: FishingMode,
 ): string[] {
   const prefs = MODE_DEFAULT_PREFERENCES[mode];
-  let base: string[] = [];
+  let base: string[];
   switch (category) {
     case 'species':
       base = prefs.favoriteSpecies;
