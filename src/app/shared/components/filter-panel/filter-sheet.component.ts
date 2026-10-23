@@ -1,4 +1,4 @@
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { FilterPanelComponent } from '../filter-panel/filter-panel.component';
@@ -19,16 +19,13 @@ export interface FilterSheetData {
         <h3>{{ 'filters.title' | tr }}</h3>
         <button mat-button type="button" (click)="close()">{{ 'common.close' | tr }}</button>
       </div>
-      <app-filter-panel
-        [filter]="data.filter"
-        [compact]="true"
-        (filterChange)="onChange($event)"
-      />
+      <app-filter-panel [filter]="data.filter" [compact]="true" (filterChange)="onChange($event)" />
       <div class="sheet-actions">
         <button mat-flat-button type="button" (click)="apply()">{{ 'filters.apply' | tr }}</button>
       </div>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .sheet {
       padding: var(--spacing-md);
@@ -49,8 +46,12 @@ export interface FilterSheetData {
       flex: 1;
       color: var(--primary);
     }
-    .sheet-actions { margin-top: var(--spacing-md); }
-    .sheet-actions button { width: 100%; }
+    .sheet-actions {
+      margin-top: var(--spacing-md);
+    }
+    .sheet-actions button {
+      width: 100%;
+    }
   `,
 })
 export class FilterSheetComponent {

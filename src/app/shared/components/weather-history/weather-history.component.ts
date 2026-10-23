@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal, ChangeDetectionStrategy } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,9 +18,7 @@ const PREVIEW_LIMIT = 5;
   template: `
     @if (history().length > 1) {
       <section class="weather-history app-card">
-        <h3 class="section-title">
-          {{ 'weatherHistory.title' | tr }} ({{ history().length }})
-        </h3>
+        <h3 class="section-title">{{ 'weatherHistory.title' | tr }} ({{ history().length }})</h3>
         <ul class="history-list">
           @for (record of visibleHistory(); track record.id) {
             <li
@@ -31,7 +29,7 @@ const PREVIEW_LIMIT = 5;
               <div class="row">
                 <span class="temp">{{ record.weather.temperatureC | formatTemp }}</span>
                 <span class="desc">{{ record.weather.description }}</span>
-                <span class="time">{{ record.capturedAt | date:'short' }}</span>
+                <span class="time">{{ record.capturedAt | date: 'short' }}</span>
               </div>
               @if (selectedId() === record.id) {
                 <div class="details">
@@ -59,6 +57,7 @@ const PREVIEW_LIMIT = 5;
       </section>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .weather-history {
       margin-top: var(--spacing-md);
@@ -133,13 +132,9 @@ export class WeatherHistoryComponent {
   readonly history = toSignal(
     toObservable(this.sessionId).pipe(
       switchMap((id) =>
-        id
-          ? this.sessionWeather.watchBySession(id)
-          : of([] as SessionWeatherRecord[]),
+        id ? this.sessionWeather.watchBySession(id) : of([] as SessionWeatherRecord[]),
       ),
-      map((records) =>
-        [...records].sort((a, b) => b.capturedAt.localeCompare(a.capturedAt)),
-      ),
+      map((records) => [...records].sort((a, b) => b.capturedAt.localeCompare(a.capturedAt))),
     ),
     { initialValue: [] as SessionWeatherRecord[] },
   );
@@ -152,9 +147,7 @@ export class WeatherHistoryComponent {
     return all.slice(0, PREVIEW_LIMIT);
   });
 
-  readonly showMoreLink = computed(
-    () => !this.showAll() && this.history().length > PREVIEW_LIMIT,
-  );
+  readonly showMoreLink = computed(() => !this.showAll() && this.history().length > PREVIEW_LIMIT);
 
   toggle(id: string): void {
     this.selectedId.update((current) => (current === id ? null : id));

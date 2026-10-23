@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import {
@@ -35,14 +35,27 @@ import {
       <p>{{ 'releaseNotes.empty' | tr }}</p>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .release-notes {
       margin-bottom: var(--spacing-md);
     }
-    .release-notes h2 { text-align: center; color: var(--text-primary); }
-    .date { text-align: center; color: var(--text-muted); }
-    h3 { color: var(--text-primary); margin-top: var(--spacing-md); }
-    li { color: var(--text-secondary); margin-bottom: var(--spacing-xs); }
+    .release-notes h2 {
+      text-align: center;
+      color: var(--text-primary);
+    }
+    .date {
+      text-align: center;
+      color: var(--text-muted);
+    }
+    h3 {
+      color: var(--text-primary);
+      margin-top: var(--spacing-md);
+    }
+    li {
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-xs);
+    }
   `,
 })
 export class ReleaseNotesComponent implements OnInit {

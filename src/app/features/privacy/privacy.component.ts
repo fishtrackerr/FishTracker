@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
@@ -55,6 +55,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
       <p>{{ 'privacy.controlBody' | tr }}</p>
     </section>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .privacy-section {
       margin-bottom: var(--spacing-md);

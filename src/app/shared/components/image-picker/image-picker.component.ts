@@ -1,4 +1,4 @@
-import { Component, Input, output, inject } from '@angular/core';
+import { Component, Input, output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ImageService } from '../../../core/services/image.service';
 import { ImageType } from '../../../core/models';
@@ -21,6 +21,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       </button>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .picker {
       display: flex;

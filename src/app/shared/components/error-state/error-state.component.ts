@@ -1,4 +1,4 @@
-import { Component, Input, output } from '@angular/core';
+import { Component, Input, output, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -10,10 +10,13 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     <div class="error-state">
       <p class="message">{{ message | tr }}</p>
       @if (showRetry) {
-        <button mat-stroked-button type="button" (click)="retry.emit()">{{ 'common.retry' | tr }}</button>
+        <button mat-stroked-button type="button" (click)="retry.emit()">
+          {{ 'common.retry' | tr }}
+        </button>
       }
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .error-state {
       text-align: center;

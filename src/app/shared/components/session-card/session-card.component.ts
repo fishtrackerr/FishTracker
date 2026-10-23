@@ -9,6 +9,7 @@ import {
   output,
   inject,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -52,11 +53,13 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
               <p class="row lake">🌊 {{ lakeName }}</p>
             }
             <div class="badges">
-              <span class="badge" [class]="session.status">{{ ('sessionStatus.' + session.status) | tr }}</span>
+              <span class="badge" [class]="session.status">{{
+                'sessionStatus.' + session.status | tr
+              }}</span>
               @if (session.catchCount > 0) {
                 <span
                   class="badge catches"
-                  [attr.aria-label]="('sessionCard.catchesBadge' | tr: { count: session.catchCount })"
+                  [attr.aria-label]="'sessionCard.catchesBadge' | tr: { count: session.catchCount }"
                 >
                   🐟 {{ session.catchCount }}
                 </span>
@@ -67,17 +70,22 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
         <div class="card-body">
           <p class="row datetime">
-            {{ 'sessionCard.start' | tr }} {{ session.startDate | date:'d MMMM y, HH:mm' }}
+            {{ 'sessionCard.start' | tr }} {{ session.startDate | date: 'd MMMM y, HH:mm' }}
           </p>
           <p class="row duration">{{ 'sessionCard.duration' | tr }} {{ durationText() }}</p>
 
           <div class="stats-primary">
             <span>{{ 'sessionCard.catches' | tr }} {{ session.catchCount }}</span>
             @if (session.biggestFishKg) {
-              <span>{{ 'sessionCard.biggest' | tr }} {{ session.biggestFishKg | formatWeight }}</span>
+              <span
+                >{{ 'sessionCard.biggest' | tr }} {{ session.biggestFishKg | formatWeight }}</span
+              >
             }
             @if (session.totalCatchWeightKg > 0) {
-              <span>{{ 'sessionCard.total' | tr }} {{ session.totalCatchWeightKg | formatWeight }}</span>
+              <span
+                >{{ 'sessionCard.total' | tr }}
+                {{ session.totalCatchWeightKg | formatWeight }}</span
+              >
             }
           </div>
 
@@ -92,24 +100,39 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
               <div expandHeader class="expand-label">{{ 'sessionCard.moreInformation' | tr }}</div>
               <div class="more-info-body">
                 @if (session.weather?.temperatureC != null) {
-                  <p class="row">{{ 'sessionCard.temperature' | tr }} {{ session.weather!.temperatureC }}°C</p>
+                  <p class="row">
+                    {{ 'sessionCard.temperature' | tr }} {{ session.weather!.temperatureC }}°C
+                  </p>
                 }
                 @if (session.notes) {
                   <p class="row notes">{{ session.notes }}</p>
                 }
-                <p class="row muted">{{ 'sessionCard.updated' | tr }} {{ session.updatedAt | date:'medium' }}</p>
+                <p class="row muted">
+                  {{ 'sessionCard.updated' | tr }} {{ session.updatedAt | date: 'medium' }}
+                </p>
               </div>
             </app-expandable-section>
           </div>
 
           <div class="actions" data-no-expand>
             @if (session.status === 'active') {
-              <button mat-flat-button type="button" class="btn-primary" (click)="onContinue($event)">
+              <button
+                mat-flat-button
+                type="button"
+                class="btn-primary"
+                (click)="onContinue($event)"
+              >
                 {{ 'common.continue' | tr }}
               </button>
             }
-            <button mat-stroked-button type="button" (click)="onEdit($event)">{{ 'common.edit' | tr }}</button>
-            <a mat-stroked-button [routerLink]="['/sessions', session.id]" (click)="$event.stopPropagation()">
+            <button mat-stroked-button type="button" (click)="onEdit($event)">
+              {{ 'common.edit' | tr }}
+            </button>
+            <a
+              mat-stroked-button
+              [routerLink]="['/sessions', session.id]"
+              (click)="$event.stopPropagation()"
+            >
               {{ 'sessionCard.details' | tr }}
             </a>
           </div>
@@ -117,6 +140,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       </app-expandable-section>
     </article>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .session-card {
       display: flex;
@@ -325,9 +349,7 @@ export class SessionCardComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private tickDuration(): void {
-    this.durationText.set(
-      formatDuration(this.sessionService.getDurationMs(this.session)),
-    );
+    this.durationText.set(formatDuration(this.sessionService.getDurationMs(this.session)));
   }
 
   private stopDurationTicker(): void {

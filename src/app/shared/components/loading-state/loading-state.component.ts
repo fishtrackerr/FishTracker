@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
@@ -11,6 +11,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       <p>{{ message | tr }}</p>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .loading-state {
       text-align: center;
@@ -27,7 +28,9 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
   `,
 })

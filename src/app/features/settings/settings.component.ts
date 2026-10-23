@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -8,10 +8,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { firstValueFrom } from 'rxjs';
-import { AssistantPrompt, BackupData, ThemeMode, USER_OPTION_VALUE_MAX_LENGTH, UserOption, UserOptionCategory, AppLanguage } from '../../core/models';
+import {
+  AssistantPrompt,
+  BackupData,
+  ThemeMode,
+  USER_OPTION_VALUE_MAX_LENGTH,
+  UserOption,
+  UserOptionCategory,
+  AppLanguage,
+} from '../../core/models';
 import { openFeedbackMailto } from '../../core/constants/feedback';
 import { EU_COUNTRIES } from '../../core/constants/eu-countries';
-import { AssistantPromptInput, AssistantPromptService } from '../../core/services/assistant-prompt.service';
+import {
+  AssistantPromptInput,
+  AssistantPromptService,
+} from '../../core/services/assistant-prompt.service';
 import { BackupService, BackupSaveCancelledError } from '../../core/services/backup.service';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { DialogService } from '../../core/services/dialog.service';
@@ -59,6 +70,7 @@ const MAX_BACKUP_FILE_BYTES = 50 * 1024 * 1024;
     TranslatePipe,
   ],
   templateUrl: './settings.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './settings.component.css',
 })
 export class SettingsComponent implements OnInit {
@@ -89,7 +101,9 @@ export class SettingsComponent implements OnInit {
   readonly aiApiKey = this.vault.aiApiKey;
   readonly supportedLanguages = this.i18n.supportedLanguages;
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
-  readonly customPrompts = toSignal(this.assistantPrompts.watchAll(), { initialValue: [] as AssistantPrompt[] });
+  readonly customPrompts = toSignal(this.assistantPrompts.watchAll(), {
+    initialValue: [] as AssistantPrompt[],
+  });
   readonly selectPanelClass = this.theme.getSelectPanelClass();
   readonly countryOptions = EU_COUNTRIES;
   readonly message = signal('');
@@ -137,7 +151,10 @@ export class SettingsComponent implements OnInit {
     await this.reloadManagedOptions();
   }
 
-  updateUnits(field: 'weightUnit' | 'lengthUnit' | 'temperatureUnit' | 'distanceUnit', value: string): void {
+  updateUnits(
+    field: 'weightUnit' | 'lengthUnit' | 'temperatureUnit' | 'distanceUnit',
+    value: string,
+  ): void {
     this.settingsService.update({ [field]: value });
   }
 
@@ -186,7 +203,9 @@ export class SettingsComponent implements OnInit {
       return;
     }
     const ok = await this.pinLock.changePin(this.oldPin, this.newPin);
-    this.message.set(ok ? this.i18n.t('messages.pinChanged') : this.i18n.t('messages.pinIncorrect'));
+    this.message.set(
+      ok ? this.i18n.t('messages.pinChanged') : this.i18n.t('messages.pinIncorrect'),
+    );
     this.oldPin = this.newPin = this.confirmPin = '';
   }
 

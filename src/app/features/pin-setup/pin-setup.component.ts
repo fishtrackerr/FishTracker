@@ -1,4 +1,4 @@
-import { Component, PLATFORM_ID, inject, signal } from '@angular/core';
+import { Component, PLATFORM_ID, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +13,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
   standalone: true,
   imports: [MatButtonModule, TranslatePipe],
   templateUrl: './pin-setup.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './pin.component.css',
 })
 export class PinSetupComponent {

@@ -1,5 +1,13 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -58,6 +66,7 @@ import { I18nService } from '../../core/services/i18n.service';
     TranslatePipe,
   ],
   templateUrl: './session-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './session-detail.component.css',
 })
 export class SessionDetailComponent {
@@ -73,20 +82,14 @@ export class SessionDetailComponent {
   private readonly i18n = inject(I18nService);
 
   readonly session = toSignal(
-    this.route.paramMap.pipe(
-      switchMap((p) => this.sessionService.watchById(p.get('id')!)),
-    ),
+    this.route.paramMap.pipe(switchMap((p) => this.sessionService.watchById(p.get('id')!))),
   );
   readonly catches = toSignal(
-    this.route.paramMap.pipe(
-      switchMap((p) => this.catchService.watchBySession(p.get('id')!)),
-    ),
+    this.route.paramMap.pipe(switchMap((p) => this.catchService.watchBySession(p.get('id')!))),
     { initialValue: [] },
   );
   readonly setupRodsMode = toSignal(
-    this.route.queryParamMap.pipe(
-      map((params) => params.get('setupRods') === '1'),
-    ),
+    this.route.queryParamMap.pipe(map((params) => params.get('setupRods') === '1')),
     { initialValue: false },
   );
 
@@ -289,7 +292,10 @@ export class SessionDetailComponent {
   async deleteSession(): Promise<void> {
     const s = this.session();
     if (!s) return;
-    const ok = await this.confirm.confirmDelete(this.i18n.t('sessionDetail.deleteSessionQuestion'), s.name);
+    const ok = await this.confirm.confirmDelete(
+      this.i18n.t('sessionDetail.deleteSessionQuestion'),
+      s.name,
+    );
     if (ok) {
       await this.sessionService.delete(s.id);
       this.notify.success(this.i18n.t('sessionDetail.sessionDeleted'));

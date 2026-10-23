@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,12 +11,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 @Component({
   selector: 'app-weather-history-page',
   standalone: true,
-  imports: [
-    PageTitleComponent,
-    WeatherHistoryComponent,
-    MatButtonModule,
-    TranslatePipe,
-  ],
+  imports: [PageTitleComponent, WeatherHistoryComponent, MatButtonModule, TranslatePipe],
   template: `
     <app-page-title title="weatherHistory.pageTitle" />
     @if (sessionId(); as id) {
@@ -26,6 +21,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
       </button>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .back-btn {
       width: 100%;
@@ -37,10 +33,9 @@ export class WeatherHistoryPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
 
-  readonly sessionId = toSignal(
-    this.route.paramMap.pipe(map((params) => params.get('id') ?? '')),
-    { initialValue: '' },
-  );
+  readonly sessionId = toSignal(this.route.paramMap.pipe(map((params) => params.get('id') ?? '')), {
+    initialValue: '',
+  });
 
   goBack(): void {
     this.location.back();

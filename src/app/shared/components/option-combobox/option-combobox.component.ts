@@ -1,4 +1,14 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,7 +41,9 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelect($event.option.value)">
         @for (option of filteredOptions(); track option.id) {
           <mat-option [value]="option.value">
-            @if (option.isFavorite) { ★ }
+            @if (option.isFavorite) {
+              ★
+            }
             {{ option.value }}
           </mat-option>
         }
@@ -41,13 +53,20 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     @if (showCustomPrompt()) {
       <div class="custom-prompt app-card">
         <p>{{ 'options.noMatch' | tr: { value: pendingCustom() } }}</p>
-        <button mat-stroked-button type="button" (click)="useOnce()">{{ 'options.useOnce' | tr }}</button>
-        <button mat-flat-button type="button" (click)="saveAsOption()">{{ 'options.saveAsOption' | tr }}</button>
+        <button mat-stroked-button type="button" (click)="useOnce()">
+          {{ 'options.useOnce' | tr }}
+        </button>
+        <button mat-flat-button type="button" (click)="saveAsOption()">
+          {{ 'options.saveAsOption' | tr }}
+        </button>
       </div>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
-    .full { width: 100%; }
+    .full {
+      width: 100%;
+    }
     .custom-prompt {
       display: flex;
       flex-wrap: wrap;
@@ -56,7 +75,11 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       margin-bottom: var(--spacing-md);
       padding: var(--spacing-sm) var(--spacing-md);
     }
-    .custom-prompt p { margin: 0; flex: 1; font-size: 0.9rem; }
+    .custom-prompt p {
+      margin: 0;
+      flex: 1;
+      font-size: 0.9rem;
+    }
   `,
 })
 export class OptionComboboxComponent implements OnChanges {

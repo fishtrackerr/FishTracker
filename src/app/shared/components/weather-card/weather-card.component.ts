@@ -1,5 +1,13 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input, effect, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  Input,
+  effect,
+  inject,
+  input,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { FormatTempPipe } from '../../../core/pipes/format-units.pipe';
 import { WeatherService } from '../../../core/services/weather.service';
@@ -37,20 +45,25 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
             <span>{{ 'weather.feelsLike' | tr }} {{ w.feelsLikeC | formatTemp }}</span>
           }
           @if (w.tempMinC != null && w.tempMaxC != null) {
-            <span>{{ 'weather.minMax' | tr }} {{ w.tempMinC | formatTemp }} – {{ w.tempMaxC | formatTemp }}</span>
+            <span
+              >{{ 'weather.minMax' | tr }} {{ w.tempMinC | formatTemp }} –
+              {{ w.tempMaxC | formatTemp }}</span
+            >
           }
           <span>💨 {{ w.windSpeedKmh }} km/h</span>
-          @if (w.windGustKmh) { <span>{{ 'weather.gusts' | tr }} {{ w.windGustKmh }} km/h</span> }
+          @if (w.windGustKmh) {
+            <span>{{ 'weather.gusts' | tr }} {{ w.windGustKmh }} km/h</span>
+          }
           <span>🌡 {{ w.airPressureHpa }} hPa</span>
           <span>💧 {{ w.humidity }}%</span>
           @if (w.rainProbability != null) {
             <span>{{ 'weather.rain' | tr }} {{ w.rainProbability }}%</span>
           }
           @if (w.sunrise) {
-            <span>🌅 {{ w.sunrise | date:'shortTime' }}</span>
+            <span>🌅 {{ w.sunrise | date: 'shortTime' }}</span>
           }
           @if (w.sunset) {
-            <span>🌇 {{ w.sunset | date:'shortTime' }}</span>
+            <span>🌇 {{ w.sunset | date: 'shortTime' }}</span>
           }
           <span>🌙 {{ w.moonPhase }}</span>
         </div>
@@ -59,7 +72,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
             <h4>{{ 'weather.dailyForecast' | tr }}</h4>
             @for (day of w.daily!.slice(0, 5); track day.date) {
               <div class="forecast-row">
-                <span>{{ day.date | date:'EEE' }}</span>
+                <span>{{ day.date | date: 'EEE' }}</span>
                 <span>{{ day.tempMinC | formatTemp }} – {{ day.tempMaxC | formatTemp }}</span>
                 <span>{{ day.precipitationProbability }}%</span>
               </div>
@@ -76,11 +89,14 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       <div class="weather-card unavailable">
         {{ 'weather.unavailable' | tr }}
         @if (showRefresh) {
-          <button mat-stroked-button type="button" (click)="refresh()">{{ 'common.retry' | tr }}</button>
+          <button mat-stroked-button type="button" (click)="refresh()">
+            {{ 'common.retry' | tr }}
+          </button>
         }
       </div>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .weather-card {
       background: var(--background-card);
@@ -116,7 +132,9 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       font-weight: 700;
       color: var(--primary);
     }
-    .desc { color: var(--text-muted); }
+    .desc {
+      color: var(--text-muted);
+    }
     .location {
       margin: 0 0 var(--spacing-sm);
       font-size: 0.85rem;
@@ -129,8 +147,13 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       font-size: 0.8rem;
       color: var(--text-muted);
     }
-    .forecast { margin-top: var(--spacing-md); }
-    .forecast h4 { margin: 0 0 var(--spacing-sm); color: var(--text-primary); }
+    .forecast {
+      margin-top: var(--spacing-md);
+    }
+    .forecast h4 {
+      margin: 0 0 var(--spacing-sm);
+      color: var(--text-primary);
+    }
     .forecast-row {
       display: flex;
       justify-content: space-between;
@@ -141,7 +164,10 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       color: var(--text-muted);
       text-align: center;
     }
-    .refresh-btn { margin-top: var(--spacing-md); width: 100%; }
+    .refresh-btn {
+      margin-top: var(--spacing-md);
+      width: 100%;
+    }
   `,
 })
 export class WeatherCardComponent {

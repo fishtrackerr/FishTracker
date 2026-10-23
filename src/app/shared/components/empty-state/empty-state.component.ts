@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
@@ -12,6 +12,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       <p>{{ message | tr }}</p>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .empty {
       text-align: center;

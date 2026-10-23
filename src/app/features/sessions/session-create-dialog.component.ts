@@ -1,11 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -61,7 +57,9 @@ export interface SessionCreateDialogData {
           <mat-option value="">{{ 'common.none' | tr }}</mat-option>
           @for (lake of data.lakes; track lake.id) {
             <mat-option [value]="lake.id">
-              @if (lake.isFavorite) { ⭐ }
+              @if (lake.isFavorite) {
+                ⭐
+              }
               {{ lake.name }}
             </mat-option>
           }
@@ -70,25 +68,30 @@ export interface SessionCreateDialogData {
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-stroked-button mat-dialog-close type="button">{{ 'common.cancel' | tr }}</button>
-      <button
-        mat-flat-button
-        type="button"
-        [disabled]="!canSave() || saving()"
-        (click)="save()"
-      >
+      <button mat-flat-button type="button" [disabled]="!canSave() || saving()" (click)="save()">
         {{ saving() ? ('dashboard.starting' | tr) : ('sessions.startSession' | tr) }}
       </button>
     </mat-dialog-actions>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     :host {
       display: block;
       color: var(--text-primary);
       background: var(--background-card);
     }
-    .dialog-title { text-align: center; width: 100%; }
-    .full { width: 100%; }
-    .field-error { color: var(--danger, #d64545); font-size: 0.85rem; margin: -8px 0 8px; }
+    .dialog-title {
+      text-align: center;
+      width: 100%;
+    }
+    .full {
+      width: 100%;
+    }
+    .field-error {
+      color: var(--danger, #d64545);
+      font-size: 0.85rem;
+      margin: -8px 0 8px;
+    }
     mat-dialog-content {
       color: var(--text-primary);
     }
@@ -96,7 +99,9 @@ export interface SessionCreateDialogData {
 })
 export class SessionCreateDialogComponent {
   readonly data = inject<SessionCreateDialogData>(MAT_DIALOG_DATA);
-  private readonly ref = inject(MatDialogRef<SessionCreateDialogComponent, SessionCreateResult | undefined>);
+  private readonly ref = inject(
+    MatDialogRef<SessionCreateDialogComponent, SessionCreateResult | undefined>,
+  );
   private readonly i18n = inject(I18nService);
   private readonly theme = inject(ThemeService);
 

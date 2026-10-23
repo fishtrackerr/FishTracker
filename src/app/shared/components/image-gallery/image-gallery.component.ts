@@ -10,6 +10,7 @@ import {
   signal,
   inject,
   viewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ImageService } from '../../../core/services/image.service';
@@ -41,7 +42,13 @@ export interface GalleryImageItem extends StoredImage {
             (click)="openViewer(item, $event)"
           >
             @if (item.url) {
-              <img [src]="item.url" [alt]="item.fileName" class="thumb" (error)="setFallbackForItem(item)" loading="lazy" />
+              <img
+                [src]="item.url"
+                [alt]="item.fileName"
+                class="thumb"
+                (error)="setFallbackForItem(item)"
+                loading="lazy"
+              />
             } @else {
               <span class="thumb-pending" aria-hidden="true"></span>
             }
@@ -89,15 +96,27 @@ export interface GalleryImageItem extends StoredImage {
         (click)="closeViewer()"
         (keydown.escape)="closeViewer()"
       >
-        <img [src]="viewerUrl()!" [alt]="'gallery.fullPreview' | tr" (error)="onViewerError()" (click)="$event.stopPropagation()" />
+        <img
+          [src]="viewerUrl()!"
+          [alt]="'gallery.fullPreview' | tr"
+          (error)="onViewerError()"
+          (click)="$event.stopPropagation()"
+        />
         <div class="viewer-nav" (click)="$event.stopPropagation()">
-          <button mat-stroked-button type="button" (click)="prev()">{{ 'common.previous' | tr }}</button>
-          <button mat-stroked-button type="button" (click)="closeViewer()">{{ 'common.close' | tr }}</button>
-          <button mat-stroked-button type="button" (click)="next()">{{ 'common.next' | tr }}</button>
+          <button mat-stroked-button type="button" (click)="prev()">
+            {{ 'common.previous' | tr }}
+          </button>
+          <button mat-stroked-button type="button" (click)="closeViewer()">
+            {{ 'common.close' | tr }}
+          </button>
+          <button mat-stroked-button type="button" (click)="next()">
+            {{ 'common.next' | tr }}
+          </button>
         </div>
       </div>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .gallery-grid {
       display: grid;
@@ -148,11 +167,16 @@ export interface GalleryImageItem extends StoredImage {
       padding: 2px 6px;
       border-radius: var(--radius-xs);
       font-size: 0.75rem;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.6);
       pointer-events: none;
     }
-    .badge.favorite { left: 4px; color: var(--warning); }
-    .badge.homepage { right: 4px; }
+    .badge.favorite {
+      left: 4px;
+      color: var(--warning);
+    }
+    .badge.homepage {
+      right: 4px;
+    }
     .actions {
       position: absolute;
       bottom: 0;
@@ -160,19 +184,23 @@ export interface GalleryImageItem extends StoredImage {
       right: 0;
       display: flex;
       justify-content: center;
-      background: rgba(0,0,0,0.55);
+      background: rgba(0, 0, 0, 0.55);
       opacity: 1;
       transition: opacity 0.2s;
     }
     @media (hover: hover) and (pointer: fine) {
-      .actions { opacity: 0; }
+      .actions {
+        opacity: 0;
+      }
       .gallery-item:hover .actions,
-      .gallery-item:focus-within .actions { opacity: 1; }
+      .gallery-item:focus-within .actions {
+        opacity: 1;
+      }
     }
     .viewer {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.9);
+      background: rgba(0, 0, 0, 0.9);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -324,9 +352,7 @@ export class ImageGalleryComponent implements AfterViewInit, OnDestroy {
 
   async setHomepage(item: GalleryImageItem): Promise<void> {
     await this.imageService.setHomepageImage(item.id);
-    this.items.update((list) =>
-      list.map((i) => ({ ...i, isHomepageImage: i.id === item.id })),
-    );
+    this.items.update((list) => list.map((i) => ({ ...i, isHomepageImage: i.id === item.id })));
     this.notifications.success(this.i18n.t('gallery.homepageUpdated'));
     this.changed.emit();
   }

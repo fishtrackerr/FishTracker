@@ -1,4 +1,12 @@
-import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ImageService } from '../../../core/services/image.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -20,6 +28,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       }
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .thumb-wrap {
       position: relative;
@@ -56,8 +65,13 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       color: var(--warning);
     }
     @keyframes pulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
+      0%,
+      100% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
     }
   `,
 })

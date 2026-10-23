@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, ChangeDetectionStrategy } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { map, of, switchMap } from 'rxjs';
@@ -21,7 +21,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
               <mat-icon class="timeline-icon">{{ iconFor(event.type) }}</mat-icon>
               <div>
                 <span class="timeline-desc">{{ event.description ?? event.type }}</span>
-                <span class="timeline-time">{{ event.occurredAt | date:'short' }}</span>
+                <span class="timeline-time">{{ event.occurredAt | date: 'short' }}</span>
               </div>
             </li>
           }
@@ -29,17 +29,31 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       </section>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
-    .timeline-list { list-style: none; padding: 0; margin: 0; }
+    .timeline-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
     .timeline-item {
       display: flex;
       gap: var(--spacing-sm);
       padding: var(--spacing-sm) 0;
       border-bottom: 1px solid var(--border-primary);
     }
-    .timeline-icon { color: var(--primary); flex-shrink: 0; }
-    .timeline-desc { display: block; font-size: 0.9rem; }
-    .timeline-time { font-size: 0.75rem; color: var(--text-muted); }
+    .timeline-icon {
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    .timeline-desc {
+      display: block;
+      font-size: 0.9rem;
+    }
+    .timeline-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
   `,
 })
 export class SessionTimelineComponent {

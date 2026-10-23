@@ -1,4 +1,4 @@
-import { Component, PLATFORM_ID, inject, signal } from '@angular/core';
+import { Component, PLATFORM_ID, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { fetchWithTimeout } from '../../../core/utils';
@@ -16,9 +16,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       class="splash"
       role="status"
       aria-live="polite"
-      [attr.aria-label]="
-        recoveryKind() ? ('dbRecovery.title' | tr) : ('splash.loading' | tr)
-      "
+      [attr.aria-label]="recoveryKind() ? ('dbRecovery.title' | tr) : ('splash.loading' | tr)"
     >
       <img class="logo" src="icons/icon-192x192.png" [alt]="'splash.logoAlt' | tr" />
       <p class="label">{{ 'splash.appName' | tr }}</p>
@@ -79,6 +77,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       }
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .splash {
       display: flex;

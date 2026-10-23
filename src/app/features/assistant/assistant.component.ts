@@ -9,6 +9,7 @@ import {
   effect,
   inject,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -37,7 +38,6 @@ export interface StarterPromptCard {
   custom: boolean;
 }
 
-
 @Component({
   selector: 'app-assistant',
   standalone: true,
@@ -53,6 +53,7 @@ export interface StarterPromptCard {
     TranslatePipe,
   ],
   templateUrl: './assistant.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './assistant.component.css',
 })
 export class AssistantComponent {
@@ -83,7 +84,9 @@ export class AssistantComponent {
     }));
     return [...builtin, ...custom];
   });
-  readonly threads = toSignal(this.chatService.watchThreads(), { initialValue: [] as ChatThread[] });
+  readonly threads = toSignal(this.chatService.watchThreads(), {
+    initialValue: [] as ChatThread[],
+  });
   readonly activeThreadId = signal<string | null>(null);
   readonly messages = signal<ChatMessage[]>([]);
   readonly draft = signal('');

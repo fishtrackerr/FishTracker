@@ -1,4 +1,11 @@
-import { Component, Input, output, signal, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Input,
+  output,
+  signal,
+  OnDestroy,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,8 +28,11 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       />
     </mat-form-field>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
-    .search-field { width: 100%; }
+    .search-field {
+      width: 100%;
+    }
   `,
 })
 export class SearchBarComponent implements OnDestroy {

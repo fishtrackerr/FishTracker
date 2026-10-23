@@ -1,4 +1,13 @@
-import { Component, computed, inject, signal, effect, linkedSignal, untracked } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  signal,
+  effect,
+  linkedSignal,
+  untracked,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -74,6 +83,7 @@ function toLakeDraft(lake: Lake | undefined): LakeDraft {
     TranslatePipe,
   ],
   templateUrl: './lake-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './lake-detail.component.css',
 })
 export class LakeDetailComponent {
@@ -91,9 +101,7 @@ export class LakeDetailComponent {
   readonly countryOptions = countrySelectOptions;
 
   readonly lake = toSignal(
-    this.route.paramMap.pipe(
-      switchMap((p) => this.lakeService.watchById(p.get('id')!)),
-    ),
+    this.route.paramMap.pipe(switchMap((p) => this.lakeService.watchById(p.get('id')!))),
   );
 
   /**
@@ -167,7 +175,7 @@ export class LakeDetailComponent {
     if (!l) return;
 
     const d = this.draft();
-    const query = (d.address?.trim() || d.name?.trim() || '');
+    const query = d.address?.trim() || d.name?.trim() || '';
     if (!query) {
       this.notifications.info(this.i18n.t('lakes.lookupNeedsAddress'));
       return;
@@ -240,7 +248,10 @@ export class LakeDetailComponent {
     const l = this.lake();
     if (!l) return;
     const spot = l.spots.find((s) => s.id === spotId);
-    const ok = await this.confirm.confirmDelete(this.i18n.t('lakes.deleteSpotQuestion'), spot?.name);
+    const ok = await this.confirm.confirmDelete(
+      this.i18n.t('lakes.deleteSpotQuestion'),
+      spot?.name,
+    );
     if (ok) {
       await this.lakeService.deleteSpot(l.id, spotId);
     }

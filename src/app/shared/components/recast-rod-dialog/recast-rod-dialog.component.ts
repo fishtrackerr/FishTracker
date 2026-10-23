@@ -1,11 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FishingSession, SessionRod, SessionSpot } from '../../../core/models';
@@ -36,6 +32,7 @@ export interface RecastRodDialogResult {
   ],
   templateUrl: './recast-rod-dialog.component.html',
   styleUrl: './recast-rod-dialog.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     class: 'themed-dialog-host',
   },

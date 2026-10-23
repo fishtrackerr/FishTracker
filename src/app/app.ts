@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeService } from './core/services/theme.service';
 import { AppStartupService } from './core/services/app-startup.service';
@@ -17,6 +17,7 @@ import { StartupSplashComponent } from './shared/components/startup-splash/start
       <router-outlet />
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: ':host { display: block; height: 100dvh; }',
 })
 export class App {

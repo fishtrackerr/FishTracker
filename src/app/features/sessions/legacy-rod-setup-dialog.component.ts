@@ -1,11 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -56,19 +52,29 @@ export interface LegacyRodSetupData {
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-stroked-button mat-dialog-close type="button">{{ 'rodSetup.skipForNow' | tr }}</button>
+      <button mat-stroked-button mat-dialog-close type="button">
+        {{ 'rodSetup.skipForNow' | tr }}
+      </button>
       <button mat-flat-button type="button" (click)="save()">{{ 'rodSetup.setUp' | tr }}</button>
     </mat-dialog-actions>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     :host {
       display: block;
       color: var(--text-primary);
       background: var(--background-card);
     }
-    .dialog-title { text-align: center; width: 100%; }
-    .full { width: 100%; }
-    mat-dialog-content { color: var(--text-primary); }
+    .dialog-title {
+      text-align: center;
+      width: 100%;
+    }
+    .full {
+      width: 100%;
+    }
+    mat-dialog-content {
+      color: var(--text-primary);
+    }
   `,
 })
 export class LegacyRodSetupDialogComponent implements OnInit {
@@ -97,9 +103,7 @@ export class LegacyRodSetupDialogComponent implements OnInit {
     if (this.sessionSpots.length === 0 && this.data.session.lakeId) {
       const lake = await this.lakeService.getById(this.data.session.lakeId);
       if (lake?.spots.length) {
-        this.sessionSpots = lake.spots.map((spot) =>
-          this.rodService.snapshotFromLakeSpot(spot),
-        );
+        this.sessionSpots = lake.spots.map((spot) => this.rodService.snapshotFromLakeSpot(spot));
       }
     }
   }

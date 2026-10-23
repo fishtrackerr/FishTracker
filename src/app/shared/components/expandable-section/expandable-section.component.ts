@@ -6,6 +6,7 @@ import {
   PLATFORM_ID,
   inject,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +18,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   standalone: true,
   imports: [MatButtonModule, MatIconModule, TranslatePipe],
   templateUrl: './expandable-section.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './expandable-section.component.css',
 })
 export class ExpandableSectionComponent implements OnInit, OnDestroy {

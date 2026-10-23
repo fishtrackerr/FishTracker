@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,6 +23,7 @@ import { I18nService } from '../../core/services/i18n.service';
     TranslatePipe,
   ],
   templateUrl: './lakes-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './lakes-list.component.css',
 })
 export class LakesListComponent {

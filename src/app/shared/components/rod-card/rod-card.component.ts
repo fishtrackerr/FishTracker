@@ -1,4 +1,4 @@
-import { Component, Input, inject, output } from '@angular/core';
+import { Component, Input, inject, output, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,6 +35,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     TranslatePipe,
   ],
   templateUrl: './rod-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './rod-card.component.css',
 })
 export class RodCardComponent {
@@ -90,11 +91,7 @@ export class RodCardComponent {
       notes: this.editNotes || undefined,
     });
     if (this.editSpotId !== (this.rod.sessionSpotId ?? '')) {
-      await this.rodService.assignSpot(
-        updated,
-        this.rod.id,
-        this.editSpotId || undefined,
-      );
+      await this.rodService.assignSpot(updated, this.rod.id, this.editSpotId || undefined);
     }
     this.editing = false;
     this.changed.emit();
@@ -137,9 +134,7 @@ export class RodCardComponent {
       maxWidth: '480px',
       data: { session: this.session, rodId: this.rod.id },
     });
-    const result = (await firstValueFrom(ref.afterClosed())) as
-      | RecastRodDialogResult
-      | undefined;
+    const result = (await firstValueFrom(ref.afterClosed())) as RecastRodDialogResult | undefined;
     if (!result?.rodId) {
       return;
     }

@@ -1,15 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
-import {
-  ReleaseNoteItem,
-  ReleaseNotesData,
-} from '../../../core/services/release-notes.service';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { ReleaseNoteItem, ReleaseNotesData } from '../../../core/services/release-notes.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
@@ -39,6 +32,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       </button>
     </mat-dialog-actions>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     :host {
       display: block;

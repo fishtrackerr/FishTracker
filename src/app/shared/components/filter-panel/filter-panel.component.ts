@@ -1,4 +1,4 @@
-import { Component, Input, output, inject, signal } from '@angular/core';
+import { Component, Input, output, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,17 +16,34 @@ import { promptForText } from '../text-prompt-dialog/text-prompt-dialog.componen
 @Component({
   selector: 'app-filter-panel',
   standalone: true,
-  imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule, TranslatePipe],
+  imports: [
+    FormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    TranslatePipe,
+  ],
   template: `
     <div class="filter-panel" [class.compact]="compact">
       @if (!compact) {
-        <h3 class="section-title">{{ 'filters.title' | tr }} @if (activeCount() > 0) { ({{ activeCount() }}) }</h3>
+        <h3 class="section-title">
+          {{ 'filters.title' | tr }}
+          @if (activeCount() > 0) {
+            ({{ activeCount() }})
+          }
+        </h3>
       }
 
       <div class="fields">
         <mat-form-field appearance="outline" class="full">
           <mat-label>{{ 'filters.dateFrom' | tr }}</mat-label>
-          <input matInput type="date" [(ngModel)]="filter.dateFrom" (ngModelChange)="emitChange()" />
+          <input
+            matInput
+            type="date"
+            [(ngModel)]="filter.dateFrom"
+            (ngModelChange)="emitChange()"
+          />
         </mat-form-field>
         <mat-form-field appearance="outline" class="full">
           <mat-label>{{ 'filters.dateTo' | tr }}</mat-label>
@@ -52,22 +69,36 @@ import { promptForText } from '../text-prompt-dialog/text-prompt-dialog.componen
       </div>
 
       <div class="actions">
-        <button mat-stroked-button type="button" (click)="clear()">{{ 'filters.clearAll' | tr }}</button>
-        <button mat-stroked-button type="button" (click)="savePreset()">{{ 'filters.savePreset' | tr }}</button>
+        <button mat-stroked-button type="button" (click)="clear()">
+          {{ 'filters.clearAll' | tr }}
+        </button>
+        <button mat-stroked-button type="button" (click)="savePreset()">
+          {{ 'filters.savePreset' | tr }}
+        </button>
       </div>
 
       @if (presets().length > 0) {
         <div class="presets">
           @for (preset of presets(); track preset.id) {
             <div class="preset-row">
-              <button mat-button type="button" (click)="applyPreset(preset.filter)">{{ preset.name }}</button>
-              <button mat-icon-button type="button" [attr.aria-label]="'filters.deletePreset' | tr" (click)="deletePreset(preset.id, preset.name)">×</button>
+              <button mat-button type="button" (click)="applyPreset(preset.filter)">
+                {{ preset.name }}
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                [attr.aria-label]="'filters.deletePreset' | tr"
+                (click)="deletePreset(preset.id, preset.name)"
+              >
+                ×
+              </button>
             </div>
           }
         </div>
       }
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .filter-panel {
       background: var(--background-card);
@@ -80,19 +111,37 @@ import { promptForText } from '../text-prompt-dialog/text-prompt-dialog.componen
       padding: 0;
       background: transparent;
     }
-    .section-title { text-align: center; margin: 0 0 var(--spacing-md); }
+    .section-title {
+      text-align: center;
+      margin: 0 0 var(--spacing-md);
+    }
     .fields {
       display: grid;
       gap: var(--spacing-sm);
       grid-template-columns: 1fr;
     }
     @media (min-width: 769px) {
-      .fields { grid-template-columns: 1fr 1fr; }
+      .fields {
+        grid-template-columns: 1fr 1fr;
+      }
     }
-    .full { width: 100%; }
-    .actions { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; margin-top: var(--spacing-sm); }
-    .presets { margin-top: var(--spacing-md); }
-    .preset-row { display: flex; align-items: center; justify-content: space-between; }
+    .full {
+      width: 100%;
+    }
+    .actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+      margin-top: var(--spacing-sm);
+    }
+    .presets {
+      margin-top: var(--spacing-md);
+    }
+    .preset-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
   `,
 })
 export class FilterPanelComponent {

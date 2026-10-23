@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,6 +29,7 @@ import { I18nService } from '../../core/services/i18n.service';
     TranslatePipe,
   ],
   templateUrl: './profile-documents.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './profile-documents.component.css',
 })
 export class ProfileDocumentsComponent {
@@ -146,7 +147,10 @@ export class ProfileDocumentsComponent {
   }
 
   async deleteDoc(id: string, title: string): Promise<void> {
-    const ok = await this.confirm.confirmDelete(this.i18n.t('profileDocs.deleteDocumentQuestion'), title);
+    const ok = await this.confirm.confirmDelete(
+      this.i18n.t('profileDocs.deleteDocumentQuestion'),
+      title,
+    );
     if (ok) {
       await this.docRepo.delete(id);
       this.notifications.success(this.i18n.t('profileDocs.documentDeleted'));

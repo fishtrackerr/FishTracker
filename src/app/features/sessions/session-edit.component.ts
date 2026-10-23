@@ -1,4 +1,11 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +27,13 @@ import { NotificationService } from '../../core/services/notification.service';
 import { RodService } from '../../core/services/rod.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { FishingSession, FishingSpot, Lake, SessionSpot, SessionStatus } from '../../core/models';
-import { fromLocalDatetimeInput, isVisibleRecord, onlyVisibleRecords, softDeleteRecord, toLocalDatetimeInput } from '../../core/utils';
+import {
+  fromLocalDatetimeInput,
+  isVisibleRecord,
+  onlyVisibleRecords,
+  softDeleteRecord,
+  toLocalDatetimeInput,
+} from '../../core/utils';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { MapsLinkButtonComponent } from '../../shared/components/maps-link-button/maps-link-button.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -43,6 +56,7 @@ import { I18nService } from '../../core/services/i18n.service';
     TranslatePipe,
   ],
   templateUrl: './session-edit.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './session-edit.component.css',
 })
 export class SessionEditComponent {
@@ -115,14 +129,16 @@ export class SessionEditComponent {
     this.longitude = s.longitude;
     this.waterTemperatureC = s.waterTemperatureC;
     this.sessionSpots.set(s.sessionSpots ?? []);
-    this.selectedSpotIds.set(
-      onlyVisibleRecords(s.sessionSpots ?? []).map((sp) => sp.id),
-    );
+    this.selectedSpotIds.set(onlyVisibleRecords(s.sessionSpots ?? []).map((sp) => sp.id));
     void this.loadLakeSpots(this.lakeId);
   }
 
   async onLakeChange(newLakeId: string): Promise<void> {
-    if (this.previousLakeId && newLakeId !== this.previousLakeId && this.sessionSpots().length > 0) {
+    if (
+      this.previousLakeId &&
+      newLakeId !== this.previousLakeId &&
+      this.sessionSpots().length > 0
+    ) {
       const ok = await this.confirm.confirm({
         title: this.i18n.t('sessionEdit.changeLakeTitle'),
         message: this.i18n.t('sessionEdit.changeLakeMessage'),
@@ -167,9 +183,7 @@ export class SessionEditComponent {
     } else {
       const snapshot = current.find((s) => s.lakeSpotId === spot.id && isVisibleRecord(s));
       if (snapshot) {
-        this.sessionSpots.set(
-          current.map((s) => (s.id === snapshot.id ? softDeleteRecord(s) : s)),
-        );
+        this.sessionSpots.set(current.map((s) => (s.id === snapshot.id ? softDeleteRecord(s) : s)));
         this.selectedSpotIds.set(this.selectedSpotIds().filter((id) => id !== snapshot.id));
       }
     }
@@ -183,7 +197,9 @@ export class SessionEditComponent {
     if (!this.lakeId) {
       return;
     }
-    const spot = await this.lakeService.addSpot(this.lakeId, { name: this.i18n.t('sessionEdit.newSpotDefaultName') });
+    const spot = await this.lakeService.addSpot(this.lakeId, {
+      name: this.i18n.t('sessionEdit.newSpotDefaultName'),
+    });
     if (spot) {
       await this.loadLakeSpots(this.lakeId);
       this.toggleSpot(spot, true);
@@ -265,7 +281,10 @@ export class SessionEditComponent {
           await this.save();
         }
       } else {
-        const msg = err instanceof SessionValidationError ? err.message : this.i18n.t('sessionEdit.updateFailed');
+        const msg =
+          err instanceof SessionValidationError
+            ? err.message
+            : this.i18n.t('sessionEdit.updateFailed');
         this.notify.error(msg);
       }
     } finally {

@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal, effect } from '@angular/core';
+import { Component, Input, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { Catch, FishingSession, RodSpotHistory, SessionRod } from '../../../core/models';
 import { I18nService } from '../../../core/services/i18n.service';
 import { RodSpotHistoryRepository } from '../../../core/services/rod-spot-history.repository';
@@ -31,7 +31,13 @@ export interface RodSummaryLine {
                 <li>{{ 'rodSummary.startedAt' | tr: { spot: line.startedAt } }}</li>
               }
               @for (move of line.movements; track move.id) {
-                <li>{{ 'rodSummary.movedTo' | tr: { spot: spotName(move.toSessionSpotId), time: formatTime(move.changedAt) } }}</li>
+                <li>
+                  {{
+                    'rodSummary.movedTo'
+                      | tr
+                        : { spot: spotName(move.toSessionSpotId), time: formatTime(move.changedAt) }
+                  }}
+                </li>
               }
               <li>{{ 'rodSummary.bitesCount' | tr: { count: line.bites } }}</li>
               <li>{{ 'rodSummary.fishSpottedCount' | tr: { count: line.fishSpotted } }}</li>
@@ -44,18 +50,39 @@ export interface RodSummaryLine {
           <p>{{ 'rodSummary.totalBites' | tr: { count: totalBites() } }}</p>
           <p>{{ 'rodSummary.totalSpotted' | tr: { count: totalSpotted() } }}</p>
           <p>{{ 'rodSummary.totalCatches' | tr: { count: totalCatches() } }}</p>
-          @if (bestRod()) { <p>{{ 'rodSummary.bestRod' | tr: { name: bestRod()! } }}</p> }
-          @if (bestSpot()) { <p>{{ 'rodSummary.bestSpot' | tr: { name: bestSpot()! } }}</p> }
+          @if (bestRod()) {
+            <p>{{ 'rodSummary.bestRod' | tr: { name: bestRod()! } }}</p>
+          }
+          @if (bestSpot()) {
+            <p>{{ 'rodSummary.bestSpot' | tr: { name: bestSpot()! } }}</p>
+          }
         </div>
       </app-expandable-section>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
-    .expand-label { font-weight: 600; color: var(--text-secondary); }
-    .summary-block { margin-bottom: var(--spacing-md); }
-    .summary-block ul { margin: var(--spacing-xs) 0; padding-left: var(--spacing-lg); font-size: 0.9rem; color: var(--text-secondary); }
-    .totals { border-top: 1px solid var(--border-primary); padding-top: var(--spacing-sm); font-size: 0.9rem; }
-    .totals p { margin: var(--spacing-xs) 0; }
+    .expand-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .summary-block {
+      margin-bottom: var(--spacing-md);
+    }
+    .summary-block ul {
+      margin: var(--spacing-xs) 0;
+      padding-left: var(--spacing-lg);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .totals {
+      border-top: 1px solid var(--border-primary);
+      padding-top: var(--spacing-sm);
+      font-size: 0.9rem;
+    }
+    .totals p {
+      margin: var(--spacing-xs) 0;
+    }
   `,
 })
 export class RodSummaryComponent {
@@ -102,7 +129,10 @@ export class RodSummaryComponent {
     if (!sessionSpotId) {
       return this.i18n.t('rod.unassigned');
     }
-    return this.session.sessionSpots?.find((s) => s.id === sessionSpotId)?.name ?? this.i18n.t('common.unknown');
+    return (
+      this.session.sessionSpots?.find((s) => s.id === sessionSpotId)?.name ??
+      this.i18n.t('common.unknown')
+    );
   }
 
   formatTime(iso: string): string {
