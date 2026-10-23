@@ -1,9 +1,9 @@
 @if (lake(); as l) {
   <h1>
-    <input class="title-input" [ngModel]="l.name" (ngModelChange)="updateField('name', $event)" (blur)="saveLake()" />
+    <input class="title-input" [ngModel]="draft().name" (ngModelChange)="updateField('name', $event)" (blur)="saveLake()" />
   </h1>
 
-  <mat-checkbox [ngModel]="l.isFavorite" (ngModelChange)="updateField('isFavorite', $event); saveLake()">
+  <mat-checkbox [ngModel]="draft().isFavorite" (ngModelChange)="updateField('isFavorite', $event); saveLake()">
     {{ 'lakes.favorite' | tr }}
   </mat-checkbox>
 
@@ -28,23 +28,23 @@
 
   <mat-form-field appearance="outline" class="full">
     <mat-label>{{ 'lakes.description' | tr }}</mat-label>
-    <textarea matInput rows="2" [ngModel]="l.description" (ngModelChange)="updateField('description', $event)" (blur)="saveLake()"></textarea>
+    <textarea matInput rows="2" [ngModel]="draft().description" (ngModelChange)="updateField('description', $event)" (blur)="saveLake()"></textarea>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
     <mat-label>{{ 'lakes.address' | tr }}</mat-label>
-    <input matInput [ngModel]="l.address" (ngModelChange)="updateField('address', $event)" (blur)="saveLake()" />
+    <input matInput [ngModel]="draft().address" (ngModelChange)="updateField('address', $event)" (blur)="saveLake()" />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
     <mat-label>{{ 'lakes.country' | tr }}</mat-label>
     <mat-select
-      [ngModel]="l.country ?? ''"
+      [ngModel]="draft().country ?? ''"
       [panelClass]="selectPanelClass"
       (ngModelChange)="updateCountry($event)"
     >
       <mat-option value="">{{ 'common.none' | tr }}</mat-option>
-      @for (country of countryOptions(l.country); track country) {
+      @for (country of countryOptions(draft().country); track country) {
         <mat-option [value]="country">{{ country }}</mat-option>
       }
     </mat-select>
@@ -63,33 +63,33 @@
   <div class="row">
     <mat-form-field appearance="outline">
       <mat-label>{{ 'sessionEdit.latitude' | tr }}</mat-label>
-      <input matInput type="number" step="any" [ngModel]="l.latitude" (ngModelChange)="updateField('latitude', $event)" (blur)="saveLake()" />
+      <input matInput type="number" step="any" [ngModel]="draft().latitude" (ngModelChange)="updateField('latitude', $event)" (blur)="saveLake()" />
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>{{ 'sessionEdit.longitude' | tr }}</mat-label>
-      <input matInput type="number" step="any" [ngModel]="l.longitude" (ngModelChange)="updateField('longitude', $event)" (blur)="saveLake()" />
+      <input matInput type="number" step="any" [ngModel]="draft().longitude" (ngModelChange)="updateField('longitude', $event)" (blur)="saveLake()" />
     </mat-form-field>
     <app-maps-link-button
-      [latitude]="l.latitude"
-      [longitude]="l.longitude"
-      [label]="l.name"
+      [latitude]="draft().latitude"
+      [longitude]="draft().longitude"
+      [label]="draft().name"
       [showDirections]="true"
     />
   </div>
 
   <mat-form-field appearance="outline" class="full">
     <mat-label>{{ 'lakes.rules' | tr }}</mat-label>
-    <textarea matInput rows="2" [ngModel]="l.rules" (ngModelChange)="updateField('rules', $event)" (blur)="saveLake()"></textarea>
+    <textarea matInput rows="2" [ngModel]="draft().rules" (ngModelChange)="updateField('rules', $event)" (blur)="saveLake()"></textarea>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
     <mat-label>{{ 'lakes.permitInformation' | tr }}</mat-label>
-    <textarea matInput rows="2" [ngModel]="l.permitInformation" (ngModelChange)="updateField('permitInformation', $event)" (blur)="saveLake()"></textarea>
+    <textarea matInput rows="2" [ngModel]="draft().permitInformation" (ngModelChange)="updateField('permitInformation', $event)" (blur)="saveLake()"></textarea>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full">
     <mat-label>{{ 'common.notes' | tr }}</mat-label>
-    <textarea matInput rows="2" [ngModel]="l.notes" (ngModelChange)="updateField('notes', $event)" (blur)="saveLake()"></textarea>
+    <textarea matInput rows="2" [ngModel]="draft().notes" (ngModelChange)="updateField('notes', $event)" (blur)="saveLake()"></textarea>
   </mat-form-field>
 
   <section class="section">

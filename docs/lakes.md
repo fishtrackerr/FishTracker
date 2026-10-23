@@ -26,6 +26,8 @@ Optional address and country can be set on the lake. Latitude/longitude can be e
 
 Lookup uses OpenStreetMap Nominatim from the client side and saves coordinates directly on success.
 
+Inline edits (name, favorite, description, address, country, coordinates, rules, permit, notes) go into a local draft signal. The draft is filled from the stored lake only when the lake id changes, so a liveQuery re-emit does not overwrite unsaved typing. Fields save from the draft on blur (favorite and country save immediately).
+
 ## Lake statistics
 
 Derived from sessions and catches linked via `session.lakeId` (same mode).

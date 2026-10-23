@@ -1,4 +1,4 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, computed, inject, signal, effect, linkedSignal, untracked } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +16,7 @@ import { ImageService } from '../../core/services/image.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { LakeGeocodingService } from '../../core/services/lake-geocoding.service';
 import { ThemeService } from '../../core/services/theme.service';
-import { FishingSpot } from '../../core/models';
+import { FishingSpot, Lake } from '../../core/models';
 import { ImageThumbComponent } from '../../shared/components/image-thumb/image-thumb.component';
 import { ImagePickerComponent } from '../../shared/components/image-picker/image-picker.component';
 import {
@@ -26,6 +26,36 @@ import {
 import { MapsLinkButtonComponent } from '../../shared/components/maps-link-button/maps-link-button.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../core/services/i18n.service';
+
+/** Lake fields edited inline on the detail page. */
+export type LakeDraft = Pick<
+  Lake,
+  | 'name'
+  | 'description'
+  | 'address'
+  | 'country'
+  | 'latitude'
+  | 'longitude'
+  | 'rules'
+  | 'permitInformation'
+  | 'notes'
+  | 'isFavorite'
+>;
+
+function toLakeDraft(lake: Lake | undefined): LakeDraft {
+  return {
+    name: lake?.name ?? '',
+    description: lake?.description,
+    address: lake?.address,
+    country: lake?.country,
+    latitude: lake?.latitude,
+    longitude: lake?.longitude,
+    rules: lake?.rules,
+    permitInformation: lake?.permitInformation,
+    notes: lake?.notes,
+    isFavorite: lake?.isFavorite ?? false,
+  };
+}
 
 @Component({
   selector: 'app-lake-detail',
@@ -65,6 +95,16 @@ export class LakeDetailComponent {
       switchMap((p) => this.lakeService.watchById(p.get('id')!)),
     ),
   );
+
+  /**
+   * Local copy of the editable fields. Hydrated from `lake()` only when the lake id
+   * changes, so liveQuery re-emits do not overwrite in-progress edits.
+   */
+  private readonly lakeId = computed(() => this.lake()?.id);
+  readonly draft = linkedSignal<string | undefined, LakeDraft>({
+    source: this.lakeId,
+    computation: () => toLakeDraft(untracked(this.lake)),
+  });
 
   readonly lakeImages = signal<GalleryImageItem[]>([]);
   readonly editingSpot = signal<FishingSpot | null>(null);
@@ -119,27 +159,15 @@ export class LakeDetailComponent {
   async saveLake(): Promise<void> {
     const l = this.lake();
     if (!l) return;
-    await this.lakeService.update(l.id, {
-      name: l.name,
-      description: l.description,
-      address: l.address,
-      country: l.country,
-      latitude: l.latitude,
-      longitude: l.longitude,
-      rules: l.rules,
-      permitInformation: l.permitInformation,
-      notes: l.notes,
-      isFavorite: l.isFavorite,
-      coverImageId: l.coverImageId,
-      photoIds: l.photoIds,
-    });
+    await this.lakeService.update(l.id, { ...this.draft() });
   }
 
   async lookupCoordinates(): Promise<void> {
     const l = this.lake();
     if (!l) return;
 
-    const query = (l.address?.trim() || l.name?.trim() || '');
+    const d = this.draft();
+    const query = (d.address?.trim() || d.name?.trim() || '');
     if (!query) {
       this.notifications.info(this.i18n.t('lakes.lookupNeedsAddress'));
       return;
@@ -170,11 +198,8 @@ export class LakeDetailComponent {
     this.notifications.error(this.i18n.t('lakes.lookupFailed'));
   }
 
-  updateField(field: string, value: unknown): void {
-    const l = this.lake();
-    if (l) {
-      (l as unknown as Record<string, unknown>)[field] = value;
-    }
+  updateField<K extends keyof LakeDraft>(field: K, value: LakeDraft[K]): void {
+    this.draft.update((d) => ({ ...d, [field]: value }));
   }
 
   async updateCountry(value: string): Promise<void> {

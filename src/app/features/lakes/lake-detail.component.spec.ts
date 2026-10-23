@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { convertToParamMap, ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FishingSpot, Lake } from '../../core/models';
 import { ConfirmService } from '../../core/services/confirm.service';
@@ -21,6 +21,7 @@ describe('LakeDetailComponent', () => {
     .mockResolvedValue({ status: 'not-found' });
 
   let lake: Lake;
+  let lake$: BehaviorSubject<Lake>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -34,19 +35,20 @@ describe('LakeDetailComponent', () => {
       createdAt: '2026-07-23T00:00:00.000Z',
       updatedAt: '2026-07-23T00:00:00.000Z',
     };
+    lake$ = new BehaviorSubject<Lake>(lake);
 
     TestBed.configureTestingModule({
       providers: [
         {
           provide: ActivatedRoute,
           useValue: {
-            paramMap: of(convertToParamMap({ id: 'lake-1' })),
+            paramMap: new BehaviorSubject(convertToParamMap({ id: 'lake-1' })),
           },
         },
         {
           provide: LakeService,
           useValue: {
-            watchById: () => of(lake),
+            watchById: () => lake$,
             update,
             addSpot: vi.fn(),
             updateSpot: vi.fn(),
@@ -130,5 +132,29 @@ describe('LakeDetailComponent', () => {
 
     expect(lookupCoordinates).not.toHaveBeenCalled();
     expect(update).not.toHaveBeenCalled();
+  });
+
+  it('keeps edits in a draft without mutating the live lake object', async () => {
+    const component = TestBed.runInInjectionContext(() => new LakeDetailComponent());
+
+    component.updateField('notes', 'Deep margins');
+
+    expect(component.draft().notes).toBe('Deep margins');
+    expect(lake.notes).toBeUndefined();
+
+    lake$.next({ ...lake, updatedAt: '2026-07-24T00:00:00.000Z' });
+    expect(component.draft().notes).toBe('Deep margins');
+
+    await component.saveLake();
+    expect(update).toHaveBeenCalledWith('lake-1', expect.objectContaining({ notes: 'Deep margins' }));
+  });
+
+  it('rehydrates the draft when the lake id changes', () => {
+    const component = TestBed.runInInjectionContext(() => new LakeDetailComponent());
+    component.updateField('name', 'Edited');
+
+    lake$.next({ ...lake, id: 'lake-2', name: 'Other Lake' });
+
+    expect(component.draft().name).toBe('Other Lake');
   });
 });

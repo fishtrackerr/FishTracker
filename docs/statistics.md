@@ -34,4 +34,4 @@ Option rename rewrites matching values only in the active mode’s presets and `
 
 ## Performance
 
-Statistics page loads catches once per filter change. Session list uses liveQuery for reactive updates. Large datasets: prefer indexed queries over full scans where possible.
+Statistics page loads catches once per filter change. Each load gets a request token; only the latest load applies its results, so a slower earlier load cannot overwrite a newer filter. A failed load shows the `statistics.loadError` notification instead of leaving the page silently empty. Session list uses liveQuery for reactive updates. Large datasets: prefer indexed queries over full scans where possible.
