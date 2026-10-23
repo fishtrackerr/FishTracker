@@ -1,5 +1,4 @@
 import sharp from 'sharp';
-import toIco from 'to-ico';
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
@@ -16,6 +15,26 @@ const ACCENT = '#ff6b00';
 const ACCENT_SOFT = '#ff9f43';
 const TEXT = '#fff6e8';
 const MUTED = '#9aa7b5';
+
+/** Packs PNG buffers into a .ico file (PNG-compressed entries, supported since Windows Vista). */
+function pngsToIco(images) {
+  const header = Buffer.alloc(6 + 16 * images.length);
+  header.writeUInt16LE(0, 0);
+  header.writeUInt16LE(1, 2);
+  header.writeUInt16LE(images.length, 4);
+  let offset = header.length;
+  images.forEach(({ size, png }, i) => {
+    const entry = 6 + 16 * i;
+    header.writeUInt8(size >= 256 ? 0 : size, entry);
+    header.writeUInt8(size >= 256 ? 0 : size, entry + 1);
+    header.writeUInt16LE(1, entry + 4);
+    header.writeUInt16LE(32, entry + 6);
+    header.writeUInt32LE(png.length, entry + 8);
+    header.writeUInt32LE(offset, entry + 12);
+    offset += png.length;
+  });
+  return Buffer.concat([header, ...images.map((image) => image.png)]);
+}
 
 const svg = readFileSync(svgPath);
 mkdirSync(screenshotsDir, { recursive: true });
@@ -48,10 +67,11 @@ const appleTouch = join(iconsDir, 'apple-touch-icon.png');
 await sharp(svg, { density: 384 }).resize(180, 180).png().toFile(appleTouch);
 console.log('wrote', appleTouch);
 
-const fav16 = await sharp(svg, { density: 384 }).resize(16, 16).png().toBuffer();
-const fav32 = await sharp(svg, { density: 384 }).resize(32, 32).png().toBuffer();
-const fav48 = await sharp(svg, { density: 384 }).resize(48, 48).png().toBuffer();
-writeFileSync('public/favicon.ico', await toIco([fav16, fav32, fav48]));
+const favicons = [];
+for (const size of [16, 32, 48]) {
+  favicons.push({ size, png: await sharp(svg, { density: 384 }).resize(size, size).png().toBuffer() });
+}
+writeFileSync('public/favicon.ico', pngsToIco(favicons));
 console.log('wrote public/favicon.ico');
 
 /**

@@ -55,8 +55,7 @@
     "eslint": "^9.22.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
-    "sharp": "^0.34.0",
-    "to-ico": "^1.1.5",
+    "sharp": "^0.35.5",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.26.0",
     "vitest": "^4.0.8"
