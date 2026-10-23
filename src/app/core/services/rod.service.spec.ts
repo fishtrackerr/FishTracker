@@ -220,4 +220,39 @@ describe('RodService', () => {
       expect(result.rods).toEqual([rod('r-1')]);
     });
   });
+
+  describe('addSessionSpot', () => {
+    it('adds a visible named spot to the latest stored session', async () => {
+      sessionRepo.getById.mockResolvedValue({
+        id: 's-1',
+        rods: [],
+        sessionSpots: [{ id: 'sp-1', name: 'Reeds', visible: true }],
+      });
+
+      const result = await service.addSessionSpot({ id: 's-1' } as FishingSession, '  Island ');
+
+      expect(result.spot.name).toBe('Island');
+      expect(result.spot.visible).toBe(true);
+      expect(result.session.sessionSpots).toHaveLength(2);
+      expect(result.session.sessionSpots?.[0].id).toBe('sp-1');
+      expect(sessionRepo.put).toHaveBeenCalled();
+    });
+
+    it('reuses a visible spot with the same name', async () => {
+      sessionRepo.getById.mockResolvedValue({
+        id: 's-1',
+        rods: [],
+        sessionSpots: [{ id: 'sp-1', name: 'Reeds', visible: true }],
+      });
+
+      const result = await service.addSessionSpot({ id: 's-1' } as FishingSession, 'reeds');
+
+      expect(result.spot.id).toBe('sp-1');
+      expect(result.session.sessionSpots).toHaveLength(1);
+    });
+
+    it('rejects an empty name', async () => {
+      await expect(service.addSessionSpot({ id: 's-1' } as FishingSession, '  ')).rejects.toThrow();
+    });
+  });
 });

@@ -291,6 +291,39 @@ export class RodService {
     };
   }
 
+  /**
+   * Adds a manually named spot to the session (no lake spot). Runs inside one
+   * repository transaction; a visible spot with the same name (case-insensitive)
+   * is reused instead of duplicated.
+   */
+  async addSessionSpot(
+    session: FishingSession,
+    name: string,
+  ): Promise<{ session: FishingSession; spot: SessionSpot }> {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      throw new Error('Spot name is required');
+    }
+    let spot: SessionSpot = { id: generateId(), name: trimmed, visible: true };
+    const add = (spots: SessionSpot[]): SessionSpot[] => {
+      const existing = onlyVisibleRecords(spots).find(
+        (s) => s.name.trim().toLowerCase() === trimmed.toLowerCase(),
+      );
+      if (existing) {
+        spot = existing;
+        return spots;
+      }
+      return [...spots, spot];
+    };
+    const updated = await this.sessionRepo.modify(session.id, (latest) => {
+      latest.sessionSpots = add(latest.sessionSpots ?? []);
+    });
+    return {
+      session: updated ?? { ...session, sessionSpots: add(session.sessionSpots ?? []) },
+      spot,
+    };
+  }
+
   /** Replaces only `rods`; other session fields keep their latest stored values. */
   async saveSessionRods(session: FishingSession, rods: SessionRod[]): Promise<FishingSession> {
     return this.modifyRods(session, () => rods);

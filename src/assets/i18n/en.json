@@ -606,7 +606,21 @@
     "spotted": "Spotted",
     "addCatch": "Add catch",
     "deactivate": "Deactivate",
-    "activate": "Activate"
+    "activate": "Activate",
+    "sheetTitle": "Rod {{n}}",
+    "sheetStats": "{{bites}} bites · {{spotted}} spotted",
+    "sheetCast": " · cast {{time}}",
+    "recastNow": "Recast now",
+    "biteMinusOne": "Bite −1",
+    "takeOut": "Take rod out",
+    "putBack": "Put rod back",
+    "newSpot": "+ New spot…",
+    "newSpotTitle": "New spot",
+    "newSpotName": "Spot name",
+    "newSpotSuffix": "(new)",
+    "spottedRegistered": "Fish spotted registered",
+    "sheetSaved": "Rod saved",
+    "sheetFailed": "Could not update rod"
   },
   "options": {
     "category": {
