@@ -1,5 +1,22 @@
 .rod-card { margin-bottom: var(--spacing-md); }
 .rod-header { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-sm); }
+.rod-name { flex: 1; min-width: 0; font-family: var(--font-label); font-size: 1.05rem; letter-spacing: 0.02em; }
+/* Rod marker: olive badge (Woodland) / bite-alarm LED colour per rod (Night bivvy) */
+.rod-marker {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--rod-color, var(--primary));
+  color: var(--rod-marker-text);
+  box-shadow: var(--rod-glow) var(--rod-color, transparent);
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 1rem;
+}
 .status { font-size: 0.75rem; color: var(--primary); font-weight: 600; }
 .status.inactive { color: var(--text-muted); }
 .row { margin: 0 0 var(--spacing-xs); font-size: 0.9rem; color: var(--text-secondary); }

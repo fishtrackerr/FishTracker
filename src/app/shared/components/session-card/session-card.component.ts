@@ -1,3 +1,4 @@
+import { MatIconModule } from '@angular/material/icon';
 import { DatePipe } from '@angular/common';
 import {
   Component,
@@ -25,6 +26,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   selector: 'app-session-card',
   standalone: true,
   imports: [
+    MatIconModule,
     RouterLink,
     DatePipe,
     MatButtonModule,
@@ -50,7 +52,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
           <div class="header-main">
             <h3 class="name">{{ session.name }}</h3>
             @if (lakeName) {
-              <p class="row lake">🌊 {{ lakeName }}</p>
+              <p class="row lake"><mat-icon class="inline-icon" aria-hidden="true">water</mat-icon> {{ lakeName }}</p>
             }
             <div class="badges">
               <span class="badge" [class]="session.status">{{
@@ -61,7 +63,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
                   class="badge catches"
                   [attr.aria-label]="'sessionCard.catchesBadge' | tr: { count: session.catchCount }"
                 >
-                  🐟 {{ session.catchCount }}
+                  <mat-icon class="inline-icon" aria-hidden="true">set_meal</mat-icon> {{ session.catchCount }}
                 </span>
               }
             </div>

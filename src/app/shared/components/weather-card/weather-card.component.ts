@@ -1,3 +1,4 @@
+import { MatIconModule } from '@angular/material/icon';
 import { DatePipe } from '@angular/common';
 import {
   Component,
@@ -21,7 +22,8 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 @Component({
   selector: 'app-weather-card',
   standalone: true,
-  imports: [FormatTempPipe, DatePipe, MatButtonModule, TranslatePipe],
+  imports: [
+    MatIconModule,FormatTempPipe, DatePipe, MatButtonModule, TranslatePipe],
   template: `
     @if (displayWeather(); as w) {
       <div class="weather-card">
@@ -38,7 +40,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
           <span class="desc">{{ w.description }}</span>
         </div>
         @if (w.locationName) {
-          <p class="location">📍 {{ w.locationName }}</p>
+          <p class="location"><mat-icon class="inline-icon" aria-hidden="true">place</mat-icon> {{ w.locationName }}</p>
         }
         <div class="details">
           @if (w.feelsLikeC != null) {

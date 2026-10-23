@@ -14,9 +14,20 @@
     </div>
   }
   @if (currentMode(); as mode) {
-    <div class="mode-banner" role="status">
-      <span>{{ 'modeSelect.modes.' + mode | tr }}</span>
-    </div>
+    <header class="camo-header">
+      <svg class="camo-bg" aria-hidden="true" viewBox="0 0 390 64" preserveAspectRatio="xMidYMid slice">
+        <rect class="camo-base" width="390" height="64"></rect>
+        <path class="camo-1" d="M-10 10 C30 -6 70 22 95 12 C120 2 150 30 120 44 C90 58 40 46 20 54 C0 62 -20 36 -10 10Z"></path>
+        <path class="camo-2" d="M150 -10 C190 -6 210 14 240 10 C270 6 290 22 270 38 C250 52 200 40 180 44 C160 48 130 28 150 -10Z"></path>
+        <path class="camo-3" d="M300 20 C330 6 380 14 400 28 L400 70 C370 74 350 60 320 64 C290 68 270 42 300 20Z"></path>
+        <path class="camo-3" d="M40 50 C70 40 110 56 140 50 C170 44 200 66 170 74 L20 74 C0 68 10 56 40 50Z"></path>
+        <path class="camo-1" d="M210 46 C240 38 270 48 290 58 C310 70 280 80 250 76 C220 72 190 56 210 46Z"></path>
+        <path class="camo-4" d="M95 26 C110 22 130 30 128 38 C126 46 104 48 96 42 C88 36 85 30 95 26Z"></path>
+        <path class="camo-4" d="M336 4 C352 0 372 8 368 16 C364 24 340 26 332 18 C326 12 326 8 336 4Z"></path>
+      </svg>
+      <span class="brand">FishTracker</span>
+      <span class="mode-chip" role="status">{{ 'modeSelect.modes.' + mode | tr }}</span>
+    </header>
   }
   <main #content class="content" tabindex="-1">
     <router-outlet />

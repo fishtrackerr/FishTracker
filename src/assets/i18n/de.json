@@ -53,9 +53,9 @@
   "settings": {
     "appearance": "Darstellung",
     "theme": "Design",
-    "darkMode": "Dunkelmodus",
-    "lightMode": "Hellmodus",
-    "systemPreference": "Systemeinstellung",
+    "darkMode": "Night bivvy (dunkel)",
+    "lightMode": "Woodland camo (Standard)",
+    "systemPreference": "Gerät folgen (hell/dunkel)",
     "preview": "Vorschau",
     "language": "Sprache",
     "units": "Einheiten",

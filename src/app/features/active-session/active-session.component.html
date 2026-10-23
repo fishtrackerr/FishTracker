@@ -53,7 +53,7 @@
 
     @if (s.latitude != null && s.longitude != null) {
       <p class="gps">
-        📍 {{ s.latitude.toFixed(5) }}, {{ s.longitude.toFixed(5) }}
+        <mat-icon class="inline-icon" aria-hidden="true">place</mat-icon> {{ s.latitude.toFixed(5) }}, {{ s.longitude.toFixed(5) }}
         <app-maps-link-button
           [latitude]="s.latitude"
           [longitude]="s.longitude"
@@ -87,7 +87,7 @@
         <mat-icon>bolt</mat-icon> {{ 'activeSession.instantCatch' | tr }}
       </button>
       <button mat-stroked-button class="action-btn" (click)="quickCatch()">
-        🐟 {{ 'activeSession.addCatch' | tr }}
+        <mat-icon>set_meal</mat-icon> {{ 'activeSession.addCatch' | tr }}
       </button>
       @if (hasRods) {
         <button mat-stroked-button class="action-btn" (click)="recastRod()">
@@ -100,14 +100,14 @@
       <button mat-stroked-button class="action-btn" (click)="openEdit()">
         {{ 'sessionDetail.editSession' | tr }}
       </button>
-      <button mat-flat-button class="action-btn" (click)="addSessionPhoto(true)">
-        📷 {{ 'images.camera' | tr }}
+      <button mat-stroked-button class="action-btn" (click)="addSessionPhoto(true)">
+        <mat-icon>photo_camera</mat-icon> {{ 'images.camera' | tr }}
       </button>
-      <button mat-flat-button class="action-btn" (click)="addSessionPhoto(false)">
-        🖼️ {{ 'images.gallery' | tr }}
+      <button mat-stroked-button class="action-btn" (click)="addSessionPhoto(false)">
+        <mat-icon>photo_library</mat-icon> {{ 'images.gallery' | tr }}
       </button>
-      <button mat-flat-button class="action-btn" (click)="toggleNotes()">
-        📝 {{ 'common.notes' | tr }}
+      <button mat-stroked-button class="action-btn" (click)="toggleNotes()">
+        <mat-icon>edit_note</mat-icon> {{ 'common.notes' | tr }}
       </button>
       <button mat-stroked-button class="action-btn end" (click)="complete()">
         {{ 'activeSession.endSession' | tr }}

@@ -53,9 +53,9 @@
   "settings": {
     "appearance": "Uiterlijk",
     "theme": "Thema",
-    "darkMode": "Donkere modus",
-    "lightMode": "Lichte modus",
-    "systemPreference": "Systeemvoorkeur",
+    "darkMode": "Night bivvy (donker)",
+    "lightMode": "Woodland camo (standaard)",
+    "systemPreference": "Volg apparaat (licht/donker)",
     "preview": "Voorbeeld",
     "language": "Taal",
     "units": "Eenheden",

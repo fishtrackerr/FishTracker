@@ -1,3 +1,4 @@
+import { MatIconModule } from '@angular/material/icon';
 import { DatePipe } from '@angular/common';
 import {
   Component,
@@ -45,6 +46,7 @@ import { I18nService } from '../../core/services/i18n.service';
   selector: 'app-session-detail',
   standalone: true,
   imports: [
+    MatIconModule,
     DatePipe,
     RouterLink,
     MatButtonModule,

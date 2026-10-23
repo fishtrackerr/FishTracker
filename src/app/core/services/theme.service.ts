@@ -54,7 +54,8 @@ export class ThemeService {
 
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      meta.setAttribute('content', resolved === 'dark' ? '#0b0b0b' : '#f7faff');
+      // Status bar matches the camo header base colour of each theme.
+      meta.setAttribute('content', resolved === 'dark' ? '#141b15' : '#6b7340');
     }
   }
 }

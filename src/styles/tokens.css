@@ -1,39 +1,55 @@
-/* Design tokens — dark theme (default) */
+/*
+ * Design tokens.
+ * light = "Woodland camo" (default): sand ground, army olive, hunter-orange actions, stencil display type.
+ * dark  = "Night bivvy": deep forest green, bivvy-green actions, bite-alarm LED colours per rod.
+ * --primary is the text/outline/icon colour and must pass 4.5:1 on the backgrounds;
+ * --cta is the fill of the main action buttons and badges (paired with --text-on-cta).
+ */
 :root,
-[data-theme='dark'] {
-  color-scheme: dark;
-  --background-primary: #0b0b0b;
-  --background-secondary: #151515;
-  --background-card: #1c1c1c;
-  --background-input: #111111;
+[data-theme='light'] {
+  color-scheme: light;
+  --background-primary: #e4ddc8;
+  --background-secondary: #ebe5d4;
+  --background-card: #f3efe3;
+  --background-raised: #dcd3b6;
+  --background-input: #f8f5ec;
+  --background-inverse: #3b2f1e;
+  --text-on-inverse: #f3efe3;
+  --text-on-inverse-muted: #d9cfb0;
 
-  --primary: #ff7a00;
-  --primary-hover: #ff922b;
-  --primary-active: #e66e00;
+  --primary: #4b5320;
+  --primary-hover: #5c6528;
+  --primary-active: #3a4019;
+  --text-on-primary: #f3efe3;
 
-  --text-primary: #f2e6d8; /* light warm body text for WCAG contrast on #0b0b0b */
-  --text-secondary: #d4b896;
-  --text-muted: #a89078;
-  /* Accent/emphasis still uses --primary (#ff7a00) */
-  --text-on-primary: #0b0b0b;
+  --cta: #e8701a;
+  --cta-hover: #f07f2c;
+  --cta-active: #cf6212;
+  --text-on-cta: #1e1407;
 
-  --border-primary: #4a2d14;
-  --border-active: #ff7a00;
-  --border-danger: #d64545;
+  --heading-color: #3a4019;
+  --text-primary: #2b2a1f;
+  --text-secondary: #434030;
+  --text-muted: #5a5640;
 
-  --success: #3ea66b;
-  --warning: #ffb020;
-  --danger: #d64545;
+  --border-primary: #c2b791;
+  --border-strong: #4b5320;
+  --border-active: #4b5320;
+  --border-danger: #a3271f;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --success: #3e6b2a;
+  --warning: #8a5a00;
+  --danger: #a3271f;
+
+  --shadow-sm: 0 1px 2px rgba(43, 42, 31, 0.12);
+  --shadow-md: 0 4px 12px rgba(43, 42, 31, 0.18);
 
   --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  /* Action buttons — matches weather-card / app-card */
-  --radius-button: var(--radius-md);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-button: 8px;
+  --radius-pill: 8px;
 
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -44,30 +60,111 @@
   --input-height: 48px;
   --button-height: 44px;
 
-  --font-family: Roboto, 'Helvetica Neue', sans-serif;
+  --font-family: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Saira Stencil One', 'Barlow Condensed', sans-serif;
+  --font-label: 'Barlow Condensed', 'Barlow', sans-serif;
+  --font-mono: 'Barlow Condensed', 'Barlow', sans-serif;
+  --label-transform: uppercase;
+  --label-spacing: 0.06em;
+  --display-spacing: 0.06em;
+
+  /* Camo header */
+  --camo-base: #6b7340;
+  --camo-1: #4b5320;
+  --camo-2: #8a7a4f;
+  --camo-3: #3b2f1e;
+  --camo-4: #b3a06e;
+  --header-text: #f3efe3;
+  --header-chip-bg: rgba(43, 42, 31, 0.85);
+
+  /* Bottom navigation */
+  --nav-bg: #2b2a1f;
+  --nav-text: #d9cfb0;
+  --nav-active: #f08a3c;
+
+  /* Rod markers (Woodland keeps one olive marker) */
+  --rod-1: #4b5320;
+  --rod-2: #4b5320;
+  --rod-3: #4b5320;
+  --rod-4: #4b5320;
+  --rod-5: #4b5320;
+  --rod-6: #4b5320;
+  --rod-glow: 0 0 0 0;
+  --rod-marker-text: #f3efe3;
 }
 
-/* Light theme */
-[data-theme='light'] {
-  color-scheme: light;
-  --background-primary: #f7faff;
-  --background-secondary: #edf4fb;
-  --background-card: #ffffff;
-  --background-input: #ffffff;
+[data-theme='dark'] {
+  color-scheme: dark;
+  --background-primary: #0e130f;
+  --background-secondary: #141b15;
+  --background-card: #18201a;
+  --background-raised: #222c24;
+  --background-input: #111712;
+  --background-inverse: #222c24;
+  --text-on-inverse: #e6ede3;
+  --text-on-inverse-muted: #9daa9a;
 
-  --primary: #2474b5;
-  --primary-hover: #3288ce;
-  --primary-active: #1e6399;
+  --primary: #a8cc6b;
+  --primary-hover: #bcd98a;
+  --primary-active: #93b85a;
+  --text-on-primary: #10170c;
 
-  --text-primary: #17212b;
-  --text-secondary: #33485c;
-  --text-muted: #6e8293;
-  --text-on-primary: #ffffff;
+  --cta: #a8cc6b;
+  --cta-hover: #bcd98a;
+  --cta-active: #93b85a;
+  --text-on-cta: #10170c;
 
-  --border-primary: #c9d9e8;
-  --border-active: #2474b5;
-  --border-danger: #d64545;
+  --heading-color: #e6ede3;
+  --text-primary: #e6ede3;
+  --text-secondary: #c6d1c3;
+  --text-muted: #9daa9a;
 
-  --shadow-sm: 0 1px 3px rgba(23, 33, 43, 0.08);
-  --shadow-md: 0 4px 12px rgba(23, 33, 43, 0.12);
+  --border-primary: #2a352b;
+  --border-strong: #3a473b;
+  --border-active: #a8cc6b;
+  --border-danger: #ff6b6b;
+
+  --success: #4cd964;
+  --warning: #e8b44c;
+  --danger: #ff6b6b;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.55);
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-button: 22px;
+  --radius-pill: 999px;
+
+  --font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Rajdhani', 'IBM Plex Sans', sans-serif;
+  --font-label: 'Rajdhani', 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --label-transform: uppercase;
+  --label-spacing: 0.08em;
+  --display-spacing: 0.08em;
+
+  --camo-base: #141b15;
+  --camo-1: #1b241c;
+  --camo-2: #1f2a20;
+  --camo-3: #192019;
+  --camo-4: #243026;
+  --header-text: #e6ede3;
+  --header-chip-bg: #18201a;
+
+  --nav-bg: #0a0e0b;
+  --nav-text: #9daa9a;
+  --nav-active: #a8cc6b;
+
+  /* Bite-alarm LED colours, one per rod */
+  --rod-1: #ff4d4d;
+  --rod-2: #3da5ff;
+  --rod-3: #4cd964;
+  --rod-4: #ffb020;
+  --rod-5: #c08bff;
+  --rod-6: #f2f2f2;
+  --rod-glow: 0 0 10px 1px;
+  --rod-marker-text: #10170c;
 }

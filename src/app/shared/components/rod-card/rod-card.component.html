@@ -4,8 +4,9 @@
     [label]="rod.name"
     [defaultExpanded]="false"
   >
-    <div expandHeader class="rod-header">
-      <strong>{{ rod.name }}</strong>
+    <div expandHeader class="rod-header" [style.--rod-color]="rodColor">
+      <span class="rod-marker" aria-hidden="true">{{ rod.rodNumber }}</span>
+      <strong class="rod-name">{{ rod.name }}</strong>
       <span class="status" [class.inactive]="!rod.isActive">{{ rod.isActive ? ('rod.active' | tr) : ('rod.inactive' | tr) }}</span>
     </div>
 

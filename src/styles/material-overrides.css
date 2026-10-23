@@ -1,12 +1,40 @@
 /* Angular Material overrides using design tokens */
 
+/* Theme fonts for every Material component (no Material typography theme is loaded) */
+:root {
+  --mat-sys-body-large-font: var(--font-family);
+  --mat-sys-body-medium-font: var(--font-family);
+  --mat-sys-body-small-font: var(--font-family);
+  --mat-sys-label-large-font: var(--font-label);
+  --mat-sys-label-medium-font: var(--font-label);
+  --mat-sys-label-small-font: var(--font-label);
+  --mat-sys-title-large-font: var(--font-label);
+  --mat-sys-title-medium-font: var(--font-label);
+  --mat-sys-title-small-font: var(--font-label);
+  --mat-sys-headline-small-font: var(--font-display);
+}
+
+.mat-mdc-form-field,
+.mat-mdc-select,
+.mat-mdc-option,
+.mat-mdc-dialog-container,
+.mat-mdc-snack-bar-container,
+.mat-mdc-checkbox,
+.mat-mdc-slide-toggle,
+.mat-mdc-radio-button,
+.mat-mdc-menu-panel,
+.mat-mdc-tooltip,
+.mat-bottom-sheet-container {
+  font-family: var(--font-family) !important;
+}
+
 /* Form fields / selects — match outline button look (primary border, button radius) */
 .mat-mdc-form-field {
   width: 100%;
   --mdc-outlined-text-field-label-text-color: var(--primary);
   --mdc-outlined-text-field-input-text-color: var(--text-primary);
   --mdc-outlined-text-field-caret-color: var(--primary);
-  --mdc-outlined-text-field-outline-color: var(--primary);
+  --mdc-outlined-text-field-outline-color: var(--border-strong);
   --mdc-outlined-text-field-focus-outline-color: var(--primary);
   --mdc-outlined-text-field-hover-outline-color: var(--primary-hover);
   --mdc-outlined-text-field-disabled-outline-color: var(--border-primary);
@@ -23,7 +51,7 @@
 .mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__leading,
 .mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__notch,
 .mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__trailing {
-  border-color: var(--primary) !important;
+  border-color: var(--border-strong) !important;
   border-width: 1px !important;
 }
 
@@ -32,6 +60,11 @@
 .mat-mdc-form-field.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing {
   border-color: var(--primary) !important;
   border-width: 1px !important;
+}
+
+/* Filled input surface inside the outline */
+.mat-mdc-form-field .mdc-text-field--outlined:not(.mdc-text-field--disabled) {
+  background: var(--background-input);
 }
 
 /* Explicit radii — Android WebView often ignores MDC shape CSS variables */
@@ -77,6 +110,13 @@ textarea.mat-mdc-input-element {
 .mat-mdc-form-field .mdc-floating-label--float-above,
 .mat-mdc-form-field label.mat-mdc-floating-label {
   color: var(--primary) !important;
+  font-family: var(--font-label) !important;
+  font-weight: 600 !important;
+}
+
+.mat-mdc-form-field .mdc-floating-label--float-above {
+  letter-spacing: var(--label-spacing) !important;
+  text-transform: var(--label-transform);
 }
 
 .mat-mdc-select {
@@ -168,8 +208,8 @@ textarea.mat-mdc-input-element {
 .theme-light-select-panel {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--primary) !important;
-  border-radius: var(--radius-button) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-sm) !important;
   box-shadow: var(--shadow-md) !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
@@ -208,8 +248,8 @@ textarea.mat-mdc-input-element {
 .mat-mdc-autocomplete-panel {
   background: var(--background-card) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--primary) !important;
-  border-radius: var(--radius-button) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-sm) !important;
   box-shadow: var(--shadow-md) !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
@@ -305,12 +345,16 @@ textarea.mat-mdc-input-element {
 .mat-mdc-dialog-container .mdc-dialog__surface {
   background-color: var(--background-card) !important;
   color: var(--text-primary) !important;
-  border: 2px solid var(--border-active) !important;
-  border-radius: var(--radius-md) !important;
+  border: 2px solid var(--border-strong) !important;
+  border-radius: var(--radius-lg) !important;
 }
 
 .mat-mdc-dialog-container .mat-mdc-dialog-title {
-  color: var(--primary) !important;
+  color: var(--heading-color) !important;
+  font-family: var(--font-label) !important;
+  font-weight: 700 !important;
+  letter-spacing: var(--label-spacing) !important;
+  text-transform: var(--label-transform);
   text-align: center;
   background: var(--background-card);
 }
@@ -330,24 +374,9 @@ textarea.mat-mdc-input-element {
   padding-top: var(--spacing-sm);
 }
 
-/* Dialog buttons — same outline style as app-wide buttons */
-.mat-mdc-dialog-container .mat-mdc-button:not(:disabled),
-.mat-mdc-dialog-container .mat-mdc-outlined-button:not(:disabled),
-.mat-mdc-dialog-container .mat-mdc-unelevated-button:not(:disabled),
-.mat-mdc-dialog-container .mat-mdc-flat-button:not(:disabled),
-.mat-mdc-dialog-container .mat-mdc-raised-button:not(:disabled) {
-  --mdc-text-button-label-text-color: var(--primary);
-  --mdc-outlined-button-label-text-color: var(--primary);
-  --mdc-outlined-button-outline-color: var(--primary);
-  --mdc-filled-button-container-color: transparent;
-  --mdc-filled-button-label-text-color: var(--primary);
-  --mdc-protected-button-container-color: transparent;
-  --mdc-protected-button-label-text-color: var(--primary);
-}
-
 /* Ensure form fields inside dialogs have proper styling */
 .mat-mdc-dialog-container .mat-mdc-form-field {
-  --mdc-outlined-text-field-outline-color: var(--primary);
+  --mdc-outlined-text-field-outline-color: var(--border-strong);
   --mdc-outlined-text-field-focus-outline-color: var(--primary);
   --mdc-outlined-text-field-hover-outline-color: var(--primary-hover);
   --mdc-outlined-text-field-label-text-color: var(--primary);
@@ -361,14 +390,17 @@ textarea.mat-mdc-input-element {
 }
 
 .cdk-overlay-backdrop.themed-backdrop.theme-backdrop-light {
-  background: rgba(23, 33, 43, 0.26);
+  background: rgba(43, 42, 31, 0.45);
 }
 
 .cdk-overlay-container[data-theme='light'] .cdk-overlay-backdrop:not(.theme-backdrop-dark) {
-  background: rgba(23, 33, 43, 0.26);
+  background: rgba(43, 42, 31, 0.45);
 }
 
-/* Unified outline button style (“Vraag je data”) for all Material buttons */
+/*
+ * Buttons: stroked/text = outline in --primary; flat/unelevated = the main action,
+ * filled with --cta (rules right after this block). Labels use the label font.
+ */
 .mat-mdc-button,
 .mat-mdc-outlined-button,
 .mat-mdc-unelevated-button,
@@ -401,8 +433,47 @@ a.mat-mdc-flat-button {
   min-height: var(--button-height);
   background: transparent !important;
   color: var(--primary) !important;
-  border: 1px solid var(--primary) !important;
+  border: 2px solid var(--primary) !important;
   box-shadow: none !important;
+  font-family: var(--font-label) !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  letter-spacing: var(--label-spacing) !important;
+  text-transform: var(--label-transform) !important;
+}
+
+.mat-mdc-button .mdc-button__label,
+.mat-mdc-outlined-button .mdc-button__label,
+.mat-mdc-unelevated-button .mdc-button__label,
+.mat-mdc-flat-button .mdc-button__label {
+  text-transform: var(--label-transform) !important;
+}
+
+.mat-mdc-unelevated-button:not(:disabled):not(.mat-warn),
+.mat-mdc-flat-button:not(:disabled):not(.mat-warn),
+a.mat-mdc-unelevated-button:not(.mat-warn),
+a.mat-mdc-flat-button:not(.mat-warn) {
+  --mdc-filled-button-container-color: var(--cta);
+  --mdc-filled-button-label-text-color: var(--text-on-cta);
+  background: var(--cta) !important;
+  color: var(--text-on-cta) !important;
+  border-color: var(--cta) !important;
+}
+
+.mat-mdc-unelevated-button:hover:not(:disabled):not(.mat-warn),
+.mat-mdc-flat-button:hover:not(:disabled):not(.mat-warn) {
+  background: var(--cta-hover) !important;
+  border-color: var(--cta-hover) !important;
+}
+
+.mat-mdc-unelevated-button:active:not(:disabled):not(.mat-warn),
+.mat-mdc-flat-button:active:not(:disabled):not(.mat-warn) {
+  background: var(--cta-active) !important;
+}
+
+.mat-mdc-unelevated-button .mdc-button__label,
+.mat-mdc-flat-button .mdc-button__label {
+  color: inherit !important;
 }
 
 .mat-mdc-button .mdc-button__ripple,
@@ -478,9 +549,13 @@ a.mat-mdc-flat-button.mat-warn {
 }
 
 .mat-mdc-chip.mat-mdc-standard-chip {
-  --mdc-chip-container-shape-radius: var(--radius-sm);
-  --mdc-chip-elevated-container-color: var(--background-secondary);
-  --mdc-chip-label-text-color: var(--text-secondary);
+  --mdc-chip-container-shape-radius: var(--radius-pill);
+  --mdc-chip-elevated-container-color: var(--background-raised);
+  --mdc-chip-label-text-color: var(--text-primary);
+  font-family: var(--font-label);
+  font-weight: 600;
+  letter-spacing: var(--label-spacing);
+  text-transform: var(--label-transform);
 }
 
 .mat-mdc-list-option {
@@ -494,11 +569,11 @@ a.mat-mdc-flat-button.mat-warn {
   --mdc-radio-selected-icon-color: var(--primary);
   --mdc-radio-selected-focus-icon-color: var(--primary);
   --mdc-radio-selected-hover-icon-color: var(--primary-hover);
-  --mat-radio-label-text-color: var(--primary);
+  --mat-radio-label-text-color: var(--text-primary);
 }
 
 .mat-mdc-radio-button .mdc-label {
-  color: var(--primary) !important;
+  color: var(--text-primary) !important;
 }
 
 .mat-mdc-tooltip {

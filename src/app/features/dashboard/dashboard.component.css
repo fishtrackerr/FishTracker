@@ -78,9 +78,10 @@
 }
 
 .section h2 {
-  font-size: 1rem;
-  color: var(--primary);
+  font-family: var(--font-label);
+  font-size: 1.05rem;
+  color: var(--heading-color);
   margin: 0 0 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  text-transform: var(--label-transform);
+  letter-spacing: var(--label-spacing);
 }

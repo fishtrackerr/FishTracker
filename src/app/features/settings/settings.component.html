@@ -19,8 +19,8 @@
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'settings.theme' | tr }}</mat-label>
         <mat-select [ngModel]="settings().themeMode" (ngModelChange)="updateTheme($event)">
-          <mat-option value="dark">{{ 'settings.darkMode' | tr }}</mat-option>
           <mat-option value="light">{{ 'settings.lightMode' | tr }}</mat-option>
+          <mat-option value="dark">{{ 'settings.darkMode' | tr }}</mat-option>
           <mat-option value="system">{{ 'settings.systemPreference' | tr }}</mat-option>
         </mat-select>
       </mat-form-field>

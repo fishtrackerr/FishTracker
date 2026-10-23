@@ -53,9 +53,9 @@
   "settings": {
     "appearance": "Appearance",
     "theme": "Theme",
-    "darkMode": "Dark mode",
-    "lightMode": "Light mode",
-    "systemPreference": "System preference",
+    "darkMode": "Night bivvy (dark)",
+    "lightMode": "Woodland camo (default)",
+    "systemPreference": "Follow device (light/dark)",
     "preview": "Preview",
     "language": "Language",
     "units": "Units",

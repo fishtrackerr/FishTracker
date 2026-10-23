@@ -52,6 +52,12 @@ export class RodCardComponent {
   @Input() catches: Catch[] = [];
   @Input() sessionSpots: SessionSpot[] = [];
 
+  /** Theme colour for this rod's marker (--rod-1 … --rod-6, repeating). */
+  get rodColor(): string {
+    const index = ((Math.max(1, this.rod.rodNumber) - 1) % 6) + 1;
+    return `var(--rod-${index})`;
+  }
+
   readonly changed = output<void>();
 
   editing = false;

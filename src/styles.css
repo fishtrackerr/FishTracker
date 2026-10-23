@@ -1,7 +1,19 @@
-@import '@fontsource/roboto/400.css';
-@import '@fontsource/roboto/500.css';
-@import '@fontsource/roboto/600.css';
-@import '@fontsource/roboto/700.css';
+/* Woodland camo fonts */
+@import '@fontsource/saira-stencil-one/latin-400.css';
+@import '@fontsource/barlow/latin-400.css';
+@import '@fontsource/barlow/latin-500.css';
+@import '@fontsource/barlow/latin-600.css';
+@import '@fontsource/barlow/latin-700.css';
+@import '@fontsource/barlow-condensed/latin-500.css';
+@import '@fontsource/barlow-condensed/latin-600.css';
+@import '@fontsource/barlow-condensed/latin-700.css';
+/* Night bivvy fonts */
+@import '@fontsource/rajdhani/latin-600.css';
+@import '@fontsource/rajdhani/latin-700.css';
+@import '@fontsource/ibm-plex-sans/latin-400.css';
+@import '@fontsource/ibm-plex-sans/latin-500.css';
+@import '@fontsource/ibm-plex-sans/latin-600.css';
+@import '@fontsource/ibm-plex-mono/latin-500.css';
 @import 'material-icons/iconfont/filled.css';
 
 @import './styles/tokens.css';
@@ -9,6 +21,13 @@
 
 * {
   box-sizing: border-box;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }
 
 html, body {
@@ -24,26 +43,36 @@ html, body {
 }
 
 h1, h2, h3, h4 {
-  color: var(--primary);
+  color: var(--heading-color);
+  font-family: var(--font-label);
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 a {
   color: var(--primary);
 }
 
+/* Page titles: stencil (Woodland) / Rajdhani (Night bivvy) */
 .app-title {
   text-align: center;
+  font-family: var(--font-display);
   font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: var(--display-spacing);
+  text-transform: uppercase;
   margin: 0 0 var(--spacing-md);
-  color: var(--primary);
+  color: var(--heading-color);
 }
 
 .section-title {
   text-align: center;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--primary);
+  font-family: var(--font-label);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: var(--label-spacing);
+  text-transform: var(--label-transform);
+  color: var(--heading-color);
   margin-bottom: var(--spacing-md);
 }
 
@@ -56,7 +85,26 @@ a {
 }
 
 .app-card:hover {
-  border-color: var(--border-active);
+  border-color: var(--border-strong);
+}
+
+/* Material icon sized to sit inline with text */
+.inline-icon.mat-icon {
+  font-size: 1.15em;
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.2em;
+  color: var(--primary);
+}
+
+/* Small uppercase field/stat label shared by both themes */
+.app-label {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: var(--label-spacing);
+  text-transform: var(--label-transform);
+  color: var(--text-muted);
 }
 
 .app-btn {
@@ -67,30 +115,34 @@ a {
   min-height: var(--button-height);
   padding: 0 var(--spacing-md);
   border-radius: var(--radius-button);
-  font-weight: 500;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: var(--label-spacing);
+  text-transform: var(--label-transform);
   cursor: pointer;
   border: none;
-  font-family: inherit;
 }
 
+/* Main action: filled hunter orange (Woodland) / bivvy green (Night bivvy) */
 .app-btn-primary {
-  background: transparent;
-  color: var(--primary);
-  border: 1px solid var(--primary);
+  background: var(--cta);
+  color: var(--text-on-cta);
+  border: 1px solid var(--cta);
 }
 
 .app-btn-primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  background: var(--cta-hover);
 }
 
 .app-btn-primary:active:not(:disabled) {
-  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  background: var(--cta-active);
 }
 
 .app-btn-outline {
   background: transparent;
   color: var(--primary);
-  border: 1px solid var(--primary);
+  border: 2px solid var(--primary);
 }
 
 .app-btn-danger {

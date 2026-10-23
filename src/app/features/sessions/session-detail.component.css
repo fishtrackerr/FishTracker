@@ -8,8 +8,8 @@
   font-weight: 600;
   margin-bottom: 16px;
 }
-.status.active { background: #ff6b0022; color: #ff6b00; }
-.status.completed { background: #22c55e22; color: #22c55e; }
+.status.active { background: color-mix(in srgb, var(--cta) 22%, transparent); color: var(--text-primary); }
+.status.completed { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--text-primary); }
 .fields { margin: 16px 0; }
 .full { width: 100%; }
 .gps { font-size: 0.85rem; color: var(--text-muted); }

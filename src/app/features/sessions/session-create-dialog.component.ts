@@ -1,3 +1,4 @@
+import { MatIconModule } from '@angular/material/icon';
 import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,6 +28,7 @@ export interface SessionCreateDialogData {
   selector: 'app-session-create-dialog',
   standalone: true,
   imports: [
+    MatIconModule,
     FormsModule,
     MatDialogModule,
     MatButtonModule,
@@ -58,7 +60,7 @@ export interface SessionCreateDialogData {
           @for (lake of data.lakes; track lake.id) {
             <mat-option [value]="lake.id">
               @if (lake.isFavorite) {
-                ⭐
+                <mat-icon class="inline-icon" aria-hidden="true">star</mat-icon>
               }
               {{ lake.name }}
             </mat-option>

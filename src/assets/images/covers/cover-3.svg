@@ -1,7 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
-  <rect width="400" height="300" fill="#1a0a28"/>
-  <rect y="190" width="400" height="110" fill="#2a1a4a"/>
-  <circle cx="200" cy="80" r="30" fill="#ffffff22"/>
-  <path d="M50 210 L350 210" stroke="#4a8aff" stroke-width="2"/>
-  <text x="200" y="240" text-anchor="middle" fill="#ff6b00" font-size="24" font-family="sans-serif"><</text>
+  <rect width="400" height="300" fill="#0e130f"/>
+  <g fill="#e6ede3" opacity="0.7">
+    <circle cx="40" cy="40" r="1.5"/><circle cx="120" cy="70" r="1.5"/><circle cx="200" cy="30" r="2"/>
+    <circle cx="280" cy="60" r="1.5"/><circle cx="350" cy="36" r="1.5"/><circle cx="90" cy="20" r="1"/>
+  </g>
+  <circle cx="320" cy="70" r="22" fill="#e6ede3" opacity="0.85"/>
+  <rect y="210" width="400" height="90" fill="#141b15"/>
+  <path d="M120 212 C130 150 170 124 200 124 C230 124 270 150 280 212Z" fill="#1f2a20" stroke="#2a352b" stroke-width="2"/>
+  <path d="M184 212 C186 186 194 172 200 172 C206 172 214 186 216 212Z" fill="#a8cc6b" opacity="0.35"/>
+  <circle cx="60" cy="200" r="5" fill="#ff4d4d"/>
+  <circle cx="84" cy="200" r="5" fill="#3da5ff"/>
+  <circle cx="108" cy="200" r="5" fill="#4cd964"/>
+  <path d="M40 206h88" stroke="#2a352b" stroke-width="3"/>
 </svg>

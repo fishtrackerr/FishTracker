@@ -3,22 +3,30 @@
 ## Shell
 
 - Fixed bottom navigation with active states
-- **Mode banner** under the offline banner (when a fishing mode is selected) showing the current mode label
+- **Camo header** under the offline banner (when a fishing mode is selected): inline SVG camo pattern coloured by `--camo-*` tokens, the stencil `FishTracker` wordmark and a fishing-mode chip
 - Offline connectivity banner above content (dismissible for the session; reappears when going offline again)
 - Content area scrolls; bottom padding clears the nav
 - Safe-area insets for notched devices
 
 ## Themes
 
-- **Dark** (default): orange primary accents on dark backgrounds; body text uses light warm neutrals (`--text-primary: #f2e6d8`) for readable contrast on `#0b0b0b`
-- **Light**: blue primary on light backgrounds
-- **System**: follows `prefers-color-scheme`
+- **Woodland camo** (`themeMode: 'light'`, default): sand ground (`#e4ddc8`), army olive text/outline colour (`--primary`), hunter-orange filled actions (`--cta`), dark bottom nav, Saira Stencil One titles, Barlow / Barlow Condensed text and uppercase labels, 8px corners
+- **Night bivvy** (`themeMode: 'dark'`): deep forest green (`#0e130f`), bivvy-green actions, faint dark camo header, Rajdhani titles/labels, IBM Plex Sans text, pill buttons; each rod marker uses a bite-alarm LED colour (`--rod-1` … `--rod-6`: red, blue, green, amber, purple, white) with a glow
+- **Follow device** (`system`): Woodland by light preference, Night bivvy by dark preference
 
-`ThemeService` sets `data-theme` on `<html>` and syncs CDK `OverlayContainer` classes.
+`ThemeService` sets `data-theme` on `<html>`, syncs CDK `OverlayContainer` classes and sets `<meta name="theme-color">` to the camo header colour of the active theme.
+
+Fonts are self-hosted with `@fontsource` (Latin subset only), like the icons: no Google Fonts CDN (CSP and offline use).
 
 ## CSS variables
 
-Defined in `src/styles/tokens.css`: backgrounds, primary, text, borders, spacing, radii, input/button heights.
+Defined in `src/styles/tokens.css`: backgrounds, primary, text, borders, spacing, radii, input/button heights, plus:
+
+- `--primary` — text, outline and icon colour (passes 4.5:1 on the backgrounds); `--cta` / `--text-on-cta` — fill of main action buttons and badges (orange in Woodland is too light to use as text)
+- `--heading-color`, `--font-display`, `--font-label`, `--label-transform`, `--label-spacing`
+- `--camo-base`, `--camo-1` … `--camo-4`, `--header-text`, `--header-chip-bg`
+- `--nav-bg`, `--nav-text`, `--nav-active`
+- `--rod-1` … `--rod-6`, `--rod-glow`, `--rod-marker-text` (rod-card marker)
 
 ## Angular Material
 
@@ -26,16 +34,17 @@ Overrides in `src/styles/material-overrides.css`:
 
 - Form fields with 12px input padding
 - Themed dialogs, selects, menus, datepicker, snackbar (`app-snackbar` classes), bottom sheet
-- Primary buttons use `--primary` token
+- Flat (`mat-flat-button`) = main action, filled with `--cta`; stroked / text buttons = outline in `--primary`; all button labels use `--font-label` and `--label-transform`
+- Form fields: neutral `--border-strong` outline, `--primary` when focused, `--background-input` fill; floated labels uppercase
 
 ## Dialogs
 
 Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hardcode `dark-dialog`.
 
-- Dialog surfaces use a `2px` border with `--border-active` (orange in dark, blue in light)
-- Dialog body text uses `--text-primary`; titles use `--primary`
+- Dialog surfaces use a `2px` `--border-strong` border and `--radius-lg`
+- Dialog body text uses `--text-primary`; titles use `--heading-color` in the label font
 - Form fields inside dialogs use shared Material overrides (`--border-primary` outline, `--text-secondary` labels)
-- Cancel actions use stroked buttons; primary/confirm actions use filled buttons — both follow `--primary`
+- Cancel actions use stroked buttons; primary/confirm actions use filled (`--cta`) buttons
 - Single text input (add/rename option, preset name): `promptForText(dialogService, data)` opens `TextPromptDialogComponent` and resolves to the trimmed value or `undefined`. Do not use `window.prompt`
 - Bottom sheets (e.g. mobile filters) should include `themed-bottom-sheet` plus `theme-dark|theme-light` and a themed backdrop class, matching `DialogService`
 
@@ -63,7 +72,7 @@ Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hard
 
 ## Icons
 
-Material Icons via `@angular/material/icon` only. Icons are self-hosted (`material-icons` package, `filled.css` only) — do not load Google Fonts CDN. Production PWA prefetches `/media/*.woff2` via the service worker; Capacitor Android builds omit the SW and use APK assets. Critical CSS inlining is disabled (`inlineCritical: false`) so the full stylesheet (including Material Icons `@font-face`) loads under CSP without a blocked `onload` handler.
+Material Icons via `@angular/material/icon` only; no emoji in buttons or labels (use `<mat-icon class="inline-icon">` next to text). Icons are self-hosted (`material-icons` package, `filled.css` only) — do not load Google Fonts CDN. Production PWA prefetches `/media/*.woff2` via the service worker; Capacitor Android builds omit the SW and use APK assets. Critical CSS inlining is disabled (`inlineCritical: false`) so the full stylesheet (including Material Icons `@font-face`) loads under CSP without a blocked `onload` handler.
 
 ## Responsive rules
 
@@ -74,8 +83,8 @@ Material Icons via `@angular/material/icon` only. Icons are self-hosted (`materi
 
 ## Buttons
 
-- Corner radius: `var(--radius-button)` (aliased to `--radius-md` / 12px — same as weather-card and `.app-card`)
-- Primary: filled, `--primary` background
+- Corner radius: `var(--radius-button)` (8px Woodland, pill in Night bivvy)
+- Primary: filled, `--cta` background with `--text-on-cta`
 - Stroked: outline for secondary actions
 - Delete: warn + confirmation dialog
 - `mat-icon-button` stays circular (do not apply `--radius-button`)

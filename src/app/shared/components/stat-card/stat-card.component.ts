@@ -20,14 +20,19 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
       box-shadow: var(--shadow-sm);
     }
     .label {
-      font-size: 0.75rem;
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: var(--label-spacing);
+      text-transform: var(--label-transform);
       color: var(--text-muted);
       margin-bottom: 4px;
     }
     .value {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--primary);
+      font-family: var(--font-label);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--heading-color);
     }
   `,
 })

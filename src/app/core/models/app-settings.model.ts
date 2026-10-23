@@ -66,7 +66,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   lengthUnit: 'cm',
   temperatureUnit: 'celsius',
   distanceUnit: 'm',
-  themeMode: 'dark',
+  themeMode: 'light',
   lockTimeoutMinutes: 5,
   pinEnabled: false,
   favoriteSpecies: ['Carp', 'Pike', 'Perch', 'Bream', 'Roach'],
