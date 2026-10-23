@@ -25,17 +25,48 @@ describe('FishingModeService', () => {
     expect(service.hasMode()).toBe(false);
   });
 
-  it('persists selected mode in sessionStorage', () => {
+  it('persists selected mode in localStorage', () => {
     service.setMode('pike');
     expect(service.getMode()).toBe('pike');
-    expect(sessionStorage.getItem('fish-tracker-fishing-mode')).toBe('pike');
+    expect(localStorage.getItem('fish-tracker-fishing-mode')).toBe('pike');
+    expect(sessionStorage.getItem('fish-tracker-fishing-mode')).toBeNull();
     expect(service.requireMode()).toBe('pike');
+  });
+
+  it('remembers the mode across restarts', () => {
+    localStorage.setItem('fish-tracker-fishing-mode', 'bass');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [FishingModeService, SettingsService] });
+    expect(TestBed.inject(FishingModeService).getMode()).toBe('bass');
+  });
+
+  it('adopts a legacy sessionStorage mode when localStorage has none', () => {
+    sessionStorage.setItem('fish-tracker-fishing-mode', 'feeder');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [FishingModeService, SettingsService] });
+    expect(TestBed.inject(FishingModeService).getMode()).toBe('feeder');
+    expect(localStorage.getItem('fish-tracker-fishing-mode')).toBe('feeder');
+  });
+
+  it('ignores invalid stored modes', () => {
+    localStorage.setItem('fish-tracker-fishing-mode', 'nonsense');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [FishingModeService, SettingsService] });
+    expect(TestBed.inject(FishingModeService).getMode()).toBeNull();
   });
 
   it('clears mode on clearMode', () => {
     service.setMode('bass');
     service.clearMode();
     expect(service.getMode()).toBeNull();
+    expect(localStorage.getItem('fish-tracker-fishing-mode')).toBeNull();
+    expect(sessionStorage.getItem('fish-tracker-fishing-mode')).toBeNull();
+  });
+
+  it('clearMode also removes a legacy sessionStorage copy', () => {
+    service.setMode('bass');
+    sessionStorage.setItem('fish-tracker-fishing-mode', 'bass');
+    service.clearMode();
     expect(sessionStorage.getItem('fish-tracker-fishing-mode')).toBeNull();
   });
 

@@ -208,6 +208,7 @@ export class ResetService {
     localStorage.removeItem(WEATHER_CACHE_KEY);
     localStorage.removeItem(LOCK_STATE_KEY);
     try {
+      localStorage.removeItem(FISHING_MODE_KEY);
       sessionStorage.removeItem(UNLOCK_SESSION_KEY);
       sessionStorage.removeItem(FISHING_MODE_KEY);
     } catch {

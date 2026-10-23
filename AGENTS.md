@@ -14,8 +14,8 @@ Rules for AI-assisted changes to this repository.
 
 ## Fishing modes
 
-- Modes: `carper`, `catfish`, `pike`, `bass`, `feeder`, `general` — selected once per app run after PIN (`/mode-select`)
-- Persist selection only in `sessionStorage` (`fish-tracker-fishing-mode`); clearing requires process restart or full reset
+- Modes: `carper`, `catfish`, `pike`, `bass`, `feeder`, `general` — selected on first run after PIN (`/mode-select`), then remembered and switchable in Settings → General
+- Persist selection in `localStorage` (`fish-tracker-fishing-mode`, legacy sessionStorage value migrated); only a full reset clears it, `resetCurrentMode` must not
 - Extend `ModeScopedRepository` for fishing data; stamp `fishingMode` on write; filter lists with `tryActiveMode()` (empty when null); hide cross-mode rows in `getById` / `watchById` via `forActiveMode`
 - Use `getAllAcrossModes()` only for backup/import/full wipe
 - Per-mode prefs in `AppSettings.modePreferences`; PIN, theme, units, language, AI key stay shared
@@ -37,7 +37,7 @@ Rules for AI-assisted changes to this repository.
 ## Storage
 
 - IndexedDB for data and images
-- localStorage for settings, lock state, filter presets only; fishing mode in sessionStorage
+- localStorage for settings, lock state, filter presets, fishing mode
 - Schema changes require Dexie version migration in `fish-db.ts`
 - Optional fields must not block entity creation
 - Centralize keys in `src/app/core/constants/storage-keys.ts`

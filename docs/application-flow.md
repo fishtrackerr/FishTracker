@@ -8,26 +8,26 @@
 4. `performInitialNavigation()` runs once:
    - Locked → `/pin/unlock` (stores return URL)
    - No PIN → `/pin/setup`
-   - No fishing mode for this app run → `/mode-select`
+   - No fishing mode stored (first run or after full reset) → `/mode-select`
    - Valid deep link → preserve route (entities from other modes are not loaded)
    - Active session (current mode) + default entry → `/sessions/active`
    - Otherwise → `/`
 
 ## Fishing mode
 
-1. After PIN unlock, user picks one mode on `/mode-select`: carper, catfish, pike, bass, feeder, or general. The picker replaces itself in history and can't be reopened in the same run (`modeNotSelectedGuard`).
-2. Choice is kept in memory and `sessionStorage` (`fish-tracker-fishing-mode`) until the app process restarts (or full application reset). Soft browser refresh keeps the mode.
+1. After PIN unlock, user picks one mode on `/mode-select`: carper, catfish, pike, bass, feeder, or general. The picker replaces itself in history and can't be reopened once a mode is stored (`modeNotSelectedGuard`).
+2. Choice is kept in memory and `localStorage` (`fish-tracker-fishing-mode`), so it is remembered across app restarts until a full application reset. A legacy `sessionStorage` value is adopted once on startup. `/mode-select` therefore only appears on first run or after a full reset.
 3. Lakes, sessions, catches, user options, images, AI chats, and filter presets are scoped to that mode.
 4. PIN, theme, units, language, and AI API key/config remain shared across modes.
 5. Per-mode preferences (`lastLakeId`, `defaultLakeId`, `homepageImageId`, favorites) live in `AppSettings.modePreferences`.
 6. Existing data from before this feature is migrated to **carper** (Dexie v7).
-7. Shell shows a mode banner for the active mode. Switching modes requires restarting the app (or clearing mode via full reset).
+7. Shell shows a mode banner for the active mode. Switch modes in Settings → General → Fishing mode: after a confirm dialog the mode is set and the app navigates to `AppStartupService.resolveUnlockedDestination('/')` (active session of the new mode, or home). Data is per mode; an active session stays in its own mode.
 
 ## PIN unlock
 
 1. User enters 6-digit PIN on `/pin/unlock`.
 2. `PinLockService.verifyPin()` validates against PBKDF2 hash in settings.
-3. On success, navigates via stored return URL / `AppStartupService.resolveInitialRoute()`. If no fishing mode is set for this run, the deep link is re-stored and the user lands on `/mode-select` first.
+3. On success, navigates via stored return URL / `AppStartupService.resolveInitialRoute()`. If no fishing mode is stored, the deep link is re-stored and the user lands on `/mode-select` first.
 
 ## Mode select
 

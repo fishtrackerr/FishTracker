@@ -67,7 +67,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   temperatureUnit: 'celsius',
   distanceUnit: 'm',
   themeMode: 'light',
-  lockTimeoutMinutes: 5,
+  lockTimeoutMinutes: 60,
   pinEnabled: false,
   favoriteSpecies: ['Carp', 'Pike', 'Perch', 'Bream', 'Roach'],
   favoriteBaits: ['Boilie', 'Corn', 'Worm', 'Pellets'],

@@ -52,6 +52,11 @@ export class FishingModeService {
   clearMode(): void {
     this.modeSignal.set(null);
     try {
+      localStorage.removeItem(FISHING_MODE_KEY);
+    } catch {
+      /* ignore */
+    }
+    try {
       sessionStorage.removeItem(FISHING_MODE_KEY);
     } catch {
       /* ignore */
@@ -135,9 +140,19 @@ export class FishingModeService {
 
   private readStoredMode(): FishingMode | null {
     try {
-      const raw = sessionStorage.getItem(FISHING_MODE_KEY);
+      const raw = localStorage.getItem(FISHING_MODE_KEY);
       if (isFishingMode(raw)) {
         return raw;
+      }
+    } catch {
+      /* ignore */
+    }
+    // Migration: older versions kept the mode in sessionStorage only.
+    try {
+      const legacy = sessionStorage.getItem(FISHING_MODE_KEY);
+      if (isFishingMode(legacy)) {
+        this.persist(legacy);
+        return legacy;
       }
     } catch {
       /* ignore */
@@ -147,7 +162,7 @@ export class FishingModeService {
 
   private persist(mode: FishingMode): void {
     try {
-      sessionStorage.setItem(FISHING_MODE_KEY, mode);
+      localStorage.setItem(FISHING_MODE_KEY, mode);
     } catch {
       /* ignore */
     }

@@ -16,7 +16,7 @@ PBKDF2-SHA256, 100,000 iterations, 256-bit derived key, random 16-byte salt.
 - `failedAttempts`, `lockoutUntil`, `lockoutCount` for brute-force backoff
 - A separate `fish-tracker-unlock-session` flag in **sessionStorage** proves a successful PIN unlock in this browser tab
 - Cold start (no unlock session) always requires PIN — localStorage `isLocked: false` alone is not trusted
-- Expired sessions auto-lock based on `lockTimeoutMinutes`
+- Expired sessions auto-lock based on `lockTimeoutMinutes` (Settings → Security select: 5, 15, 30, 60 or 240 minutes; default 60). The value `0` means "only when the app starts": no inactivity lock, but a cold start still always requires the PIN
 
 ## Attempt lockout
 
@@ -36,7 +36,7 @@ Inactivity checked every 30 seconds. Activity tracked on pointer and keyboard ev
 
 Guards await startup initialization before evaluating lock state. Return URL stored in sessionStorage when redirecting to unlock. Only same-app relative paths are accepted (`/…`, not `//…` or absolute URLs).
 
-After unlock, if no fishing mode is selected for this app run, navigation goes to `/mode-select` before shell routes. See [routing.md](./routing.md) and [application-flow.md](./application-flow.md).
+After unlock, if no fishing mode is stored (first run or after a full reset), navigation goes to `/mode-select` before shell routes. See [routing.md](./routing.md) and [application-flow.md](./application-flow.md).
 
 ## Lock navigation
 

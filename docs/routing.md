@@ -33,7 +33,7 @@ Waits for `AppStartupService.waitUntilReady()`. Redirects to setup or unlock; st
 
 ### `fishingModeGuard`
 
-Requires a fishing mode selected for this app run (`FishingModeService`). When missing, stores the intended deep link as the return URL and redirects to `/mode-select`. Also re-checks PIN lock (stores return URL and redirects to unlock when locked).
+Requires a fishing mode stored (`FishingModeService`). When missing, stores the intended deep link as the return URL and redirects to `/mode-select`. Also re-checks PIN lock (stores return URL and redirects to unlock when locked).
 
 ### `pinSetupGuard` / `pinUnlockGuard`
 
@@ -47,7 +47,7 @@ Safety net: redirects to `/` if no active session exists **in the current fishin
 
 Primary logic in `AppStartupService.resolveInitialRoute()`. Guards complement but do not duplicate startup navigation.
 
-Flow after unlock: no mode → `/mode-select` (deep link kept in return URL) → pick mode → restore return URL or active session (current mode) or home. Mode choice is kept in `sessionStorage` until process restart.
+Flow after unlock: no mode → `/mode-select` (deep link kept in return URL) → pick mode → restore return URL or active session (current mode) or home. Mode choice is kept in `localStorage` and remembered across restarts; it can be changed in Settings.
 
 When an active session exists for the current mode, startup may route `/` to `/sessions/active`. The shell bottom nav shows primary destinations (Home, Current when active, Assistant when fishing, Sessions, Lakes) plus a **More** menu for Gallery, Stats, Settings (and Assistant when idle).
 

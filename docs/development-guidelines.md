@@ -33,7 +33,7 @@
 ## Storage
 
 - IndexedDB for app data and images
-- localStorage for settings, lock state, filter presets only; fishing mode in sessionStorage
+- localStorage for settings, lock state, filter presets only; fishing mode in localStorage too (`fish-tracker-fishing-mode`)
 - Handle write errors; schema changes require Dexie migrations
 - Optional fields must not block creation
 - No direct `db` access from components

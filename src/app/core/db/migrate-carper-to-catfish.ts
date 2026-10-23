@@ -129,6 +129,14 @@ export function migrateLocalStorageForCarperToCatfish(
       // Ignore corrupt settings during migration.
     }
 
+    try {
+      if (storage.getItem(FISHING_MODE_KEY) === SOURCE_MODE) {
+        storage.setItem(FISHING_MODE_KEY, TARGET_MODE);
+      }
+    } catch {
+      // Ignore storage errors.
+    }
+
     const carperPresetsKey = `${FILTER_PRESETS_KEY_PREFIX}:${SOURCE_MODE}`;
     const catfishPresetsKey = `${FILTER_PRESETS_KEY_PREFIX}:${TARGET_MODE}`;
     try {

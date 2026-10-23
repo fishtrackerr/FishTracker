@@ -200,6 +200,12 @@ describe('migrateLocalStorageForCarperToCatfish', () => {
     expect(session.getItem(FISHING_MODE_KEY)).toBe(TARGET_MODE);
   });
 
+  it('also maps a carper mode stored in localStorage', () => {
+    const local = memoryStorage({ [FISHING_MODE_KEY]: SOURCE_MODE });
+    migrateLocalStorageForCarperToCatfish(local, memoryStorage());
+    expect(local.getItem(FISHING_MODE_KEY)).toBe(TARGET_MODE);
+  });
+
   it('leaves non-carper session mode unchanged', () => {
     const session = memoryStorage({ [FISHING_MODE_KEY]: 'pike' });
     migrateLocalStorageForCarperToCatfish(memoryStorage(), session);

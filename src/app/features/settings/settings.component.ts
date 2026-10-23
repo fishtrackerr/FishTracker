@@ -16,6 +16,8 @@ import {
   UserOption,
   UserOptionCategory,
   AppLanguage,
+  FishingMode,
+  FISHING_MODES,
 } from '../../core/models';
 import { openFeedbackMailto } from '../../core/constants/feedback';
 import { EU_COUNTRIES } from '../../core/constants/eu-countries';
@@ -27,6 +29,7 @@ import { BackupService, BackupSaveCancelledError } from '../../core/services/bac
 import { ConfirmService } from '../../core/services/confirm.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { DemoDataService } from '../../core/services/demo-data.service';
+import { AppStartupService } from '../../core/services/app-startup.service';
 import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ImageService } from '../../core/services/image.service';
@@ -50,6 +53,9 @@ import {
   AssistantPromptDialogComponent,
   AssistantPromptDialogData,
 } from '../assistant/assistant-prompt-dialog.component';
+
+/** Inactivity lock choices in minutes; 0 = only when the app starts. */
+const LOCK_TIMEOUT_OPTIONS = [5, 15, 30, 60, 240, 0];
 
 /** Reject backup files larger than this before parsing. */
 const MAX_BACKUP_FILE_BYTES = 50 * 1024 * 1024;
@@ -95,8 +101,11 @@ export class SettingsComponent implements OnInit {
   private readonly assistantPrompts = inject(AssistantPromptService);
   private readonly dialog = inject(DialogService);
   private readonly router = inject(Router);
+  private readonly startup = inject(AppStartupService);
 
   readonly settings = this.settingsService.settings;
+  readonly fishingModes = FISHING_MODES;
+  readonly activeMode = () => this.fishingMode.getMode();
   readonly modePreferences = () => this.fishingMode.getActivePreferences();
   readonly aiApiKey = this.vault.aiApiKey;
   /** False after an in-tab reload until the next PIN unlock (key can't be encrypted). */
@@ -197,6 +206,45 @@ export class SettingsComponent implements OnInit {
 
   updateLockTimeout(value: number): void {
     this.settingsService.update({ lockTimeoutMinutes: value });
+  }
+
+  /** Fixed choices (0 = only when the app starts) plus a legacy custom value if one is stored. */
+  readonly lockTimeoutOptions = (): number[] => {
+    const current = this.settings().lockTimeoutMinutes;
+    return LOCK_TIMEOUT_OPTIONS.includes(current)
+      ? [...LOCK_TIMEOUT_OPTIONS]
+      : [...LOCK_TIMEOUT_OPTIONS, current].sort((a, b) => (a || Infinity) - (b || Infinity));
+  };
+
+  lockTimeoutLabel(minutes: number): string {
+    if (minutes === 0) {
+      return this.i18n.t('settings.lockOptionStart');
+    }
+    if (minutes === 60) {
+      return this.i18n.t('settings.lockOptionHour');
+    }
+    if (minutes > 60 && minutes % 60 === 0) {
+      return this.i18n.t('settings.lockOptionHours', { count: minutes / 60 });
+    }
+    return this.i18n.t('settings.lockOptionMinutes', { count: minutes });
+  }
+
+  async changeFishingMode(mode: FishingMode): Promise<void> {
+    if (mode === this.fishingMode.getMode()) {
+      return;
+    }
+    const ok = await this.confirm.confirm({
+      title: this.i18n.t('settings.fishingModeSwitchTitle'),
+      message: this.i18n.t('settings.fishingModeSwitchMessage', {
+        mode: this.i18n.t('modeSelect.modes.' + mode),
+      }),
+      confirmLabel: this.i18n.t('settings.fishingModeSwitchConfirm'),
+    });
+    if (!ok) {
+      return;
+    }
+    this.fishingMode.setMode(mode);
+    await this.router.navigateByUrl(await this.startup.resolveUnlockedDestination('/'));
   }
 
   async changePin(): Promise<void> {

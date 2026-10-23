@@ -84,6 +84,19 @@
     </div>
     <div class="submenu-content">
       <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'settings.fishingMode' | tr }}</mat-label>
+        <mat-select
+          [ngModel]="activeMode()"
+          [panelClass]="selectPanelClass"
+          (ngModelChange)="changeFishingMode($event)"
+        >
+          @for (mode of fishingModes; track mode) {
+            <mat-option [value]="mode">{{ 'modeSelect.modes.' + mode | tr }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>{{ 'settings.fishingModeHint' | tr }}</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'settings.defaultLake' | tr }}</mat-label>
         <mat-select [ngModel]="modePreferences().defaultLakeId" (ngModelChange)="updateDefaultLake($event || undefined)">
           <mat-option value="">{{ 'common.none' | tr }}</mat-option>
@@ -345,7 +358,15 @@
       <p class="hint">{{ 'settings.pinPrivacyHint' | tr }}</p>
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'settings.lockAfter' | tr }}</mat-label>
-        <input matInput type="number" [ngModel]="settings().lockTimeoutMinutes" (ngModelChange)="updateLockTimeout(+$event)" />
+        <mat-select
+          [ngModel]="settings().lockTimeoutMinutes"
+          [panelClass]="selectPanelClass"
+          (ngModelChange)="updateLockTimeout($event)"
+        >
+          @for (option of lockTimeoutOptions(); track option) {
+            <mat-option [value]="option">{{ lockTimeoutLabel(option) }}</mat-option>
+          }
+        </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'settings.currentPin' | tr }}</mat-label>

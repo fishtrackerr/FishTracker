@@ -30,7 +30,7 @@ About **40+** `*.spec.ts` files across:
 |------|-------|
 | Startup | Route resolution: PIN → mode select → home / active session (per mode) |
 | PIN | Cold-start lock without sessionStorage; inactivity; visibility checks timeout before activity |
-| Fishing mode | Mode select, sessionStorage persistence, mode-scoped lists, one active session per mode |
+| Fishing mode | Mode select, localStorage persistence, mode-scoped lists, one active session per mode |
 | Catches | Insert, stats update, watchBySession |
 | Themes | resolvedTheme, overlay class sync |
 | Session edit | Date validation, catches preserved |

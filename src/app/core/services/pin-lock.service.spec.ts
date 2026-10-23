@@ -89,6 +89,47 @@ describe('PinLockService', () => {
     expect(service.isAppLocked()).toBe(true);
   });
 
+  it('never locks for inactivity when the timeout is 0 (only at app start)', () => {
+    settingsGet.mockReturnValue({ pinHash: 'abc', pinSalt: 'def', lockTimeoutMinutes: 0 });
+    sessionStorage.setItem('fish-tracker-unlock-session', '1');
+    const past = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+    localStorage.setItem(
+      'fish-tracker-lock-state',
+      JSON.stringify({ isLocked: false, lastActivityAt: past }),
+    );
+    service.initializeFromStorage();
+    expect(service.isAppLocked()).toBe(false);
+
+    service.checkInactivity();
+    expect(service.isAppLocked()).toBe(false);
+  });
+
+  it('still locks on cold start when the timeout is 0', () => {
+    settingsGet.mockReturnValue({ pinHash: 'abc', pinSalt: 'def', lockTimeoutMinutes: 0 });
+    localStorage.setItem(
+      'fish-tracker-lock-state',
+      JSON.stringify({ isLocked: false, lastActivityAt: new Date().toISOString() }),
+    );
+    service.initializeFromStorage();
+    expect(service.isAppLocked()).toBe(true);
+  });
+
+  it('checkInactivity locks after the timeout when it is above 0', () => {
+    sessionStorage.setItem('fish-tracker-unlock-session', '1');
+    localStorage.setItem(
+      'fish-tracker-lock-state',
+      JSON.stringify({
+        isLocked: false,
+        lastActivityAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+      }),
+    );
+    service.initializeFromStorage();
+    expect(service.isAppLocked()).toBe(false);
+    settingsGet.mockReturnValue({ pinHash: 'abc', pinSalt: 'def', lockTimeoutMinutes: 5 });
+    service.checkInactivity();
+    expect(service.isAppLocked()).toBe(true);
+  });
+
   it('persists unlock on unlock()', () => {
     service.initializeFromStorage();
     service.lock();

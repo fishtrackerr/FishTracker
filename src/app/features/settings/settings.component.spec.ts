@@ -26,6 +26,7 @@ import { DialogService } from '../../core/services/dialog.service';
 import { TextPromptDialogComponent } from '../../shared/components/text-prompt-dialog/text-prompt-dialog.component';
 import { AssistantPromptDialogComponent } from '../assistant/assistant-prompt-dialog.component';
 import { Router } from '@angular/router';
+import { AppStartupService } from '../../core/services/app-startup.service';
 
 const settingsState = signal({
   themeMode: 'dark',
@@ -205,6 +206,7 @@ describe('SettingsComponent', () => {
               favoriteRigs: [],
             }),
             updateActivePreferences: vi.fn(),
+            setMode: vi.fn(),
             getMode: () => 'carper',
           },
         },
@@ -223,7 +225,85 @@ describe('SettingsComponent', () => {
           provide: Router,
           useValue: { navigateByUrl: vi.fn() },
         },
+        {
+          provide: AppStartupService,
+          useValue: { resolveUnlockedDestination: vi.fn().mockResolvedValue('/') },
+        },
       ],
+    });
+  });
+
+  describe('changeFishingMode', () => {
+    function setup(answer: boolean) {
+      const confirm = TestBed.inject(ConfirmService).confirm as ReturnType<typeof vi.fn>;
+      confirm.mockResolvedValueOnce(answer);
+      const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+      return {
+        component,
+        confirm,
+        mode: TestBed.inject(FishingModeService),
+        router: TestBed.inject(Router),
+        startup: TestBed.inject(AppStartupService),
+      };
+    }
+
+    it('lists every fishing mode', () => {
+      const { component } = setup(false);
+      expect(component.fishingModes).toEqual([
+        'carper',
+        'catfish',
+        'pike',
+        'bass',
+        'feeder',
+        'general',
+      ]);
+    });
+
+    it('does nothing for the already active mode', async () => {
+      const { component, confirm, mode } = setup(true);
+      await component.changeFishingMode('carper');
+      expect(confirm).not.toHaveBeenCalled();
+      expect(mode.setMode).not.toHaveBeenCalled();
+    });
+
+    it('keeps the mode when the switch is declined', async () => {
+      const { component, mode, router } = setup(false);
+      await component.changeFishingMode('pike');
+      expect(mode.setMode).not.toHaveBeenCalled();
+      expect(router.navigateByUrl).not.toHaveBeenCalled();
+    });
+
+    it('switches mode and navigates to the resolved destination after confirm', async () => {
+      const { component, mode, router, startup } = setup(true);
+      vi.mocked(startup.resolveUnlockedDestination).mockResolvedValueOnce('/sessions/active');
+      await component.changeFishingMode('pike');
+      expect(mode.setMode).toHaveBeenCalledWith('pike');
+      expect(startup.resolveUnlockedDestination).toHaveBeenCalledWith('/');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/sessions/active');
+    });
+  });
+
+  describe('lock timeout', () => {
+    it('offers fixed choices with 0 as only-at-start', () => {
+      const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+      settingsState.update((s) => ({ ...s, lockTimeoutMinutes: 15 }));
+      expect(component.lockTimeoutOptions()).toEqual([5, 15, 30, 60, 240, 0]);
+      expect(component.lockTimeoutLabel(0)).toBe('settings.lockOptionStart');
+      expect(component.lockTimeoutLabel(60)).toBe('settings.lockOptionHour');
+      expect(component.lockTimeoutLabel(240)).toBe('settings.lockOptionHours');
+    });
+
+    it('keeps a legacy custom value selectable', () => {
+      const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+      settingsState.update((s) => ({ ...s, lockTimeoutMinutes: 7 }));
+      expect(component.lockTimeoutOptions()).toEqual([5, 7, 15, 30, 60, 240, 0]);
+      settingsState.update((s) => ({ ...s, lockTimeoutMinutes: 15 }));
+    });
+
+    it('stores the chosen value', () => {
+      const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+      component.updateLockTimeout(0);
+      expect(update).toHaveBeenCalledWith({ lockTimeoutMinutes: 0 });
     });
   });
 

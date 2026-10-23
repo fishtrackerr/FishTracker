@@ -38,7 +38,7 @@ export class PinLockService {
 
     this.lockState = this.loadLockState();
     const hasUnlockSession = this.hasUnlockSession();
-    const timeoutMs = this.settings.get().lockTimeoutMinutes * 60 * 1000;
+    const timeoutMs = this.inactivityTimeoutMs();
     const lastActivity = this.lockState.lastActivityAt
       ? new Date(this.lockState.lastActivityAt).getTime()
       : 0;
@@ -57,7 +57,7 @@ export class PinLockService {
 
     if (lastActivity > 0) {
       const elapsed = Date.now() - lastActivity;
-      if (elapsed > timeoutMs) {
+      if (timeoutMs !== null && elapsed > timeoutMs) {
         this.lockState.isLocked = true;
         this.clearUnlockSession();
         this.vault.lock();
@@ -149,6 +149,15 @@ export class PinLockService {
     this.lockChangeCallback?.(true);
   }
 
+  /** Inactivity timeout in ms; null when set to "only when the app starts" (0). */
+  private inactivityTimeoutMs(): number | null {
+    const minutes = this.settings.get().lockTimeoutMinutes;
+    if (!minutes || minutes <= 0) {
+      return null;
+    }
+    return minutes * 60 * 1000;
+  }
+
   touchActivity(): void {
     if (!this.hasPinConfigured() || this.lockedSignal()) {
       return;
@@ -161,7 +170,10 @@ export class PinLockService {
     if (!this.hasPinConfigured() || this.lockedSignal()) {
       return;
     }
-    const timeoutMs = this.settings.get().lockTimeoutMinutes * 60 * 1000;
+    const timeoutMs = this.inactivityTimeoutMs();
+    if (timeoutMs === null) {
+      return;
+    }
     const lastActivity = this.lockState.lastActivityAt
       ? new Date(this.lockState.lastActivityAt).getTime()
       : Date.now();

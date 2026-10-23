@@ -37,7 +37,7 @@ Migrations run in `.upgrade()` handlers; always add migrations for schema change
 
 ### Fishing modes
 
-App run selects one mode (`carper` | `catfish` | `pike` | `bass` | `feeder` | `general`). Repositories filter list/read by active mode and stamp it on write. PIN, theme, units, and AI key stay shared in settings.
+The active mode is remembered across restarts and selects one mode (`carper` | `catfish` | `pike` | `bass` | `feeder` | `general`). Repositories filter list/read by active mode and stamp it on write. PIN, theme, units, and AI key stay shared in settings.
 
 ### Open failure recovery
 
@@ -59,7 +59,7 @@ Do not clear site data or use Settings full reset unless you have a backup — w
 | `fish-tracker-lock-state` | AppLockState |
 | `fish-tracker-return-url` | sessionStorage — post-unlock / post-mode-select navigation |
 | `fish-tracker-unlock-session` | sessionStorage — proves PIN unlock in this tab |
-| `fish-tracker-fishing-mode` | sessionStorage — active fishing mode for this process |
+| `fish-tracker-fishing-mode` | localStorage — active fishing mode, remembered across restarts (legacy sessionStorage value migrated; cleared by full reset only) |
 | `fish-tracker-filter-presets:<mode>` | Saved filter presets per fishing mode |
 | `fish-tracker-weather-cache` | Multi-slot Open-Meteo weather snapshots (up to 8 locations) |
 | `fish-tracker-geocode-cache` | Nominatim forward/reverse lookup cache (up to 50 entries) |

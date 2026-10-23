@@ -32,8 +32,8 @@ Offline-first Angular PWA for logging fishing sessions, catches, lakes, and stat
 
 ## Main architecture decisions
 
-- **Offline-first**: Dexie/IndexedDB for all app data; localStorage/sessionStorage for settings, lock state, fishing mode, and filter presets.
-- **Fishing modes**: One mode selected per app run after PIN unlock; lakes, sessions, catches, options, images, and AI chats are isolated per mode. PIN, theme, units, and AI key stay shared.
+- **Offline-first**: Dexie/IndexedDB for all app data; localStorage/sessionStorage for settings, lock state, fishing mode (localStorage), and filter presets.
+- **Fishing modes**: One mode selected after PIN unlock (remembered across restarts, switchable in Settings); lakes, sessions, catches, options, images, and AI chats are isolated per mode. PIN, theme, units, and AI key stay shared.
 - **Standalone Angular components**: No NgModules; feature folders under `src/app/features/`.
 - **Reactive data**: Dexie `liveQuery` exposed via RxJS observables and `toSignal`.
 - **Central startup**: `AppStartupService` resolves initial route (PIN → mode select → active session or home).
