@@ -1,0 +1,114 @@
+.sheet {
+  padding: var(--spacing-md);
+  max-height: 85vh;
+  overflow-y: auto;
+  color: var(--text-primary);
+  background: var(--background-card);
+}
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+.sheet-header h3 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  color: var(--primary);
+}
+.rod-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+.rod-line {
+  color: var(--text-secondary);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.label {
+  display: block;
+  margin: var(--spacing-sm) 0 4px;
+  font-family: var(--font-label);
+  text-transform: var(--label-transform);
+  letter-spacing: var(--label-spacing);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-button);
+  background: var(--background-input);
+  color: var(--text-primary);
+  font-family: var(--font-label);
+  text-transform: var(--label-transform);
+  cursor: pointer;
+}
+.chip.selected {
+  background: var(--cta);
+  border-color: var(--cta);
+  color: var(--text-on-cta);
+}
+.measures {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+.field {
+  display: block;
+  flex: 1;
+}
+.weight-field {
+  flex: 2;
+}
+.field input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-button);
+  background: var(--background-input);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+.field .weight-input {
+  min-height: 56px;
+  font-size: 1.6rem;
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.photo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--spacing-md);
+}
+.released-toggle {
+  margin-left: auto;
+}
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: var(--spacing-md);
+}
+.sheet-actions button {
+  width: 100%;
+}
+.hint {
+  color: var(--text-secondary);
+}

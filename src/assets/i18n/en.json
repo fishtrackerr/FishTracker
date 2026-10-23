@@ -454,6 +454,19 @@
     "moreDetails": "More details",
     "otherSpecies": "Other"
   },
+  "catchSheet": {
+    "title": "Catch · Rod {{rod}}",
+    "otherRod": "Other rod",
+    "other": "Other…",
+    "otherSpeciesTitle": "Other species",
+    "weight": "Weight",
+    "length": "Length",
+    "addPhoto": "+ Photo",
+    "save": "Save catch",
+    "allDetails": "All details…",
+    "saved": "{{species}}{{weight}} on rod {{rod}}",
+    "undo": "Undo"
+  },
   "lakes": {
     "title": "Lakes",
     "addLake": "Add Lake",

@@ -1,0 +1,106 @@
+<div class="sheet">
+  <div class="sheet-header">
+    <h3>{{ 'catchSheet.title' | tr: { rod: rod()?.rodNumber ?? '' } }}</h3>
+    <button mat-button type="button" (click)="close()">{{ 'common.close' | tr }}</button>
+  </div>
+
+  @if (!rod()) {
+    <p class="hint">{{ 'catchForm.rodRequired' | tr }}</p>
+  } @else {
+    <div class="rod-row">
+      <span class="rod-line">{{ rodLine() }}</span>
+      @if (rods.length > 1) {
+        <button
+          mat-stroked-button
+          type="button"
+          class="other-rod"
+          [attr.aria-expanded]="pickingRod()"
+          (click)="pickingRod.set(!pickingRod())"
+        >
+          {{ 'catchSheet.otherRod' | tr }}
+        </button>
+      }
+    </div>
+
+    @if (pickingRod()) {
+      <div class="chips" role="group" [attr.aria-label]="'catchForm.rod' | tr">
+        @for (r of rods; track r.id) {
+          <button
+            type="button"
+            class="chip rod-chip"
+            [class.selected]="r.id === rodId()"
+            [attr.aria-pressed]="r.id === rodId()"
+            (click)="selectRod(r.id)"
+          >
+            {{ r.rodNumber }} · {{ r.name }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="label">{{ 'catchForm.species' | tr }}</div>
+    <div class="chips" role="group" [attr.aria-label]="'catchForm.species' | tr">
+      @for (s of speciesChips(); track s) {
+        <button
+          type="button"
+          class="chip species-chip"
+          [class.selected]="s === species()"
+          [attr.aria-pressed]="s === species()"
+          (click)="selectSpecies(s)"
+        >
+          {{ s }}
+        </button>
+      }
+      <button type="button" class="chip other-chip" (click)="pickOtherSpecies()">
+        {{ 'catchSheet.other' | tr }}
+      </button>
+    </div>
+
+    <div class="measures">
+      <label class="field weight-field">
+        <span class="label">{{ 'catchSheet.weight' | tr }} ({{ weightUnit }})</span>
+        <input
+          class="weight-input"
+          type="number"
+          inputmode="decimal"
+          step="0.1"
+          min="0"
+          [ngModel]="weight()"
+          (ngModelChange)="weight.set($event)"
+        />
+      </label>
+      <label class="field length-field">
+        <span class="label">{{ 'catchSheet.length' | tr }} ({{ lengthUnit }})</span>
+        <input
+          class="length-input"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          [ngModel]="length()"
+          (ngModelChange)="length.set($event)"
+        />
+      </label>
+    </div>
+
+    <div class="photo-row">
+      <button mat-stroked-button type="button" class="photo-camera" (click)="pickPhoto(true)">
+        {{ photo() ? ('catchForm.photoSelected' | tr) : ('catchSheet.addPhoto' | tr) }}
+      </button>
+      <button mat-button type="button" class="photo-gallery" (click)="pickPhoto(false)">
+        {{ 'images.gallery' | tr }}
+      </button>
+      <mat-slide-toggle class="released-toggle" [checked]="released()" (change)="released.set($event.checked)">
+        {{ 'catchForm.released' | tr }}
+      </mat-slide-toggle>
+    </div>
+
+    <div class="sheet-actions">
+      <button mat-flat-button type="button" class="save" [disabled]="!canSave()" (click)="save()">
+        {{ 'catchSheet.save' | tr }}
+      </button>
+      <button mat-button type="button" class="all-details" (click)="openAllDetails()">
+        {{ 'catchSheet.allDetails' | tr }}
+      </button>
+    </div>
+  }
+</div>
