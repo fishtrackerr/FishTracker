@@ -70,6 +70,8 @@ Do not clear site data or use Settings full reset unless you have a backup — w
 
 Repositories use Dexie `put`, `delete`, `bulkPut`. Catch creation updates session stats in a separate write after catch insert.
 
+Partial session updates go through `SessionRepository.modify(id, change)`: it reads the latest row, applies a synchronous change and saves it in one `rw` transaction. Catch statistics, rod counts/rods, session spots and `SessionService.update` (weather, location, notes) use it, so a background weather refresh or bite sync can't overwrite another write with a stale copy of the session.
+
 ## Image storage
 
 Binary blobs in `images` store with thumbnails. See [images.md](./images.md).

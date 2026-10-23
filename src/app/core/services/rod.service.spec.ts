@@ -1,10 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RodService } from './rod.service';
-import { FishingSession } from '../models';
+import { FishingSession, SessionRod } from '../models';
 
 describe('RodService', () => {
   let service: RodService;
-  let sessionRepo: { put: ReturnType<typeof vi.fn>; getById: ReturnType<typeof vi.fn> };
+  let sessionRepo: {
+    put: ReturnType<typeof vi.fn>;
+    getById: ReturnType<typeof vi.fn>;
+    modify?: ReturnType<typeof vi.fn>;
+  };
   let biteRepo: { countByRod: ReturnType<typeof vi.fn> };
   let fishSpottedRepo: { countByRod: ReturnType<typeof vi.fn> };
   let catchRepo: { getBySession: ReturnType<typeof vi.fn> };
@@ -20,6 +24,19 @@ describe('RodService', () => {
         sessionSpots: [],
       })),
     };
+    // Mirrors SessionRepository.modify: apply the change to the latest row, then put it.
+    sessionRepo.modify = vi.fn(async (id: string, change: (s: FishingSession) => void) => {
+      const repo = sessionRepo as unknown as {
+        getById(id: string): Promise<FishingSession | undefined>;
+        put(session: FishingSession): Promise<unknown>;
+      };
+      const row = await repo.getById(id);
+      if (!row) return undefined;
+      const latest = { ...row };
+      change(latest);
+      await repo.put(latest);
+      return latest;
+    });
     biteRepo = { countByRod: vi.fn().mockResolvedValue(0) };
     fishSpottedRepo = { countByRod: vi.fn().mockResolvedValue(0) };
     catchRepo = { getBySession: vi.fn().mockResolvedValue([]) };
@@ -171,5 +188,47 @@ describe('RodService', () => {
     expect(sessionEvents.record).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'rod-cast' }),
     );
+  });
+
+  describe('concurrent session updates', () => {
+    const rod = (id: string, extra: Partial<SessionRod> = {}): SessionRod => ({
+      id,
+      sessionId: 's-1',
+      rodNumber: 1,
+      name: id,
+      biteCount: 0,
+      fishSpottedCount: 0,
+      isActive: true,
+      ...extra,
+    });
+
+    it('syncRodCounts merges counts into rods changed while counting', async () => {
+      const before = { id: 's-1', rods: [rod('r-1')], sessionSpots: [] } as unknown as FishingSession;
+      const latest = {
+        id: 's-1',
+        rods: [rod('r-1', { castAt: '2026-10-23T10:00:00.000Z' }), rod('r-2')],
+        sessionSpots: [],
+      } as unknown as FishingSession;
+      sessionRepo.getById.mockResolvedValueOnce(before).mockResolvedValue(latest);
+      biteRepo.countByRod.mockResolvedValue(3);
+
+      const result = await service.syncRodCounts(before);
+
+      expect(result.rods).toEqual([
+        rod('r-1', { castAt: '2026-10-23T10:00:00.000Z', biteCount: 3 }),
+        rod('r-2'),
+      ]);
+    });
+
+    it('saveSessionRods keeps fields written by others since the caller read the session', async () => {
+      const stale = { id: 's-1', rods: [], catchCount: 0 } as unknown as FishingSession;
+      sessionRepo.getById.mockResolvedValue({ ...stale, catchCount: 4, weather: { description: 'Rain' } });
+
+      const result = await service.saveSessionRods(stale, [rod('r-1')]);
+
+      expect(result.catchCount).toBe(4);
+      expect(result.weather?.description).toBe('Rain');
+      expect(result.rods).toEqual([rod('r-1')]);
+    });
   });
 });

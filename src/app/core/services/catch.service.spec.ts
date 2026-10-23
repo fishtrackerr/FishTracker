@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CatchService } from './catch.service';
-import { Catch } from '../models';
+import { Catch, FishingSession } from '../models';
 
 describe('CatchService', () => {
   let service: CatchService;
@@ -13,6 +13,7 @@ describe('CatchService', () => {
   let sessionRepo: {
     getById: ReturnType<typeof vi.fn>;
     put: ReturnType<typeof vi.fn>;
+    modify?: ReturnType<typeof vi.fn>;
   };
   let lakeRepo: { getById: ReturnType<typeof vi.fn> };
   let processFile: ReturnType<typeof vi.fn>;
@@ -80,6 +81,19 @@ describe('CatchService', () => {
       }),
       put: vi.fn().mockResolvedValue(undefined),
     };
+    // Mirrors SessionRepository.modify: apply the change to the latest row, then put it.
+    sessionRepo.modify = vi.fn(async (id: string, change: (s: FishingSession) => void) => {
+      const repo = sessionRepo as unknown as {
+        getById(id: string): Promise<FishingSession | undefined>;
+        put(session: FishingSession): Promise<unknown>;
+      };
+      const row = await repo.getById(id);
+      if (!row) return undefined;
+      const latest = { ...row };
+      change(latest);
+      await repo.put(latest);
+      return latest;
+    });
     lakeRepo = {
       getById: vi.fn().mockResolvedValue(
         overrides?.lake === null

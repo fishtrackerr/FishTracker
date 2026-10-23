@@ -244,14 +244,21 @@ export class RodService {
 
   async syncRodCounts(session: FishingSession): Promise<FishingSession> {
     const full = await this.loadFull(session);
-    const rods = full.rods ?? [];
-    const updatedRods: SessionRod[] = [];
-    for (const rod of rods) {
-      const biteCount = await this.biteRepo.countByRod(rod.id);
-      const fishSpottedCount = await this.fishSpottedRepo.countByRod(rod.id);
-      updatedRods.push({ ...rod, biteCount, fishSpottedCount });
+    const counts = new Map<string, Pick<SessionRod, 'biteCount' | 'fishSpottedCount'>>();
+    for (const rod of full.rods ?? []) {
+      counts.set(rod.id, {
+        biteCount: await this.biteRepo.countByRod(rod.id),
+        fishSpottedCount: await this.fishSpottedRepo.countByRod(rod.id),
+      });
     }
-    return this.saveSessionRods(full, updatedRods);
+    // Merge counts into the latest rods so rod edits made meanwhile are kept.
+    const updated = await this.sessionRepo.modify(full.id, (latest) => {
+      latest.rods = (latest.rods ?? []).map((rod) => {
+        const rodCounts = counts.get(rod.id);
+        return rodCounts ? { ...rod, ...rodCounts } : rod;
+      });
+    });
+    return updated ?? full;
   }
 
   snapshotFromLakeSpot(spot: FishingSpot): SessionSpot {
@@ -268,25 +275,20 @@ export class RodService {
     };
   }
 
+  /** Replaces only `rods`; other session fields keep their latest stored values. */
   async saveSessionRods(session: FishingSession, rods: SessionRod[]): Promise<FishingSession> {
-    const updated: FishingSession = {
-      ...session,
-      rods,
-      updatedAt: nowIso(),
-    };
-    await this.sessionRepo.put(updated);
-    return updated;
+    const updated = await this.sessionRepo.modify(session.id, (latest) => {
+      latest.rods = rods;
+    });
+    return updated ?? { ...session, rods };
   }
 
+  /** Replaces only `sessionSpots`; other session fields keep their latest stored values. */
   async saveSessionSpots(session: FishingSession, sessionSpots: SessionSpot[]): Promise<FishingSession> {
-    const full = await this.loadFull(session);
-    const updated: FishingSession = {
-      ...full,
-      sessionSpots,
-      updatedAt: nowIso(),
-    };
-    await this.sessionRepo.put(updated);
-    return updated;
+    const updated = await this.sessionRepo.modify(session.id, (latest) => {
+      latest.sessionSpots = sessionSpots;
+    });
+    return updated ?? { ...session, sessionSpots };
   }
 
   getRodCatchCount(sessionId: string, rodId: string, catches: { rodId?: string }[]): number {

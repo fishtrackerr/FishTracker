@@ -261,13 +261,11 @@ export class CatchService {
       0,
     );
     const lake = session.lakeId ? await this.lakeRepo.getById(session.lakeId) : undefined;
-    await this.sessionRepo.put({
-      ...session,
-      catchCount: catches.length,
-      totalCatchWeightKg: totalWeight,
-      biggestFishKg: biggest > 0 ? biggest : undefined,
-      coverImageId: resolveSessionCoverImageId(catches, lake),
-      updatedAt: nowIso(),
+    await this.sessionRepo.modify(sessionId, (latest) => {
+      latest.catchCount = catches.length;
+      latest.totalCatchWeightKg = totalWeight;
+      latest.biggestFishKg = biggest > 0 ? biggest : undefined;
+      latest.coverImageId = resolveSessionCoverImageId(catches, lake);
     });
   }
 }

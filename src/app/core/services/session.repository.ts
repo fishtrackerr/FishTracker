@@ -92,6 +92,28 @@ export class SessionRepository extends ModeScopedRepository {
     await db.sessions.put(this.withMode(session));
   }
 
+  /**
+   * Applies `change` to the latest stored row and saves it in one transaction,
+   * so concurrent updates (weather refresh, bite sync, catch stats) don't
+   * overwrite each other. `change` must be synchronous.
+   * Returns the saved row, or undefined when it is missing or in another mode.
+   */
+  async modify(
+    id: string,
+    change: (session: FishingSession) => void,
+  ): Promise<FishingSession | undefined> {
+    return db.transaction('rw', db.sessions, async () => {
+      const row = this.forActiveMode(await db.sessions.get(id));
+      if (!row) {
+        return undefined;
+      }
+      change(row);
+      row.updatedAt = nowIso();
+      await db.sessions.put(row);
+      return row;
+    });
+  }
+
   async delete(id: string): Promise<void> {
     const row = await db.sessions.get(id);
     if (!row) {

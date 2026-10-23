@@ -232,13 +232,10 @@ export class SessionService {
   }
 
   async update(id: string, data: Partial<FishingSession>): Promise<FishingSession | undefined> {
-    const existing = await this.sessionRepo.getById(id);
-    if (!existing) {
-      return undefined;
-    }
-    const updated = { ...existing, ...data, id, updatedAt: nowIso() };
-    await this.sessionRepo.put(updated);
-    return this.projectSession(updated);
+    const updated = await this.sessionRepo.modify(id, (latest) => {
+      Object.assign(latest, data, { id });
+    });
+    return updated ? this.projectSession(updated) : undefined;
   }
 
   async updateSession(
