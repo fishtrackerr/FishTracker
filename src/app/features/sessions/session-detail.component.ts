@@ -269,10 +269,6 @@ export class SessionDetailComponent {
     });
   }
 
-  onRodChanged(): void {
-    // liveQuery refreshes session and catches automatically
-  }
-
   spotName(sessionSpotId?: string): string {
     const s = this.session();
     if (!s || !sessionSpotId) return '';

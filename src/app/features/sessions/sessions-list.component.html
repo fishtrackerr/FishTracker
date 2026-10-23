@@ -59,7 +59,6 @@
         [session]="current"
         [lakeName]="getLakeName(current.lakeId)"
         [defaultExpanded]="true"
-        (editSession)="editSession($event)"
       />
     </section>
   }
@@ -72,7 +71,6 @@
           [session]="session"
           [lakeName]="getLakeName(session.lakeId)"
           [defaultExpanded]="!showCurrentSession() && i === 0"
-          (editSession)="editSession($event)"
         />
       }
     </section>

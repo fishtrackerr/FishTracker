@@ -28,6 +28,8 @@ Before create (when none is active), a full JSON backup is downloaded; if export
 
 Edit via `/sessions/:id/edit` (`SessionEditComponent`): name, lake, session spots, rod count, dates, status, GPS, weather refresh, notes, prebait, tags.
 
+The **Edit** button on a session card navigates there itself, exactly once; parent pages do not add their own navigation for it.
+
 Legacy sessions without rods show a setup prompt on active session detail.
 
 `SessionService.updateSession()` validates:

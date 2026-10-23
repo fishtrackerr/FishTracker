@@ -12,7 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { Lake } from '../../core/models';
 import { I18nService } from '../../core/services/i18n.service';
 import { ThemeService } from '../../core/services/theme.service';
-import { nowIso } from '../../core/utils';
+import { nowIso, toLocalDatetimeInput } from '../../core/utils';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 export interface SessionCreateResult {
@@ -123,10 +123,4 @@ export class SessionCreateDialogComponent {
       lakeId: this.lakeId || undefined,
     });
   }
-}
-
-function toLocalDatetimeInput(iso: string): string {
-  const d = new Date(iso);
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }

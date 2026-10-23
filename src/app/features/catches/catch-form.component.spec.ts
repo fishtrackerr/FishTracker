@@ -144,7 +144,7 @@ describe('CatchFormComponent', () => {
   it('loads session defaults from selected rod and query params', async () => {
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
 
-    await component.loadSession();
+    await component.load();
 
     expect(getById).toHaveBeenCalledWith('session-1');
     expect(component.rods).toEqual([
@@ -178,7 +178,7 @@ describe('CatchFormComponent', () => {
     routeStub.snapshot.queryParamMap = createParamMap({ sessionSpotId: 'spot-2' });
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
 
-    await component.loadSession();
+    await component.load();
 
     expect(component.rodId).toBe('rod-1');
     expect(component.bait).toBe('Boilie');
@@ -199,7 +199,7 @@ describe('CatchFormComponent', () => {
 
   it('updates bait, rig, and spot when rod changes', async () => {
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
-    await component.loadSession();
+    await component.load();
 
     component.bait = 'Old Bait';
     component.rig = 'Old Rig';
@@ -214,7 +214,7 @@ describe('CatchFormComponent', () => {
 
   it('does not save without a selected rod', async () => {
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
-    await component.loadSession();
+    await component.load();
 
     component.species = 'Carp';
     component.rodId = '';
@@ -227,7 +227,7 @@ describe('CatchFormComponent', () => {
 
   it('normalizes optional values and navigates after save', async () => {
     const component = TestBed.runInInjectionContext(() => new CatchFormComponent());
-    await component.loadSession();
+    await component.load();
 
     component.species = 'Carp';
     component.fishName = '';

@@ -137,11 +137,6 @@ export class CatchFormComponent {
     this.prebait = this.session.prebait ?? '';
   }
 
-  /** @deprecated Tests call loadSession — prefer load(). */
-  async loadSession(): Promise<void> {
-    await this.load();
-  }
-
   private applyCatch(c: Catch): void {
     this.species = c.species;
     this.fishName = c.fishName ?? '';

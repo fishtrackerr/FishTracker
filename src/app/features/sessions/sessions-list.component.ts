@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,7 +18,6 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
 import { FilterPanelComponent } from '../../shared/components/filter-panel/filter-panel.component';
 import { FilterSheetComponent } from '../../shared/components/filter-panel/filter-sheet.component';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
-import { FishingSession } from '../../core/models';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
@@ -47,7 +45,6 @@ export class SessionsListComponent {
   private readonly lakeService = inject(LakeService);
   private readonly searchService = inject(SearchService);
   private readonly filterService = inject(FilterService);
-  private readonly router = inject(Router);
   private readonly sessionStartFlow = inject(SessionStartFlowService);
   private readonly bottomSheet = inject(MatBottomSheet);
   private readonly theme = inject(ThemeService);
@@ -124,10 +121,6 @@ export class SessionsListComponent {
         this.onFilterChange(result);
       }
     });
-  }
-
-  async editSession(session: FishingSession): Promise<void> {
-    await this.router.navigate(['/sessions', session.id, 'edit']);
   }
 
   async startSession(): Promise<void> {

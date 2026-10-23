@@ -291,7 +291,7 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
 
     const confirmed = await this.confirm.confirm({
       title: this.i18n.t('activeSession.endSession'),
-      message: this.i18n.t('activeSession.endSessionConfirm') || 'End this fishing session?',
+      message: this.i18n.t('activeSession.endSessionConfirm'),
       confirmLabel: this.i18n.t('activeSession.endSession'),
     });
 
@@ -299,11 +299,11 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
 
     try {
       await this.sessionService.complete(s.id);
-      this.notifications.success(this.i18n.t('activeSession.sessionEnded') || 'Session ended');
+      this.notifications.success(this.i18n.t('activeSession.sessionEnded'));
       await this.router.navigate(['/sessions']);
     } catch (error) {
       console.error('[ActiveSession] Failed to complete session', error);
-      this.notifications.error(this.i18n.t('activeSession.endFailed') || 'Failed to end session');
+      this.notifications.error(this.i18n.t('activeSession.endFailed'));
     }
   }
 }

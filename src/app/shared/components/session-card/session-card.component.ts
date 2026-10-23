@@ -286,7 +286,6 @@ export class SessionCardComponent implements OnInit, OnChanges, OnDestroy {
   @Input() defaultExpanded = false;
 
   readonly continueSession = output<FishingSession>();
-  readonly editSession = output<FishingSession>();
 
   readonly durationText = signal('');
   readonly coverImageId = signal<string | undefined>(undefined);
@@ -349,6 +348,5 @@ export class SessionCardComponent implements OnInit, OnChanges, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     void this.router.navigate(['/sessions', this.session.id, 'edit']);
-    this.editSession.emit(this.session);
   }
 }
