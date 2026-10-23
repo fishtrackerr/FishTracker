@@ -22,13 +22,9 @@ jobs:
 
       - name: Lint
         run: npm run lint
-        continue-on-error: true
 
       - name: Unit tests
         run: npm test -- --watch=false
-
-      - name: Generate PWA icons
-        run: npm run icons
 
       - name: Production build
         run: npm run build-prod

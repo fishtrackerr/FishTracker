@@ -13,7 +13,7 @@ export function hardReloadApp(): void {
   try {
     window.location.reload();
   } catch {
-    window.location.href = window.location.href;
+    window.location.assign(window.location.href);
   }
 }
 

@@ -1,18 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExpandableSectionComponent } from './expandable-section.component';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 describe('ExpandableSectionComponent', () => {
   let fixture: ComponentFixture<ExpandableSectionComponent>;
+  const originalMatchMedia = window.matchMedia;
 
   beforeEach(async () => {
+    // Complete MediaQueryList shape: CDK BreakpointObserver uses addListener.
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
+      configurable: true,
       value: vi.fn().mockImplementation((query: string) => ({
         matches: false,
         media: query,
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       })),
     });
 
@@ -24,6 +29,15 @@ describe('ExpandableSectionComponent', () => {
     fixture.componentRef.setInput('label', 'test section');
     fixture.componentRef.setInput('defaultExpanded', true);
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    // Don't leak the stub into later spec files running in the same worker.
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      configurable: true,
+      value: originalMatchMedia,
+    });
   });
 
   it('toggles aria-expanded on click', () => {

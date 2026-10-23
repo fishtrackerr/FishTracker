@@ -77,16 +77,14 @@ Static client build (`outputMode: static`) published to **GitHub Pages** via `an
 1. Patch-bump `package.json` and write `public/assets/version.json`
 2. Regenerate PWA icons
 3. Generate `public/assets/release-notes.json` from commits since the latest git tag
-4. Create annotated tag `v{version}` (so the next release’s commit range is correct)
+4. Commit the release files (`chore: release v{version}`) and create annotated tag `v{version}` on that commit (so the next release’s commit range is correct)
 5. `ng deploy` — production build + push to `gh-pages`
 
 ### After deploy
 
-Commit the mutated files on your working branch (`package.json`, `package-lock.json` if touched, `public/assets/version.json`, `public/assets/release-notes.json`) and push tags:
+`npm run deploy` already committed the release files and tagged that commit. Push both:
 
 ```bash
-git add package.json public/assets/version.json public/assets/release-notes.json
-git commit -m "chore: release vX.Y.Z"
 git push
 git push --tags
 ```

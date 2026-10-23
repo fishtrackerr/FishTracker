@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FishSpottedEvent, FishingSession } from '../models';
+import { FishingSession } from '../models';
 import { generateId, nowIso } from '../utils';
 import { FishSpottedRepository } from './fish-spotted.repository';
 import { GeolocationService } from './geolocation.service';

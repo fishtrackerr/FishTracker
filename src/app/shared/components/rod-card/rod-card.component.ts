@@ -83,14 +83,14 @@ export class RodCardComponent {
   }
 
   async saveEdit(): Promise<void> {
-    let updated = await this.rodService.updateRod(this.session, this.rod.id, {
+    const updated = await this.rodService.updateRod(this.session, this.rod.id, {
       name: this.editName.trim() || this.rod.name,
       bait: this.editBait || undefined,
       rig: this.editRig || undefined,
       notes: this.editNotes || undefined,
     });
     if (this.editSpotId !== (this.rod.sessionSpotId ?? '')) {
-      updated = await this.rodService.assignSpot(
+      await this.rodService.assignSpot(
         updated,
         this.rod.id,
         this.editSpotId || undefined,

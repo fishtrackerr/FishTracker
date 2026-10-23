@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { Catch, FishingSession, SessionSpot, WeatherSnapshot } from '../models';
+import { FishingSession, SessionSpot, WeatherSnapshot } from '../models';
 import {
   generateId,
   nowIso,
@@ -263,7 +263,7 @@ export class SessionService {
       }
     }
 
-    let sessionSpots = options.sessionSpots ?? existing.sessionSpots ?? [];
+    const sessionSpots = options.sessionSpots ?? existing.sessionSpots ?? [];
     let rods = existing.rods ?? [];
 
     if (options.rodCount != null) {

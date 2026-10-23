@@ -21,6 +21,33 @@ function writeJson(filePath, content) {
   fs.writeFileSync(filePath, JSON.stringify(content, null, 2) + '\n', 'utf8');
 }
 
+/** Files the release steps change; committed together before tagging. */
+const RELEASE_FILES = [
+  'package.json',
+  'package-lock.json',
+  'public/assets/version.json',
+  'public/assets/release-notes.json'
+];
+
+/**
+ * Commits the version bump and release notes so the tag points at the commit
+ * that actually contains the new version (other changes are left alone).
+ */
+function commitReleaseFiles(root, version) {
+  const changed = execSync(`git status --porcelain -- ${RELEASE_FILES.join(' ')}`, {
+    cwd: root,
+    encoding: 'utf8'
+  }).trim();
+  if (!changed) {
+    return;
+  }
+  execSync(`git add -- ${RELEASE_FILES.join(' ')}`, { cwd: root, stdio: 'inherit' });
+  execSync(`git commit -m "chore: release v${version}" -- ${RELEASE_FILES.join(' ')}`, {
+    cwd: root,
+    stdio: 'inherit'
+  });
+}
+
 function createAnnotatedTag(root, version) {
   const tag = `v${version}`;
   const existing = execSync('git tag --list', { cwd: root, encoding: 'utf8' })
@@ -49,6 +76,7 @@ function main() {
   const pkg = readJson(packageJsonPath);
 
   if (tagOnly) {
+    commitReleaseFiles(root, pkg.version);
     createAnnotatedTag(root, pkg.version);
     return;
   }

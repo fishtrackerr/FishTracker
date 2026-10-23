@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BiteEvent, FishingSession } from '../models';
+import { FishingSession } from '../models';
 import { generateId, nowIso } from '../utils';
 import { BiteEventRepository } from './bite-event.repository';
 import { RodService } from './rod.service';

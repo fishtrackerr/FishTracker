@@ -66,7 +66,7 @@ Declared in [`android/app/src/main/AndroidManifest.xml`](../android/app/src/main
 | `INTERNET` | Weather (Open-Meteo), geocoding (Nominatim), optional AI, maps links |
 | `ACCESS_COARSE_LOCATION` / `ACCESS_FINE_LOCATION` | Session/catch GPS and weather |
 | `CAMERA` | Catch/gallery photo capture via file input |
-| `READ_MEDIA_IMAGES` (+ legacy storage ≤ API 32) | Pick photos from the device |
+| _(none for photos)_ | Picking photos uses the system picker via the WebView file chooser, so no `READ_MEDIA_IMAGES` / storage permission is requested (avoids Play's photo-permission declaration) |
 
 GPS and camera hardware are `required="false"` so the app installs on devices without them.
 

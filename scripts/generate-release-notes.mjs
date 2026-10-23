@@ -74,7 +74,7 @@ function listVersionTags() {
 
 function tagDate(tag) {
   try {
-    // Annotated tags: tagger date; lightweight: committer date.
+    // Committer date of the tagged commit (the release commit).
     const date = runGit(`git log -1 --format=%cs ${tag}`);
     return date || new Date().toISOString().slice(0, 10);
   } catch {
@@ -87,7 +87,9 @@ function parseCommitLines(raw) {
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean)
-    .filter((line) => !/^Merge /i.test(line));
+    .filter((line) => !/^Merge /i.test(line))
+    // Version-bump commits made by `npm run deploy` are not release notes.
+    .filter((line) => !/chore: release v\d/i.test(line));
 }
 
 function commitsInRange(fromExclusive, toInclusive) {
