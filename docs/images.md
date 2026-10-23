@@ -50,3 +50,6 @@ Removed from `images` store when parent entity deleted or explicitly removed.
 ## Fullscreen display
 
 Gallery component supports fullscreen overlay viewer.
+
+- Each tile is a container with a separate open button (the thumbnail) and the favorite / homepage / delete icon buttons beside it, so no interactive control is nested inside another button.
+- The viewer (`role="dialog"`, `tabindex="-1"`) receives focus when opened, so **Escape** closes it. Closing returns focus to the tile that opened it.

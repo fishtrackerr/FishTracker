@@ -2,11 +2,14 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  Injector,
   Input,
   OnDestroy,
+  afterNextRender,
   output,
   signal,
   inject,
+  viewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ImageService } from '../../../core/services/image.service';
@@ -30,18 +33,19 @@ export interface GalleryImageItem extends StoredImage {
   template: `
     <div class="gallery-grid">
       @for (item of items(); track item.id) {
-        <button
-          type="button"
-          class="gallery-item"
-          [attr.data-id]="item.id"
-          [attr.aria-label]="item.fileName"
-          (click)="openViewer(item)"
-        >
-          @if (item.url) {
-            <img [src]="item.url" [alt]="item.fileName" class="thumb" (error)="setFallbackForItem(item)" loading="lazy" />
-          } @else {
-            <span class="thumb-pending" aria-hidden="true"></span>
-          }
+        <div class="gallery-item" [attr.data-id]="item.id">
+          <button
+            type="button"
+            class="open-btn"
+            [attr.aria-label]="item.fileName"
+            (click)="openViewer(item, $event)"
+          >
+            @if (item.url) {
+              <img [src]="item.url" [alt]="item.fileName" class="thumb" (error)="setFallbackForItem(item)" loading="lazy" />
+            } @else {
+              <span class="thumb-pending" aria-hidden="true"></span>
+            }
+          </button>
           @if (item.isFavorite) {
             <span class="badge favorite" [attr.aria-label]="'gallery.toggleFavorite' | tr">★</span>
           }
@@ -70,15 +74,17 @@ export interface GalleryImageItem extends StoredImage {
               />
             }
           </div>
-        </button>
+        </div>
       }
     </div>
 
     @if (viewerUrl()) {
       <div
+        #viewer
         class="viewer"
         role="dialog"
         aria-modal="true"
+        tabindex="-1"
         [attr.aria-label]="'gallery.imagePreview' | tr"
         (click)="closeViewer()"
         (keydown.escape)="closeViewer()"
@@ -104,11 +110,25 @@ export interface GalleryImageItem extends StoredImage {
       border-radius: var(--radius-sm);
       overflow: hidden;
       border: 1px solid var(--border-primary);
-      cursor: pointer;
-      padding: 0;
       background: var(--background-secondary);
       display: block;
       width: 100%;
+    }
+    .open-btn {
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+    }
+    .open-btn:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: -2px;
     }
     .thumb {
       width: 100%;
@@ -129,6 +149,7 @@ export interface GalleryImageItem extends StoredImage {
       border-radius: var(--radius-xs);
       font-size: 0.75rem;
       background: rgba(0,0,0,0.6);
+      pointer-events: none;
     }
     .badge.favorite { left: 4px; color: var(--warning); }
     .badge.homepage { right: 4px; }
@@ -158,6 +179,9 @@ export interface GalleryImageItem extends StoredImage {
       justify-content: center;
       z-index: 1000;
     }
+    .viewer:focus {
+      outline: none;
+    }
     .viewer img {
       max-width: 95vw;
       max-height: 80vh;
@@ -176,6 +200,9 @@ export class ImageGalleryComponent implements AfterViewInit, OnDestroy {
   private readonly notifications = inject(NotificationService);
   private readonly i18n = inject(I18nService);
   private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly injector = inject(Injector);
+  private readonly viewerEl = viewChild<ElementRef<HTMLElement>>('viewer');
+  private opener: HTMLElement | null = null;
 
   @Input() allowDelete = true;
   @Input() set galleryItems(value: GalleryImageItem[]) {
@@ -234,10 +261,13 @@ export class ImageGalleryComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  async openViewer(item: GalleryImageItem): Promise<void> {
+  async openViewer(item: GalleryImageItem, event?: Event): Promise<void> {
+    const trigger = event?.currentTarget;
+    this.opener = trigger instanceof HTMLElement ? trigger : null;
     const idx = this.items().findIndex((i) => i.id === item.id);
     this.viewerIndex = idx >= 0 ? idx : 0;
     await this.showViewerAt(this.viewerIndex);
+    afterNextRender(() => this.viewerEl()?.nativeElement.focus(), { injector: this.injector });
   }
 
   closeViewer(): void {
@@ -246,6 +276,9 @@ export class ImageGalleryComponent implements AfterViewInit, OnDestroy {
       this.viewerImageId = null;
     }
     this.viewerUrl.set(null);
+    const opener = this.opener;
+    this.opener = null;
+    opener?.focus();
   }
 
   setFallbackForItem(item: GalleryImageItem): void {
