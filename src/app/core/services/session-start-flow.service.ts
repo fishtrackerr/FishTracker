@@ -63,7 +63,7 @@ export class SessionStartFlowService {
 
       this.starting.set(true);
       const hadActive = !!(await this.sessionService.getActive());
-      if (!hadActive) {
+      if (!hadActive && this.settings.get().backupBeforeSession) {
         const mayContinue = await this.exportPreSessionBackup();
         if (!mayContinue) {
           return false;

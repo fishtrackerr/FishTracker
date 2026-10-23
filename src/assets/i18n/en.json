@@ -183,6 +183,7 @@
     "exporting": "Exporting...",
     "exportJson": "Export JSON Backup",
     "importJson": "Import JSON Backup",
+    "backupBeforeSession": "Save a backup before each new session",
     "generateDemo": "Generate demo fishing data",
     "generatingDemo": "Generating…",
     "generateDemoDesc": "Adds sample lakes, sessions (with rods), catches, bites, and fish-spotted events for the current fishing mode — useful for testing the assistant. Press again to add another batch; existing data is kept.",

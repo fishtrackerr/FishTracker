@@ -183,6 +183,7 @@
     "exporting": "Export läuft...",
     "exportJson": "JSON-Backup exportieren",
     "importJson": "JSON-Backup importieren",
+    "backupBeforeSession": "Vor jeder neuen Sitzung ein Backup speichern",
     "generateDemo": "Demo-Angeldaten erzeugen",
     "generatingDemo": "Wird erzeugt…",
     "generateDemoDesc": "Fügt Beispielseen, Sessions (mit Ruten), Fänge, Bisse und gesichtete Fische für den aktuellen Angelmodus hinzu — nützlich zum Testen des Assistenten. Erneutes Tippen fügt einen weiteren Stapel hinzu; bestehende Daten bleiben.",

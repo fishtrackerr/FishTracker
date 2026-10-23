@@ -71,7 +71,7 @@ describe('SessionStartFlowService', () => {
         },
         {
           provide: SettingsService,
-          useValue: { get: vi.fn().mockReturnValue({}) },
+          useValue: { get: vi.fn().mockReturnValue({ backupBeforeSession: true }) },
         },
         {
           provide: FishingModeService,
@@ -132,6 +132,19 @@ describe('SessionStartFlowService', () => {
     });
     expect(success).toHaveBeenCalledWith('sessions.backupSaved');
     expect(success).toHaveBeenCalledWith('sessions.sessionStarted');
+  });
+
+  it('starts without a backup when backup before session is off', async () => {
+    vi.mocked(TestBed.inject(SettingsService).get).mockReturnValue({
+      backupBeforeSession: false,
+    } as never);
+
+    const service = TestBed.inject(SessionStartFlowService);
+    const ok = await service.start();
+
+    expect(ok).toBe(true);
+    expect(exportBackup).not.toHaveBeenCalled();
+    expect(saveToFile).not.toHaveBeenCalled();
   });
 
   it('skips backup when an active session already exists', async () => {

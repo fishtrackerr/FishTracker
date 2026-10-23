@@ -380,6 +380,9 @@
         <input type="file" accept=".json" (change)="importBackup($event)" hidden />
         <span mat-stroked-button>{{ 'settings.importJson' | tr }}</span>
       </label>
+      <mat-checkbox [ngModel]="settings().backupBeforeSession" (ngModelChange)="updateSetting('backupBeforeSession', $event)">
+        {{ 'settings.backupBeforeSession' | tr }}
+      </mat-checkbox>
       <p class="reset-desc">{{ 'settings.generateDemoDesc' | tr }}</p>
       <button
         mat-stroked-button

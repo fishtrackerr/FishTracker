@@ -3,7 +3,7 @@
 ## When backups are created
 
 - **Settings → Export JSON Backup** — manual export (`fish-tracker-backup-YYYY-MM-DD.json`).
-- **Start Session** — before creating a new fishing session (when none is active **in the current mode**), the app saves a full backup as `fish-tracker-pre-session-YYYY-MM-DD.json`. If export fails or the share sheet is dismissed, the user can skip and start anyway, or cancel. Restore remains **Settings → Import JSON Backup**.
+- **Start Session** (only when **Settings → Data → Save a backup before each new session** is on; off by default) — before creating a new fishing session (when none is active **in the current mode**), the app saves a full backup as `fish-tracker-pre-session-YYYY-MM-DD.json`. If export fails or the share sheet is dismissed, the user can skip and start anyway, or cancel. Restore remains **Settings → Import JSON Backup**.
 - **Full application reset** — optionally exports first. If that export fails or is cancelled, the reset stops.
 
 ## Saving the file

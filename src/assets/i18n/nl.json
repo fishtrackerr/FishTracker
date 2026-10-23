@@ -183,6 +183,7 @@
     "exporting": "Exporteren...",
     "exportJson": "JSON-back-up exporteren",
     "importJson": "JSON-back-up importeren",
+    "backupBeforeSession": "Back-up opslaan vóór elke nieuwe sessie",
     "generateDemo": "Demo-visdata genereren",
     "generatingDemo": "Bezig met genereren…",
     "generateDemoDesc": "Voegt voorbeeldmeren, sessies (met hengels), vangsten, aanbeten en gespotte vissen toe voor de huidige vismodus — handig om de assistent te testen. Opnieuw indrukken voegt een nieuwe batch toe; bestaande data blijft staan.",

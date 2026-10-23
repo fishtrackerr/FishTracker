@@ -29,6 +29,8 @@ export interface AppSettings {
   homepageImageId?: string;
   detailedWeatherEnabled: boolean;
   autoLoadWeather: boolean;
+  /** Save a full backup (share sheet on Android) before starting a session. */
+  backupBeforeSession: boolean;
   weatherRefreshMinutes: number;
   useGpsForWeather: boolean;
   showWeatherWarnings: boolean;
@@ -72,6 +74,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   favoriteRigs: ['Hair Rig', 'Method Feeder', 'Float Rig', 'Ledger'],
   detailedWeatherEnabled: true,
   autoLoadWeather: true,
+  backupBeforeSession: false,
   weatherRefreshMinutes: 30,
   useGpsForWeather: true,
   showWeatherWarnings: true,
