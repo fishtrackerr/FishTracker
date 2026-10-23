@@ -12,6 +12,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { EXPAND_STATE_KEY_PREFIX } from '../../../core/constants/storage-keys';
 
 @Component({
   selector: 'app-expandable-section',
@@ -42,7 +43,7 @@ export class ExpandableSectionComponent implements OnInit, OnDestroy {
 
     let shouldExpand = this.defaultExpanded;
     if (this.persistKey && isPlatformBrowser(this.platformId)) {
-      const stored = localStorage.getItem(`expand-${this.persistKey}`);
+      const stored = localStorage.getItem(`${EXPAND_STATE_KEY_PREFIX}${this.persistKey}`);
       if (stored !== null) {
         shouldExpand = stored === 'true';
       }
@@ -94,7 +95,7 @@ export class ExpandableSectionComponent implements OnInit, OnDestroy {
     this.expanded.set(next);
 
     if (persist && this.persistKey && isPlatformBrowser(this.platformId)) {
-      localStorage.setItem(`expand-${this.persistKey}`, String(next));
+      localStorage.setItem(`${EXPAND_STATE_KEY_PREFIX}${this.persistKey}`, String(next));
     }
   }
 

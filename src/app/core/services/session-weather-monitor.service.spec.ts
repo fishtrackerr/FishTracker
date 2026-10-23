@@ -1,6 +1,17 @@
-import { describe, expect, it } from 'vitest';
+import { signal } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { describe, expect, it, vi } from 'vitest';
 import { WeatherWarning } from '../models';
+import { ConnectivityService } from './connectivity.service';
+import { FishingModeService } from './fishing-mode.service';
+import { NotificationService } from './notification.service';
+import { SessionEventService } from './session-event.service';
+import { SessionService } from './session.service';
+import { SettingsService } from './settings.service';
+import { WeatherService } from './weather.service';
 import {
+  SessionWeatherMonitorService,
   takeEscalatedWarnings,
   weatherWarningFingerprint,
 } from './session-weather-monitor.service';
@@ -60,5 +71,34 @@ describe('takeEscalatedWarnings', () => {
     takeEscalatedWarnings(previous, []);
     const again = takeEscalatedWarnings(previous, [stormDanger]);
     expect(again).toEqual([stormDanger]);
+  });
+});
+
+describe('SessionWeatherMonitorService', () => {
+  it('re-subscribes to the active session when the fishing mode is chosen', async () => {
+    const mode = signal<string | null>(null);
+    const watchActive = vi.fn(() => of(mode() ? { id: 's1', weather: undefined } : undefined));
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: FishingModeService, useValue: { selectedMode: mode.asReadonly() } },
+        { provide: SessionService, useValue: { watchActive } },
+        { provide: WeatherService, useValue: {} },
+        { provide: SettingsService, useValue: { get: () => ({ autoLoadWeather: false }) } },
+        { provide: NotificationService, useValue: {} },
+        { provide: SessionEventService, useValue: {} },
+        { provide: ConnectivityService, useValue: { online$: of(true) } },
+      ],
+    });
+    const monitor = TestBed.inject(SessionWeatherMonitorService);
+
+    monitor.start();
+    TestBed.tick();
+    expect(watchActive).toHaveBeenCalledTimes(1);
+
+    mode.set('pike');
+    TestBed.tick();
+
+    expect(watchActive).toHaveBeenCalledTimes(2);
+    monitor.ngOnDestroy();
   });
 });

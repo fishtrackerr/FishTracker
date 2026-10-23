@@ -110,6 +110,7 @@
     "clearAiKey": "Clear API key",
     "openAssistant": "Open assistant",
     "aiKeyCleared": "API key cleared",
+    "aiKeyNeedsPin": "After a reload the API key can't be changed. Lock the app and unlock it with your PIN to change it.",
     "customPrompts": "Custom prompts",
     "customPromptsHint": "Add your own starter questions for Ask your data. Custom prompts need online AI when answered.",
     "addPrompt": "Add prompt",

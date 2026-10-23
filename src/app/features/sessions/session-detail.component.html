@@ -32,7 +32,7 @@
   }
 
   @if (s.rods && s.rods.length > 0) {
-    <app-expandable-section sectionId="session-rods" label="sessionDetail.rodsAndSpots" [defaultExpanded]="true">
+    <app-expandable-section sectionId="session-rods" [label]="'sessionDetail.moreInfoRodsSpots' | tr" [defaultExpanded]="true">
       <div expandHeader class="expand-label">{{ 'sessionDetail.moreInfoRodsSpots' | tr }}</div>
       @if (setupRodsMode()) {
         <section class="rod-setup-callout app-card" aria-live="polite">

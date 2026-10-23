@@ -11,7 +11,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-appearance" label="appearance" [defaultExpanded]="true" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-appearance" [label]="'settings.appearance' | tr" [defaultExpanded]="true" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.appearance' | tr }}</h2>
     </div>
@@ -40,7 +40,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-units" label="units" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-units" [label]="'settings.units' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.units' | tr }}</h2>
     </div>
@@ -78,7 +78,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-general" label="general" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-general" [label]="'settings.general' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.general' | tr }}</h2>
     </div>
@@ -128,7 +128,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-gallery" label="gallery" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-gallery" [label]="'settings.gallery' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.gallery' | tr }}</h2>
     </div>
@@ -161,7 +161,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-weather" label="weather" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-weather" [label]="'settings.weather' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.weather' | tr }}</h2>
     </div>
@@ -188,7 +188,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant-guide" label="assistantGuide" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant-guide" [label]="'settings.assistantGuide' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.assistantGuide' | tr }}</h2>
     </div>
@@ -228,7 +228,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant" label="assistant" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-assistant" [label]="'settings.assistant' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.assistant' | tr }}</h2>
     </div>
@@ -254,10 +254,14 @@
               matInput
               type="password"
               autocomplete="off"
+              [disabled]="!aiKeyEditable()"
               [ngModel]="aiApiKey() ?? ''"
               (ngModelChange)="updateAiApiKey($event)"
             />
           </mat-form-field>
+          @if (!aiKeyEditable()) {
+            <p class="field-hint">{{ 'settings.aiKeyNeedsPin' | tr }}</p>
+          }
 
           <mat-form-field appearance="outline" class="full no-subscript">
             <mat-label>{{ 'settings.aiBaseUrl' | tr }}</mat-label>
@@ -293,7 +297,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-prompts" label="customPrompts" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-prompts" [label]="'settings.customPrompts' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.customPrompts' | tr }}</h2>
     </div>
@@ -333,7 +337,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-security" label="security" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-security" [label]="'settings.security' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.security' | tr }}</h2>
     </div>
@@ -364,7 +368,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-data" label="data" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-data" [label]="'settings.data' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.data' | tr }}</h2>
     </div>
@@ -390,7 +394,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-reset" label="reset" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-reset" [label]="'settings.resetSection' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.resetSection' | tr }}</h2>
     </div>
@@ -461,7 +465,7 @@
 </section>
 
 <section class="section app-card about">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-about" label="about" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-about" [label]="'settings.about' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.about' | tr }}</h2>
     </div>
@@ -485,7 +489,7 @@
 </section>
 
 <section class="section app-card">
-  <app-expandable-section accordionGroup="settings" sectionId="settings-changelog" label="changelog" [flat]="true">
+  <app-expandable-section accordionGroup="settings" sectionId="settings-changelog" [label]="'settings.changelog' | tr" [flat]="true">
     <div expandHeader>
       <h2 class="section-title">{{ 'settings.changelog' | tr }}</h2>
     </div>

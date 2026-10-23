@@ -38,7 +38,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       <app-expandable-section
         class="session-card-expand"
         [sectionId]="'session-card-' + session.id"
-        label="session"
+        [label]="session.name"
         [persistKey]="'session-card-' + session.id"
         [defaultExpanded]="defaultExpanded"
         [flat]="true"
@@ -92,7 +92,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
           <div class="more-info-box">
             <app-expandable-section
               sectionId="session-{{ session.id }}-details"
-              label="session details"
+              [label]="'sessionCard.moreInformation' | tr"
               [persistKey]="'session-card-details-' + session.id"
               [defaultExpanded]="false"
               [flat]="true"

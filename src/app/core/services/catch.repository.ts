@@ -52,6 +52,11 @@ export class CatchRepository extends ModeScopedRepository {
     return this.forActiveMode(await db.catches.get(id));
   }
 
+  /** Updates only the personal-record flag of one catch. */
+  async setPersonalRecord(id: string, isPersonalRecord: boolean): Promise<void> {
+    await db.catches.update(id, { isPersonalRecord });
+  }
+
   async put(catchRecord: NewModeEntity<Catch>): Promise<void> {
     await db.catches.put(this.withMode(catchRecord));
   }

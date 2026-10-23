@@ -110,6 +110,7 @@
     "clearAiKey": "API-sleutel wissen",
     "openAssistant": "Assistent openen",
     "aiKeyCleared": "API-sleutel gewist",
+    "aiKeyNeedsPin": "Na herladen kan de API-sleutel niet worden gewijzigd. Vergrendel de app en ontgrendel met je pincode om hem te wijzigen.",
     "customPrompts": "Eigen prompts",
     "customPromptsHint": "Voeg eigen startvragen toe voor Vraag je data. Eigen prompts hebben online AI nodig voor een antwoord.",
     "addPrompt": "Prompt toevoegen",

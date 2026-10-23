@@ -33,7 +33,7 @@
 
 1. User chooses a fishing mode.
 2. `FishingModeService.setMode()` persists the choice and seeds `modePreferences` defaults if needed.
-3. `UserOptionService.ensureDefaultsForCurrentMode()` seeds defaults per option category that has never had rows in this mode. Deleted or renamed defaults are not re-added; Settings reset restores them.
+3. `UserOptionService.ensureDefaultsForCurrentMode()` seeds defaults per option category that has never had rows in this mode. Deleted or renamed defaults are not re-added; Settings reset restores them. Defaults added in a later app version therefore only reach categories that are still empty (or after a reset).
 4. Navigation uses `consumeReturnUrl()` then `resolveUnlockedDestination` (preserves deep links stored by the PIN/mode guards or startup, else active session in that mode, else home).
 
 ## Active session flow

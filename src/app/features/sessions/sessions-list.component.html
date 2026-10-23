@@ -31,7 +31,7 @@
 <div class="desktop-filters">
   <app-expandable-section
     sectionId="sessions-filters"
-    label="filters"
+    [label]="'sessions.filters' | tr"
     persistKey="sessions-list-filters"
     [defaultExpanded]="false"
   >

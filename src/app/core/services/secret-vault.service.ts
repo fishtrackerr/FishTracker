@@ -15,6 +15,13 @@ export class SecretVaultService {
 
   private wrapKey: CryptoKey | undefined;
   private readonly memoryAiKey = signal<string | undefined>(undefined);
+  private readonly canPersistSignal = signal(false);
+
+  /**
+   * False after an in-tab refresh (only the plaintext is restored, not the
+   * PIN-derived wrap key): a changed key could not be saved until PIN unlock.
+   */
+  readonly canPersist = this.canPersistSignal.asReadonly();
 
   readonly aiApiKey = this.memoryAiKey.asReadonly();
 
@@ -53,6 +60,7 @@ export class SecretVaultService {
     }
     const salt = this.fromBase64(saltB64);
     this.wrapKey = await this.deriveWrapKey(pin, salt);
+    this.canPersistSignal.set(true);
 
     const legacyPlain = s.aiApiKey?.trim();
     if (legacyPlain) {
@@ -71,8 +79,8 @@ export class SecretVaultService {
       return;
     }
 
-    // Ciphertext missing (key changed after an in-tab refresh, or mid-migration):
-    // take the session copy and encrypt it now that the wrap key is known.
+    // Ciphertext missing (mid-migration): take the session copy and encrypt it
+    // now that the wrap key is known.
     this.restoreFromSession();
     const pending = this.memoryAiKey();
     if (pending) {
@@ -83,11 +91,20 @@ export class SecretVaultService {
   /** Clear in-memory secrets (call on lock). Does not wipe ciphertext. */
   lock(): void {
     this.wrapKey = undefined;
+    this.canPersistSignal.set(false);
     this.setMemory(undefined);
   }
 
-  async setAiApiKey(value: string | undefined): Promise<void> {
+  /**
+   * Saves (or clears) the AI key. Returns false when a new key can't be saved
+   * because the wrap key is missing; nothing changes then, so the stored key
+   * is never lost. Clearing always works.
+   */
+  async setAiApiKey(value: string | undefined): Promise<boolean> {
     const trimmed = value?.trim() || undefined;
+    if (trimmed && !this.wrapKey) {
+      return false;
+    }
     this.setMemory(trimmed);
     if (!trimmed) {
       this.settings.update({
@@ -95,20 +112,10 @@ export class SecretVaultService {
         aiApiKeyEncrypted: undefined,
         aiApiKeyIv: undefined,
       });
-      return;
-    }
-    if (!this.wrapKey) {
-      // Unlocked via session restore without the PIN wrap key: drop the old
-      // ciphertext so the previous key can't come back; the session copy is
-      // encrypted on the next PIN unlock.
-      this.settings.update({
-        aiApiKey: undefined,
-        aiApiKeyEncrypted: undefined,
-        aiApiKeyIv: undefined,
-      });
-      return;
+      return true;
     }
     await this.persistEncrypted(trimmed);
+    return true;
   }
 
   async clearAiApiKey(): Promise<void> {
@@ -124,6 +131,7 @@ export class SecretVaultService {
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const saltB64 = this.toBase64(salt);
     this.wrapKey = await this.deriveWrapKey(newPin, salt);
+    this.canPersistSignal.set(true);
     this.settings.update({ aiKeySalt: saltB64 });
     if (plain) {
       await this.persistEncrypted(plain);

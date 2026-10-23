@@ -110,6 +110,7 @@
     "clearAiKey": "API-Schlüssel löschen",
     "openAssistant": "Assistent öffnen",
     "aiKeyCleared": "API-Schlüssel gelöscht",
+    "aiKeyNeedsPin": "Nach einem Neuladen kann der API-Schlüssel nicht geändert werden. Sperre die App und entsperre sie mit deiner PIN, um ihn zu ändern.",
     "customPrompts": "Eigene Prompts",
     "customPromptsHint": "Eigene Starterfragen für Frag deine Daten hinzufügen. Eigene Prompts brauchen Online-KI für eine Antwort.",
     "addPrompt": "Prompt hinzufügen",

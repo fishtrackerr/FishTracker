@@ -46,23 +46,38 @@ describe('SecretVaultService', () => {
     expect(restarted.getAiApiKey()).toBe('sk-first');
   });
 
-  it('never brings back the old key when it was changed after an in-tab refresh', async () => {
+  it('keeps the stored key when a change is attempted after an in-tab refresh', async () => {
     await vault.unlockWithPin('123456');
     await vault.setAiApiKey('sk-old');
+    const cipher = stored.aiApiKeyEncrypted;
 
     // In-tab refresh: plaintext comes back from sessionStorage, the wrap key does not.
     const refreshed = newVault();
     refreshed.restoreFromSession();
-    await refreshed.setAiApiKey('sk-new');
-    expect(stored.aiApiKeyEncrypted).toBeUndefined();
+    expect(refreshed.canPersist()).toBe(false);
+    expect(await refreshed.setAiApiKey('sk-new')).toBe(false);
+    expect(stored.aiApiKeyEncrypted).toBe(cipher);
 
-    // Next PIN unlock in the same tab encrypts the new key.
+    // The app always locks before the next PIN unlock.
+    refreshed.lock();
     await refreshed.unlockWithPin('123456');
-    expect(stored.aiApiKeyEncrypted).toBeTruthy();
+    expect(refreshed.getAiApiKey()).toBe('sk-old');
+    expect(refreshed.canPersist()).toBe(true);
+    expect(await refreshed.setAiApiKey('sk-new')).toBe(true);
 
-    sessionStorage.clear();
+    refreshed.lock();
     const restarted = newVault();
     await restarted.unlockWithPin('123456');
     expect(restarted.getAiApiKey()).toBe('sk-new');
+  });
+
+  it('can always clear the key', async () => {
+    await vault.unlockWithPin('123456');
+    await vault.setAiApiKey('sk-old');
+    const refreshed = newVault();
+    refreshed.restoreFromSession();
+
+    expect(await refreshed.setAiApiKey(undefined)).toBe(true);
+    expect(stored.aiApiKeyEncrypted).toBeUndefined();
   });
 });

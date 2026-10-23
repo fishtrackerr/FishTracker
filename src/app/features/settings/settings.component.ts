@@ -99,6 +99,8 @@ export class SettingsComponent implements OnInit {
   readonly settings = this.settingsService.settings;
   readonly modePreferences = () => this.fishingMode.getActivePreferences();
   readonly aiApiKey = this.vault.aiApiKey;
+  /** False after an in-tab reload until the next PIN unlock (key can't be encrypted). */
+  readonly aiKeyEditable = this.vault.canPersist;
   readonly supportedLanguages = this.i18n.supportedLanguages;
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
   readonly customPrompts = toSignal(this.assistantPrompts.watchAll(), {

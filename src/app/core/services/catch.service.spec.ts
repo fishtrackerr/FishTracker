@@ -10,6 +10,7 @@ describe('CatchService', () => {
     getById: ReturnType<typeof vi.fn>;
     getBySession: ReturnType<typeof vi.fn>;
     getAll: ReturnType<typeof vi.fn>;
+    setPersonalRecord: ReturnType<typeof vi.fn>;
   };
   let sessionRepo: {
     getById: ReturnType<typeof vi.fn>;
@@ -48,6 +49,7 @@ describe('CatchService', () => {
       getById: vi.fn(),
       getBySession: vi.fn().mockResolvedValue([]),
       getAll: vi.fn().mockResolvedValue([]),
+      setPersonalRecord: vi.fn().mockResolvedValue(undefined),
     };
     processFile = vi.fn();
     sessionEvents = { record: vi.fn() };
@@ -102,6 +104,7 @@ describe('CatchService', () => {
         put: catchRepo.put,
         getBySession: catchRepo.getBySession,
         getAll: catchRepo.getAll,
+        setPersonalRecord: catchRepo.setPersonalRecord,
         watchBySession: vi.fn(),
         watchAll: vi.fn(),
         getById: catchRepo.getById,
@@ -240,14 +243,11 @@ describe('CatchService', () => {
       const record = pike('c-big', 9, true);
       const second = pike('c-second', 7, false);
       catchRepo.getById.mockResolvedValue(record);
-      (catchRepo as unknown as { delete: ReturnType<typeof vi.fn> }).delete = vi.fn();
       catchRepo.getAll.mockResolvedValue([second]);
 
       await service.delete('c-big');
 
-      expect(catchRepo.put).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'c-second', isPersonalRecord: true }),
-      );
+      expect(catchRepo.setPersonalRecord).toHaveBeenCalledWith('c-second', true);
     });
 
     it('clears the flag on a former record once a bigger fish is saved', async () => {
@@ -256,9 +256,7 @@ describe('CatchService', () => {
 
       await service.createQuick('session-1', { species: 'Pike', weightKg: 8, rodId: 'rod-1' });
 
-      expect(catchRepo.put).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'c-old', isPersonalRecord: false }),
-      );
+      expect(catchRepo.setPersonalRecord).toHaveBeenCalledWith('c-old', false);
     });
   });
 

@@ -21,7 +21,7 @@ export interface RodSummaryLine {
   imports: [ExpandableSectionComponent, TranslatePipe],
   template: `
     @if (summaries().length > 0) {
-      <app-expandable-section sectionId="rod-summary" label="rod-summary" [defaultExpanded]="false">
+      <app-expandable-section sectionId="rod-summary" [label]="'rodSummary.title' | tr" [defaultExpanded]="false">
         <div expandHeader class="expand-label">{{ 'rodSummary.title' | tr }}</div>
         @for (line of summaries(); track line.rod.id) {
           <div class="summary-block">

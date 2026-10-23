@@ -190,8 +190,9 @@ describe('SettingsComponent', () => {
           provide: SecretVaultService,
           useValue: {
             aiApiKey: signal('').asReadonly(),
+            canPersist: signal(true).asReadonly(),
             getAiApiKey: () => '',
-            setAiApiKey: vi.fn().mockResolvedValue(undefined),
+            setAiApiKey: vi.fn().mockResolvedValue(true),
             clearAiApiKey: vi.fn().mockResolvedValue(undefined),
           },
         },

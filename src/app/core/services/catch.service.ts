@@ -272,7 +272,8 @@ export class CatchService {
         const isRecord =
           (maxWeight > 0 && c.weightKg === maxWeight) || (maxLength > 0 && c.lengthCm === maxLength);
         if (!!c.isPersonalRecord !== isRecord) {
-          await this.catchRepo.put({ ...c, isPersonalRecord: isRecord });
+          // Only the flag: a full put of this snapshot could undo a concurrent edit.
+          await this.catchRepo.setPersonalRecord(c.id, isRecord);
         }
       }
     }
