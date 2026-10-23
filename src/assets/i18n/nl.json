@@ -445,6 +445,19 @@
     "moreDetails": "Meer details",
     "otherSpecies": "Overig"
   },
+  "catchSheet": {
+    "title": "Vangst · Hengel {{rod}}",
+    "otherRod": "Andere hengel",
+    "other": "Anders…",
+    "otherSpeciesTitle": "Andere soort",
+    "weight": "Gewicht",
+    "length": "Lengte",
+    "addPhoto": "+ Foto",
+    "save": "Vangst opslaan",
+    "allDetails": "Alle details…",
+    "saved": "{{species}}{{weight}} op hengel {{rod}}",
+    "undo": "Ongedaan maken"
+  },
   "lakes": {
     "title": "Meren",
     "addLake": "Meer toevoegen",

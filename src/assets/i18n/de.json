@@ -445,6 +445,19 @@
     "moreDetails": "Mehr Details",
     "otherSpecies": "Andere"
   },
+  "catchSheet": {
+    "title": "Fang · Rute {{rod}}",
+    "otherRod": "Andere Rute",
+    "other": "Andere…",
+    "otherSpeciesTitle": "Andere Art",
+    "weight": "Gewicht",
+    "length": "Länge",
+    "addPhoto": "+ Foto",
+    "save": "Fang speichern",
+    "allDetails": "Alle Details…",
+    "saved": "{{species}}{{weight}} an Rute {{rod}}",
+    "undo": "Rückgängig"
+  },
   "lakes": {
     "title": "Seen",
     "addLake": "See hinzufügen",

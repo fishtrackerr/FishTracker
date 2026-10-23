@@ -20,6 +20,17 @@ Dialog on active session (`QuickCatchDialogComponent`):
 - “Other” is shown translated (`quickCatch.otherSpecies`) but saved as the fixed value `Other`, so stored catches stay language-independent
 - Saves via `CatchService.createQuick()`
 
+## Catch sheet
+
+Bottom sheet `CatchSheetComponent` (`features/catches/catch-sheet/`), opened with `openCatchSheet(bottomSheet, theme, { session, rodId? })`; resolves to the saved `Catch` (or `undefined`). Themed like the filter sheet. It is meant for per-rod "Catch" buttons and replaces the quick-catch dialog (which stays until it is removed).
+
+- Header "Catch · Rod N" with the rod name, spot and bait; "Other rod" switches between visible rods
+- Species chips from the mode favourites plus "Other…" (text prompt, any species). Preselected: species of the latest catch in the session, else the latest in the mode, else the first favourite
+- Weight and length in the units from settings (stored as kg / cm); photo via camera or gallery; Released toggle (default on)
+- Save uses `CatchService.create` with the rod, its `sessionSpotId`, bait and rig. Without a weight the catch is saved `detailsPending` ("log now, details later")
+- Snackbar "species weight on rod N" with Undo (`CatchService.delete`)
+- "All details…" closes the sheet and opens `/sessions/:id/catches/new?rodId=&sessionSpotId=&returnUrl=<current url>`
+
 ## Full catch form
 
 - Create: `/sessions/:id/catches/new` — extended fields (hook, line, depth, rod, session spot, etc.)
