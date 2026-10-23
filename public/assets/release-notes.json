@@ -1,57 +1,54 @@
 {
-  "version": "0.0.54",
+  "version": "0.0.55",
   "date": "2026-10-23",
   "sections": [
     {
       "category": "New Features",
       "items": [
-        "make the pre-session backup optional (off by default)",
-        "update app version to 0.0.53, enhance user option and assistant prompt validation, and improve privacy welcome dialog handling"
-      ]
-    },
-    {
-      "category": "Bug Fixes",
-      "items": [
-        "review follow-ups (AI key, personal records, labels)",
-        "image gallery tile markup and viewer keyboard focus",
-        "lake detail edit draft and statistics load race/error handling",
-        "image storage growth and session photo loading (phase 3)",
-        "visible bugs from the audit (phase 2)",
-        "review follow-ups for backup and session updates",
-        "atomic partial session updates",
-        "working Android export, keep deleted photos hidden, safer full reset"
+        "camo redesign — Woodland camo (default) and Night bivvy themes"
       ]
     },
     {
       "category": "Maintenance",
       "items": [
-        "upgrade to Capacitor 8",
-        "upgrade dev tooling (ESLint 10, Vitest 5, jsdom 30, @types/node 24)",
-        "upgrade to Angular 22 (ng update migrations)",
-        "tooling fixes (phase 4)",
-        "update dependencies and drop to-ico"
-      ]
-    },
-    {
-      "category": "Improvements",
-      "items": [
-        "themed text prompt, DialogService, confirm and i18n cleanup",
-        "remove dead code and duplicate session-card edit navigation",
-        "service-level cleanup (phase 5)"
-      ]
-    },
-    {
-      "category": "Documentation",
-      "items": [
-        "audit findings and fix plan"
+        "regenerate mdpi launcher icons with sharp 0.35"
       ]
     }
   ],
   "releases": [
     {
+      "version": "0.0.55",
+      "date": "2026-10-23",
+      "sections": [
+        {
+          "category": "New Features",
+          "items": [
+            "camo redesign — Woodland camo (default) and Night bivvy themes"
+          ]
+        },
+        {
+          "category": "Maintenance",
+          "items": [
+            "regenerate mdpi launcher icons with sharp 0.35"
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.0.54",
       "date": "2026-10-23",
       "sections": [
+        {
+          "category": "Maintenance",
+          "items": [
+            "release v0.0.54",
+            "upgrade to Capacitor 8",
+            "upgrade dev tooling (ESLint 10, Vitest 5, jsdom 30, @types/node 24)",
+            "upgrade to Angular 22 (ng update migrations)",
+            "tooling fixes (phase 4)",
+            "update dependencies and drop to-ico"
+          ]
+        },
         {
           "category": "New Features",
           "items": [
@@ -70,16 +67,6 @@
             "review follow-ups for backup and session updates",
             "atomic partial session updates",
             "working Android export, keep deleted photos hidden, safer full reset"
-          ]
-        },
-        {
-          "category": "Maintenance",
-          "items": [
-            "upgrade to Capacitor 8",
-            "upgrade dev tooling (ESLint 10, Vitest 5, jsdom 30, @types/node 24)",
-            "upgrade to Angular 22 (ng update migrations)",
-            "tooling fixes (phase 4)",
-            "update dependencies and drop to-ico"
           ]
         },
         {
