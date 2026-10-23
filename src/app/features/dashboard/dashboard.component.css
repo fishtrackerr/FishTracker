@@ -54,6 +54,73 @@
   margin-bottom: var(--spacing-sm);
 }
 
+.live-card {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--background-card);
+  border: 2px solid var(--cta);
+  border-radius: var(--radius-md);
+}
+
+.live-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin: 0 0 var(--spacing-sm);
+  font-family: var(--font-label);
+  font-size: 1rem;
+  color: var(--heading-color);
+  text-transform: var(--label-transform);
+  letter-spacing: var(--label-spacing);
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cta);
+}
+
+.live-lake {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.live-lake mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--primary);
+}
+
+.live-facts {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin: 0 0 var(--spacing-md);
+}
+
+.live-facts dt {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.live-facts dd {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.live-card .continue-btn {
+  --mat-button-filled-container-color: var(--cta);
+  --mat-button-filled-label-text-color: var(--text-on-cta);
+  margin-bottom: 0;
+}
+
 .assistant-btn {
   width: 100%;
   min-height: var(--button-height) !important;

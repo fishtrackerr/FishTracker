@@ -55,7 +55,7 @@ Primary logic in `AppStartupService.resolveInitialRoute()`. Guards complement bu
 
 Flow after unlock: no mode → `/mode-select` (deep link kept in return URL) → pick mode → restore return URL or active session (current mode) or home. Mode choice is kept in `localStorage` and remembered across restarts; it can be changed in Settings.
 
-When an active session exists for the current mode, startup may route `/` to `/sessions/active`, which redirects to `/sessions/<id>`. The shell **Current** tab links straight to `/sessions/<active id>`. The shell bottom nav shows primary destinations (Home, Current when active, Assistant when fishing, Sessions, Lakes) plus a **More** menu for Gallery, Stats, Settings (and Assistant when idle).
+When an active session exists for the current mode, startup may route `/` to `/sessions/active`, which redirects to `/sessions/<id>`. The shell bottom nav always shows five items (Home, Sessions, Gallery, Stats, More); the **More** menu holds Lakes, Assistant, WhatsApp share and Settings. While a session is active, the camo header's mode chip becomes a **LIVE · mode** link straight to `/sessions/<active id>` (no Current/Assistant tabs).
 
 ## Deep links
 

@@ -21,9 +21,27 @@
   <app-loading-state />
 } @else {
   @if (activeSession(); as active) {
-    <button mat-flat-button class="start-btn continue-btn" (click)="continueSession()">
-      {{ 'dashboard.continueActive' | tr: { count: active.catchCount } }}
-    </button>
+    <section class="live-card" aria-labelledby="live-card-title">
+      <h2 id="live-card-title" class="live-title">
+        <span class="live-dot" aria-hidden="true"></span>{{ 'dashboard.liveSession' | tr }}
+      </h2>
+      @if (activeLakeName(); as lake) {
+        <p class="live-lake"><mat-icon aria-hidden="true">water</mat-icon> {{ lake }}</p>
+      }
+      <dl class="live-facts">
+        <div>
+          <dt>{{ 'dashboard.liveElapsed' | tr }}</dt>
+          <dd>{{ elapsed() }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'dashboard.liveCatches' | tr }}</dt>
+          <dd>{{ active.catchCount }}</dd>
+        </div>
+      </dl>
+      <button mat-flat-button class="start-btn continue-btn" (click)="continueSession()">
+        {{ 'dashboard.liveContinue' | tr }}
+      </button>
+    </section>
   } @else {
     <button mat-flat-button class="start-btn" (click)="startSession()" [disabled]="starting() || loading()">
       {{ starting() ? ('dashboard.starting' | tr) : ('dashboard.startSession' | tr) }}
