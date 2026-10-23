@@ -55,46 +55,63 @@ export class RodService {
 
   async ensureRods(session: FishingSession, count: number): Promise<FishingSession> {
     const full = await this.loadFull(session);
-    const rods = full.rods ?? [];
-    const visible = onlyVisibleRecords(rods);
-    if (visible.length === count) {
+    if (onlyVisibleRecords(full.rods ?? []).length >= count) {
       return full;
     }
-    if (visible.length < count) {
-      let need = count - visible.length;
-      let newRods = rods.map((rod) => ({ ...rod }));
-      const hidden = newRods
-        .filter((r) => r.visible === false)
-        .sort((a, b) => a.rodNumber - b.rodNumber);
-      for (const hiddenRod of hidden) {
-        if (need <= 0) {
-          break;
-        }
-        newRods = newRods.map((r) =>
-          r.id === hiddenRod.id ? { ...r, visible: true, isActive: true } : r,
-        );
-        need -= 1;
-      }
-      const visibleAfterRevive = onlyVisibleRecords(newRods);
-      let nextNumber =
-        Math.max(0, ...newRods.map((r) => r.rodNumber), visibleAfterRevive.length) + 1;
-      while (need > 0) {
-        const rod = this.createRodRecords(full.id, 1)[0];
-        rod.rodNumber = nextNumber;
-        rod.name = `Rod ${nextNumber}`;
-        nextNumber += 1;
-        newRods.push(rod);
-        need -= 1;
-        await this.sessionEvents.record({
-          sessionId: full.id,
-          type: 'rod-created',
-          rodId: rod.id,
-          description: `${rod.name} created`,
-        });
-      }
-      return this.saveSessionRods(full, newRods);
+    let created: SessionRod[] = [];
+    const updated = await this.modifyRods(full, (rods) => {
+      const result = this.growRods(full.id, rods, count);
+      created = result.created;
+      return result.rods;
+    });
+    for (const rod of created) {
+      await this.sessionEvents.record({
+        sessionId: full.id,
+        type: 'rod-created',
+        rodId: rod.id,
+        description: `${rod.name} created`,
+      });
     }
-    return full;
+    return updated;
+  }
+
+  /** Revives hidden rods first, then creates new ones until `count` are visible. */
+  private growRods(
+    sessionId: string,
+    rods: SessionRod[],
+    count: number,
+  ): { rods: SessionRod[]; created: SessionRod[] } {
+    let need = count - onlyVisibleRecords(rods).length;
+    if (need <= 0) {
+      return { rods, created: [] };
+    }
+    let newRods = rods.map((rod) => ({ ...rod }));
+    const hidden = newRods
+      .filter((r) => r.visible === false)
+      .sort((a, b) => a.rodNumber - b.rodNumber);
+    for (const hiddenRod of hidden) {
+      if (need <= 0) {
+        break;
+      }
+      newRods = newRods.map((r) =>
+        r.id === hiddenRod.id ? { ...r, visible: true, isActive: true } : r,
+      );
+      need -= 1;
+    }
+    const visibleAfterRevive = onlyVisibleRecords(newRods);
+    let nextNumber =
+      Math.max(0, ...newRods.map((r) => r.rodNumber), visibleAfterRevive.length) + 1;
+    const created: SessionRod[] = [];
+    while (need > 0) {
+      const rod = this.createRodRecords(sessionId, 1)[0];
+      rod.rodNumber = nextNumber;
+      rod.name = `Rod ${nextNumber}`;
+      nextNumber += 1;
+      newRods.push(rod);
+      created.push(rod);
+      need -= 1;
+    }
+    return { rods: newRods, created };
   }
 
   async resizeRodCount(
@@ -131,10 +148,9 @@ export class RodService {
     }
 
     const hideIds = new Set(removed.map((r) => r.id));
-    const updatedRods = rods.map((rod) =>
-      hideIds.has(rod.id) ? softDeleteRecord(rod) : rod,
+    const updated = await this.modifyRods(full, (latestRods) =>
+      latestRods.map((rod) => (hideIds.has(rod.id) ? softDeleteRecord(rod) : rod)),
     );
-    const updated = await this.saveSessionRods(full, updatedRods);
     return { session: updated, requiresConfirm: false, affectedRodIds };
   }
 
@@ -154,9 +170,9 @@ export class RodService {
       return full;
     }
 
-    const updatedRod: SessionRod = { ...rod, sessionSpotId };
-    const updatedRods = rods.map((r) => (r.id === rodId ? updatedRod : r));
-    const updatedSession = await this.saveSessionRods(full, updatedRods);
+    const updatedSession = await this.modifyRods(full, (latestRods) =>
+      latestRods.map((r) => (r.id === rodId ? { ...r, sessionSpotId } : r)),
+    );
 
     const history: RodSpotHistory = {
       id: generateId(),
@@ -218,10 +234,11 @@ export class RodService {
     const full = await this.loadFull(session);
     const rods = full.rods ?? [];
     const existing = rods.find((r) => r.id === rodId);
-    const updatedRods = rods.map((rod) =>
-      rod.id === rodId ? { ...rod, ...options, id: rodId, sessionId: full.id } : rod,
+    const updated = await this.modifyRods(full, (latestRods) =>
+      latestRods.map((rod) =>
+        rod.id === rodId ? { ...rod, ...options, id: rodId, sessionId: full.id } : rod,
+      ),
     );
-    const updated = await this.saveSessionRods(full, updatedRods);
 
     if (options.castAt) {
       const rodName = existing?.name ?? rodId;
@@ -252,13 +269,12 @@ export class RodService {
       });
     }
     // Merge counts into the latest rods so rod edits made meanwhile are kept.
-    const updated = await this.sessionRepo.modify(full.id, (latest) => {
-      latest.rods = (latest.rods ?? []).map((rod) => {
+    return this.modifyRods(full, (latestRods) =>
+      latestRods.map((rod) => {
         const rodCounts = counts.get(rod.id);
         return rodCounts ? { ...rod, ...rodCounts } : rod;
-      });
-    });
-    return updated ?? full;
+      }),
+    );
   }
 
   snapshotFromLakeSpot(spot: FishingSpot): SessionSpot {
@@ -277,10 +293,22 @@ export class RodService {
 
   /** Replaces only `rods`; other session fields keep their latest stored values. */
   async saveSessionRods(session: FishingSession, rods: SessionRod[]): Promise<FishingSession> {
+    return this.modifyRods(session, () => rods);
+  }
+
+  /**
+   * Derives the new rods from the latest stored rods inside one transaction, so
+   * rod edits, bite syncs and catch stats never overwrite each other.
+   * When the row is gone (deleted or other mode) nothing is written.
+   */
+  private async modifyRods(
+    session: FishingSession,
+    change: (rods: SessionRod[]) => SessionRod[],
+  ): Promise<FishingSession> {
     const updated = await this.sessionRepo.modify(session.id, (latest) => {
-      latest.rods = rods;
+      latest.rods = change(latest.rods ?? []);
     });
-    return updated ?? { ...session, rods };
+    return updated ?? { ...session, rods: change(session.rods ?? []) };
   }
 
   /** Replaces only `sessionSpots`; other session fields keep their latest stored values. */

@@ -39,6 +39,7 @@ const ALLOWED_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const FIRST_CATFISH_BACKUP_VERSION = 8;
 /** Characters per Filesystem write on native; keeps each bridge call small. */
 const NATIVE_WRITE_CHUNK = 4 * 1024 * 1024;
+const NATIVE_BACKUP_DIR = 'backups';
 
 /** Thrown when the user closes the share sheet without saving the backup. */
 export class BackupSaveCancelledError extends Error {
@@ -166,6 +167,12 @@ function modeResolver(backupVersion: number): (mode: unknown) => FishingMode {
 export class BackupService {
   private readonly profileRepo = inject(ProfileRepository);
   private readonly profileDocumentRepo = inject(ProfileDocumentRepository);
+  /** Capacitor plugins (proxies); fields so tests can substitute them. */
+  private readonly filesystem: Pick<
+    typeof Filesystem,
+    'writeFile' | 'appendFile' | 'rmdir' | 'getUri'
+  > = Filesystem;
+  private readonly share: Pick<typeof Share, 'share'> = Share;
 
   constructor(
     private readonly sessionRepo: SessionRepository,
@@ -516,30 +523,34 @@ export class BackupService {
   }
 
   private async saveNative(parts: string[], filename: string): Promise<void> {
-    const path = `backups/${filename}`;
+    const path = `${NATIVE_BACKUP_DIR}/${filename}`;
+    // Only the newest backup is kept in the cache; it has already been shared.
+    await this.filesystem.rmdir({ path: NATIVE_BACKUP_DIR, directory: Directory.Cache, recursive: true }).catch(
+      () => undefined,
+    );
     let chunk = '';
     let written = false;
     const flush = async (): Promise<void> => {
       const options = { path, data: chunk, directory: Directory.Cache, encoding: Encoding.UTF8 };
       if (written) {
-        await Filesystem.appendFile(options);
+        await this.filesystem.appendFile(options);
       } else {
-        await Filesystem.writeFile({ ...options, recursive: true });
+        await this.filesystem.writeFile({ ...options, recursive: true });
         written = true;
       }
       chunk = '';
     };
     for (const part of parts) {
-      chunk += part;
-      if (chunk.length >= NATIVE_WRITE_CHUNK) {
+      if (chunk.length > 0 && chunk.length + part.length > NATIVE_WRITE_CHUNK) {
         await flush();
       }
+      chunk += part;
     }
     await flush();
 
-    const { uri } = await Filesystem.getUri({ path, directory: Directory.Cache });
+    const { uri } = await this.filesystem.getUri({ path, directory: Directory.Cache });
     try {
-      await Share.share({ title: filename, files: [uri] });
+      await this.share.share({ title: filename, files: [uri] });
     } catch (error) {
       if (isShareCancel(error)) {
         throw new BackupSaveCancelledError();

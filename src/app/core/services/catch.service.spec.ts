@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CatchService } from './catch.service';
-import { Catch, FishingSession } from '../models';
+import { Catch } from '../models';
+import { fakeSessionModify } from './session-repository.fake';
 
 describe('CatchService', () => {
   let service: CatchService;
@@ -81,19 +82,7 @@ describe('CatchService', () => {
       }),
       put: vi.fn().mockResolvedValue(undefined),
     };
-    // Mirrors SessionRepository.modify: apply the change to the latest row, then put it.
-    sessionRepo.modify = vi.fn(async (id: string, change: (s: FishingSession) => void) => {
-      const repo = sessionRepo as unknown as {
-        getById(id: string): Promise<FishingSession | undefined>;
-        put(session: FishingSession): Promise<unknown>;
-      };
-      const row = await repo.getById(id);
-      if (!row) return undefined;
-      const latest = { ...row };
-      change(latest);
-      await repo.put(latest);
-      return latest;
-    });
+    sessionRepo.modify = vi.fn(fakeSessionModify(sessionRepo));
     lakeRepo = {
       getById: vi.fn().mockResolvedValue(
         overrides?.lake === null

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SessionService, StartSessionOptions } from './session.service';
 import { FishingSession } from '../models';
+import { fakeSessionModify } from './session-repository.fake';
 
 describe('SessionService.start', () => {
   let service: SessionService;
@@ -8,6 +9,7 @@ describe('SessionService.start', () => {
     getActive: ReturnType<typeof vi.fn>;
     put: ReturnType<typeof vi.fn>;
     getById: ReturnType<typeof vi.fn>;
+    modify?: ReturnType<typeof vi.fn>;
   };
   let lakeRepo: { getById: ReturnType<typeof vi.fn> };
   let geo: { getCurrentPosition: ReturnType<typeof vi.fn> };
@@ -44,6 +46,7 @@ describe('SessionService.start', () => {
         longitude: 5.1,
       })),
     };
+    sessionRepo.modify = vi.fn(fakeSessionModify(sessionRepo));
     lakeRepo = { getById: vi.fn().mockResolvedValue({ id: 'lake-1', name: 'Lake A', photoIds: [] }) };
     geo = { getCurrentPosition: vi.fn().mockResolvedValue(null) };
     weather = {
@@ -191,8 +194,12 @@ describe('SessionService.start', () => {
 
     // Async enrichment: refreshWeather uses getSnapshot after persist.
     await vi.waitFor(() => {
-      expect(weather.getSnapshot).toHaveBeenCalledWith(52.1, 5.1);
+      expect(sessionRepo.modify).toHaveBeenCalledWith(session.id, expect.any(Function));
     });
+    expect(weather.getSnapshot).toHaveBeenCalledWith(52.1, 5.1);
+    expect(sessionRepo.put).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: session.id, weather: snapshot }),
+    );
   });
 });
 
@@ -202,6 +209,7 @@ describe('SessionService.updateSession', () => {
     getById: ReturnType<typeof vi.fn>;
     put: ReturnType<typeof vi.fn>;
     getActive: ReturnType<typeof vi.fn>;
+    modify?: ReturnType<typeof vi.fn>;
   };
   let catchRepo: { getBySession: ReturnType<typeof vi.fn> };
 
@@ -211,6 +219,7 @@ describe('SessionService.updateSession', () => {
       put: vi.fn().mockResolvedValue(undefined),
       getActive: vi.fn().mockResolvedValue(undefined),
     };
+    sessionRepo.modify = vi.fn(fakeSessionModify(sessionRepo));
     catchRepo = {
       getBySession: vi.fn().mockResolvedValue([
         { weightKg: 5 },

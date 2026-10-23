@@ -11,7 +11,8 @@
 `BackupService.saveToFile(data, filename?)`:
 
 - **Web / PWA:** browser download of a `Blob`.
-- **Android app (Capacitor):** writes the file to the app cache (`backups/`) with `@capacitor/filesystem`, then opens the Android share sheet (`@capacitor/share`) so the user can save it to Files, Drive, mail, etc. Dismissing the sheet throws `BackupSaveCancelledError`.
+- **Android app (Capacitor):** writes the file to the app cache (`backups/`, previous backups there are removed first) with `@capacitor/filesystem`, then opens the Android share sheet (`@capacitor/share`) so the user can save it to Files, Drive, mail, etc. Dismissing the sheet throws `BackupSaveCancelledError`; before a session start the user then gets a "Backup not saved" prompt.
+- Limitation: Android only reports that a target app was opened, not that the file was saved there. Cancelling inside Drive/Files after picking it still counts as exported.
 
 The JSON is built in fragments (`serializeBackup`, one per record, no indentation) so large galleries never have to fit in one string.
 
@@ -55,7 +56,7 @@ interface BackupData {
 
 On import:
 
-- Backups **before version 8**: `carper` and missing `fishingMode` restore into **`catfish`** (same as the Dexie v8 migration)
+- Backups **before version 8**: `carper` and missing `fishingMode` restore into **`catfish`** (same as the Dexie v8 migration). Caveat: builds v0.0.42–v0.0.48 already ran the migration but still exported version 7, so carper sessions created in those builds also restore into catfish.
 - Version 8+: missing `fishingMode` defaults to **`carper`**
 - At most **one active session per fishing mode** (extras completed); soft-deleted sessions don't count
 - Soft-deleted images (`visible: false`) stay hidden; older backups without the flag restore as visible

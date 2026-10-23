@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BackupService } from './backup.service';
 import { ConfirmService } from './confirm.service';
+import { BackupSaveCancelledError } from './backup.service';
 import { DialogService } from './dialog.service';
 import { FishingModeService } from './fishing-mode.service';
 import { I18nService } from './i18n.service';
@@ -147,6 +148,25 @@ describe('SessionStartFlowService', () => {
     expect(navigate).toHaveBeenCalledWith(['/sessions/active'], {
       queryParams: { id: 's-active' },
     });
+  });
+
+  it('asks with "not saved" wording when the share sheet is dismissed', async () => {
+    saveToFile.mockRejectedValue(new BackupSaveCancelledError());
+    confirm.mockResolvedValue(false);
+    const consoleError = vi.spyOn(console, 'error');
+
+    const service = TestBed.inject(SessionStartFlowService);
+    const ok = await service.start();
+
+    expect(ok).toBe(false);
+    expect(confirm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'sessions.backupSkippedTitle',
+        message: 'sessions.backupSkippedMessage',
+      }),
+    );
+    expect(consoleError).not.toHaveBeenCalled();
+    expect(startSession).not.toHaveBeenCalled();
   });
 
   it('starts session when backup fails and user skips', async () => {

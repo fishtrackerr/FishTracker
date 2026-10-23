@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BackupService, serializeBackup } from './backup.service';
+import { Directory } from '@capacitor/filesystem';
+import { BackupSaveCancelledError, BackupService, serializeBackup } from './backup.service';
 import { BackupData, BACKUP_EXPORT_VERSION, SUPPORTED_BACKUP_VERSIONS } from '../models';
 import { db } from '../db/fish-db';
 import { ProfileDocumentRepository } from './profile-document.repository';
@@ -345,5 +346,100 @@ describe('BackupService export/import', () => {
 
     const real = putRows('session').find((row) => row['id'] === 'real');
     expect(real?.['status']).toBe('active');
+  });
+});
+
+describe('BackupService.saveToFile', () => {
+  let service: BackupService;
+  const data = {
+    version: BACKUP_EXPORT_VERSION,
+    exportedAt: '2026-10-23T00:00:00.000Z',
+    sessions: [{ id: 's1' }],
+    catches: [],
+    lakes: [],
+    images: [{ id: 'i1', data: 'x'.repeat(10), thumbnail: '' }],
+  } as unknown as BackupData;
+
+  beforeEach(() => {
+    service = Object.create(BackupService.prototype) as BackupService;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+    delete (window as { Capacitor?: unknown }).Capacitor;
+  });
+
+  describe('in the Android app', () => {
+    let written: string;
+    let writeFile: ReturnType<typeof vi.fn>;
+    let appendFile: ReturnType<typeof vi.fn>;
+    let rmdir: ReturnType<typeof vi.fn>;
+    let share: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      (window as { Capacitor?: unknown }).Capacitor = { isNativePlatform: () => true };
+      written = '';
+      writeFile = vi.fn(async ({ data: chunk }: { data: string }) => {
+        written = chunk;
+        return { uri: '' };
+      });
+      appendFile = vi.fn(async ({ data: chunk }: { data: string }) => {
+        written += chunk;
+      });
+      rmdir = vi.fn().mockRejectedValue(new Error('missing'));
+      share = vi.fn().mockResolvedValue({});
+      Object.assign(service, {
+        filesystem: {
+          writeFile,
+          appendFile,
+          rmdir,
+          getUri: vi.fn().mockResolvedValue({ uri: 'file:///cache/backups/b.json' }),
+        },
+        share: { share },
+      });
+    });
+
+    it('writes valid JSON to the cache and opens the share sheet', async () => {
+      await service.saveToFile(data, 'b.json');
+
+      expect(rmdir).toHaveBeenCalledWith(
+        expect.objectContaining({ path: 'backups', directory: Directory.Cache, recursive: true }),
+      );
+      expect(writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({ path: 'backups/b.json', directory: Directory.Cache, recursive: true }),
+      );
+      expect(JSON.parse(written)).toEqual(data);
+      expect(share).toHaveBeenCalledWith({ title: 'b.json', files: ['file:///cache/backups/b.json'] });
+    });
+
+    it('reports a dismissed share sheet as cancelled', async () => {
+      share.mockRejectedValue(new Error('Share canceled'));
+
+      await expect(service.saveToFile(data, 'b.json')).rejects.toBeInstanceOf(
+        BackupSaveCancelledError,
+      );
+    });
+
+    it('passes other share errors through', async () => {
+      share.mockRejectedValue(new Error('No app can handle this'));
+
+      await expect(service.saveToFile(data, 'b.json')).rejects.toThrow('No app can handle this');
+    });
+  });
+
+  it('downloads in the browser and revokes the URL later', async () => {
+    vi.useFakeTimers();
+    const createObjectURL = vi.fn().mockReturnValue('blob:backup');
+    const revokeObjectURL = vi.fn();
+    Object.assign(URL, { createObjectURL, revokeObjectURL });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
+
+    await service.saveToFile(data, 'b.json');
+
+    expect(click).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).not.toHaveBeenCalled();
+    vi.runAllTimers();
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:backup');
   });
 });

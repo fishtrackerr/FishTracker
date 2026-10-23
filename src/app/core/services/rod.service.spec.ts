@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RodService } from './rod.service';
 import { FishingSession, SessionRod } from '../models';
+import { fakeSessionModify } from './session-repository.fake';
 
 describe('RodService', () => {
   let service: RodService;
@@ -24,19 +25,7 @@ describe('RodService', () => {
         sessionSpots: [],
       })),
     };
-    // Mirrors SessionRepository.modify: apply the change to the latest row, then put it.
-    sessionRepo.modify = vi.fn(async (id: string, change: (s: FishingSession) => void) => {
-      const repo = sessionRepo as unknown as {
-        getById(id: string): Promise<FishingSession | undefined>;
-        put(session: FishingSession): Promise<unknown>;
-      };
-      const row = await repo.getById(id);
-      if (!row) return undefined;
-      const latest = { ...row };
-      change(latest);
-      await repo.put(latest);
-      return latest;
-    });
+    sessionRepo.modify = vi.fn(fakeSessionModify(sessionRepo));
     biteRepo = { countByRod: vi.fn().mockResolvedValue(0) };
     fishSpottedRepo = { countByRod: vi.fn().mockResolvedValue(0) };
     catchRepo = { getBySession: vi.fn().mockResolvedValue([]) };

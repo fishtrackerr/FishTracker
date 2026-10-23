@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { BackupService } from './backup.service';
+import { BackupSaveCancelledError, BackupService } from './backup.service';
 import { ConfirmService } from './confirm.service';
 import { DialogService } from './dialog.service';
 import { FishingModeService } from './fishing-mode.service';
@@ -105,10 +105,17 @@ export class SessionStartFlowService {
       this.notifications.success(this.i18n.t('sessions.backupSaved'));
       return true;
     } catch (error) {
-      console.error('[SessionStartFlow] pre-session backup failed', error);
+      const cancelled = error instanceof BackupSaveCancelledError;
+      if (!cancelled) {
+        console.error('[SessionStartFlow] pre-session backup failed', error);
+      }
       return this.confirm.confirm({
-        title: this.i18n.t('sessions.backupFailedTitle'),
-        message: this.i18n.t('sessions.backupFailedMessage'),
+        title: this.i18n.t(
+          cancelled ? 'sessions.backupSkippedTitle' : 'sessions.backupFailedTitle',
+        ),
+        message: this.i18n.t(
+          cancelled ? 'sessions.backupSkippedMessage' : 'sessions.backupFailedMessage',
+        ),
         confirmLabel: this.i18n.t('sessions.startWithoutBackup'),
       });
     }
