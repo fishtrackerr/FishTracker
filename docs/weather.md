@@ -22,7 +22,7 @@ Each refresh is also stored in the `sessionWeather` IndexedDB table (`SessionWea
 
 ## Session integration
 
-Captured at session start when GPS available. **Refresh weather & GPS** re-queries current position (when `useGpsForWeather` is enabled), fetches weather for those coordinates, and appends a history record. When GPS-for-weather is off, refresh uses the session’s stored coordinates.
+Captured at session start when GPS available. **Refresh weather & GPS** re-queries current position (when `useGpsForWeather` is enabled), fetches weather for those coordinates, and appends a history record. When the live fetch fails and a cached snapshot is returned (`isCached`), the session still shows it but no new history record is added. When GPS-for-weather is off, refresh uses the session’s stored coordinates.
 
 ## Active session monitoring
 

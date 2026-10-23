@@ -113,6 +113,30 @@ export class ImageRepository extends ModeScopedRepository {
     await db.images.clear();
   }
 
+  /**
+   * Visible session and catch photos of one session: rows with this parentId
+   * plus explicitly linked ids, read by index instead of scanning the mode.
+   */
+  async getSessionImages(sessionId: string, linkedIds: string[]): Promise<StoredImage[]> {
+    const [byParent, linked] = await Promise.all([
+      db.images.where('parentId').equals(sessionId).toArray(),
+      db.images.bulkGet(linkedIds),
+    ]);
+    const byId = new Map<string, StoredImage>();
+    for (const row of [...byParent, ...linked]) {
+      const image = this.forActiveMode(row);
+      if (image && (image.type === 'session' || image.type === 'catch')) {
+        byId.set(image.id, image);
+      }
+    }
+    return [...byId.values()];
+  }
+
+  /** Permanently removes an image row (for internal images the user never sees). */
+  async purge(id: string): Promise<void> {
+    await db.images.delete(id);
+  }
+
   async getByType(type: ImageType): Promise<StoredImage[]> {
     const mode = this.tryActiveMode();
     if (!mode) {

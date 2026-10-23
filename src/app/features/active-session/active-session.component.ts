@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, computed, effect, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, computed, effect, inject, signal, untracked } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,7 +13,6 @@ import { CatchService } from '../../core/services/catch.service';
 import { RodService } from '../../core/services/rod.service';
 import { WeatherService } from '../../core/services/weather.service';
 import { SettingsService } from '../../core/services/settings.service';
-import { ImageRepository } from '../../core/services/image.repository';
 import { ImageService } from '../../core/services/image.service';
 import { WeatherCardComponent } from '../../shared/components/weather-card/weather-card.component';
 import { WeatherHistoryComponent } from '../../shared/components/weather-history/weather-history.component';
@@ -72,7 +71,6 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
   private readonly dialog = inject(DialogService);
   private readonly confirm = inject(ConfirmService);
   private readonly notifications = inject(NotificationService);
-  private readonly imageRepo = inject(ImageRepository);
   private readonly imageService = inject(ImageService);
   private readonly i18n = inject(I18nService);
   private readonly photoPick = inject(PhotoPickService);
@@ -104,6 +102,15 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
   readonly timer = signal('00:00:00');
   readonly showNotes = signal(false);
   readonly sessionImages = signal<GalleryImageItem[]>([]);
+  /** Changes only when the session's photo ids change, not on every session write. */
+  private readonly sessionImageKey = computed(() => {
+    const s = this.session();
+    if (!s) return '';
+    const catchPhotoIds = this.catches()
+      .map((c) => c.photoId)
+      .filter((id): id is string => !!id);
+    return JSON.stringify({ sessionId: s.id, linkedIds: [...s.photoIds, ...catchPhotoIds] });
+  });
   notes = '';
   private intervalId?: ReturnType<typeof setInterval>;
   private notesSessionId = '';
@@ -118,10 +125,8 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
     });
 
     effect(() => {
-      const s = this.session();
-      this.catches();
-      if (s) {
-        void this.loadSessionImages();
+      if (this.sessionImageKey()) {
+        void untracked(() => this.loadSessionImages());
       } else {
         this.sessionImages.set([]);
       }
@@ -138,28 +143,14 @@ export class ActiveSessionComponent implements OnInit, OnDestroy {
   }
 
   async loadSessionImages(): Promise<void> {
-    const s = this.session();
-    if (!s) return;
-    const catchPhotoIds = this.catches()
-      .map((c) => c.photoId)
-      .filter((id): id is string => !!id);
-    const [sessionType, catchType] = await Promise.all([
-      this.imageRepo.getByType('session'),
-      this.imageRepo.getByType('catch'),
-    ]);
-    const linked = new Set([...s.photoIds, ...catchPhotoIds]);
-    const matched = [...sessionType, ...catchType].filter(
-      (img) => img.parentId === s.id || linked.has(img.id),
-    );
-    const byId = new Map(matched.map((img) => [img.id, img]));
-    const items: GalleryImageItem[] = await Promise.all(
-      [...byId.values()].map(async (img) => ({
-        ...img,
-        url: (await this.imageService.getObjectUrl(img.id)) ?? undefined,
-      })),
-    );
-    items.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-    this.sessionImages.set(items);
+    const key = this.sessionImageKey();
+    if (!key) return;
+    const { sessionId, linkedIds } = JSON.parse(key) as { sessionId: string; linkedIds: string[] };
+    const items = await this.imageService.getSessionImages(sessionId, linkedIds);
+    // Ignore a slower, older load when the photos changed meanwhile.
+    if (key === this.sessionImageKey()) {
+      this.sessionImages.set(items);
+    }
   }
 
   updateTimer(): void {

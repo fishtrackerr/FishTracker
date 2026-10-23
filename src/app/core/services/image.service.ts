@@ -156,6 +156,36 @@ export class ImageService {
     return isFavorite;
   }
 
+  /** Session + catch photos with thumbnail URLs, oldest first. */
+  async getSessionImages(
+    sessionId: string,
+    linkedIds: string[],
+  ): Promise<(StoredImage & { url?: string })[]> {
+    const images = await this.imageRepo.getSessionImages(sessionId, linkedIds);
+    const items = await Promise.all(
+      images.map(async (img) => ({ ...img, url: (await this.getObjectUrl(img.id)) ?? undefined })),
+    );
+    return items.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  }
+
+  /**
+   * Stores `file` as the homepage cover. The previous cover upload is removed
+   * permanently: covers never appear in the gallery, so it would only waste space.
+   */
+  async replaceHomepageCover(file: File): Promise<void> {
+    const previousId = this.fishingMode.getActivePreferences().homepageImageId;
+    const id = await this.processFile(file, 'cover');
+    await this.setHomepageImage(id);
+    if (previousId && previousId !== id) {
+      const previous = await this.imageRepo.getById(previousId);
+      if (previous?.type === 'cover') {
+        this.revokeUrl(previousId);
+        this.revokeFullUrl(previousId);
+        await this.imageRepo.purge(previousId);
+      }
+    }
+  }
+
   async setHomepageImage(id: string): Promise<void> {
     await this.imageRepo.clearHomepageFlags();
     const image = await this.imageRepo.getById(id);

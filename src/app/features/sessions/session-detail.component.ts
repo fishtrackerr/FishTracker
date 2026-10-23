@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -93,6 +93,15 @@ export class SessionDetailComponent {
   readonly lakeName = signal('');
   readonly durationText = signal('—');
   readonly sessionImages = signal<GalleryImageItem[]>([]);
+  /** Changes only when the session's photo ids change, not on every session write. */
+  private readonly sessionImageKey = computed(() => {
+    const s = this.session();
+    if (!s) return '';
+    const catchPhotoIds = this.catches()
+      .map((c) => c.photoId)
+      .filter((id): id is string => !!id);
+    return JSON.stringify({ sessionId: s.id, linkedIds: [...s.photoIds, ...catchPhotoIds] });
+  });
   readonly coverImageId = signal<string | undefined>(undefined);
   notes = '';
   prebait = '';
@@ -135,11 +144,17 @@ export class SessionDetailComponent {
       const s = this.session();
       this.catches();
       if (s) {
-        void this.loadSessionImages();
         void this.refreshCover(s);
       } else {
-        this.sessionImages.set([]);
         this.coverImageId.set(undefined);
+      }
+    });
+
+    effect(() => {
+      if (this.sessionImageKey()) {
+        void untracked(() => this.loadSessionImages());
+      } else {
+        this.sessionImages.set([]);
       }
     });
   }
@@ -160,28 +175,14 @@ export class SessionDetailComponent {
   }
 
   async loadSessionImages(): Promise<void> {
-    const s = this.session();
-    if (!s) return;
-    const catchPhotoIds = this.catches()
-      .map((c) => c.photoId)
-      .filter((id): id is string => !!id);
-    const [sessionType, catchType] = await Promise.all([
-      this.imageRepo.getByType('session'),
-      this.imageRepo.getByType('catch'),
-    ]);
-    const linked = new Set([...s.photoIds, ...catchPhotoIds]);
-    const matched = [...sessionType, ...catchType].filter(
-      (img) => img.parentId === s.id || linked.has(img.id),
-    );
-    const byId = new Map(matched.map((img) => [img.id, img]));
-    const items: GalleryImageItem[] = await Promise.all(
-      [...byId.values()].map(async (img) => ({
-        ...img,
-        url: (await this.imageService.getObjectUrl(img.id)) ?? undefined,
-      })),
-    );
-    items.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-    this.sessionImages.set(items);
+    const key = this.sessionImageKey();
+    if (!key) return;
+    const { sessionId, linkedIds } = JSON.parse(key) as { sessionId: string; linkedIds: string[] };
+    const items = await this.imageService.getSessionImages(sessionId, linkedIds);
+    // Ignore a slower, older load when the photos changed meanwhile.
+    if (key === this.sessionImageKey()) {
+      this.sessionImages.set(items);
+    }
   }
 
   async onImageUploaded(imageId: string): Promise<void> {

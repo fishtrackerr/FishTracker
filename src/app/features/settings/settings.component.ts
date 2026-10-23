@@ -297,8 +297,7 @@ export class SettingsComponent implements OnInit {
     }
     this.changingHomepage.set(true);
     try {
-      const id = await this.imageService.processFile(file, 'cover');
-      await this.imageService.setHomepageImage(id);
+      await this.imageService.replaceHomepageCover(file);
       this.notifications.success(this.i18n.t('gallery.homepageUpdated'));
     } catch {
       this.notifications.error(this.i18n.t('images.uploadFailed'));

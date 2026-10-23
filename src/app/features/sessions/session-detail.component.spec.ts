@@ -16,8 +16,8 @@ import { SessionDetailComponent } from './session-detail.component';
 
 describe('SessionDetailComponent', () => {
   const update = vi.fn<SessionService['update']>().mockResolvedValue(undefined);
-  const getByType = vi.fn<ImageRepository['getByType']>().mockResolvedValue([]);
   const getObjectUrl = vi.fn<ImageService['getObjectUrl']>().mockResolvedValue('blob:thumb');
+  const getSessionImages = vi.fn<ImageService['getSessionImages']>().mockResolvedValue([]);
   const getById = vi.fn<ImageRepository['getById']>().mockResolvedValue(undefined);
 
   let session: FishingSession;
@@ -90,7 +90,6 @@ describe('SessionDetailComponent', () => {
         {
           provide: ImageRepository,
           useValue: {
-            getByType,
             getById,
           },
         },
@@ -98,6 +97,7 @@ describe('SessionDetailComponent', () => {
           provide: ImageService,
           useValue: {
             getObjectUrl,
+            getSessionImages,
           },
         },
         {
@@ -137,17 +137,13 @@ describe('SessionDetailComponent', () => {
       isHomepageImage: false,
       createdAt: '2026-07-23T10:00:00.000Z',
     };
-    getByType.mockImplementation(async (type) => {
-      if (type === 'session') return [sessionPhoto];
-      if (type === 'catch') return [catchPhoto];
-      return [];
-    });
+    getSessionImages.mockResolvedValue([sessionPhoto, catchPhoto]);
 
     const component = TestBed.runInInjectionContext(() => new SessionDetailComponent());
-    await component.loadSessionImages();
-
-    expect(component.sessionImages().map((i) => i.id)).toEqual(['img-session', 'img-catch']);
-    expect(getObjectUrl).toHaveBeenCalled();
+    await vi.waitFor(() =>
+      expect(component.sessionImages().map((i) => i.id)).toEqual(['img-session', 'img-catch']),
+    );
+    expect(getSessionImages).toHaveBeenCalledWith('session-1', expect.any(Array));
   });
 
   it('appends uploaded image ids to session photoIds', async () => {

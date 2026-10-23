@@ -32,8 +32,13 @@ export class ProfileService {
   }
 
   async uploadProfilePicture(file: File): Promise<UserProfile> {
+    const previousId = (await this.profileRepo.get()).profilePictureId;
     const pictureId = await this.imageService.processFile(file, 'profile', 'default');
-    return this.save({ profilePictureId: pictureId });
+    const saved = await this.save({ profilePictureId: pictureId });
+    if (previousId && previousId !== pictureId) {
+      await this.imageService.delete(previousId);
+    }
+    return saved;
   }
 
   async removeProfilePicture(): Promise<UserProfile> {

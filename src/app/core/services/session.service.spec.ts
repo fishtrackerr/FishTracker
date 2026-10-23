@@ -201,6 +201,19 @@ describe('SessionService.start', () => {
       expect.objectContaining({ id: session.id, weather: snapshot }),
     );
   });
+
+  it('does not add a weather history entry for a cached fallback', async () => {
+    emptyDeps.sessionWeather.record.mockClear();
+    weather.getSnapshot.mockResolvedValue({ description: 'Clear', isCached: true });
+    settings.get.mockReturnValue({ maxRodCount: 10, useGpsForWeather: false });
+
+    await service.refreshWeather('s-1');
+
+    expect(sessionRepo.put).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 's-1', weather: expect.objectContaining({ isCached: true }) }),
+    );
+    expect(emptyDeps.sessionWeather.record).not.toHaveBeenCalled();
+  });
 });
 
 describe('SessionService.updateSession', () => {

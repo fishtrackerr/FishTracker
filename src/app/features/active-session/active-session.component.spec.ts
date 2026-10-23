@@ -8,7 +8,6 @@ import { ConfirmService } from '../../core/services/confirm.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { I18nService } from '../../core/services/i18n.service';
 import type { FishingSession, StoredImage } from '../../core/models';
-import { ImageRepository } from '../../core/services/image.repository';
 import { ImageService } from '../../core/services/image.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { RodService } from '../../core/services/rod.service';
@@ -106,15 +105,10 @@ describe('ActiveSessionComponent', () => {
           },
         },
         {
-          provide: ImageRepository,
-          useValue: {
-            getByType: vi.fn().mockResolvedValue([]),
-          },
-        },
-        {
           provide: ImageService,
           useValue: {
             getObjectUrl: vi.fn().mockResolvedValue(undefined),
+            getSessionImages: vi.fn().mockResolvedValue([]),
           },
         },
         {
@@ -158,15 +152,13 @@ describe('ActiveSessionComponent', () => {
       isHomepageImage: false,
       createdAt: '2026-07-23T09:00:00.000Z',
     };
-    const imageRepo = TestBed.inject(ImageRepository);
-    vi.mocked(imageRepo.getByType).mockImplementation(async (type) =>
-      type === 'session' ? [photo] : [],
-    );
+    const imageService = TestBed.inject(ImageService);
+    vi.mocked(imageService.getSessionImages).mockResolvedValue([{ ...photo, url: 'blob:1' }]);
 
     const component = TestBed.runInInjectionContext(() => new ActiveSessionComponent());
-    await component.loadSessionImages();
+    await vi.waitFor(() => expect(component.sessionImages()).toHaveLength(1));
 
-    expect(component.sessionImages()).toHaveLength(1);
+    expect(imageService.getSessionImages).toHaveBeenCalledWith('session-1', expect.any(Array));
     expect(component.sessionImages()[0].id).toBe('img-1');
   });
 });

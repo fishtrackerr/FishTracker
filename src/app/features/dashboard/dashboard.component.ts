@@ -120,8 +120,7 @@ export class DashboardComponent implements OnInit {
     }
     this.changingHomepage.set(true);
     try {
-      const id = await this.imageService.processFile(file, 'cover');
-      await this.imageService.setHomepageImage(id);
+      await this.imageService.replaceHomepageCover(file);
       this.homepageUrl.set(await this.imageService.getHomepageUrl());
       this.notifications.success(this.i18n.t('gallery.homepageUpdated'));
     } catch {

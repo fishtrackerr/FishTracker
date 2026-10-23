@@ -341,7 +341,8 @@ export class SessionService {
     }
 
     await this.update(id, updates);
-    if (weather) {
+    // A cached fallback (fetch failed) is not a new reading; don't log it again.
+    if (weather && !weather.isCached) {
       await this.appendWeatherHistory(id, weather);
     }
   }
