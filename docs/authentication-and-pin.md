@@ -16,7 +16,7 @@ PBKDF2-SHA256, 100,000 iterations, 256-bit derived key, random 16-byte salt.
 - `failedAttempts`, `lockoutUntil`, `lockoutCount` for brute-force backoff
 - A separate `fish-tracker-unlock-session` flag in **sessionStorage** proves a successful PIN unlock in this browser tab
 - Cold start (no unlock session) always requires PIN — localStorage `isLocked: false` alone is not trusted
-- Expired sessions auto-lock based on `lockTimeoutMinutes` (Settings → Security select: 5, 15, 30, 60 or 240 minutes; default 60). The value `0` means "only when the app starts": no inactivity lock, but a cold start still always requires the PIN
+- Expired sessions auto-lock based on `lockTimeoutMinutes` (Settings → Security select: 5, 15, 30, 60 or 240 minutes; default 60). The value `0` means "only when the app starts": no inactivity lock, but a cold start still always requires the PIN. Older versions stored a negative value for "lock within ~30 seconds"; `SettingsService` migrates any stored negative value to 5 minutes on load (and on `replace`, e.g. a backup import). `0` is left as is
 
 ## Attempt lockout
 

@@ -1,0 +1,112 @@
+@if (session(); as s) {
+  <section class="summary">
+    <header class="summary-head">
+      <h1 class="app-title">{{ 'sessionSummary.title' | tr }}</h1>
+      <p class="where">
+        @if (lakeName()) {
+          <span class="lake">{{ lakeName() }}</span>
+        }
+        @if (swim()) {
+          <span class="swim">{{ swim() }}</span>
+        }
+      </p>
+      <p class="when">
+        {{ s.startDate | date: 'medium' }}
+        @if (s.endDate) {
+          – {{ s.endDate | date: 'shortTime' }}
+        }
+        · {{ duration() }}
+      </p>
+    </header>
+
+    <div class="tiles">
+      <div class="tile">
+        <span class="tile-value">{{ catchCount() }}</span>
+        <span class="tile-label">{{ 'sessionSummary.catches' | tr }}</span>
+      </div>
+      <div class="tile">
+        <span class="tile-value">{{ biteCount() }}</span>
+        <span class="tile-label">{{ 'sessionSummary.bites' | tr }}</span>
+      </div>
+      <div class="tile">
+        <span class="tile-value">{{ totalWeightKg() | formatWeight }}</span>
+        <span class="tile-label">{{ 'sessionSummary.totalWeight' | tr }}</span>
+      </div>
+    </div>
+
+    <section class="block biggest">
+      <h2>{{ 'sessionSummary.biggestFish' | tr }}</h2>
+      @if (biggest(); as b) {
+        <p class="biggest-main">
+          <span class="biggest-species">{{ b.species }}</span>
+          <span class="biggest-weight">{{ b.weightKg | formatWeight }}</span>
+          @if (b.isPersonalRecord) {
+            <span class="pr-badge">{{ 'sessionDetail.pr' | tr }}</span>
+          }
+        </p>
+        <p class="biggest-meta">
+          @if (biggestRod(); as rod) {
+            {{ rodLabel(rod) }} ·
+          }
+          {{ b.caughtAt | date: 'shortTime' }}
+        </p>
+      } @else {
+        <p class="empty">{{ 'sessionSummary.noBiggest' | tr }}</p>
+      }
+    </section>
+
+    @if (rodRows().length > 0) {
+      <section class="block">
+        <h2>{{ 'sessionSummary.perRod' | tr }}</h2>
+        <div class="table-wrap">
+          <table class="rod-table">
+            <thead>
+              <tr>
+                <th>{{ 'sessionSummary.colRod' | tr }}</th>
+                <th>{{ 'sessionSummary.colSpot' | tr }}</th>
+                <th>{{ 'sessionSummary.colBait' | tr }}</th>
+                <th class="num">{{ 'sessionSummary.colBites' | tr }}</th>
+                <th class="num">{{ 'sessionSummary.colFish' | tr }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rodRows(); track row.rod.id) {
+                <tr>
+                  <td>{{ row.rod.rodNumber }} · {{ row.rod.name }}</td>
+                  <td>{{ row.spot || '—' }}</td>
+                  <td>{{ row.bait || '—' }}</td>
+                  <td class="num">{{ row.bites }}</td>
+                  <td class="num">{{ row.fish }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    <mat-form-field appearance="outline" class="notes">
+      <mat-label>{{ 'sessionSummary.lastNotes' | tr }}</mat-label>
+      <textarea
+        matInput
+        rows="3"
+        name="lastNotes"
+        [ngModel]="notes()"
+        (ngModelChange)="notes.set($event)"
+        (blur)="saveNotes()"
+      ></textarea>
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-stroked-button type="button" class="open-btn" (click)="openSession()">
+        {{ 'sessionSummary.openSession' | tr }}
+      </button>
+      <button mat-flat-button type="button" class="done-btn" (click)="done()">
+        {{ 'sessionSummary.done' | tr }}
+      </button>
+    </div>
+  </section>
+} @else if (session() === undefined) {
+  <h1 class="app-title">{{ 'sessionDetail.notFoundTitle' | tr }}</h1>
+  <a mat-stroked-button routerLink="/sessions">{{ 'sessionDetail.backToSessions' | tr }}</a>
+}

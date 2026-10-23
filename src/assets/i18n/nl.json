@@ -307,6 +307,23 @@
       "general": "Algemeen"
     }
   },
+  "sessionSummary": {
+    "title": "Sessie beëindigd",
+    "catches": "Vangsten",
+    "bites": "Aanbeten",
+    "totalWeight": "Totaalgewicht",
+    "biggestFish": "Grootste vis",
+    "noBiggest": "Geen gewichten gelogd deze sessie.",
+    "perRod": "Per hengel",
+    "colRod": "Hengel",
+    "colSpot": "Stek",
+    "colBait": "Aas",
+    "colBites": "Aanbeten",
+    "colFish": "Vis",
+    "lastNotes": "Laatste notities",
+    "openSession": "Sessie openen",
+    "done": "Klaar"
+  },
   "activeSession": {
     "catches": "vangsten",
     "best": "Beste",
@@ -341,7 +358,7 @@
     "undo": "Ongedaan maken",
     "photo": "Foto",
     "note": "Notitie",
-    "end": "Stoppen",
+    "end": "Beëindigen",
     "actions": "Sessieacties",
     "pressure": {
       "rising": "Luchtdruk stijgt",
@@ -385,11 +402,11 @@
     "rodsAndSpots": "Hengels en stekken",
     "rods": "hengels",
     "active": "actief",
-    "bites": "beten",
+    "bites": "aanbeten",
     "spotted": "gezien",
     "catches": "Vangsten",
     "images": "Sessie-afbeeldingen",
-    "addCatch": "Vangst toevoegen",
+    "addCatch": "+ Vangst",
     "pr": "PR",
     "editSession": "Sessie bewerken",
     "notFoundTitle": "Sessie niet gevonden",
@@ -438,7 +455,7 @@
     "defaultName": "Vissessie"
   },
   "catchForm": {
-    "title": "Vangst toevoegen",
+    "title": "Vangst",
     "species": "Soort",
     "fishNameOptional": "Visnaam (optioneel)",
     "weightKg": "Gewicht (kg)",
@@ -464,7 +481,10 @@
     "addPhoto": "Foto toevoegen",
     "saveCatch": "Vangst opslaan",
     "saveChanges": "Wijzigingen opslaan",
-    "editTitle": "Vangst bewerken"
+    "editTitle": "Vangst",
+    "deleteQuestion": "Deze vangst verwijderen?",
+    "deleteCatch": "Vangst verwijderen",
+    "deleted": "Vangst verwijderd"
   },
   "quickCatch": {},
   "catchSheet": {
@@ -628,12 +648,12 @@
     "recastNoSpots": "Nog geen sessiestekken. Je kunt nog steeds inwerpen, of stekken toevoegen via Sessie bewerken.",
     "recastSuccess": "Hengel opnieuw ingeworpen",
     "recastFailed": "Opnieuw inwerpen mislukt",
-    "markFishSpotted": "Vis gezien markeren",
+    "markFishSpotted": "Vis gezien",
     "sheetTitle": "Hengel {{n}}",
-    "sheetStats": "{{bites}} bijten · {{spotted}} gezien",
+    "sheetStats": "{{bites}} aanbeten · {{spotted}} gezien",
     "sheetCast": " · ingeworpen {{time}}",
     "recastNow": "Nu opnieuw inwerpen",
-    "biteMinusOne": "Bijt −1",
+    "biteMinusOne": "Aanbeet −1",
     "takeOut": "Hengel binnenhalen",
     "putBack": "Hengel terugzetten",
     "newSpot": "+ Nieuwe stek…",
@@ -705,7 +725,7 @@
     "moreInformation": "Meer informatie",
     "temperature": "Temperatuur:",
     "updated": "Bijgewerkt:",
-    "details": "Details"
+    "details": "Sessie"
   },
   "rodSummary": {
     "title": "Hengelsamenvatting",

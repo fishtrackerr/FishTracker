@@ -30,6 +30,8 @@ The flow turns the swim into a real session spot (`RodService.snapshotFromLakeSp
 - Sets status `active` and stamps `fishingMode`
 - Updates mode `lastLakeId` when a lake is selected
 
+`SessionStartFlowService` order: guard for an active session, sheet, optional backup, **re-check for an active session** (the backup step can wait on the user), then `SessionService.start`. A new swim is added to the lake’s spots (`LakeService.addSpot`) only **after** the start succeeded; the session spot is then linked to it (`lakeSpotId`). A failure of that step is logged and does not fail the start.
+
 After creating the session (with its rods) the app navigates to `/sessions/:id` and shows the “Session started” snackbar. Rod details (bait, rig, notes, spot, in/out of the water) are edited in the rod sheet, opened from a rod tile.
 
 Before create (when none is active), a full JSON backup is downloaded; if export fails, the user can skip or cancel. See [backup-and-restore.md](./backup-and-restore.md).
@@ -74,11 +76,11 @@ One screen, `SessionDetailComponent` (`features/sessions/session-detail.componen
   - **Photo** → menu Camera / Gallery (`PhotoPickService` + `SessionService.addSessionPhoto`)
   - **Note** → scrolls to and focuses the notes field
   - **Recast** (only with rods) → `RecastRodDialogComponent` (pick rod + spot) → `RodService.recast`
-  - **End** → `ConfirmService` confirm → `SessionService.complete` → `endSession()` navigates to `/sessions/:id` (finished mode). `endSession()` is the one place to change when a summary route is added
+  - **End** → `ConfirmService` confirm → `SessionService.complete` → `endSession()` navigates to `/sessions/:id/summary` with `replaceUrl` (so Back does not return to the live screen)
 
 ### Both modes (below the tiles in live mode)
 
-- **Catches** (liveQuery): photo, species, details-pending badge, PR badge, weight · length · time · spot, maps link; tap → `/sessions/:id/catches/:catchId/edit`. **Add catch** opens the full form `/sessions/:id/catches/new`
+- **Catches** (liveQuery): photo, species, details-pending badge, PR badge, weight · length · time · spot, maps link; tap → `/sessions/:id/catches/:catchId/edit`. **+ Catch** opens the full form `/sessions/:id/catches/new`. Both links, and **Edit session**, pass `returnUrl` = the current URL so Save, Cancel and Delete come back to this screen (see [catches.md](./catches.md))
 - **Session images**: cover preview, `image-picker`, `image-gallery` (favourite, set as homepage cover, delete; deleted ids are pruned from the session and its catches). Loading is keyed on the photo ids (`sessionImageKey` + `ImageService.getSessionImages`) so other session writes do not reload thumbnails
 - **Prebait** and **Notes**, saved on blur. Fields are only refreshed from storage when the stored value changes, so a bite or weather write does not wipe text being typed
 - **Weather card** (live: always, with **Refresh weather & GPS**; finished: when weather exists) and **weather history**
@@ -86,6 +88,18 @@ One screen, `SessionDetailComponent` (`features/sessions/session-detail.componen
 - **Rods**: totals (rods, active, bites, spotted); in finished mode compact rod tiles (small **+1** bite, tap → rod sheet to edit after the fact) and the rod summary (per rod start spot, moves, bites, spotted, catches; best rod / spot)
 - **Session timeline**
 - **Edit session** (`/sessions/:id/edit`) and **Delete** (`ConfirmService.confirmDelete`)
+
+### End-of-session summary (`/sessions/:id/summary`)
+
+`SessionSummaryComponent` (`features/sessions/session-summary.component.*`), shown right after **End**:
+
+- Title "Session ended", lake and swim (swim only when all rods share one spot), start – end time and duration
+- Stat tiles: catches, bites (sum over rods), total weight (settings units)
+- Biggest fish: species, weight, rod, time and a **PR** badge when `isPersonalRecord`; a hint when no catch has a weight
+- Per-rod table: rod number and name, spot, bait, bites, fish (catches with that `rodId`)
+- **Last notes** textarea, prefilled with the session notes; saved with `SessionService.update` on blur and before leaving
+- **Open session** → `/sessions/:id`, **Done** → `/`
+- A still-active session is redirected to `/sessions/:id` (nothing to summarise yet); an unknown id shows "Session not found"
 
 ### Finished mode (completed / planned)
 

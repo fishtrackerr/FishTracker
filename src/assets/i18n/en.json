@@ -307,6 +307,23 @@
       "general": "General"
     }
   },
+  "sessionSummary": {
+    "title": "Session ended",
+    "catches": "Catches",
+    "bites": "Bites",
+    "totalWeight": "Total weight",
+    "biggestFish": "Biggest fish",
+    "noBiggest": "No weights logged this session.",
+    "perRod": "Per rod",
+    "colRod": "Rod",
+    "colSpot": "Spot",
+    "colBait": "Bait",
+    "colBites": "Bites",
+    "colFish": "Fish",
+    "lastNotes": "Last notes",
+    "openSession": "Open session",
+    "done": "Done"
+  },
   "activeSession": {
     "catches": "catches",
     "best": "Best",
@@ -317,7 +334,7 @@
     "detailsPending": "Details pending",
     "recast": "Recast",
     "camera": "Camera",
-    "endSession": "End Session",
+    "endSession": "End session",
     "endSessionConfirm": "End this fishing session?",
     "sessionEnded": "Session ended",
     "endFailed": "Failed to end session"
@@ -389,7 +406,7 @@
     "spotted": "spotted",
     "catches": "Catches",
     "images": "Session Images",
-    "addCatch": "Add Catch",
+    "addCatch": "+ Catch",
     "pr": "PR",
     "editSession": "Edit Session",
     "notFoundTitle": "Session not found",
@@ -438,7 +455,7 @@
     "defaultName": "Fishing Session"
   },
   "catchForm": {
-    "title": "Add Catch",
+    "title": "Catch",
     "species": "Species",
     "fishNameOptional": "Fish Name (optional)",
     "weightKg": "Weight (kg)",
@@ -464,7 +481,10 @@
     "addPhoto": "Add Photo",
     "saveCatch": "Save Catch",
     "saveChanges": "Save changes",
-    "editTitle": "Edit Catch"
+    "editTitle": "Catch",
+    "deleteQuestion": "Delete this catch?",
+    "deleteCatch": "Delete catch",
+    "deleted": "Catch deleted"
   },
   "quickCatch": {},
   "catchSheet": {
@@ -628,7 +648,7 @@
     "recastNoSpots": "No session spots yet. You can still recast, or add spots via Edit session.",
     "recastSuccess": "Rod recast",
     "recastFailed": "Failed to recast rod",
-    "markFishSpotted": "Mark fish spotted",
+    "markFishSpotted": "Fish spotted",
     "sheetTitle": "Rod {{n}}",
     "sheetStats": "{{bites}} bites · {{spotted}} spotted",
     "sheetCast": " · cast {{time}}",
@@ -705,7 +725,7 @@
     "moreInformation": "More information",
     "temperature": "Temperature:",
     "updated": "Updated:",
-    "details": "Details"
+    "details": "Session"
   },
   "rodSummary": {
     "title": "Rod Summary",

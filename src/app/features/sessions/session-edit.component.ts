@@ -26,6 +26,7 @@ import { ConfirmService } from '../../core/services/confirm.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { RodService } from '../../core/services/rod.service';
 import { SettingsService } from '../../core/services/settings.service';
+import { safeReturnUrlParam } from '../../core/utils/return-url';
 import { FishingSession, FishingSpot, Lake, SessionSpot, SessionStatus } from '../../core/models';
 import {
   fromLocalDatetimeInput,
@@ -69,6 +70,11 @@ export class SessionEditComponent {
   private readonly rodService = inject(RodService);
   private readonly settings = inject(SettingsService);
   private readonly i18n = inject(I18nService);
+
+  /** Where Save and Cancel go back to; undefined means the session screen. */
+  private readonly returnUrl = safeReturnUrlParam(
+    this.route.snapshot?.queryParamMap?.get('returnUrl'),
+  );
 
   readonly session = toSignal(
     this.route.paramMap.pipe(
@@ -268,7 +274,7 @@ export class SessionEditComponent {
     try {
       await this.sessionService.updateSession(s.id, options, this.forceRodResize());
       this.notify.success(this.i18n.t('sessionEdit.sessionUpdated'));
-      await this.router.navigate(['/sessions', s.id]);
+      await this.goBack(s.id);
     } catch (err) {
       if (err instanceof SessionValidationError && err.message.includes('Confirm')) {
         const ok = await this.confirm.confirm({
@@ -296,9 +302,17 @@ export class SessionEditComponent {
   async cancel(): Promise<void> {
     const s = this.session();
     if (s) {
-      await this.router.navigate(['/sessions', s.id]);
+      await this.goBack(s.id);
     } else {
       await this.router.navigate(['/sessions']);
+    }
+  }
+
+  private async goBack(sessionId: string): Promise<void> {
+    if (this.returnUrl) {
+      await this.router.navigateByUrl(this.returnUrl);
+    } else {
+      await this.router.navigate(['/sessions', sessionId]);
     }
   }
 

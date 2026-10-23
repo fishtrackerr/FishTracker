@@ -153,7 +153,7 @@ describe('SessionDetailComponent (session screen)', () => {
             queryParamMap: of(convertToParamMap({})),
           },
         },
-        { provide: Router, useValue: { navigate } },
+        { provide: Router, useValue: { navigate, url: '/sessions/session-1' } },
         { provide: SessionService, useValue: sessionService },
         {
           provide: CatchService,
@@ -501,16 +501,21 @@ describe('SessionDetailComponent (session screen)', () => {
     it('navigates to the session edit page', () => {
       const component = create();
       component.editSession();
-      expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1', 'edit']);
+      expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1', 'edit'], {
+        queryParams: { returnUrl: '/sessions/session-1' },
+      });
     });
 
     it('opens a catch for editing', () => {
       const component = create();
       component.editCatch('c-1');
-      expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1', 'catches', 'c-1', 'edit']);
+      expect(navigate).toHaveBeenCalledWith(
+        ['/sessions', 'session-1', 'catches', 'c-1', 'edit'],
+        { queryParams: { returnUrl: '/sessions/session-1' } },
+      );
     });
 
-    it('ends the session after confirm and lands on the session screen', async () => {
+    it('ends the session after confirm and opens the summary', async () => {
       const component = create();
 
       await component.endSession();
@@ -518,7 +523,9 @@ describe('SessionDetailComponent (session screen)', () => {
       expect(confirm.confirm).toHaveBeenCalled();
       expect(sessionService.complete).toHaveBeenCalledWith('session-1');
       expect(notify.success).toHaveBeenCalledWith('activeSession.sessionEnded');
-      expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1']);
+      expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1', 'summary'], {
+        replaceUrl: true,
+      });
     });
 
     it('does not end the session when the confirm is cancelled', async () => {

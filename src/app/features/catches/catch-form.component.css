@@ -22,8 +22,21 @@
   font-size: 0.9rem;
   color: var(--text-secondary);
 }
+.actions {
+  display: flex;
+  gap: 12px;
+}
+.cancel-btn {
+  flex: 1;
+  height: 48px !important;
+}
 .save-btn {
-  width: 100%;
+  flex: 2;
   height: 48px !important;
   font-weight: 600 !important;
+}
+.delete-btn {
+  width: 100%;
+  height: 48px !important;
+  margin-top: 12px;
 }

@@ -7,6 +7,9 @@ import { CatchService } from '../../core/services/catch.service';
 import { SessionService } from '../../core/services/session.service';
 import { ImageService } from '../../core/services/image.service';
 import { PhotoPickService } from '../../core/services/photo-pick.service';
+import { ConfirmService } from '../../core/services/confirm.service';
+import { I18nService } from '../../core/services/i18n.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { UserOptionService } from '../../core/services/user-option.service';
 import type { Catch, FishingSession } from '../../core/models';
 
@@ -67,6 +70,10 @@ function createSession(): FishingSession {
 
 describe('CatchFormComponent', () => {
   const navigate = vi.fn<Router['navigate']>().mockResolvedValue(true);
+  const navigateByUrl = vi.fn<Router['navigateByUrl']>().mockResolvedValue(true);
+  const confirmDelete = vi.fn().mockResolvedValue(true);
+  const deleteCatchFn = vi.fn().mockResolvedValue(undefined);
+  const notifySuccess = vi.fn();
   const createCatch = vi.fn(
     async (..._args: Parameters<CatchService['create']>) =>
       ({ id: 'catch-1' } as Awaited<ReturnType<CatchService['create']>>),
@@ -91,6 +98,7 @@ describe('CatchFormComponent', () => {
     vi.clearAllMocks();
     routeStub.snapshot.paramMap = createParamMap({ id: 'session-1' });
     routeStub.snapshot.queryParamMap = createParamMap({ rodId: 'rod-1', sessionSpotId: 'spot-2' });
+    confirmDelete.mockResolvedValue(true);
 
     TestBed.configureTestingModule({
       providers: [
@@ -103,6 +111,7 @@ describe('CatchFormComponent', () => {
           provide: Router,
           useValue: {
             navigate,
+            navigateByUrl,
           },
         },
         {
@@ -111,8 +120,12 @@ describe('CatchFormComponent', () => {
             create: createCatch,
             update: updateCatch,
             getById: getCatchById,
+            delete: deleteCatchFn,
           },
         },
+        { provide: ConfirmService, useValue: { confirmDelete } },
+        { provide: I18nService, useValue: { t: (key: string) => key } },
+        { provide: NotificationService, useValue: { success: notifySuccess } },
         {
           provide: SessionService,
           useValue: {
@@ -341,5 +354,86 @@ describe('CatchFormComponent', () => {
     );
     expect(createCatch).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1']);
+  });
+
+  describe('returnUrl, cancel and delete', () => {
+    const existing = {
+      id: 'catch-99',
+      sessionId: 'session-1',
+      species: 'Carp',
+      caughtAt: '2026-07-15T10:00:00.000Z',
+      rodId: 'rod-1',
+      createdAt: '2026-07-15T10:00:00.000Z',
+      updatedAt: '2026-07-15T10:00:00.000Z',
+    } as Catch;
+
+    function withQuery(values: Record<string, string>, editing = false) {
+      routeStub.snapshot.queryParamMap = createParamMap(values);
+      if (editing) {
+        routeStub.snapshot.paramMap = createParamMap({ id: 'session-1', catchId: 'catch-99' });
+        getCatchById.mockResolvedValue(existing);
+      }
+      return TestBed.runInInjectionContext(() => new CatchFormComponent());
+    }
+
+    it('returns to a safe returnUrl after saving a new catch', async () => {
+      const component = withQuery({ rodId: 'rod-1', returnUrl: '/sessions/session-1?x=1' });
+      await component.load();
+      component.species = 'Carp';
+      await component.save();
+      expect(navigateByUrl).toHaveBeenCalledWith('/sessions/session-1?x=1');
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it.each(['https://evil.example/', '//evil.example', '/pin/unlock', '/mode-select', '/\\evil'])(
+      'ignores the unsafe returnUrl %s',
+      async (returnUrl) => {
+        const component = withQuery({ rodId: 'rod-1', returnUrl });
+        expect(component.returnUrl).toBeUndefined();
+        await component.cancel();
+        expect(navigateByUrl).not.toHaveBeenCalled();
+        expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1']);
+      },
+    );
+
+    it('cancel goes to the returnUrl without saving', async () => {
+      const component = withQuery({ returnUrl: '/sessions/session-1' });
+      await component.cancel();
+      expect(navigateByUrl).toHaveBeenCalledWith('/sessions/session-1');
+      expect(createCatch).not.toHaveBeenCalled();
+    });
+
+    it('deletes the catch after confirm and navigates back', async () => {
+      const component = withQuery({ returnUrl: '/sessions/session-1' }, true);
+      await component.load();
+      await component.deleteCatch();
+      expect(confirmDelete).toHaveBeenCalled();
+      expect(deleteCatchFn).toHaveBeenCalledWith('catch-99');
+      expect(notifySuccess).toHaveBeenCalled();
+      expect(navigateByUrl).toHaveBeenCalledWith('/sessions/session-1');
+    });
+
+    it('falls back to the session screen after deleting without a returnUrl', async () => {
+      const component = withQuery({}, true);
+      await component.load();
+      await component.deleteCatch();
+      expect(navigate).toHaveBeenCalledWith(['/sessions', 'session-1']);
+    });
+
+    it('keeps the catch when the delete is not confirmed', async () => {
+      confirmDelete.mockResolvedValueOnce(false);
+      const component = withQuery({}, true);
+      await component.load();
+      await component.deleteCatch();
+      expect(deleteCatchFn).not.toHaveBeenCalled();
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('cannot delete in create mode', async () => {
+      const component = withQuery({ rodId: 'rod-1' });
+      await component.deleteCatch();
+      expect(confirmDelete).not.toHaveBeenCalled();
+      expect(deleteCatchFn).not.toHaveBeenCalled();
+    });
   });
 });

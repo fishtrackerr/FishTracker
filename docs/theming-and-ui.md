@@ -33,7 +33,9 @@ Defined in `src/styles/tokens.css`: backgrounds, primary, text, borders, spacing
 Overrides in `src/styles/material-overrides.css`:
 
 - Form fields with 12px input padding
-- Themed dialogs, selects, menus, datepicker, snackbar (`app-snackbar` classes), bottom sheet
+- Themed dialogs, selects, menus, datepicker, snackbar (`app-snackbar` classes), bottom sheet. All bottom sheets (filters, start session, catch sheet, rod sheet) take their config from `themedBottomSheetConfig`
+- A `mat-select` bound one-way with `[ngModel]` does not re-render when a pick is rejected (cancelled confirm or prompt): reset it with `restoreSelectValue(viewChild(MatSelect), value)` (`shared/utils/restore-select.ts`), as Settings → fishing mode and the rod sheet's "+ New spot…" do
+- UI copy: **Catch**, **Bite**, **Fish spotted**, **End session**; the session card button that opens a session is **Session**
 - Flat (`mat-flat-button`) = main action, filled with `--cta`; stroked / text buttons = outline in `--primary`; all button labels use `--font-label` and `--label-transform`
 - Form fields: neutral `--border-strong` outline, `--primary` when focused, `--background-input` fill; floated labels uppercase
 

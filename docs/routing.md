@@ -12,6 +12,7 @@ Defined in `src/app/app.routes.ts`.
 | `/` | DashboardComponent | `pinLockGuard`, `fishingModeGuard` |
 | `/sessions` | SessionsListComponent | `pinLockGuard`, `fishingModeGuard` |
 | `/sessions/active` | — (redirect only) | `pinLockGuard`, `fishingModeGuard`, `activeSessionRedirectGuard` |
+| `/sessions/:id/summary` | SessionSummaryComponent (end-of-session summary, opened by **End**) | `pinLockGuard`, `fishingModeGuard` |
 | `/sessions/:id` | SessionDetailComponent (the one session screen: live or finished) | `pinLockGuard`, `fishingModeGuard` |
 | `/sessions/:id/catches/new` | CatchFormComponent | `pinLockGuard`, `fishingModeGuard` |
 | `/lakes`, `/lakes/:id` | Lakes list/detail | `pinLockGuard`, `fishingModeGuard` |
@@ -48,6 +49,10 @@ Prevent accessing PIN screens when inappropriate (already configured / already u
 - no active session → `/`
 
 So every caller that still navigates to `/sessions/active` (startup `resolveUnlockedDestination`, dashboard / sessions list **Continue session**, session card **Continue**, `SessionStartFlowService`, Settings mode switch) lands on the session screen.
+
+## `returnUrl` query param
+
+`/sessions/:id/catches/new`, `/sessions/:id/catches/:catchId/edit` and `/sessions/:id/edit` accept an optional `returnUrl` (the session screen passes its own URL). Save, Cancel and (catch form) Delete navigate there when it passes `safeReturnUrlParam`; otherwise they go to `/sessions/:id`. This is separate from the post-unlock return URL stored in `sessionStorage`.
 
 ## Startup redirects
 

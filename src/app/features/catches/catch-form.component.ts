@@ -12,6 +12,10 @@ import { ImageService } from '../../core/services/image.service';
 import { PhotoPickService } from '../../core/services/photo-pick.service';
 import { UserOptionService } from '../../core/services/user-option.service';
 import { OptionComboboxComponent } from '../../shared/components/option-combobox/option-combobox.component';
+import { ConfirmService } from '../../core/services/confirm.service';
+import { I18nService } from '../../core/services/i18n.service';
+import { NotificationService } from '../../core/services/notification.service';
+import { safeReturnUrlParam } from '../../core/utils/return-url';
 import { Catch, FishingSession } from '../../core/models';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
@@ -41,10 +45,15 @@ export class CatchFormComponent {
   private readonly photoPick = inject(PhotoPickService);
   private readonly userOptions = inject(UserOptionService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly confirm = inject(ConfirmService);
+  private readonly i18n = inject(I18nService);
+  private readonly notify = inject(NotificationService);
 
   sessionId = this.route.snapshot.paramMap.get('id')!;
   catchId = this.route.snapshot.paramMap.get('catchId');
   readonly isEdit = !!this.catchId;
+  /** Where Save, Cancel and Delete go back to; undefined means the session screen. */
+  readonly returnUrl = safeReturnUrlParam(this.route.snapshot.queryParamMap.get('returnUrl'));
   session?: FishingSession;
   private existingCatch?: Catch;
 
@@ -247,9 +256,43 @@ export class CatchFormComponent {
           photo: this.photo,
         });
       }
-      await this.router.navigate(['/sessions', this.sessionId]);
+      await this.goBack();
     } finally {
       this.saving.set(false);
+    }
+  }
+
+  async cancel(): Promise<void> {
+    await this.goBack();
+  }
+
+  /** Edit mode only: deletes the catch (and its photo) after a confirm, then goes back. */
+  async deleteCatch(): Promise<void> {
+    if (!this.isEdit || !this.catchId || this.saving()) {
+      return;
+    }
+    const ok = await this.confirm.confirmDelete(
+      this.i18n.t('catchForm.deleteQuestion'),
+      this.species.trim() || undefined,
+    );
+    if (!ok) {
+      return;
+    }
+    this.saving.set(true);
+    try {
+      await this.catchService.delete(this.catchId);
+      this.notify.success(this.i18n.t('catchForm.deleted'));
+      await this.goBack();
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  private async goBack(): Promise<void> {
+    if (this.returnUrl) {
+      await this.router.navigateByUrl(this.returnUrl);
+    } else {
+      await this.router.navigate(['/sessions', this.sessionId]);
     }
   }
 }

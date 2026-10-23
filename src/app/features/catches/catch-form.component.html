@@ -102,11 +102,29 @@
   </button>
 </div>
 
-<button
-  mat-flat-button
-  class="save-btn"
-  [disabled]="!species.trim() || saving() || rods.length === 0 || !rodId"
-  (click)="save()"
->
-  {{ (saving() ? 'sessionEdit.saving' : (isEdit ? 'catchForm.saveChanges' : 'catchForm.saveCatch')) | tr }}
-</button>
+<div class="actions">
+  <button mat-stroked-button type="button" class="cancel-btn" [disabled]="saving()" (click)="cancel()">
+    {{ 'common.cancel' | tr }}
+  </button>
+  <button
+    mat-flat-button
+    class="save-btn"
+    [disabled]="!species.trim() || saving() || rods.length === 0 || !rodId"
+    (click)="save()"
+  >
+    {{ (saving() ? 'sessionEdit.saving' : (isEdit ? 'catchForm.saveChanges' : 'catchForm.saveCatch')) | tr }}
+  </button>
+</div>
+
+@if (isEdit) {
+  <button
+    mat-stroked-button
+    color="warn"
+    type="button"
+    class="delete-btn"
+    [disabled]="saving()"
+    (click)="deleteCatch()"
+  >
+    {{ 'catchForm.deleteCatch' | tr }}
+  </button>
+}

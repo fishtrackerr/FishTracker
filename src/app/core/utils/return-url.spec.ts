@@ -5,6 +5,7 @@ import {
   isSafeAppReturnUrl,
   persistReturnUrl,
   readReturnUrl,
+  safeReturnUrlParam,
 } from './return-url';
 
 describe('persistReturnUrl', () => {
@@ -68,5 +69,27 @@ describe('isSafeAppReturnUrl', () => {
     expect(isSafeAppReturnUrl('/mode-select')).toBe(false);
     expect(isSafeAppReturnUrl('https://x')).toBe(false);
     expect(isSafeAppReturnUrl('')).toBe(false);
+  });
+});
+
+describe('safeReturnUrlParam', () => {
+  it('passes a same-app relative path through', () => {
+    expect(safeReturnUrlParam('/sessions/s-1?tab=1')).toBe('/sessions/s-1?tab=1');
+  });
+
+  it.each([
+    null,
+    undefined,
+    '',
+    'https://evil.example/',
+    '//evil.example',
+    '/\\evil',
+    'sessions/s-1',
+    '/pin/unlock',
+    '/pin/setup',
+    '/mode-select',
+    '/mode-select?x=1',
+  ])('rejects %s', (value) => {
+    expect(safeReturnUrlParam(value)).toBeUndefined();
   });
 });

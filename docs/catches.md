@@ -14,7 +14,7 @@ Bottom sheet `CatchSheetComponent` (`features/catches/catch-sheet/`), opened wit
 - Species chips from the mode favourites plus "Other…" (text prompt, any species). Preselected: species of the latest catch in the session, else the latest in the mode, else the first favourite
 - Weight and length in the units from settings (stored as kg / cm); photo via camera or gallery; Released toggle (default on)
 - Save uses `CatchService.create` with the rod, its `sessionSpotId`, bait and rig. Without a weight the catch is saved `detailsPending` ("log now, details later")
-- Snackbar "species weight on rod N" with Undo (`CatchService.delete`)
+- Snackbar "species weight on rod N" with Undo (`CatchService.delete`, which also removes the catch photo, see Deleting a catch)
 - "All details…" closes the sheet and opens `/sessions/:id/catches/new?rodId=&sessionSpotId=&returnUrl=<current url>`
 
 ## Full catch form
@@ -22,9 +22,19 @@ Bottom sheet `CatchSheetComponent` (`features/catches/catch-sheet/`), opened wit
 - Create: `/sessions/:id/catches/new` — extended fields (hook, line, depth, rod, session spot, etc.)
 - Edit: `/sessions/:id/catches/:catchId/edit` — same form; clears `detailsPending` on save; does **not** overwrite frozen `weather`, `caughtAt`, or GPS
 
+`returnUrl` query param: after **Save** or **Cancel** the form navigates there; it is validated with `safeReturnUrlParam` (`core/utils/return-url.ts`: same-app relative paths only, no absolute/protocol-relative/backslash URLs, no `/pin/*`, no `/mode-select`) and falls back to `/sessions/:id`. The session screen and the catch sheet pass their current URL.
+
+### Deleting a catch
+
+In edit mode the form has a **Delete catch** button (warn): `ConfirmService.confirmDelete` → `CatchService.delete` → snackbar → back to `returnUrl` (fallback `/sessions/:id`). `CatchService.delete` recomputes personal records and session stats, and soft-deletes the catch photo (`ImageService.delete`) so it leaves the session photos and the gallery, unless that image is still used by another catch or listed in the session's `photoIds`. The catch sheet's **Undo** uses the same method, so an undone catch leaves no photo behind. There is no delete action on the session screen's catch rows (open the row, then delete).
+
 Custom dropdown options via `option-combobox` and `UserOptionService` (mode-scoped). Query params `rodId` and `sessionSpotId` preselect the rod (catch sheet **All details…**).
 
 Catches store optional `rodId` and `sessionSpotId` links.
+
+## Timeline event
+
+`CatchService.create` records a `catch` session event: "<species> caught" (`activeSession.catchEvent`) when a real species is given, also for a catch saved without weight ("details pending"). Only `createInstant` (species "Unknown") keeps the generic "Quick catch logged" text.
 
 ## Weather on catch
 

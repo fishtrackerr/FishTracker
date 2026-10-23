@@ -490,19 +490,25 @@ export class SessionDetailComponent {
   editSession(): void {
     const s = this.current();
     if (!s) return;
-    void this.router.navigate(['/sessions', s.id, 'edit']);
+    void this.router.navigate(['/sessions', s.id, 'edit'], {
+      queryParams: { returnUrl: this.currentUrl() },
+    });
+  }
+
+  /** This screen's URL, passed as `returnUrl` so edit pages come back here. */
+  currentUrl(): string {
+    return this.router.url;
   }
 
   editCatch(catchId: string): void {
     const s = this.current();
     if (!s) return;
-    void this.router.navigate(['/sessions', s.id, 'catches', catchId, 'edit']);
+    void this.router.navigate(['/sessions', s.id, 'catches', catchId, 'edit'], {
+      queryParams: { returnUrl: this.currentUrl() },
+    });
   }
 
-  /**
-   * Ends the live session (with confirm). The one place that decides where the user
-   * lands afterwards, so a later summary route only changes this method.
-   */
+  /** Ends the live session (with confirm) and opens its summary. */
   async endSession(): Promise<void> {
     const s = this.current();
     if (!s) return;
@@ -515,7 +521,7 @@ export class SessionDetailComponent {
     try {
       await this.sessionService.complete(s.id);
       this.notify.success(this.i18n.t('activeSession.sessionEnded'));
-      await this.router.navigate(['/sessions', s.id]);
+      await this.router.navigate(['/sessions', s.id, 'summary'], { replaceUrl: true });
     } catch (error) {
       console.error('[SessionScreen] Failed to complete session', error);
       this.notify.error(this.i18n.t('activeSession.endFailed'));

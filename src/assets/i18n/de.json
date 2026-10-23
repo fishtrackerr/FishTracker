@@ -307,6 +307,23 @@
       "general": "Allgemein"
     }
   },
+  "sessionSummary": {
+    "title": "Sitzung beendet",
+    "catches": "Fänge",
+    "bites": "Bisse",
+    "totalWeight": "Gesamtgewicht",
+    "biggestFish": "Größter Fisch",
+    "noBiggest": "Keine Gewichte in dieser Sitzung erfasst.",
+    "perRod": "Pro Rute",
+    "colRod": "Rute",
+    "colSpot": "Platz",
+    "colBait": "Köder",
+    "colBites": "Bisse",
+    "colFish": "Fische",
+    "lastNotes": "Letzte Notizen",
+    "openSession": "Sitzung öffnen",
+    "done": "Fertig"
+  },
   "activeSession": {
     "catches": "Fänge",
     "best": "Beste",
@@ -389,7 +406,7 @@
     "spotted": "gesichtet",
     "catches": "Fänge",
     "images": "Sitzungsbilder",
-    "addCatch": "Fang hinzufügen",
+    "addCatch": "+ Fang",
     "pr": "PR",
     "editSession": "Sitzung bearbeiten",
     "notFoundTitle": "Sitzung nicht gefunden",
@@ -438,7 +455,7 @@
     "defaultName": "Angelsitzung"
   },
   "catchForm": {
-    "title": "Fang hinzufügen",
+    "title": "Fang",
     "species": "Art",
     "fishNameOptional": "Fischname (optional)",
     "weightKg": "Gewicht (kg)",
@@ -464,7 +481,10 @@
     "addPhoto": "Foto hinzufügen",
     "saveCatch": "Fang speichern",
     "saveChanges": "Änderungen speichern",
-    "editTitle": "Fang bearbeiten"
+    "editTitle": "Fang",
+    "deleteQuestion": "Diesen Fang löschen?",
+    "deleteCatch": "Fang löschen",
+    "deleted": "Fang gelöscht"
   },
   "quickCatch": {},
   "catchSheet": {
@@ -628,7 +648,7 @@
     "recastNoSpots": "Noch keine Sitzungsplätze. Du kannst trotzdem auswerfen oder Plätze über Sitzung bearbeiten hinzufügen.",
     "recastSuccess": "Rute neu ausgeworfen",
     "recastFailed": "Neu auswerfen fehlgeschlagen",
-    "markFishSpotted": "Fisch gesichtet markieren",
+    "markFishSpotted": "Fisch gesichtet",
     "sheetTitle": "Rute {{n}}",
     "sheetStats": "{{bites}} Bisse · {{spotted}} gesichtet",
     "sheetCast": " · ausgeworfen {{time}}",
@@ -705,7 +725,7 @@
     "moreInformation": "Mehr Informationen",
     "temperature": "Temperatur:",
     "updated": "Aktualisiert:",
-    "details": "Details"
+    "details": "Sitzung"
   },
   "rodSummary": {
     "title": "Rutenübersicht",

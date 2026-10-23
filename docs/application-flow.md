@@ -21,7 +21,7 @@
 4. PIN, theme, units, language, and AI API key/config remain shared across modes.
 5. Per-mode preferences (`lastLakeId`, `defaultLakeId`, `homepageImageId`, favorites) live in `AppSettings.modePreferences`.
 6. Existing data from before this feature is migrated to **carper** (Dexie v7).
-7. Shell shows a mode banner for the active mode. Switch modes in Settings → General → Fishing mode: after a confirm dialog the mode is set and the app navigates to `AppStartupService.resolveUnlockedDestination('/')` (active session of the new mode, or home). Data is per mode; an active session stays in its own mode.
+7. Shell shows a mode banner for the active mode. Switch modes in Settings → General → Fishing mode: after a confirm dialog (cancelling snaps the select back to the current mode) the mode is set, its option defaults are seeded (`ensureDefaultsForCurrentMode`) and the app navigates to `AppStartupService.resolveUnlockedDestination('/')` (active session of the new mode, or home). Data is per mode; an active session stays in its own mode.
 
 ## PIN unlock
 
@@ -41,7 +41,7 @@
 1. Start session from dashboard or sessions list: one bottom sheet (lake, rods stepper, optional swim, more options) → optional pre-session backup. Only one **active** session per fishing mode; while one is active both screens show **Continue session** (`/sessions/active`) instead of Start.
 2. `SessionService.start()` creates the active session with its rods, session spot and optional GPS/weather/cover (stamped with current `fishingMode`).
 3. The user lands on `/sessions/:id`, the one session screen. While the session is active it is in **live mode**: top strip (lake/swim, timer, weather, catch count), one tile per rod with **Bite +1** and **Catch**, and a sticky action bar (Photo, Note, Recast, End). `/sessions/active` only redirects there.
-4. End session via **End** in the action bar (confirm) → `SessionService.complete()`; the screen switches to **finished mode**.
+4. End session via **End** in the action bar (confirm) → `SessionService.complete()`; the app opens the end-of-session summary `/sessions/:id/summary` (see [sessions.md](./sessions.md)); **Open session** there shows the screen in **finished mode**.
 
 ## Add catch flow
 

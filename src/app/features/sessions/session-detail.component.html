@@ -139,7 +139,7 @@
     <section class="section">
       <div class="section-header">
         <h2>{{ 'sessionDetail.catches' | tr }} ({{ catches().length }})</h2>
-        <a mat-button [routerLink]="['/sessions', s.id, 'catches', 'new']">{{ 'sessionDetail.addCatch' | tr }}</a>
+        <a mat-button [routerLink]="['/sessions', s.id, 'catches', 'new']" [queryParams]="{ returnUrl: currentUrl() }">{{ 'sessionDetail.addCatch' | tr }}</a>
       </div>
       @for (c of catches(); track c.id) {
         <div

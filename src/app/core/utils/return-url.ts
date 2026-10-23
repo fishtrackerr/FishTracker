@@ -13,7 +13,7 @@ export function isSafeAppReturnUrl(url: string): boolean {
   if (!url || typeof url !== 'string') {
     return false;
   }
-  if (!url.startsWith('/') || url.startsWith('//')) {
+  if (!url.startsWith('/') || url.startsWith('//') || url.includes('\\')) {
     return false;
   }
   if (url.includes('://')) {
@@ -27,6 +27,14 @@ export function isSafeAppReturnUrl(url: string): boolean {
     return false;
   }
   return true;
+}
+
+/**
+ * Reads a `returnUrl` query param (catch form, session edit): the value when it is a
+ * safe same-app path, otherwise undefined so the caller uses its own fallback.
+ */
+export function safeReturnUrlParam(raw: string | null | undefined): string | undefined {
+  return raw && isSafeAppReturnUrl(raw) ? raw : undefined;
 }
 
 /** Persist post-unlock destination. Never clobber a deep link with bare `/`. */
