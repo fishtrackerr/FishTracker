@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, viewChild, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { firstValueFrom } from 'rxjs';
 import {
   AssistantPrompt,
@@ -48,6 +48,7 @@ import { WeatherService } from '../../core/services/weather.service';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { promptForText } from '../../shared/components/text-prompt-dialog/text-prompt-dialog.component';
+import { restoreSelectValue } from '../../shared/utils/restore-select';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import {
   AssistantPromptDialogComponent,
@@ -105,6 +106,7 @@ export class SettingsComponent implements OnInit {
 
   readonly settings = this.settingsService.settings;
   readonly fishingModes = FISHING_MODES;
+  readonly modeSelect = viewChild<MatSelect>('modeSelect');
   readonly activeMode = () => this.fishingMode.getMode();
   readonly modePreferences = () => this.fishingMode.getActivePreferences();
   readonly aiApiKey = this.vault.aiApiKey;
@@ -241,9 +243,12 @@ export class SettingsComponent implements OnInit {
       confirmLabel: this.i18n.t('settings.fishingModeSwitchConfirm'),
     });
     if (!ok) {
+      // The select shows the rejected pick: snap it back to the current mode.
+      restoreSelectValue(this.modeSelect(), this.fishingMode.getMode());
       return;
     }
     this.fishingMode.setMode(mode);
+    await this.userOptions.ensureDefaultsForCurrentMode();
     await this.router.navigateByUrl(await this.startup.resolveUnlockedDestination('/'));
   }
 

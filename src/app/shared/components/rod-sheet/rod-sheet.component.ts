@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   MatBottomSheet,
@@ -8,7 +8,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { FishingSession, SessionRod, SessionSpot } from '../../../core/models';
 import { onlyVisibleRecords } from '../../../core/utils';
 import { BiteEventService } from '../../../core/services/bite-event.service';
@@ -18,6 +18,8 @@ import { I18nService } from '../../../core/services/i18n.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { RodService, UpdateRodOptions } from '../../../core/services/rod.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { restoreSelectValue } from '../../utils/restore-select';
+import { themedBottomSheetConfig } from '../../utils/themed-bottom-sheet';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { OptionComboboxComponent } from '../option-combobox/option-combobox.component';
 import { promptForText } from '../text-prompt-dialog/text-prompt-dialog.component';
@@ -94,6 +96,7 @@ export const NEW_SPOT_VALUE = '__new__';
         <mat-form-field appearance="outline" class="full">
           <mat-label>{{ 'rod.spot' | tr }}</mat-label>
           <mat-select
+            #spotSelect
             [ngModel]="editSpotId()"
             (ngModelChange)="onSpotChange($event)"
             [panelClass]="selectPanelClass"
@@ -239,6 +242,7 @@ export class RodSheetComponent {
 
   readonly session = signal<FishingSession>(this.data.session);
   readonly busy = signal(false);
+  readonly spotSelect = viewChild<MatSelect>('spotSelect');
   readonly pendingSpotName = signal('');
   readonly editSpotId = signal('');
 
@@ -341,14 +345,15 @@ export class RodSheetComponent {
       title: this.i18n.t('rod.newSpotTitle'),
       label: this.i18n.t('rod.newSpotName'),
       initialValue: this.pendingSpotName(),
+      maxLength: 60,
     });
     if (name) {
       this.pendingSpotName.set(name);
       this.editSpotId.set(NEW_SPOT_VALUE);
     } else {
-      // Force the select back to the previous value after a cancelled prompt.
-      this.editSpotId.set(this.newSpotPromptValue);
+      // The select itself shows the picked "+ New spot…" entry: put it back visibly.
       this.editSpotId.set(previous);
+      restoreSelectValue(this.spotSelect(), previous);
     }
   }
 
@@ -438,19 +443,13 @@ export async function openRodSheet(
   theme: ThemeService,
   data: { session: FishingSession; rodId: string },
 ): Promise<FishingSession | undefined> {
-  const themeClass = theme.resolvedTheme() === 'dark' ? 'theme-dark' : 'theme-light';
-  const backdropThemeClass =
-    theme.resolvedTheme() === 'dark' ? 'theme-backdrop-dark' : 'theme-backdrop-light';
   let latest: FishingSession | undefined;
   const ref = bottomSheet.open<RodSheetComponent, RodSheetData, FishingSession>(
     RodSheetComponent,
-    {
-      data: { ...data, onSessionChange: (session) => (latest = session) },
-      panelClass: ['themed-bottom-sheet', themeClass],
-      // MatBottomSheetConfig types this as string, but CDK Overlay accepts string[]
-      // and a space-separated string throws in classList.add.
-      backdropClass: ['themed-backdrop', backdropThemeClass] as unknown as string,
-    },
+    themedBottomSheetConfig(theme.resolvedTheme(), {
+      ...data,
+      onSessionChange: (session: FishingSession) => (latest = session),
+    }),
   );
   await new Promise<void>((resolve) => {
     ref.afterDismissed().subscribe(() => resolve());

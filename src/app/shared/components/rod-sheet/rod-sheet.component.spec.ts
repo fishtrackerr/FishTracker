@@ -170,6 +170,29 @@ describe('RodSheetComponent', () => {
     expect(rodService['assignSpot']).not.toHaveBeenCalled();
   });
 
+  it('passes maxLength 60 to the new-spot prompt', async () => {
+    dialog.open.mockReturnValue({ afterClosed: () => of(undefined) });
+    const component = create().componentInstance;
+    await component.onSpotChange(PROMPT_VALUE);
+    expect(dialog.open.mock.calls[0][1].data.maxLength).toBe(60);
+  });
+
+  it('visibly restores the select after a cancelled new-spot prompt', async () => {
+    dialog.open.mockReturnValue({ afterClosed: () => of(undefined) });
+    const fixture = create();
+    const component = fixture.componentInstance;
+    await fixture.whenStable();
+    const select = component.spotSelect()!;
+    expect(select.value).toBe('sp-1');
+    // The user picked the "+ New spot…" entry: the control shows it.
+    select.writeValue(PROMPT_VALUE);
+    expect(select.value).toBe(PROMPT_VALUE);
+    await component.onSpotChange(PROMPT_VALUE);
+    fixture.detectChanges();
+    expect(select.value).toBe('sp-1');
+    expect(select.triggerValue).toBe('Reeds');
+  });
+
   it('unassigns the spot through assignSpot', async () => {
     const component = create().componentInstance;
     await component.onSpotChange('');

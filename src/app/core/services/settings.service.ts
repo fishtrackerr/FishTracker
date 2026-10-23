@@ -33,6 +33,17 @@ const ALLOWED_SETTINGS_KEYS = new Set<keyof AppSettings>([
   ...OPTIONAL_SETTINGS_KEYS,
 ]);
 
+/**
+ * Old versions stored a negative value for "lock within ~30 seconds"; that choice no
+ * longer exists, so it becomes 5 minutes. 0 stays "only when the app starts".
+ */
+function normalizeLockTimeout(minutes: unknown): number {
+  if (typeof minutes === 'number' && Number.isFinite(minutes)) {
+    return minutes < 0 ? 5 : minutes;
+  }
+  return DEFAULT_SETTINGS.lockTimeoutMinutes;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
   private readonly settingsSignal = signal<AppSettings>(this.load());
@@ -56,7 +67,10 @@ export class SettingsService {
 
   /** Fully replaces settings (clears optional keys omitted from the payload). */
   replace(settings: AppSettings): void {
-    const next = { ...settings };
+    const next = {
+      ...settings,
+      lockTimeoutMinutes: normalizeLockTimeout(settings.lockTimeoutMinutes),
+    };
     this.settingsSignal.set(next);
     this.persist(next);
   }
@@ -84,6 +98,7 @@ export class SettingsService {
         }
       }
       const merged: AppSettings = { ...DEFAULT_SETTINGS, ...picked, modePreferences: {} };
+      merged.lockTimeoutMinutes = normalizeLockTimeout(merged.lockTimeoutMinutes);
       merged.modePreferences = this.migrateModePreferences(merged, picked.modePreferences);
       const carperPrefs = merged.modePreferences[DEFAULT_FISHING_MODE];
       if (carperPrefs) {

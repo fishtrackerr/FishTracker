@@ -19,6 +19,7 @@ describe('CatchService', () => {
   };
   let lakeRepo: { getById: ReturnType<typeof vi.fn> };
   let processFile: ReturnType<typeof vi.fn>;
+  let imageDelete: ReturnType<typeof vi.fn>;
   let sessionEvents: { record: ReturnType<typeof vi.fn> };
   let i18n: { t: ReturnType<typeof vi.fn> };
 
@@ -52,11 +53,13 @@ describe('CatchService', () => {
       setPersonalRecord: vi.fn().mockResolvedValue(undefined),
     };
     processFile = vi.fn();
+    imageDelete = vi.fn().mockResolvedValue(undefined);
     sessionEvents = { record: vi.fn() };
     i18n = {
-      t: vi.fn((key: string) => {
+      t: vi.fn((key: string, params?: Record<string, string>) => {
         if (key === 'common.unknown') return 'Unknown';
         if (key === 'activeSession.instantCatchEvent') return 'Quick catch logged';
+        if (key === 'activeSession.catchEvent') return `${params?.['species']} caught`;
         return key;
       }),
     };
@@ -122,7 +125,7 @@ describe('CatchService', () => {
         getCachedSnapshotFor:
           overrides?.getCachedSnapshotFor ?? vi.fn().mockReturnValue(null),
       } as never,
-      { processFile } as never,
+      { processFile, delete: imageDelete } as never,
       sessionEvents as never,
       i18n as never,
     );
@@ -224,6 +227,13 @@ describe('CatchService', () => {
       );
     });
 
+    it('names the species in the timeline when a catch is pending but has a species', async () => {
+      await service.create('session-1', { species: 'Pike', detailsPending: true, rodId: 'rod-1' });
+      expect(sessionEvents.record).toHaveBeenCalledWith(
+        expect.objectContaining({ description: 'Pike caught' }),
+      );
+    });
+
     it('throws when the session has no rods', async () => {
       createService({ session: { rods: [] } });
 
@@ -248,6 +258,33 @@ describe('CatchService', () => {
       await service.delete('c-big');
 
       expect(catchRepo.setPersonalRecord).toHaveBeenCalledWith('c-second', true);
+    });
+
+    it('soft-deletes the catch photo with the catch', async () => {
+      catchRepo.getById.mockResolvedValue({ ...pike('c1', 5, false), photoId: 'img-1' });
+      catchRepo.getAll.mockResolvedValue([]);
+      await service.delete('c1');
+      expect(imageDelete).toHaveBeenCalledWith('img-1');
+    });
+
+    it('keeps a photo that another catch still uses', async () => {
+      catchRepo.getById.mockResolvedValue({ ...pike('c1', 5, false), photoId: 'img-1' });
+      catchRepo.getAll.mockResolvedValue([{ ...pike('c2', 4, false), photoId: 'img-1' }]);
+      await service.delete('c1');
+      expect(imageDelete).not.toHaveBeenCalled();
+    });
+
+    it('keeps a photo the session also lists', async () => {
+      createService({ session: { photoIds: ['img-1'] } });
+      catchRepo.getById.mockResolvedValue({ ...pike('c1', 5, false), photoId: 'img-1' });
+      await service.delete('c1');
+      expect(imageDelete).not.toHaveBeenCalled();
+    });
+
+    it('does not touch images for a catch without a photo', async () => {
+      catchRepo.getById.mockResolvedValue(pike('c1', 5, false));
+      await service.delete('c1');
+      expect(imageDelete).not.toHaveBeenCalled();
     });
 
     it('clears the flag on a former record once a bigger fish is saved', async () => {

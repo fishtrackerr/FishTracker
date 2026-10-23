@@ -12,7 +12,7 @@ import { RodService } from './rod.service';
 import { SessionService } from './session.service';
 import { SettingsService } from './settings.service';
 import { ThemeService } from './theme.service';
-import { SessionSpot } from '../models';
+import { FishingSession, SessionSpot } from '../models';
 import { generateId, onlyVisibleRecords } from '../utils';
 import {
   StartSessionSheetComponent,
@@ -75,15 +75,16 @@ export class SessionStartFlowService {
       }
 
       this.starting.set(true);
-      // Another start may have won while the sheet was open: continue it instead.
-      if (await this.goToActiveSession()) {
-        return false;
-      }
       if (this.settings.get().backupBeforeSession) {
         const mayContinue = await this.exportPreSessionBackup();
         if (!mayContinue) {
           return false;
         }
+      }
+      // Another start may have won while the sheet or the backup step was open
+      // (the backup can wait on the user): continue it instead of starting a second one.
+      if (await this.goToActiveSession()) {
+        return false;
       }
 
       const { swim, ...options } = result;
@@ -93,6 +94,9 @@ export class SessionStartFlowService {
         sessionSpots: swimSpot ? [swimSpot] : undefined,
         rodSpotId: swimSpot?.id,
       });
+      if (swim?.newName && swimSpot && result.lakeId) {
+        await this.saveNewSwimOnLake(session, swimSpot, result.lakeId);
+      }
       await this.router.navigate(['/sessions', session.id]);
       this.notifications.success(this.i18n.t('sessions.sessionStarted'));
       return true;
@@ -125,14 +129,15 @@ export class SessionStartFlowService {
 
   /**
    * Turns the swim picked in the sheet into a real session spot (own id, saved with the
-   * session). A new swim is also added to the lake's spots when a lake is chosen.
+   * session). A new swim becomes a lake spot only after the session started
+   * ({@link saveNewSwimOnLake}), so a failed start leaves the lake untouched.
    */
   private async resolveSwim(lakeId: string | undefined, swim?: StartSessionSwim) {
     if (!swim) {
       return undefined;
     }
-    const lake = lakeId ? await this.lakeService.getById(lakeId) : undefined;
     if (swim.lakeSpotId) {
+      const lake = lakeId ? await this.lakeService.getById(lakeId) : undefined;
       const lakeSpot = lake?.spots.find((spot) => spot.id === swim.lakeSpotId);
       return lakeSpot ? this.rodService.snapshotFromLakeSpot(lakeSpot) : undefined;
     }
@@ -140,10 +145,29 @@ export class SessionStartFlowService {
     if (!name) {
       return undefined;
     }
-    const lakeSpot = lake ? await this.lakeService.addSpot(lake.id, { name }) : undefined;
-    return lakeSpot
-      ? this.rodService.snapshotFromLakeSpot(lakeSpot)
-      : ({ id: generateId(), name, visible: true } satisfies SessionSpot);
+    return { id: generateId(), name, visible: true } satisfies SessionSpot;
+  }
+
+  /** Adds the new swim to the lake's spots and links the session spot to it. Never fails the start. */
+  private async saveNewSwimOnLake(
+    session: FishingSession,
+    swimSpot: SessionSpot,
+    lakeId: string,
+  ): Promise<void> {
+    try {
+      const lakeSpot = await this.lakeService.addSpot(lakeId, { name: swimSpot.name });
+      if (!lakeSpot) {
+        return;
+      }
+      const current = session.sessionSpots?.length ? session.sessionSpots : [swimSpot];
+      await this.sessionService.update(session.id, {
+        sessionSpots: current.map((spot) =>
+          spot.id === swimSpot.id ? { ...spot, lakeSpotId: lakeSpot.id } : spot,
+        ),
+      });
+    } catch (error) {
+      console.error('[SessionStartFlow] could not save the new swim on the lake', error);
+    }
   }
 
   /**

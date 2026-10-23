@@ -25,7 +25,7 @@ import { AssistantPromptService } from '../../core/services/assistant-prompt.ser
 import { DialogService } from '../../core/services/dialog.service';
 import { TextPromptDialogComponent } from '../../shared/components/text-prompt-dialog/text-prompt-dialog.component';
 import { AssistantPromptDialogComponent } from '../assistant/assistant-prompt-dialog.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppStartupService } from '../../core/services/app-startup.service';
 
 const settingsState = signal({
@@ -170,6 +170,8 @@ describe('SettingsComponent', () => {
           useValue: {
             supportedLanguages: ['en', 'nl', 'de'],
             setLanguage: vi.fn().mockResolvedValue(undefined),
+            language: () => 'en',
+            dictionary: () => ({}),
             t: (key: string) => key,
           },
         },
@@ -223,8 +225,9 @@ describe('SettingsComponent', () => {
         },
         {
           provide: Router,
-          useValue: { navigateByUrl: vi.fn() },
+          useValue: { navigateByUrl: vi.fn(), events: of(), createUrlTree: vi.fn(), serializeUrl: vi.fn(() => '') },
         },
+        { provide: ActivatedRoute, useValue: {} },
         {
           provide: AppStartupService,
           useValue: { resolveUnlockedDestination: vi.fn().mockResolvedValue('/') },
@@ -280,6 +283,37 @@ describe('SettingsComponent', () => {
       expect(mode.setMode).toHaveBeenCalledWith('pike');
       expect(startup.resolveUnlockedDestination).toHaveBeenCalledWith('/');
       expect(router.navigateByUrl).toHaveBeenCalledWith('/sessions/active');
+    });
+
+    it('seeds the options of the new mode after switching, before navigating', async () => {
+      const { component, mode, router } = setup(true);
+      const ensure = TestBed.inject(UserOptionService).ensureDefaultsForCurrentMode as ReturnType<
+        typeof vi.fn
+      >;
+      await component.changeFishingMode('pike');
+      expect(ensure).toHaveBeenCalled();
+      expect(vi.mocked(mode.setMode).mock.invocationCallOrder[0]).toBeLessThan(
+        ensure.mock.invocationCallOrder[0],
+      );
+      expect(ensure.mock.invocationCallOrder[0]).toBeLessThan(
+        vi.mocked(router.navigateByUrl).mock.invocationCallOrder[0],
+      );
+    });
+
+    it('snaps the rendered select back to the current mode when the switch is declined', async () => {
+      const confirm = TestBed.inject(ConfirmService).confirm as ReturnType<typeof vi.fn>;
+      confirm.mockResolvedValueOnce(false);
+      const fixture = TestBed.createComponent(SettingsComponent);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const select = fixture.componentInstance.modeSelect();
+      expect(select).toBeTruthy();
+      expect(select!.value).toBe('carper');
+      select!.writeValue('pike');
+      expect(select!.value).toBe('pike');
+      await fixture.componentInstance.changeFishingMode('pike');
+      fixture.detectChanges();
+      expect(select!.value).toBe('carper');
     });
   });
 

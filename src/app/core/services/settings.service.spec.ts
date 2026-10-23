@@ -47,6 +47,23 @@ describe('SettingsService', () => {
     );
   });
 
+  it('migrates a negative lock timeout to 5 minutes and keeps 0 and positive values', () => {
+    const load = (value: number) => {
+      localStorage.setItem('fish-tracker-settings', JSON.stringify({ lockTimeoutMinutes: value }));
+      return new SettingsService().get().lockTimeoutMinutes;
+    };
+    expect(load(-0.5)).toBe(5);
+    expect(load(-1)).toBe(5);
+    expect(load(0)).toBe(0);
+    expect(load(15)).toBe(15);
+  });
+
+  it('migrates a negative lock timeout on replace as well', () => {
+    const service = new SettingsService();
+    service.replace({ ...service.get(), lockTimeoutMinutes: -1 });
+    expect(service.get().lockTimeoutMinutes).toBe(5);
+  });
+
   it('falls back to defaults when stored json is invalid', () => {
     localStorage.setItem('fish-tracker-settings', '{invalid json');
 

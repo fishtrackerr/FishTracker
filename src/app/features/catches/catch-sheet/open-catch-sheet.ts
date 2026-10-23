@@ -1,6 +1,7 @@
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { firstValueFrom } from 'rxjs';
 import { Catch } from '../../../core/models';
+import { themedBottomSheetConfig } from '../../../shared/utils/themed-bottom-sheet';
 import { CatchSheetComponent, CatchSheetData } from './catch-sheet.component';
 
 /** Minimal theme surface needed to pick the themed panel classes. */
@@ -17,16 +18,9 @@ export async function openCatchSheet(
   theme: CatchSheetTheme,
   data: CatchSheetData,
 ): Promise<Catch | undefined> {
-  const dark = theme.resolvedTheme() === 'dark';
   const ref = bottomSheet.open<CatchSheetComponent, CatchSheetData, Catch | undefined>(
     CatchSheetComponent,
-    {
-      data,
-      panelClass: ['themed-bottom-sheet', dark ? 'theme-dark' : 'theme-light'],
-      // MatBottomSheetConfig types this as string, but CDK Overlay accepts string[]
-      // and a space-separated string throws in classList.add.
-      backdropClass: ['themed-backdrop', dark ? 'theme-backdrop-dark' : 'theme-backdrop-light'] as unknown as string,
-    },
+    themedBottomSheetConfig(theme.resolvedTheme(), data),
   );
   return firstValueFrom(ref.afterDismissed());
 }

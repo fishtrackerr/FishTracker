@@ -156,9 +156,7 @@ export class CatchService {
       type: 'catch',
       rodId: rod.id,
       sessionSpotId,
-      description: input.detailsPending
-        ? this.i18n.t('activeSession.instantCatchEvent')
-        : `${input.species} caught`,
+      description: this.catchEventDescription(input),
       occurredAt: catchRecord.caughtAt,
     });
     return catchRecord;
@@ -208,8 +206,40 @@ export class CatchService {
       return;
     }
     await this.catchRepo.delete(id);
+    await this.removeOrphanedPhoto(existing);
     await this.refreshPersonalRecords([existing.species]);
     await this.updateSessionStats(existing.sessionId);
+  }
+
+  /**
+   * Soft-deletes the catch photo so it leaves the session photos, unless the
+   * image is also used elsewhere (another catch, or kept on the session).
+   */
+  private async removeOrphanedPhoto(deleted: Catch): Promise<void> {
+    const photoId = deleted.photoId;
+    if (!photoId) {
+      return;
+    }
+    const [others, session] = await Promise.all([
+      this.catchRepo.getAll(),
+      this.sessionRepo.getById(deleted.sessionId),
+    ]);
+    const usedByOtherCatch = others.some((c) => c.id !== deleted.id && c.photoId === photoId);
+    const keptOnSession = session?.photoIds?.includes(photoId) ?? false;
+    if (usedByOtherCatch || keptOnSession) {
+      return;
+    }
+    await this.image.delete(photoId);
+  }
+
+  /** Timeline text: instant catches without a real species keep the generic text. */
+  private catchEventDescription(input: FullCatchInput): string {
+    const species = input.species?.trim();
+    const hasSpecies = !!species && species !== this.i18n.t('common.unknown');
+    if (input.detailsPending && !hasSpecies) {
+      return this.i18n.t('activeSession.instantCatchEvent');
+    }
+    return this.i18n.t('activeSession.catchEvent', { species: species ?? '' });
   }
 
   /** Prefer explicit rod; otherwise first visible session rod. */

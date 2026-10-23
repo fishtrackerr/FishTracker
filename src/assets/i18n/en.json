@@ -313,6 +313,7 @@
     "refreshWeatherGps": "Refresh weather & GPS",
     "instantCatchFailed": "Failed to log catch",
     "instantCatchEvent": "Quick catch logged",
+    "catchEvent": "{species} caught",
     "detailsPending": "Details pending",
     "recast": "Recast",
     "camera": "Camera",

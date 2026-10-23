@@ -40,6 +40,7 @@ describe('SessionStartFlowService', () => {
   let confirm: ReturnType<typeof vi.fn>;
   let openSheet: ReturnType<typeof vi.fn>;
   let addSpot: ReturnType<typeof vi.fn>;
+  let updateSession: ReturnType<typeof vi.fn>;
   let getLakeById: ReturnType<typeof vi.fn>;
   let watchAll: ReturnType<typeof vi.fn>;
   let navigate: ReturnType<typeof vi.fn>;
@@ -58,6 +59,7 @@ describe('SessionStartFlowService', () => {
       afterDismissed: () => of(dialogResult),
     }));
     addSpot = vi.fn();
+    updateSession = vi.fn().mockResolvedValue(undefined);
     getLakeById = vi.fn().mockResolvedValue(undefined);
     watchAll = vi.fn().mockReturnValue(of([]));
     navigate = vi.fn().mockResolvedValue(true);
@@ -70,7 +72,7 @@ describe('SessionStartFlowService', () => {
         SessionStartFlowService,
         {
           provide: SessionService,
-          useValue: { getActive, start: startSession, watchAll },
+          useValue: { getActive, start: startSession, watchAll, update: updateSession },
         },
         {
           provide: LakeService,
@@ -193,7 +195,22 @@ describe('SessionStartFlowService', () => {
 
     expect(ok).toBe(false);
     expect(startSession).not.toHaveBeenCalled();
-    expect(success).not.toHaveBeenCalled();
+    expect(success).not.toHaveBeenCalledWith('sessions.sessionStarted');
+    expect(navigate).toHaveBeenCalledWith(['/sessions/active'], {
+      queryParams: { id: 's-active' },
+    });
+  });
+
+  it('continues the active session when one appears during the backup step', async () => {
+    getActive
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({ id: 's-active', status: 'active' });
+
+    const ok = await TestBed.inject(SessionStartFlowService).start();
+
+    expect(ok).toBe(false);
+    expect(exportBackup).toHaveBeenCalled();
+    expect(startSession).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith(['/sessions/active'], {
       queryParams: { id: 's-active' },
     });
@@ -241,7 +258,7 @@ describe('SessionStartFlowService', () => {
     expect(config.panelClass).toEqual(['themed-bottom-sheet', 'theme-dark']);
   });
 
-  it('creates a new swim on the lake and assigns it to all rods as a real session spot', async () => {
+  it('assigns a new swim to all rods as a real session spot and adds it to the lake after the start', async () => {
     dialogResult = { ...createResult, lakeId: 'l1', swim: { newName: 'Point' } };
     getLakeById.mockResolvedValue({ id: 'l1', spots: [] });
     addSpot.mockResolvedValue({ id: 'ls1', name: 'Point' });
@@ -249,10 +266,38 @@ describe('SessionStartFlowService', () => {
     await TestBed.inject(SessionStartFlowService).start();
 
     expect(addSpot).toHaveBeenCalledWith('l1', { name: 'Point' });
-    const spot = { id: 'ss-ls1', lakeSpotId: 'ls1', name: 'Point', visible: true };
-    expect(startSession).toHaveBeenCalledWith(
-      expect.objectContaining({ lakeId: 'l1', sessionSpots: [spot], rodSpotId: 'ss-ls1' }),
-    );
+    const call = startSession.mock.calls[0][0] as {
+      sessionSpots: { id: string; name: string }[];
+      rodSpotId: string;
+    };
+    expect(call.sessionSpots).toHaveLength(1);
+    expect(call.sessionSpots[0].name).toBe('Point');
+    expect(call.rodSpotId).toBe(call.sessionSpots[0].id);
+    expect(startSession.mock.invocationCallOrder[0]).toBeLessThan(addSpot.mock.invocationCallOrder[0]);
+    expect(updateSession).toHaveBeenCalledWith('s-new', {
+      sessionSpots: [expect.objectContaining({ id: call.rodSpotId, lakeSpotId: 'ls1' })],
+    });
+  });
+
+  it('does not add the new swim to the lake when starting fails', async () => {
+    dialogResult = { ...createResult, lakeId: 'l1', swim: { newName: 'Point' } };
+    startSession.mockRejectedValue(new Error('boom'));
+
+    const ok = await TestBed.inject(SessionStartFlowService).start();
+
+    expect(ok).toBe(false);
+    expect(addSpot).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalled();
+  });
+
+  it('still starts when saving the new swim on the lake fails', async () => {
+    dialogResult = { ...createResult, lakeId: 'l1', swim: { newName: 'Point' } };
+    addSpot.mockRejectedValue(new Error('db'));
+
+    const ok = await TestBed.inject(SessionStartFlowService).start();
+
+    expect(ok).toBe(true);
+    expect(navigate).toHaveBeenCalledWith(['/sessions', 's-new']);
   });
 
   it('snapshots an existing lake spot into the session', async () => {
