@@ -25,7 +25,7 @@
       <app-maps-link-button
         [latitude]="s.latitude"
         [longitude]="s.longitude"
-        label="session location"
+        [label]="'maps.label.sessionLocation' | tr"
         [showDirections]="true"
       />
     </p>
@@ -113,7 +113,7 @@
               <app-maps-link-button
                 [latitude]="c.latitude"
                 [longitude]="c.longitude"
-                label="catch location"
+                [label]="'maps.label.catchLocation' | tr"
                 (click)="$event.stopPropagation()"
               />
             }

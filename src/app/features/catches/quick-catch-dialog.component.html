@@ -22,7 +22,7 @@
     <mat-label>{{ 'catchForm.species' | tr }}</mat-label>
     <mat-select [(ngModel)]="species" [panelClass]="selectPanelClass">
       @for (s of speciesList; track s) {
-        <mat-option [value]="s">{{ s }}</mat-option>
+        <mat-option [value]="s">{{ s === otherSpecies ? ('quickCatch.otherSpecies' | tr) : s }}</mat-option>
       }
     </mat-select>
   </mat-form-field>
@@ -61,7 +61,7 @@
 
   <app-expandable-section
     sectionId="quick-catch-more"
-    label="quickCatch.moreDetails"
+    [label]="'quickCatch.moreDetails' | tr"
     persistKey="quick-catch-more"
     [defaultExpanded]="false"
   >

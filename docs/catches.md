@@ -17,6 +17,7 @@ Dialog on active session (`QuickCatchDialogComponent`):
 
 - Primary: species (from **current mode** favorites + Other), weight, length, bait, rig, photo
 - Collapsible: released, notes
+- “Other” is shown translated (`quickCatch.otherSpecies`) but saved as the fixed value `Other`, so stored catches stay language-independent
 - Saves via `CatchService.createQuick()`
 
 ## Full catch form

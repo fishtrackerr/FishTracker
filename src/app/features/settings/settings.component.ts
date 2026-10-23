@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -12,9 +11,10 @@ import { firstValueFrom } from 'rxjs';
 import { AssistantPrompt, BackupData, ThemeMode, USER_OPTION_VALUE_MAX_LENGTH, UserOption, UserOptionCategory, AppLanguage } from '../../core/models';
 import { openFeedbackMailto } from '../../core/constants/feedback';
 import { EU_COUNTRIES } from '../../core/constants/eu-countries';
-import { AssistantPromptService } from '../../core/services/assistant-prompt.service';
+import { AssistantPromptInput, AssistantPromptService } from '../../core/services/assistant-prompt.service';
 import { BackupService, BackupSaveCancelledError } from '../../core/services/backup.service';
 import { ConfirmService } from '../../core/services/confirm.service';
+import { DialogService } from '../../core/services/dialog.service';
 import { DemoDataService } from '../../core/services/demo-data.service';
 import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { I18nService } from '../../core/services/i18n.service';
@@ -33,8 +33,12 @@ import { UserOptionService } from '../../core/services/user-option.service';
 import { WeatherService } from '../../core/services/weather.service';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
+import { promptForText } from '../../shared/components/text-prompt-dialog/text-prompt-dialog.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import { AssistantPromptDialogComponent } from '../assistant/assistant-prompt-dialog.component';
+import {
+  AssistantPromptDialogComponent,
+  AssistantPromptDialogData,
+} from '../assistant/assistant-prompt-dialog.component';
 
 /** Reject backup files larger than this before parsing. */
 const MAX_BACKUP_FILE_BYTES = 50 * 1024 * 1024;
@@ -77,7 +81,7 @@ export class SettingsComponent implements OnInit {
   private readonly userOptions = inject(UserOptionService);
   private readonly fishingMode = inject(FishingModeService);
   private readonly assistantPrompts = inject(AssistantPromptService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialog = inject(DialogService);
   private readonly router = inject(Router);
 
   readonly settings = this.settingsService.settings;
@@ -337,10 +341,12 @@ export class SettingsComponent implements OnInit {
   }
 
   async renameOption(option: UserOption): Promise<void> {
-    const next = window.prompt(
-      this.i18n.t('settings.renameOptionPrompt', { value: option.value }),
-      option.value,
-    );
+    const next = await promptForText(this.dialog, {
+      title: this.i18n.t('settings.renameOptionPrompt', { value: option.value }),
+      initialValue: option.value,
+      confirmLabel: this.i18n.t('common.rename'),
+      maxLength: USER_OPTION_VALUE_MAX_LENGTH,
+    });
     if (next == null) {
       return;
     }
@@ -359,7 +365,10 @@ export class SettingsComponent implements OnInit {
   }
 
   async addOption(category: UserOptionCategory): Promise<void> {
-    const next = window.prompt(this.i18n.t('settings.addOptionPrompt', { category: this.categoryLabel(category) }));
+    const next = await promptForText(this.dialog, {
+      title: this.i18n.t('settings.addOptionPrompt', { category: this.categoryLabel(category) }),
+      maxLength: USER_OPTION_VALUE_MAX_LENGTH,
+    });
     if (next == null) {
       return;
     }
@@ -397,13 +406,16 @@ export class SettingsComponent implements OnInit {
   }
 
   async addPrompt(): Promise<void> {
-    const result = await firstValueFrom(
-      this.dialog.open(AssistantPromptDialogComponent, {
-        data: {},
-        width: '420px',
-        maxWidth: '95vw',
-      }).afterClosed(),
-    );
+    const ref = this.dialog.open<
+      AssistantPromptDialogComponent,
+      AssistantPromptDialogData,
+      AssistantPromptInput | undefined
+    >(AssistantPromptDialogComponent, {
+      data: {},
+      width: '420px',
+      maxWidth: '95vw',
+    });
+    const result = await firstValueFrom(ref.afterClosed());
     if (!result) {
       return;
     }
@@ -417,13 +429,16 @@ export class SettingsComponent implements OnInit {
   }
 
   async editPrompt(prompt: AssistantPrompt): Promise<void> {
-    const result = await firstValueFrom(
-      this.dialog.open(AssistantPromptDialogComponent, {
-        data: { prompt },
-        width: '420px',
-        maxWidth: '95vw',
-      }).afterClosed(),
-    );
+    const ref = this.dialog.open<
+      AssistantPromptDialogComponent,
+      AssistantPromptDialogData,
+      AssistantPromptInput | undefined
+    >(AssistantPromptDialogComponent, {
+      data: { prompt },
+      width: '420px',
+      maxWidth: '95vw',
+    });
+    const result = await firstValueFrom(ref.afterClosed());
     if (!result) {
       return;
     }

@@ -10,6 +10,7 @@ import { ProfileService } from '../../core/services/profile.service';
 import { LakeService } from '../../core/services/lake.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ConfirmService } from '../../core/services/confirm.service';
 import { PhotoPickService } from '../../core/services/photo-pick.service';
 import { UserProfile } from '../../core/models';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
@@ -42,6 +43,7 @@ export class ProfileComponent {
   private readonly notifications = inject(NotificationService);
   private readonly i18n = inject(I18nService);
   private readonly photoPick = inject(PhotoPickService);
+  private readonly confirm = inject(ConfirmService);
 
   readonly profile = toSignal(this.profileService.watch(), { initialValue: undefined });
   readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
@@ -89,12 +91,15 @@ export class ProfileComponent {
     }
   }
 
-  async onPictureUploaded(imageId: string): Promise<void> {
-    await this.profileService.save({ profilePictureId: imageId });
-    this.notifications.success(this.i18n.t('profile.pictureUpdated'));
-  }
-
   async removePicture(): Promise<void> {
+    const ok = await this.confirm.confirm({
+      title: this.i18n.t('profile.removePhotoTitle'),
+      message: this.i18n.t('profile.removePhotoMessage'),
+      confirmLabel: this.i18n.t('profile.removePhoto'),
+    });
+    if (!ok) {
+      return;
+    }
     await this.profileService.removeProfilePicture();
     this.notifications.success(this.i18n.t('profile.pictureRemoved'));
   }

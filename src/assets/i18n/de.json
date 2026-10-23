@@ -22,7 +22,9 @@
     "retry": "Erneut versuchen",
     "loading": "Wird geladen...",
     "errorGeneric": "Etwas ist schiefgelaufen",
-    "back": "Zurück"
+    "back": "Zurück",
+    "expandSection": "{{label}} aufklappen",
+    "collapseSection": "{{label}} zuklappen"
   },
   "connectivity": {
     "offlineBanner": "Du bist offline — Fänge und Sessions funktionieren weiter",
@@ -438,7 +440,8 @@
   },
   "quickCatch": {
     "title": "Schnellen Fang hinzufügen",
-    "moreDetails": "Mehr Details"
+    "moreDetails": "Mehr Details",
+    "otherSpecies": "Andere"
   },
   "lakes": {
     "title": "Seen",
@@ -500,7 +503,9 @@
     "profileSaved": "Profil gespeichert",
     "saveFailed": "Profil konnte nicht gespeichert werden",
     "pictureUpdated": "Profilbild aktualisiert",
-    "pictureRemoved": "Profilbild entfernt"
+    "pictureRemoved": "Profilbild entfernt",
+    "removePhotoTitle": "Profilbild entfernen?",
+    "removePhotoMessage": "Dein Profilbild wird gelöscht. Dies kann nicht rückgängig gemacht werden."
   },
   "profileDocs": {
     "title": "Profildokumente",
@@ -835,6 +840,18 @@
       "offline": "Du bist offline. Einblick-Prompts funktionieren weiterhin ohne KI.",
       "unauthorized": "API-Schlüssel abgelehnt. Prüfe die Einstellungen.",
       "generic": "KI-Anbieter konnte nicht erreicht werden."
+    }
+  },
+  "maps": {
+    "openInMaps": "{{label}} in Karten öffnen",
+    "directionsTo": "Route zu {{label}}",
+    "getDirectionsTo": "Route zu {{label}} planen",
+    "label": {
+      "location": "Standort",
+      "currentSession": "aktuelle Sitzung",
+      "sessionLocation": "Sitzungsort",
+      "catchLocation": "Fangort",
+      "session": "Sitzung"
     }
   }
 }

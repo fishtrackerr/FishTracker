@@ -70,7 +70,7 @@
       <mat-label>{{ 'sessionEdit.longitude' | tr }}</mat-label>
       <input matInput type="number" step="any" [(ngModel)]="longitude" />
     </mat-form-field>
-    <app-maps-link-button [latitude]="latitude" [longitude]="longitude" label="session" [showDirections]="true" />
+    <app-maps-link-button [latitude]="latitude" [longitude]="longitude" [label]="'maps.label.session' | tr" [showDirections]="true" />
   </div>
 
   <button mat-stroked-button type="button" (click)="refreshWeather()">{{ 'sessionEdit.refreshWeatherGps' | tr }}</button>

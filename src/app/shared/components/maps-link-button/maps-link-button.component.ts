@@ -1,6 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { I18nService } from '../../../core/services/i18n.service';
 import { MapsService } from '../../../core/services/maps.service';
 
 @Component({
@@ -42,10 +43,12 @@ import { MapsService } from '../../../core/services/maps.service';
 })
 export class MapsLinkButtonComponent {
   private readonly maps = inject(MapsService);
+  private readonly i18n = inject(I18nService);
 
   @Input() latitude?: number | null;
   @Input() longitude?: number | null;
-  @Input() label = 'location';
+  /** Already-translated name of the place; defaults to the translated word "location". */
+  @Input() label?: string;
   @Input() showDirections = false;
 
   get visible(): boolean {
@@ -53,15 +56,21 @@ export class MapsLinkButtonComponent {
   }
 
   get titleText(): string {
+    const label = this.resolvedLabel();
     return this.showDirections
-      ? `Directions to ${this.label}`
-      : `Open ${this.label} in Maps`;
+      ? this.i18n.t('maps.directionsTo', { label })
+      : this.i18n.t('maps.openInMaps', { label });
   }
 
   get ariaLabel(): string {
+    const label = this.resolvedLabel();
     return this.showDirections
-      ? `Get directions to ${this.label}`
-      : `Open ${this.label} in Maps`;
+      ? this.i18n.t('maps.getDirectionsTo', { label })
+      : this.i18n.t('maps.openInMaps', { label });
+  }
+
+  private resolvedLabel(): string {
+    return this.label?.trim() || this.i18n.t('maps.label.location');
   }
 
   onClick(): void {

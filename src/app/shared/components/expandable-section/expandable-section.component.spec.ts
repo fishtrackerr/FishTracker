@@ -49,6 +49,24 @@ describe('ExpandableSectionComponent', () => {
     expect(button.getAttribute('aria-expanded')).toBe(String(!initial));
   });
 
+  it('announces a translated expand/collapse label for screen readers', () => {
+    const srText = (): string =>
+      (fixture.nativeElement.querySelector('.sr-only') as HTMLElement).textContent?.trim() ?? '';
+    fixture.componentInstance.setExpanded(true);
+    fixture.detectChanges();
+    const collapseText = srText();
+
+    fixture.componentInstance.setExpanded(false);
+    fixture.detectChanges();
+    const expandText = srText();
+
+    expect(collapseText).toContain('test section');
+    expect(expandText).toContain('test section');
+    expect(collapseText).not.toBe(expandText);
+    expect(collapseText).not.toContain('common.');
+    expect(expandText).not.toContain('common.');
+  });
+
   it('closes other sections in the same accordion group when opening', () => {
     const first = TestBed.createComponent(ExpandableSectionComponent);
     first.componentRef.setInput('label', 'first');

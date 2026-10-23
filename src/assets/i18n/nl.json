@@ -22,7 +22,9 @@
     "retry": "Opnieuw proberen",
     "loading": "Laden...",
     "errorGeneric": "Er is iets misgegaan",
-    "back": "Terug"
+    "back": "Terug",
+    "expandSection": "{{label}} uitklappen",
+    "collapseSection": "{{label}} inklappen"
   },
   "connectivity": {
     "offlineBanner": "Je bent offline — vangsten en sessies blijven werken",
@@ -438,7 +440,8 @@
   },
   "quickCatch": {
     "title": "Snelle vangst toevoegen",
-    "moreDetails": "Meer details"
+    "moreDetails": "Meer details",
+    "otherSpecies": "Overig"
   },
   "lakes": {
     "title": "Meren",
@@ -500,7 +503,9 @@
     "profileSaved": "Profiel opgeslagen",
     "saveFailed": "Opslaan van profiel mislukt",
     "pictureUpdated": "Profielfoto bijgewerkt",
-    "pictureRemoved": "Profielfoto verwijderd"
+    "pictureRemoved": "Profielfoto verwijderd",
+    "removePhotoTitle": "Profielfoto verwijderen?",
+    "removePhotoMessage": "Je profielfoto wordt verwijderd. Dit kan niet ongedaan worden gemaakt."
   },
   "profileDocs": {
     "title": "Profieldocumenten",
@@ -835,6 +840,18 @@
       "offline": "Je bent offline. Inzicht-prompts werken nog zonder AI.",
       "unauthorized": "API-sleutel geweigerd. Controleer Instellingen.",
       "generic": "Kon de AI-provider niet bereiken."
+    }
+  },
+  "maps": {
+    "openInMaps": "{{label}} openen in Kaarten",
+    "directionsTo": "Route naar {{label}}",
+    "getDirectionsTo": "Route plannen naar {{label}}",
+    "label": {
+      "location": "locatie",
+      "currentSession": "huidige sessie",
+      "sessionLocation": "sessielocatie",
+      "catchLocation": "vanglocatie",
+      "session": "sessie"
     }
   }
 }

@@ -22,7 +22,9 @@
     "retry": "Try again",
     "loading": "Loading...",
     "errorGeneric": "Something went wrong",
-    "back": "Back"
+    "back": "Back",
+    "expandSection": "Expand {{label}}",
+    "collapseSection": "Collapse {{label}}"
   },
   "connectivity": {
     "offlineBanner": "You're offline — catches and sessions still work",
@@ -438,7 +440,8 @@
   },
   "quickCatch": {
     "title": "Quick Add Catch",
-    "moreDetails": "More details"
+    "moreDetails": "More details",
+    "otherSpecies": "Other"
   },
   "lakes": {
     "title": "Lakes",
@@ -500,7 +503,9 @@
     "profileSaved": "Profile saved",
     "saveFailed": "Failed to save profile",
     "pictureUpdated": "Profile picture updated",
-    "pictureRemoved": "Profile picture removed"
+    "pictureRemoved": "Profile picture removed",
+    "removePhotoTitle": "Remove profile picture?",
+    "removePhotoMessage": "Your profile picture will be deleted. This cannot be undone."
   },
   "profileDocs": {
     "title": "Profile Documents",
@@ -835,6 +840,18 @@
       "offline": "You are offline. Insight prompts still work without AI.",
       "unauthorized": "API key rejected. Check Settings.",
       "generic": "Could not reach the AI provider."
+    }
+  },
+  "maps": {
+    "openInMaps": "Open {{label}} in Maps",
+    "directionsTo": "Directions to {{label}}",
+    "getDirectionsTo": "Get directions to {{label}}",
+    "label": {
+      "location": "location",
+      "currentSession": "current session",
+      "sessionLocation": "session location",
+      "catchLocation": "catch location",
+      "session": "session"
     }
   }
 }

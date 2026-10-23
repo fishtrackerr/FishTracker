@@ -1,4 +1,4 @@
-import { Component, Input, output, inject, signal, OnInit } from '@angular/core';
+import { Component, Input, output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -6,10 +6,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FilterService, StatisticsFilter } from '../../../core/services/filter.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
+import { DialogService } from '../../../core/services/dialog.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { I18nService } from '../../../core/services/i18n.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { promptForText } from '../text-prompt-dialog/text-prompt-dialog.component';
 
 @Component({
   selector: 'app-filter-panel',
@@ -93,14 +95,29 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     .preset-row { display: flex; align-items: center; justify-content: space-between; }
   `,
 })
-export class FilterPanelComponent implements OnInit {
+export class FilterPanelComponent {
   private readonly filterService = inject(FilterService);
   private readonly confirm = inject(ConfirmService);
   private readonly notifications = inject(NotificationService);
   private readonly i18n = inject(I18nService);
   private readonly theme = inject(ThemeService);
+  private readonly dialog = inject(DialogService);
 
-  @Input() filter: StatisticsFilter = {};
+  /**
+   * Working copy edited by the form fields. The parent's object is never mutated;
+   * changes go out through `filterChange` as a fresh object.
+   */
+  private current: StatisticsFilter = {};
+
+  @Input()
+  set filter(value: StatisticsFilter | null | undefined) {
+    this.current = { ...(value ?? {}) };
+    this.sessionStatus = this.current.sessionStatus ?? '';
+    this.activeCount.set(this.filterService.countActive(this.current));
+  }
+  get filter(): StatisticsFilter {
+    return this.current;
+  }
   @Input() compact = false;
   readonly filterChange = output<StatisticsFilter>();
   readonly selectPanelClass = this.theme.getSelectPanelClass();
@@ -111,45 +128,45 @@ export class FilterPanelComponent implements OnInit {
   readonly presets = signal(this.filterService.getPresets());
   readonly activeCount = signal(0);
 
-  ngOnInit(): void {
-    this.sessionStatus = this.filter.sessionStatus ?? '';
-    this.activeCount.set(this.filterService.countActive(this.filter));
-  }
-
   onSessionStatusChange(value: string): void {
     this.sessionStatus = value;
+    const next: StatisticsFilter = { ...this.current };
     if (value) {
-      this.filter.sessionStatus = value as NonNullable<StatisticsFilter['sessionStatus']>;
+      next.sessionStatus = value as NonNullable<StatisticsFilter['sessionStatus']>;
     } else {
-      delete this.filter.sessionStatus;
+      delete next.sessionStatus;
     }
+    this.current = next;
     this.emitChange();
   }
 
   emitChange(): void {
-    this.filterService.setActive(this.filter);
-    this.activeCount.set(this.filterService.countActive(this.filter));
-    this.filterChange.emit({ ...this.filter });
+    this.filterService.setActive(this.current);
+    this.activeCount.set(this.filterService.countActive(this.current));
+    this.filterChange.emit({ ...this.current });
   }
 
   clear(): void {
-    this.filter = {};
+    this.current = {};
     this.sessionStatus = '';
     this.filterService.clearActive();
     this.activeCount.set(0);
     this.filterChange.emit({});
   }
 
-  savePreset(): void {
-    const name = prompt(this.i18n.t('filters.presetNamePrompt'));
-    if (!name?.trim()) return;
-    this.filterService.savePreset(name.trim(), this.filter);
+  async savePreset(): Promise<void> {
+    const name = await promptForText(this.dialog, {
+      title: this.i18n.t('filters.savePreset'),
+      label: this.i18n.t('filters.presetNamePrompt'),
+    });
+    if (!name) return;
+    this.filterService.savePreset(name, this.current);
     this.presets.set(this.filterService.getPresets());
     this.notifications.success(this.i18n.t('filters.presetSaved'));
   }
 
   applyPreset(filter: StatisticsFilter): void {
-    this.filter = { ...filter };
+    this.current = { ...filter };
     this.sessionStatus = filter.sessionStatus ?? '';
     this.emitChange();
   }

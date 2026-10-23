@@ -36,13 +36,15 @@ Use `DialogService.open()` for automatic `themed-dialog` panel class. Never hard
 - Dialog body text uses `--text-primary`; titles use `--primary`
 - Form fields inside dialogs use shared Material overrides (`--border-primary` outline, `--text-secondary` labels)
 - Cancel actions use stroked buttons; primary/confirm actions use filled buttons — both follow `--primary`
+- Single text input (add/rename option, preset name): `promptForText(dialogService, data)` opens `TextPromptDialogComponent` and resolves to the trimmed value or `undefined`. Do not use `window.prompt`
 - Bottom sheets (e.g. mobile filters) should include `themed-bottom-sheet` plus `theme-dark|theme-light` and a themed backdrop class, matching `DialogService`
 
 ## Shared components
 
 - Shared cards via CSS class `.app-card` plus components: `session-card`, `stat-card`, `weather-card`
 - Loading / error / empty: `LoadingStateComponent`, `ErrorStateComponent`, `EmptyStateComponent`
-- `expandable-section` — consistent expand/collapse with `aria-expanded`
+- `expandable-section` — consistent expand/collapse with `aria-expanded`; the screen-reader text is translated (`common.expandSection` / `common.collapseSection`), so pass a translated `label`
+- `maps-link-button` — tooltip and `aria-label` are translated (`maps.*`); pass a translated `label`
 - `page-title` — centered titles
 - `filter-panel` — desktop expandable / mobile bottom sheet
 

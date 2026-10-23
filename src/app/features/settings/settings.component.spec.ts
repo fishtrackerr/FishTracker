@@ -22,7 +22,9 @@ import { SecretVaultService } from '../../core/services/secret-vault.service';
 import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { UserOptionService } from '../../core/services/user-option.service';
 import { AssistantPromptService } from '../../core/services/assistant-prompt.service';
-import { MatDialog } from '@angular/material/dialog';
+import { DialogService } from '../../core/services/dialog.service';
+import { TextPromptDialogComponent } from '../../shared/components/text-prompt-dialog/text-prompt-dialog.component';
+import { AssistantPromptDialogComponent } from '../assistant/assistant-prompt-dialog.component';
 import { Router } from '@angular/router';
 
 const settingsState = signal({
@@ -131,7 +133,7 @@ describe('SettingsComponent', () => {
           },
         },
         {
-          provide: MatDialog,
+          provide: DialogService,
           useValue: {
             open: vi.fn(),
           },
@@ -326,6 +328,66 @@ describe('SettingsComponent', () => {
     );
 
     vi.unstubAllGlobals();
+  });
+
+  describe('option prompts', () => {
+    function dialogReturning(value: string | undefined) {
+      const open = TestBed.inject(DialogService).open as ReturnType<typeof vi.fn>;
+      open.mockReturnValue({ afterClosed: () => of(value) });
+      return open;
+    }
+
+    it('adds an option through the themed text prompt', async () => {
+      const open = dialogReturning('  Tench  ');
+      const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+
+      await component.addOption('species');
+
+      expect(open).toHaveBeenCalledWith(TextPromptDialogComponent, expect.anything());
+      expect(TestBed.inject(UserOptionService).saveOption).toHaveBeenCalledWith('species', 'Tench');
+    });
+
+    it('does not add an option when the prompt is cancelled', async () => {
+      dialogReturning(undefined);
+      const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+
+      await component.addOption('species');
+
+      expect(TestBed.inject(UserOptionService).saveOption).not.toHaveBeenCalled();
+    });
+
+    it('renames an option with the prompt prefilled', async () => {
+      const open = dialogReturning('Mirror carp');
+      const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+
+      await component.renameOption({ id: 'opt-1', value: 'Carp' } as never);
+
+      expect(open).toHaveBeenCalledWith(
+        TextPromptDialogComponent,
+        expect.objectContaining({ data: expect.objectContaining({ initialValue: 'Carp' }) }),
+      );
+      expect(TestBed.inject(UserOptionService).rename).toHaveBeenCalledWith('opt-1', 'Mirror carp');
+    });
+
+    it('skips rename when the value is unchanged', async () => {
+      dialogReturning('Carp');
+      const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+
+      await component.renameOption({ id: 'opt-1', value: 'Carp' } as never);
+
+      expect(TestBed.inject(UserOptionService).rename).not.toHaveBeenCalled();
+    });
+  });
+
+  it('opens the assistant prompt dialog through DialogService', async () => {
+    const open = TestBed.inject(DialogService).open as ReturnType<typeof vi.fn>;
+    open.mockReturnValue({ afterClosed: () => of(undefined) });
+    const component = TestBed.runInInjectionContext(() => new SettingsComponent());
+
+    await component.addPrompt();
+
+    expect(open).toHaveBeenCalledWith(AssistantPromptDialogComponent, expect.objectContaining({ data: {} }));
+    expect(TestBed.inject(AssistantPromptService).create).not.toHaveBeenCalled();
   });
 
   it('shares the app via WhatsApp', () => {

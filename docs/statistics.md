@@ -24,11 +24,12 @@ Statistics page: filtered catch/session aggregates with charts and tables.
 
 - Date range, species, session status, and related fields
 - Active filter is in-memory for the app run
+- The panel edits its own copy of the `filter` input and emits a new object via `filterChange`; it never mutates the parent's object. Session status and the active count resync whenever the input changes
 - Presets saved to localStorage under `fish-tracker-filter-presets:<fishingMode>`
 
 ## Saved filter presets
 
-Named presets via save/delete with confirmation on delete. Presets are **per fishing mode** so lake/species values from one mode do not appear in another.
+Named presets via save/delete with confirmation on delete. The preset name is asked in the themed text prompt dialog (`TextPromptDialogComponent`), not `window.prompt`. Presets are **per fishing mode** so lake/species values from one mode do not appear in another.
 
 Option rename rewrites matching values only in the active mode’s presets and `modePreferences`.
 

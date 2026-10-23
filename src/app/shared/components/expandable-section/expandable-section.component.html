@@ -12,7 +12,7 @@
         (click)="toggle($event)"
       >
         <span class="toggle-icon" aria-hidden="true">{{ expanded() ? '▲' : '▼' }}</span>
-        <span class="sr-only">{{ expanded() ? 'Collapse' : 'Expand' }} {{ label }}</span>
+        <span class="sr-only">{{ (expanded() ? 'common.collapseSection' : 'common.expandSection') | tr: { label } }}</span>
       </button>
     }
   </div>

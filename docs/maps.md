@@ -26,7 +26,7 @@ Coordinate lookup for lakes is handled by `LakeGeocodingService` (`src/app/core/
 - Session detail GPS and catch locations
 - Lake detail (lake + spots with coordinates)
 
-Tooltips and `aria-label` describe the action. Directions mode requests current location permission.
+Tooltips and `aria-label` describe the action and are translated (`maps.openInMaps`, `maps.directionsTo`, `maps.getDirectionsTo`); callers pass a translated `label` (fallback `maps.label.location`). Directions mode requests current location permission.
 
 ## Geolocation errors
 

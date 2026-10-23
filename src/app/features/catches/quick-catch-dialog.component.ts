@@ -14,6 +14,9 @@ import { FishingSession } from '../../core/models';
 import { ExpandableSectionComponent } from '../../shared/components/expandable-section/expandable-section.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
+/** Stored species value for the catch-all entry; shown translated via `quickCatch.otherSpecies`. */
+export const OTHER_SPECIES = 'Other';
+
 export interface QuickCatchDialogData {
   session: FishingSession;
 }
@@ -67,8 +70,10 @@ export class QuickCatchDialogComponent {
 
   readonly speciesList = [
     ...this.fishingMode.getActivePreferences().favoriteSpecies,
-    'Other',
+    OTHER_SPECIES,
   ];
+
+  readonly otherSpecies = OTHER_SPECIES;
 
   readonly selectPanelClass = this.theme.getSelectPanelClass();
 

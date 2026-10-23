@@ -33,7 +33,7 @@ Images are stamped with `fishingMode` on write; gallery and homepage queries are
 
 Sessions and lakes may have `coverImageId`. Default cover generated on session start when possible.
 
-A homepage image picked from a file is stored as `type: cover` (never shown in the gallery). `ImageService.replaceHomepageCover()` permanently removes the previous `cover` upload; a gallery photo used as homepage image is left alone. Replacing the profile picture soft-deletes the old one.
+A homepage image picked from a file is stored as `type: cover` (never shown in the gallery). `ImageService.replaceHomepageCover()` permanently removes the previous `cover` upload; a gallery photo used as homepage image is left alone. Replacing the profile picture soft-deletes the old one. Removing the profile picture on `/profile` asks for confirmation first (`ConfirmService`).
 
 ## Session images
 

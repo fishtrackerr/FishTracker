@@ -2,7 +2,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { QuickCatchDialogComponent } from './quick-catch-dialog.component';
+import { OTHER_SPECIES, QuickCatchDialogComponent } from './quick-catch-dialog.component';
 import { FishingModeService } from '../../core/services/fishing-mode.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { PhotoPickService } from '../../core/services/photo-pick.service';
@@ -100,6 +100,16 @@ describe('QuickCatchDialogComponent', () => {
     expect(component.selectPanelClass).toBe('theme-dark-select-panel');
     expect(component.rodId).toBe('rod-1');
     expect(component.bait).toBe('Boilie');
+  });
+
+  it('keeps the untranslated Other value as stored species', () => {
+    const component = TestBed.runInInjectionContext(() => new QuickCatchDialogComponent());
+    component.species = OTHER_SPECIES;
+
+    component.save();
+
+    expect(OTHER_SPECIES).toBe('Other');
+    expect(close).toHaveBeenCalledWith(expect.objectContaining({ species: 'Other' }));
   });
 
   it('does not save without a non-empty species', () => {
