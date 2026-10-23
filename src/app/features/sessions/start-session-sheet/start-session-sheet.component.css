@@ -1,0 +1,104 @@
+.sheet {
+  padding: var(--spacing-md);
+  max-height: 85vh;
+  overflow-y: auto;
+  color: var(--text-primary);
+  background: var(--background-card);
+}
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+.sheet-header h3 {
+  margin: 0;
+  text-align: center;
+  flex: 1;
+  color: var(--primary);
+}
+.full {
+  width: 100%;
+}
+.field-row {
+  margin-bottom: var(--spacing-md);
+}
+.field-label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-label);
+  text-transform: var(--label-transform);
+  letter-spacing: var(--label-spacing);
+  color: var(--text-secondary);
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+.step-btn {
+  min-width: 48px;
+  height: 48px;
+}
+.stepper-value {
+  min-width: 2ch;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--primary);
+  font-family: var(--font-label);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.chip mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+.chip.selected {
+  background: var(--cta);
+  border-color: var(--cta);
+  color: var(--text-on-cta);
+}
+.add-chip {
+  border-style: dashed;
+}
+.more-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 var(--spacing-md);
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font-family: var(--font-label);
+  text-transform: var(--label-transform);
+  letter-spacing: var(--label-spacing);
+  cursor: pointer;
+}
+.field-error {
+  color: var(--danger, #d64545);
+  font-size: 0.85rem;
+  margin: -8px 0 8px;
+}
+.sheet-actions .start-btn {
+  width: 100%;
+  height: 52px;
+  font-size: 1.1rem;
+}

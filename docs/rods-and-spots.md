@@ -33,8 +33,8 @@ Linked session spots (`lakeSpotId` set) follow later lake spot edits (name, coor
 - Each rod has at most one current `sessionSpotId`
 - Multiple rods may share a spot
 - Reducing rod count requires confirmation if removed rods have activity
-- After starting a new session, users are routed to session detail setup mode (`setupRods=1`) to complete rod details right away
-- Immediate setup supports per-rod **bait**, **rig**, **notes**, and **active/inactive** status
+- The start-session sheet creates the rods (count from the stepper) and assigns the chosen swim, as a saved session spot, to all of them; users then land on session detail
+- Rod cards support per-rod **bait**, **rig**, **notes**, and **active/inactive** status
 - **Recast** (active sessions only): change a rod's session spot and record `castAt` / a `rod-cast` timeline event. Available from the active session screen and each rod card. Spot changes also write `RodSpotHistory` and a `rod-moved` event when the spot differs.
 
 ## Bites and fish spotted

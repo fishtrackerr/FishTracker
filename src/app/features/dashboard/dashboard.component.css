@@ -54,12 +54,6 @@
   margin-bottom: var(--spacing-sm);
 }
 
-.continue-btn {
-  width: 100%;
-  min-height: var(--button-height) !important;
-  margin-bottom: var(--spacing-sm);
-}
-
 .assistant-btn {
   width: 100%;
   min-height: var(--button-height) !important;

@@ -347,15 +347,13 @@
     "backupFailedMessage": "Die Sicherung konnte nicht auf diesem Gerät gespeichert werden. Sitzung ohne Sicherung starten? Wiederherstellen ist weiterhin unter Einstellungen → Import möglich, wenn du eine frühere Datei hast.",
     "backupSkippedTitle": "Sicherung nicht gespeichert",
     "backupSkippedMessage": "Das Teilen-Menü wurde geschlossen, daher wurde keine Sicherung gespeichert. Sitzung ohne Sicherung starten?",
-    "startWithoutBackup": "Ohne Sicherung starten"
+    "startWithoutBackup": "Ohne Sicherung starten",
+    "continueSession": "Sitzung fortsetzen"
   },
   "sessionDetail": {
     "prebait": "Vorfüttern",
     "rodsAndSpots": "Ruten und Plätze",
     "moreInfoRodsSpots": "Mehr Infos - Ruten und Plätze",
-    "rodSetupTitle": "Rutendetails einrichten",
-    "rodSetupMessage": "Ergänze Köder, Rig, Notizen und Aktiv-Status pro Rute, bevor du zur aktiven Sitzungsansicht wechselst.",
-    "finishRodSetup": "Ruten-Setup abschließen",
     "rods": "Ruten",
     "active": "aktiv",
     "bites": "Bisse",
@@ -647,14 +645,6 @@
     "deletePreset": "Vorlage löschen",
     "apply": "Anwenden"
   },
-  "rodSetup": {
-    "title": "Ruten einrichten",
-    "introNew": "Wie viele Ruten verwendest du für diese Sitzung?",
-    "introExisting": "Diese Sitzung hat noch keine Ruten. Wie viele Ruten verwendest du?",
-    "defaultSpotOptional": "Standardplatz (optional)",
-    "skipForNow": "Vorerst überspringen",
-    "setUp": "Einrichten"
-  },
   "weather": {
     "cachedOffline": "Zwischengespeicherte / Offline-Daten",
     "feelsLike": "Gefühlt",
@@ -855,5 +845,18 @@
       "catchLocation": "Fangort",
       "session": "Sitzung"
     }
+  },
+  "startSheet": {
+    "title": "Angeln starten",
+    "lake": "Gewässer",
+    "rods": "Ruten",
+    "rodsDecrease": "Weniger Ruten",
+    "rodsIncrease": "Mehr Ruten",
+    "swim": "Angelplatz (optional)",
+    "newSwim": "Neuer Angelplatz",
+    "newSwimTitle": "Neuer Angelplatz",
+    "newSwimLabel": "Name des Angelplatzes",
+    "moreOptions": "Weitere Optionen",
+    "start": "Angeln starten"
   }
 }

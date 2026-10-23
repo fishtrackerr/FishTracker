@@ -1,16 +1,17 @@
 import { TestBed } from '@angular/core/testing';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BackupService } from './backup.service';
 import { ConfirmService } from './confirm.service';
 import { BackupSaveCancelledError } from './backup.service';
-import { DialogService } from './dialog.service';
 import { FishingModeService } from './fishing-mode.service';
 import { I18nService } from './i18n.service';
 import { LakeService } from './lake.service';
 import { NotificationService } from './notification.service';
-import { RodSetupFlowService } from './rod-setup-flow.service';
+import { RodService } from './rod.service';
+import { ThemeService } from './theme.service';
 import { SessionService } from './session.service';
 import { SessionStartFlowService } from './session-start-flow.service';
 import { SettingsService } from './settings.service';
@@ -28,6 +29,7 @@ describe('SessionStartFlowService', () => {
   const createResult = {
     name: 'Morning',
     startDate: '2026-08-01T08:00:00.000Z',
+    rodCount: 2,
   };
 
   let dialogResult: unknown;
@@ -36,7 +38,10 @@ describe('SessionStartFlowService', () => {
   let exportBackup: ReturnType<typeof vi.fn>;
   let saveToFile: ReturnType<typeof vi.fn>;
   let confirm: ReturnType<typeof vi.fn>;
-  let promptAfterSessionCreate: ReturnType<typeof vi.fn>;
+  let openSheet: ReturnType<typeof vi.fn>;
+  let addSpot: ReturnType<typeof vi.fn>;
+  let getLakeById: ReturnType<typeof vi.fn>;
+  let watchAll: ReturnType<typeof vi.fn>;
   let navigate: ReturnType<typeof vi.fn>;
   let info: ReturnType<typeof vi.fn>;
   let success: ReturnType<typeof vi.fn>;
@@ -49,7 +54,12 @@ describe('SessionStartFlowService', () => {
     exportBackup = vi.fn().mockResolvedValue({ version: 6, sessions: [] });
     saveToFile = vi.fn().mockResolvedValue(undefined);
     confirm = vi.fn();
-    promptAfterSessionCreate = vi.fn().mockResolvedValue(newSession);
+    openSheet = vi.fn().mockImplementation(() => ({
+      afterDismissed: () => of(dialogResult),
+    }));
+    addSpot = vi.fn();
+    getLakeById = vi.fn().mockResolvedValue(undefined);
+    watchAll = vi.fn().mockReturnValue(of([]));
     navigate = vi.fn().mockResolvedValue(true);
     info = vi.fn();
     success = vi.fn();
@@ -60,13 +70,15 @@ describe('SessionStartFlowService', () => {
         SessionStartFlowService,
         {
           provide: SessionService,
-          useValue: { getActive, start: startSession },
+          useValue: { getActive, start: startSession, watchAll },
         },
         {
           provide: LakeService,
           useValue: {
             getAll: vi.fn().mockResolvedValue([]),
             getSortedLakes: vi.fn((lakes: unknown[]) => lakes),
+            getById: getLakeById,
+            addSpot,
           },
         },
         {
@@ -92,16 +104,23 @@ describe('SessionStartFlowService', () => {
           useValue: { navigate },
         },
         {
-          provide: DialogService,
-          useValue: {
-            open: vi.fn().mockImplementation(() => ({
-              afterClosed: () => of(dialogResult),
-            })),
-          },
+          provide: MatBottomSheet,
+          useValue: { open: openSheet },
         },
         {
-          provide: RodSetupFlowService,
-          useValue: { promptAfterSessionCreate },
+          provide: ThemeService,
+          useValue: { resolvedTheme: () => 'dark' },
+        },
+        {
+          provide: RodService,
+          useValue: {
+            snapshotFromLakeSpot: vi.fn((spot: { id: string; name: string }) => ({
+              id: 'ss-' + spot.id,
+              lakeSpotId: spot.id,
+              name: spot.name,
+              visible: true,
+            })),
+          },
         },
         {
           provide: BackupService,
@@ -125,11 +144,12 @@ describe('SessionStartFlowService', () => {
       expect.anything(),
       expect.stringMatching(/^fish-tracker-pre-session-\d{4}-\d{2}-\d{2}\.json$/),
     );
-    expect(startSession).toHaveBeenCalledWith(createResult);
-    expect(promptAfterSessionCreate).toHaveBeenCalledWith(newSession);
-    expect(navigate).toHaveBeenCalledWith(['/sessions', 's-new'], {
-      queryParams: { setupRods: '1' },
+    expect(startSession).toHaveBeenCalledWith({
+      ...createResult,
+      sessionSpots: undefined,
+      rodSpotId: undefined,
     });
+    expect(navigate).toHaveBeenCalledWith(['/sessions', 's-new']);
     expect(success).toHaveBeenCalledWith('sessions.backupSaved');
     expect(success).toHaveBeenCalledWith('sessions.sessionStarted');
   });
@@ -147,20 +167,122 @@ describe('SessionStartFlowService', () => {
     expect(saveToFile).not.toHaveBeenCalled();
   });
 
-  it('skips backup when an active session already exists', async () => {
+  it('goes to the active session without a sheet, backup or snackbar when one exists', async () => {
     getActive.mockResolvedValue({ id: 's-active', status: 'active' });
-    startSession.mockResolvedValue({ id: 's-active', status: 'active' });
 
     const service = TestBed.inject(SessionStartFlowService);
     const ok = await service.start();
 
-    expect(ok).toBe(true);
+    expect(ok).toBe(false);
+    expect(openSheet).not.toHaveBeenCalled();
     expect(exportBackup).not.toHaveBeenCalled();
-    expect(saveToFile).not.toHaveBeenCalled();
-    expect(promptAfterSessionCreate).not.toHaveBeenCalled();
+    expect(startSession).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith(['/sessions/active'], {
       queryParams: { id: 's-active' },
     });
+    expect(success).not.toHaveBeenCalled();
+  });
+
+  it('continues the active session when one appears while the sheet is open', async () => {
+    getActive
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({ id: 's-active', status: 'active' });
+
+    const service = TestBed.inject(SessionStartFlowService);
+    const ok = await service.start();
+
+    expect(ok).toBe(false);
+    expect(startSession).not.toHaveBeenCalled();
+    expect(success).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith(['/sessions/active'], {
+      queryParams: { id: 's-active' },
+    });
+  });
+
+  it('defaults the rod count to the most recent session and clamps to the maximum', async () => {
+    vi.mocked(TestBed.inject(SettingsService).get).mockReturnValue({
+      backupBeforeSession: false,
+      maxRodCount: 3,
+    } as never);
+    watchAll.mockReturnValue(
+      of([
+        { id: 'a', startDate: '2026-07-01T00:00:00Z', rods: [{ id: 'r1' }] },
+        {
+          id: 'b',
+          startDate: '2026-07-20T00:00:00Z',
+          rods: [
+            { id: 'r1' },
+            { id: 'r2' },
+            { id: 'r3' },
+            { id: 'r4' },
+            { id: 'r5', visible: false },
+          ],
+        },
+      ]),
+    );
+
+    await TestBed.inject(SessionStartFlowService).start();
+
+    const config = openSheet.mock.calls[0][1] as {
+      data: { defaultRodCount: number; maxRodCount: number };
+    };
+    expect(config.data.defaultRodCount).toBe(3);
+    expect(config.data.maxRodCount).toBe(3);
+  });
+
+  it('defaults to one rod without earlier sessions and opens a themed sheet', async () => {
+    await TestBed.inject(SessionStartFlowService).start();
+
+    const config = openSheet.mock.calls[0][1] as {
+      data: { defaultRodCount: number };
+      panelClass: string[];
+    };
+    expect(config.data.defaultRodCount).toBe(1);
+    expect(config.panelClass).toEqual(['themed-bottom-sheet', 'theme-dark']);
+  });
+
+  it('creates a new swim on the lake and assigns it to all rods as a real session spot', async () => {
+    dialogResult = { ...createResult, lakeId: 'l1', swim: { newName: 'Point' } };
+    getLakeById.mockResolvedValue({ id: 'l1', spots: [] });
+    addSpot.mockResolvedValue({ id: 'ls1', name: 'Point' });
+
+    await TestBed.inject(SessionStartFlowService).start();
+
+    expect(addSpot).toHaveBeenCalledWith('l1', { name: 'Point' });
+    const spot = { id: 'ss-ls1', lakeSpotId: 'ls1', name: 'Point', visible: true };
+    expect(startSession).toHaveBeenCalledWith(
+      expect.objectContaining({ lakeId: 'l1', sessionSpots: [spot], rodSpotId: 'ss-ls1' }),
+    );
+  });
+
+  it('snapshots an existing lake spot into the session', async () => {
+    dialogResult = { ...createResult, lakeId: 'l1', swim: { lakeSpotId: 'ls9' } };
+    getLakeById.mockResolvedValue({ id: 'l1', spots: [{ id: 'ls9', name: 'Reeds' }] });
+
+    await TestBed.inject(SessionStartFlowService).start();
+
+    expect(addSpot).not.toHaveBeenCalled();
+    expect(startSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rodSpotId: 'ss-ls9',
+        sessionSpots: [expect.objectContaining({ name: 'Reeds' })],
+      }),
+    );
+  });
+
+  it('keeps a new swim on the session only when no lake is chosen', async () => {
+    dialogResult = { ...createResult, swim: { newName: 'Bank' } };
+
+    await TestBed.inject(SessionStartFlowService).start();
+
+    expect(addSpot).not.toHaveBeenCalled();
+    const call = startSession.mock.calls[0][0] as {
+      sessionSpots: { id: string; name: string }[];
+      rodSpotId: string;
+    };
+    expect(call.sessionSpots).toHaveLength(1);
+    expect(call.sessionSpots[0].name).toBe('Bank');
+    expect(call.rodSpotId).toBe(call.sessionSpots[0].id);
   });
 
   it('asks with "not saved" wording when the share sheet is dismissed', async () => {
@@ -197,7 +319,7 @@ describe('SessionStartFlowService', () => {
         confirmLabel: 'sessions.startWithoutBackup',
       }),
     );
-    expect(startSession).toHaveBeenCalledWith(createResult);
+    expect(startSession).toHaveBeenCalledWith(expect.objectContaining(createResult));
   });
 
   it('does not start session when backup fails and user cancels', async () => {
@@ -212,7 +334,7 @@ describe('SessionStartFlowService', () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
-  it('returns false when create dialog is cancelled', async () => {
+  it('returns false when the sheet is dismissed', async () => {
     dialogResult = undefined;
 
     const service = TestBed.inject(SessionStartFlowService);
