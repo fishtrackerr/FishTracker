@@ -10,7 +10,8 @@ About **40+** `*.spec.ts` files across:
 
 - Core services: session, catch, weather, theme, filter, search, statistics, pin-lock, settings, maps, geolocation, rods, bites, user-options, local insights, startup, fishing mode, lake geocoding, image, session-weather-monitor
 - Guards / utils: pin-lock guard, return-url, fetch-with-timeout
-- Features: active-session, sessions list/detail/create dialog, catches (form + quick catch), assistant, settings, lake detail, pin-unlock, mode-select, release notes, shell, expandable-section, confirm-dialog
+- Guards: `active-session.guard.spec.ts` (`/sessions/active` redirect: `?id=`, active session, home)
+- Features: session screen (`session-detail.component.spec.ts`: live/finished mode, timer, swim, weather alerts + pressure trend + refresh, Bite +1 with Undo, catch sheet / rod sheet open, add rods, recast, photos load/upload/camera/prune, notes, end with confirm, delete), rod tile, sessions list, start-session sheet, catches (form + catch sheet), assistant, settings, lake detail, pin-unlock, mode-select, release notes, shell (Current tab links to the session), expandable-section, confirm-dialog
 - App bootstrap smoke (`app.spec.ts`)
 
 ## Priority gaps
@@ -51,7 +52,7 @@ Verify `document.documentElement` and overlay container attributes after theme c
 
 ## Mobile / PWA
 
-Manual testing at 375px width. PWA reload with active session should land on `/sessions/active`.
+Manual testing at 375px width. PWA reload with active session should land on the session screen `/sessions/<id>` (via the `/sessions/active` redirect).
 
 After install or update on Android (PWA or Capacitor), confirm bottom-nav and mode-picker icons are real glyphs — not clipped ligature scraps (`ho`, `ev`, `wa`, `me`). Those scraps mean the Material Icons font failed to load.
 

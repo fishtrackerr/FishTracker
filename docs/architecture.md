@@ -23,7 +23,7 @@ flowchart TD
 
 ### Presentation (`src/app/features/`, `src/app/layout/`, `src/app/shared/`)
 
-- **Features**: dashboard, sessions, active-session, catches, lakes, gallery, statistics, settings, profile, PIN screens, mode-select.
+- **Features**: dashboard, sessions (incl. the one session screen `/sessions/:id`), catches, lakes, gallery, statistics, settings, profile, PIN screens, mode-select.
 - **Layout**: shell with bottom navigation, mode banner, and dismissible offline banner.
 - **Shared**: session-card, filter-panel, expandable-section, weather-card, dialogs.
 

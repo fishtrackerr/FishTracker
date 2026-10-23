@@ -11,8 +11,8 @@ Defined in `src/app/app.routes.ts`.
 | `/mode-select` | ModeSelectComponent | `pinLockGuard`, `modeNotSelectedGuard` (redirects to the unlocked destination once a mode is set) |
 | `/` | DashboardComponent | `pinLockGuard`, `fishingModeGuard` |
 | `/sessions` | SessionsListComponent | `pinLockGuard`, `fishingModeGuard` |
-| `/sessions/active` | ActiveSessionComponent | `pinLockGuard`, `fishingModeGuard`, `activeSessionGuard` |
-| `/sessions/:id` | SessionDetailComponent | `pinLockGuard`, `fishingModeGuard` |
+| `/sessions/active` | — (redirect only) | `pinLockGuard`, `fishingModeGuard`, `activeSessionRedirectGuard` |
+| `/sessions/:id` | SessionDetailComponent (the one session screen: live or finished) | `pinLockGuard`, `fishingModeGuard` |
 | `/sessions/:id/catches/new` | CatchFormComponent | `pinLockGuard`, `fishingModeGuard` |
 | `/lakes`, `/lakes/:id` | Lakes list/detail | `pinLockGuard`, `fishingModeGuard` |
 | `/gallery` | GalleryComponent | `pinLockGuard`, `fishingModeGuard` |
@@ -39,9 +39,15 @@ Requires a fishing mode stored (`FishingModeService`). When missing, stores the 
 
 Prevent accessing PIN screens when inappropriate (already configured / already unlocked).
 
-### `activeSessionGuard`
+### `activeSessionRedirectGuard`
 
-Safety net: redirects to `/` if no active session exists **in the current fishing mode**.
+`/sessions/active` has no screen of its own; it is a stable entry point that always redirects (`core/guards/active-session.guard.ts`):
+
+- `?id=<id>` naming an **active** session in the current fishing mode → `/sessions/<id>`
+- otherwise the active session of the current mode → `/sessions/<id>`
+- no active session → `/`
+
+So every caller that still navigates to `/sessions/active` (startup `resolveUnlockedDestination`, dashboard / sessions list **Continue session**, session card **Continue**, `SessionStartFlowService`, Settings mode switch) lands on the session screen.
 
 ## Startup redirects
 
@@ -49,13 +55,13 @@ Primary logic in `AppStartupService.resolveInitialRoute()`. Guards complement bu
 
 Flow after unlock: no mode → `/mode-select` (deep link kept in return URL) → pick mode → restore return URL or active session (current mode) or home. Mode choice is kept in `localStorage` and remembered across restarts; it can be changed in Settings.
 
-When an active session exists for the current mode, startup may route `/` to `/sessions/active`. The shell bottom nav shows primary destinations (Home, Current when active, Assistant when fishing, Sessions, Lakes) plus a **More** menu for Gallery, Stats, Settings (and Assistant when idle).
+When an active session exists for the current mode, startup may route `/` to `/sessions/active`, which redirects to `/sessions/<id>`. The shell **Current** tab links straight to `/sessions/<active id>`. The shell bottom nav shows primary destinations (Home, Current when active, Assistant when fishing, Sessions, Lakes) plus a **More** menu for Gallery, Stats, Settings (and Assistant when idle).
 
 ## Deep links
 
 Paths like `/sessions/:id`, `/settings`, `/lakes/:id` are preserved when unlocked unless the app is locked. After mode select, the stored return URL is restored when valid. Entities belonging to another fishing mode are not returned by repositories (`getById` / `watchById`).
 
-`/sessions` displays current/history sections when active data exists; `/sessions/active` remains the focused live-session screen.
+`/sessions` displays current/history sections when active data exists; `/sessions/:id` is the session screen for both live and finished sessions.
 
 ## PIN unlock redirect
 

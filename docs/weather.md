@@ -28,7 +28,7 @@ Captured at session start when GPS available. **Refresh weather & GPS** re-queri
 
 `SessionWeatherMonitorService` starts at app init. While a session is `active` **in the current fishing mode** and `autoLoadWeather` is on, it refreshes weather every `weatherRefreshMinutes` (minimum 5). It re-subscribes to the active session whenever the fishing mode changes, so polling starts right after mode select. Polls are **skipped while offline**; when connectivity returns, one immediate refresh runs. Warnings respect `showWeatherWarnings`.
 
-- Sticky alert banner on the active session screen lists current warnings
+- Sticky alert banner on the session screen (live mode) lists current warnings; the top strip shows temperature, wind and pressure with a trend arrow from the last two history snapshots
 - Snackbars (`NotificationService.weatherWarning`) fire only when a warning is **new** or **severity escalates** (e.g. wind warning → danger), not on every poll
 - New **danger** alerts are also recorded as `sessionEvents` with type `weather` (e.g. “Weather alert: Storm conditions detected”)
 

@@ -33,23 +33,33 @@ Linked session spots (`lakeSpotId` set) follow later lake spot edits (name, coor
 - Each rod has at most one current `sessionSpotId`
 - Multiple rods may share a spot
 - Reducing rod count requires confirmation if removed rods have activity
-- The start-session sheet creates the rods (count from the stepper) and assigns the chosen swim, as a saved session spot, to all of them; users then land on session detail
-- Rod cards support per-rod **bait**, **rig**, **notes**, and **active/inactive** status
-- **Recast** (active sessions only): change a rod's session spot and record `castAt` / a `rod-cast` timeline event. Available from the active session screen and each rod card. Spot changes also write `RodSpotHistory` and a `rod-moved` event when the spot differs.
+- The start-session sheet creates the rods (count from the stepper) and assigns the chosen swim, as a saved session spot, to all of them; users then land on the session screen
+- The rod sheet edits per-rod **bait**, **rig**, **notes**, **name**, **spot** and in/out of the water (`isActive`)
+- **Recast**: change a rod's session spot and record `castAt` / a `rod-cast` timeline event. Available from the session screen action bar (recast dialog with rod picker) and **Recast now** in the rod sheet. Spot changes also write `RodSpotHistory` and a `rod-moved` event when the spot differs.
 
 ## Bites and fish spotted
 
-- `+` / `-` controls per rod; count derived from `BiteEvent` records
+- **Bite +1** on a rod tile (`BiteEventService.addBite`); the snackbar "Bite on rod N" offers **Undo** (`removeBite`). **Bite −1** in the rod sheet. Count derived from `BiteEvent` records
 - Count never goes below zero
-- Fish spotted registered via rod card; optional GPS
+- Fish spotted registered via the rod sheet; optional GPS
 
 ## Catches
 
-Catches link via `rodId` and `sessionSpotId`. Opening Add Catch from a rod preselects rod, spot, bait, and rig.
+Catches link via `rodId` and `sessionSpotId`. **Catch** on a rod tile opens the catch sheet for that rod (rod, spot, bait and rig preselected); its **All details…** opens the full form with `rodId` / `sessionSpotId`.
 
-## Session detail
+## Rod tiles
 
-**More info** expandable shows rod cards, summary stats, timeline, and rod change summary.
+`RodTileComponent` (`features/sessions/rod-tile`) shows one rod on the session screen. Inputs `rod`, `spotName`, `variant` (`live` | `compact`); outputs `bite`, `catchTap`, `open`. The session screen does the writes.
+
+- Marker: rod number on `--rod-N` (`rodMarkerColor`, 1…6 repeating) with `--rod-glow` (bite-alarm LED look in Night bivvy)
+- Name (+ spot), line "bait · cast HH:mm · N bites" (parts without data are left out)
+- `live` (active rods of a live session): two 64px buttons, **Bite +1** (outline) and **Catch** (filled `--cta`)
+- `compact` (rods taken out, all rods of a finished session): smaller row, greyed when inactive, a small **+1** bite button
+- The name area and the ⋮ button open the rod sheet (edit, recast now, fish spotted, bite −1, take out / put back)
+
+## Session screen
+
+Live: rod tiles under the top strip; with no rods an inline "No rods yet" prompt with a stepper adds rods (`RodService.ensureRods`). Finished: compact tiles in the Rods section, rod totals and the rod summary. Timeline below. See [sessions.md](./sessions.md#session-screen-sessionsid).
 
 ## Legacy migration (Dexie v4)
 
@@ -60,7 +70,7 @@ session.sessionSpots ??= [];
 session.rods ??= [];
 ```
 
-Catches with legacy `spotId` get `sessionSpotId` snapshots where possible. Active sessions without rods show a non-blocking setup prompt. Completed sessions are not auto-assigned rods.
+Catches with legacy `spotId` get `sessionSpotId` snapshots where possible. Active sessions without rods show the inline "No rods yet" prompt on the session screen. Completed sessions are not auto-assigned rods.
 
 ## Rod sheet
 

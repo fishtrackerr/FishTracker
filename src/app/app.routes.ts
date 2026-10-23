@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { pinLockGuard } from './core/guards/pin-lock.guard';
 import { fishingModeGuard, modeNotSelectedGuard } from './core/guards/fishing-mode.guard';
-import { activeSessionGuard } from './core/guards/active-session.guard';
+import { activeSessionRedirectGuard } from './core/guards/active-session.guard';
 import { pinSetupGuard } from './core/guards/pin-setup.guard';
 import { pinUnlockGuard } from './core/guards/pin-unlock.guard';
 
@@ -41,12 +41,10 @@ export const routes: Routes = [
           import('./features/sessions/sessions-list.component').then((m) => m.SessionsListComponent),
       },
       {
+        // Old live-session URL: always redirects to /sessions/<active id> (or /).
         path: 'sessions/active',
-        loadComponent: () =>
-          import('./features/active-session/active-session.component').then(
-            (m) => m.ActiveSessionComponent,
-          ),
-        canActivate: [activeSessionGuard],
+        canActivate: [activeSessionRedirectGuard],
+        children: [],
       },
       {
         path: 'sessions/:id/edit',

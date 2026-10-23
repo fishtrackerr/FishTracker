@@ -1,132 +1,312 @@
 @if (session(); as s) {
-  <h1>{{ s.name }}</h1>
-  <p class="meta">{{ lakeName() }} · {{ s.startDate | date:'medium' }} · {{ durationText() }}</p>
-  <p class="status" [class]="s.status">{{ ('sessionStatus.' + s.status) | tr }}</p>
+  <div class="session-screen" [class.live]="isLive()">
+    @if (weatherAlerts().length > 0) {
+      <div
+        class="weather-alert-banner"
+        [class.has-danger]="weatherAlerts().some((w) => w.severity === 'danger')"
+        role="alert"
+      >
+        @for (alert of weatherAlerts(); track alert.type + alert.message) {
+          <p class="weather-alert-item" [class.danger]="alert.severity === 'danger'">
+            ⚠ {{ alert.message }}
+          </p>
+        }
+      </div>
+    }
 
-  @if (s.weather) {
-    <app-weather-card [weather]="s.weather" />
-  }
-  <app-weather-history [sessionId]="s.id" />
+    <h1>{{ s.name }}</h1>
 
-  <div class="fields">
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>{{ 'sessionDetail.prebait' | tr }}</mat-label>
-      <input matInput [(ngModel)]="prebait" (blur)="saveNotes()" />
-    </mat-form-field>
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>{{ 'common.notes' | tr }}</mat-label>
-      <textarea matInput rows="3" [(ngModel)]="notes" (blur)="saveNotes()"></textarea>
-    </mat-form-field>
-  </div>
+    @if (isLive()) {
+      <section class="top-strip" [attr.aria-label]="'sessionScreen.liveStatus' | tr">
+        @if (s.lakeId || sharedSwim()) {
+          <p class="strip-lake">
+            @if (s.lakeId) {
+              {{ lakeName() }}
+            }
+            @if (sharedSwim()) {
+              <span class="strip-swim">{{ s.lakeId ? '· ' : '' }}{{ sharedSwim() }}</span>
+            }
+          </p>
+        }
+        <div class="timer" role="timer">{{ timer() }}</div>
+        <div class="strip-facts">
+          <span class="fact catches-fact">
+            <mat-icon aria-hidden="true">set_meal</mat-icon>
+            {{ catches().length }} {{ 'activeSession.catches' | tr }}
+          </span>
+          @if (s.weather; as w) {
+            <span class="fact">
+              <mat-icon aria-hidden="true">thermostat</mat-icon>{{ w.temperatureC | formatTemp }}
+            </span>
+            <span class="fact">
+              <mat-icon aria-hidden="true">air</mat-icon>{{ w.windSpeedKmh }} km/h
+            </span>
+            <span class="fact">
+              <mat-icon aria-hidden="true">speed</mat-icon>{{ w.airPressureHpa }} hPa
+              @if (pressureTrend(); as trend) {
+                <span class="trend" [attr.aria-label]="('sessionScreen.pressure.' + trend) | tr">
+                  {{ trend === 'rising' ? '↑' : trend === 'falling' ? '↓' : '→' }}
+                </span>
+              }
+            </span>
+          }
+        </div>
+        @if (s.totalCatchWeightKg > 0 || s.biggestFishKg) {
+          <p class="strip-weights">
+            @if (s.totalCatchWeightKg > 0) {
+              <span>{{ s.totalCatchWeightKg | formatWeight }}</span>
+            }
+            @if (s.biggestFishKg) {
+              <span>· {{ 'activeSession.best' | tr }}: {{ s.biggestFishKg | formatWeight }}</span>
+            }
+          </p>
+        }
+      </section>
 
-  @if (s.latitude != null && s.longitude != null) {
-    <p class="gps">
-      <mat-icon class="inline-icon" aria-hidden="true">place</mat-icon> {{ s.latitude.toFixed(5) }}, {{ s.longitude.toFixed(5) }}
-      <app-maps-link-button
-        [latitude]="s.latitude"
-        [longitude]="s.longitude"
-        [label]="'maps.label.sessionLocation' | tr"
-        [showDirections]="true"
-      />
-    </p>
-  }
+      <section class="rod-tiles" [attr.aria-label]="'sessionScreen.rods' | tr">
+        @if (rods().length === 0) {
+          <div class="no-rods app-card">
+            <h2>{{ 'sessionScreen.noRodsTitle' | tr }}</h2>
+            <p>{{ 'sessionScreen.noRodsHint' | tr }}</p>
+            <div class="stepper" role="group" [attr.aria-label]="'sessionScreen.rodCount' | tr">
+              <button
+                mat-stroked-button
+                type="button"
+                class="step-btn"
+                [attr.aria-label]="'sessionScreen.fewerRods' | tr"
+                [disabled]="newRodCount() <= 1"
+                (click)="changeNewRodCount(-1)"
+              >
+                <mat-icon>remove</mat-icon>
+              </button>
+              <span class="step-value" aria-live="polite">{{ newRodCount() }}</span>
+              <button
+                mat-stroked-button
+                type="button"
+                class="step-btn"
+                [attr.aria-label]="'sessionScreen.moreRods' | tr"
+                [disabled]="newRodCount() >= maxRodCount"
+                (click)="changeNewRodCount(1)"
+              >
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+            <button mat-flat-button type="button" class="add-rods-btn" (click)="addRods()">
+              {{ 'sessionScreen.addRods' | tr }}
+            </button>
+          </div>
+        } @else {
+          @for (rod of activeRods(); track rod.id) {
+            <app-rod-tile
+              [rod]="rod"
+              [spotName]="spotName(rod.sessionSpotId)"
+              (bite)="addBite(rod)"
+              (catchTap)="openCatch(rod)"
+              (open)="openRod(rod)"
+            />
+          }
+          @for (rod of inactiveRods(); track rod.id) {
+            <app-rod-tile
+              variant="compact"
+              [rod]="rod"
+              [spotName]="spotName(rod.sessionSpotId)"
+              (bite)="addBite(rod)"
+              (open)="openRod(rod)"
+            />
+          }
+        }
+      </section>
+    } @else {
+      <p class="meta">
+        {{ lakeName() }} · {{ s.startDate | date: 'medium' }}
+        @if (s.endDate) {
+          – {{ s.endDate | date: 'medium' }}
+        }
+        · {{ timer() }}
+      </p>
+      <p class="status" [class]="s.status">{{ ('sessionStatus.' + s.status) | tr }}</p>
+      <p class="stats-row">
+        <span>{{ catches().length }} {{ 'activeSession.catches' | tr }}</span>
+        @if (s.totalCatchWeightKg > 0) {
+          <span>· {{ s.totalCatchWeightKg | formatWeight }}</span>
+        }
+        @if (s.biggestFishKg) {
+          <span>· {{ 'activeSession.best' | tr }}: {{ s.biggestFishKg | formatWeight }}</span>
+        }
+      </p>
+    }
 
-  @if (s.rods && s.rods.length > 0) {
-    <app-expandable-section sectionId="session-rods" [label]="'sessionDetail.moreInfoRodsSpots' | tr" [defaultExpanded]="true">
-      <div expandHeader class="expand-label">{{ 'sessionDetail.moreInfoRodsSpots' | tr }}</div>
-      @if (rodSummary; as summary) {
+    <section class="section">
+      <div class="section-header">
+        <h2>{{ 'sessionDetail.catches' | tr }} ({{ catches().length }})</h2>
+        <a mat-button [routerLink]="['/sessions', s.id, 'catches', 'new']">{{ 'sessionDetail.addCatch' | tr }}</a>
+      </div>
+      @for (c of catches(); track c.id) {
+        <div
+          class="catch-row catch-row-link"
+          role="link"
+          tabindex="0"
+          (click)="editCatch(c.id)"
+          (keydown.enter)="editCatch(c.id)"
+        >
+          @if (c.photoId) {
+            <div class="catch-photo"><app-image-thumb [imageId]="c.photoId" /></div>
+          }
+          <div class="catch-info">
+            <div class="catch-header">
+              <div class="catch-title">
+                <strong>{{ c.species }}</strong>
+                @if (c.detailsPending) {
+                  <span class="pending-badge">{{ 'activeSession.detailsPending' | tr }}</span>
+                }
+                @if (c.isPersonalRecord) { <span class="pr">{{ 'sessionDetail.pr' | tr }}</span> }
+              </div>
+              @if (c.latitude != null && c.longitude != null) {
+                <app-maps-link-button
+                  [latitude]="c.latitude"
+                  [longitude]="c.longitude"
+                  [label]="'maps.label.catchLocation' | tr"
+                  (click)="$event.stopPropagation()"
+                />
+              }
+            </div>
+            <div class="catch-meta">
+              {{ c.weightKg | formatWeight }} · {{ c.lengthCm | formatLength }}
+              · {{ c.caughtAt | date: 'short' }}
+              @if (c.sessionSpotId) { · {{ spotName(c.sessionSpotId) }} }
+            </div>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="section images-section">
+      <h2 class="section-title">{{ 'sessionDetail.images' | tr }}</h2>
+      <div class="cover-preview">
+        <app-image-thumb
+          [imageId]="coverImageId() ?? s.photoIds[0]"
+          [alt]="s.name + ' ' + ('sessionDetail.images' | tr)"
+          placeholder="🎣"
+        />
+      </div>
+      <app-image-picker type="session" [parentId]="s.id" (uploaded)="onImageUploaded($event)" />
+      @if (sessionImages().length > 0) {
+        <app-image-gallery
+          [galleryItems]="sessionImages()"
+          [allowDelete]="true"
+          (changed)="onImagesChanged()"
+        />
+      }
+    </section>
+
+    <section class="section fields">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'sessionDetail.prebait' | tr }}</mat-label>
+        <input matInput [ngModel]="prebait()" (ngModelChange)="prebait.set($event)" (blur)="saveNotes()" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'common.notes' | tr }}</mat-label>
+        <textarea
+          #notesField
+          matInput
+          rows="3"
+          [ngModel]="notes()"
+          (ngModelChange)="notes.set($event)"
+          (blur)="saveNotes()"
+        ></textarea>
+      </mat-form-field>
+    </section>
+
+    <section class="section weather-section">
+      @if (isLive() || s.weather) {
+        <app-weather-card [weather]="s.weather" />
+      }
+      @if (isLive()) {
+        <button mat-button type="button" class="refresh" (click)="refreshWeather()">
+          {{ 'activeSession.refreshWeatherGps' | tr }}
+        </button>
+      }
+      <app-weather-history [sessionId]="s.id" />
+
+      @if (s.latitude != null && s.longitude != null) {
+        <p class="gps">
+          <mat-icon class="inline-icon" aria-hidden="true">place</mat-icon>
+          {{ s.latitude.toFixed(5) }}, {{ s.longitude.toFixed(5) }}
+          <app-maps-link-button
+            [latitude]="s.latitude"
+            [longitude]="s.longitude"
+            [label]="(isLive() ? 'maps.label.currentSession' : 'maps.label.sessionLocation') | tr"
+            [showDirections]="true"
+          />
+        </p>
+      }
+    </section>
+
+    @if (rodSummary(); as summary) {
+      <section class="section rods-section">
+        <h2 class="section-title">{{ 'sessionScreen.rods' | tr }}</h2>
         <div class="rod-stats">
           <span>{{ summary.total }} {{ 'sessionDetail.rods' | tr }}</span>
           <span>{{ summary.active }} {{ 'sessionDetail.active' | tr }}</span>
           <span>{{ summary.bites }} {{ 'sessionDetail.bites' | tr }}</span>
           <span>{{ summary.spotted }} {{ 'sessionDetail.spotted' | tr }}</span>
         </div>
-      }
-      @for (rod of s.rods; track rod.id) {
-        <app-rod-card
-          [session]="s"
-          [rod]="rod"
-          [catches]="catches()"
-          [sessionSpots]="s.sessionSpots ?? []"
-        />
-      }
-    </app-expandable-section>
-    <app-rod-summary [session]="s" [catches]="catches()" />
-  }
-
-  <app-session-timeline [sessionId]="s.id" />
-
-  <section class="section images-section">
-    <h2 class="section-title">{{ 'sessionDetail.images' | tr }}</h2>
-    <div class="cover-preview">
-      <app-image-thumb
-        [imageId]="coverImageId() ?? s.photoIds[0]"
-        [alt]="s.name + ' ' + ('sessionDetail.images' | tr)"
-        placeholder="🎣"
-      />
-    </div>
-    <app-image-picker type="session" [parentId]="s.id" (uploaded)="onImageUploaded($event)" />
-    @if (sessionImages().length > 0) {
-      <app-image-gallery
-        [galleryItems]="sessionImages()"
-        [allowDelete]="true"
-        (changed)="onImagesChanged()"
-      />
-    }
-  </section>
-
-  <section class="section">
-    <div class="section-header">
-      <h2>{{ 'sessionDetail.catches' | tr }} ({{ catches().length }})</h2>
-      <a mat-button [routerLink]="['/sessions', s.id, 'catches', 'new']">{{ 'sessionDetail.addCatch' | tr }}</a>
-    </div>
-    @for (c of catches(); track c.id) {
-      <div
-        class="catch-row catch-row-link"
-        role="link"
-        tabindex="0"
-        (click)="editCatch(c.id)"
-        (keydown.enter)="editCatch(c.id)"
-      >
-        @if (c.photoId) {
-          <div class="catch-photo"><app-image-thumb [imageId]="c.photoId" /></div>
-        }
-        <div class="catch-info">
-          <div class="catch-header">
-            <div class="catch-title">
-              <strong>{{ c.species }}</strong>
-              @if (c.detailsPending) {
-                <span class="pending-badge">{{ 'activeSession.detailsPending' | tr }}</span>
-              }
-              @if (c.isPersonalRecord) { <span class="pr">{{ 'sessionDetail.pr' | tr }}</span> }
-            </div>
-            @if (c.latitude != null && c.longitude != null) {
-              <app-maps-link-button
-                [latitude]="c.latitude"
-                [longitude]="c.longitude"
-                [label]="'maps.label.catchLocation' | tr"
-                (click)="$event.stopPropagation()"
+        @if (!isLive()) {
+          <div class="compact-rods">
+            @for (rod of rods(); track rod.id) {
+              <app-rod-tile
+                variant="compact"
+                [rod]="rod"
+                [spotName]="spotName(rod.sessionSpotId)"
+                (bite)="addBite(rod)"
+                (open)="openRod(rod)"
               />
             }
           </div>
-          <div class="catch-meta">
-            {{ c.weightKg | formatWeight }} · {{ c.lengthCm | formatLength }}
-            · {{ c.caughtAt | date:'short' }}
-            @if (c.sessionSpotId) { · {{ spotName(c.sessionSpotId) }} }
-          </div>
-        </div>
-      </div>
+        }
+        <app-rod-summary [session]="s" [catches]="catches()" />
+      </section>
     }
-  </section>
 
-  <div class="actions">
-    <button mat-stroked-button (click)="editSession()">{{ 'sessionDetail.editSession' | tr }}</button>
-    @if (s.status === 'active') {
-      <button mat-flat-button class="cta" (click)="complete()">{{ 'sessionDetail.completeSession' | tr }}</button>
+    <app-session-timeline [sessionId]="s.id" />
+
+    <div class="actions">
+      <button mat-stroked-button type="button" (click)="editSession()">{{ 'sessionDetail.editSession' | tr }}</button>
+      <button mat-stroked-button type="button" color="warn" (click)="deleteSession()">{{ 'common.delete' | tr }}</button>
+    </div>
+
+    @if (isLive()) {
+      <nav class="action-bar" [attr.aria-label]="'sessionScreen.actions' | tr">
+        <button type="button" class="bar-btn" [matMenuTriggerFor]="photoMenu">
+          <mat-icon>photo_camera</mat-icon>
+          <span>{{ 'sessionScreen.photo' | tr }}</span>
+        </button>
+        <mat-menu #photoMenu="matMenu">
+          <button mat-menu-item type="button" (click)="addSessionPhoto(true)">
+            <mat-icon>photo_camera</mat-icon> {{ 'images.camera' | tr }}
+          </button>
+          <button mat-menu-item type="button" (click)="addSessionPhoto(false)">
+            <mat-icon>photo_library</mat-icon> {{ 'images.gallery' | tr }}
+          </button>
+        </mat-menu>
+        <button type="button" class="bar-btn" (click)="focusNotes()">
+          <mat-icon>edit_note</mat-icon>
+          <span>{{ 'sessionScreen.note' | tr }}</span>
+        </button>
+        @if (rods().length > 0) {
+          <button type="button" class="bar-btn" (click)="recastRod()">
+            <mat-icon>south</mat-icon>
+            <span>{{ 'activeSession.recast' | tr }}</span>
+          </button>
+        }
+        <button type="button" class="bar-btn end-btn" (click)="endSession()">
+          <mat-icon>stop_circle</mat-icon>
+          <span>{{ 'sessionScreen.end' | tr }}</span>
+        </button>
+      </nav>
     }
-    <button mat-stroked-button color="warn" (click)="deleteSession()">{{ 'common.delete' | tr }}</button>
   </div>
-} @else {
+} @else if (session() === undefined) {
   <h1>{{ 'sessionDetail.notFoundTitle' | tr }}</h1>
   <p class="error-msg">{{ 'sessionDetail.notFoundMessage' | tr }}</p>
   <a mat-stroked-button routerLink="/sessions">{{ 'sessionDetail.backToSessions' | tr }}</a>

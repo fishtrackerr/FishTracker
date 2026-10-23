@@ -10,7 +10,7 @@
    - No PIN → `/pin/setup`
    - No fishing mode stored (first run or after full reset) → `/mode-select`
    - Valid deep link → preserve route (entities from other modes are not loaded)
-   - Active session (current mode) + default entry → `/sessions/active`
+   - Active session (current mode) + default entry → `/sessions/active` (redirects to `/sessions/<id>`)
    - Otherwise → `/`
 
 ## Fishing mode
@@ -40,12 +40,12 @@
 
 1. Start session from dashboard or sessions list: one bottom sheet (lake, rods stepper, optional swim, more options) → optional pre-session backup. Only one **active** session per fishing mode; while one is active both screens show **Continue session** (`/sessions/active`) instead of Start.
 2. `SessionService.start()` creates the active session with its rods, session spot and optional GPS/weather/cover (stamped with current `fishingMode`).
-3. The user lands on `/sessions/:id` (session detail); `/sessions/active` shows the live view with timer, weather, catch list, Quick Catch.
-4. End session via **End Session** → `SessionService.complete()`.
+3. The user lands on `/sessions/:id`, the one session screen. While the session is active it is in **live mode**: top strip (lake/swim, timer, weather, catch count), one tile per rod with **Bite +1** and **Catch**, and a sticky action bar (Photo, Note, Recast, End). `/sessions/active` only redirects there.
+4. End session via **End** in the action bar (confirm) → `SessionService.complete()`; the screen switches to **finished mode**.
 
 ## Add catch flow
 
-1. **Quick Catch** (active session): dialog species list from mode favorites → `CatchService.createQuick()` → IndexedDB → `updateSessionStats()` → liveQuery refreshes UI.
+1. **Catch** on a rod tile (live session): catch sheet (species chips from mode favourites, weight, length, photo, released) → `CatchService.create()` with the rod, its spot, bait and rig → IndexedDB → `updateSessionStats()` → liveQuery refreshes UI. Without a weight the catch is saved as "details pending".
 2. **Full catch form** (`/sessions/:id/catches/new`): extended fields → same persistence path.
 
 ## End session flow

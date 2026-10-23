@@ -42,12 +42,12 @@
       <mat-icon>home</mat-icon>
       <span>{{ 'nav.home' | tr }}</span>
     </a>
-    @if (activeSession()) {
+    @if (activeSession(); as current) {
       <a
-        routerLink="/sessions/active"
+        [routerLink]="['/sessions', current.id]"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-        [attr.aria-current]="router.url.startsWith('/sessions/active') ? 'page' : null"
+        [attr.aria-current]="router.url === '/sessions/' + current.id ? 'page' : null"
       >
         <mat-icon>play_circle</mat-icon>
         <span>{{ 'nav.current' | tr }}</span>

@@ -2,27 +2,13 @@
 
 Catches are scoped to the active **fishing mode** (via `fishingMode` on the record and mode-filtered repositories).
 
-## Instant catch
+## Instant catch / Quick Catch (removed from the UI)
 
-One-tap button on the active session (`createInstant`):
-
-- Saves immediately with placeholder species (`common.unknown`), current time, GPS, and a **deep-copied** weather snapshot
-- Sets `detailsPending: true`
-- Snackbar offers “Add details” → edit form
-- No dialog — use when you do not have time to fill fields
-
-## Quick Catch
-
-Dialog on active session (`QuickCatchDialogComponent`):
-
-- Primary: species (from **current mode** favorites + Other), weight, length, bait, rig, photo
-- Collapsible: released, notes
-- “Other” is shown translated (`quickCatch.otherSpecies`) but saved as the fixed value `Other`, so stored catches stay language-independent
-- Saves via `CatchService.createQuick()`
+The one-tap **Instant catch** button and the **Quick Catch** dialog (`QuickCatchDialogComponent`) were on the old `/sessions/active` page. Both are replaced by the per-rod **Catch** button on the session screen, which opens the catch sheet; saving it without a weight logs the catch as `detailsPending` ("log now, details later"). `CatchService.createInstant()` / `createQuick()` remain in the service.
 
 ## Catch sheet
 
-Bottom sheet `CatchSheetComponent` (`features/catches/catch-sheet/`), opened with `openCatchSheet(bottomSheet, theme, { session, rodId? })`; resolves to the saved `Catch` (or `undefined`). Themed like the filter sheet. It is meant for per-rod "Catch" buttons and replaces the quick-catch dialog (which stays until it is removed).
+Bottom sheet `CatchSheetComponent` (`features/catches/catch-sheet/`), opened with `openCatchSheet(bottomSheet, theme, { session, rodId? })`; resolves to the saved `Catch` (or `undefined`). Themed like the filter sheet. Opened by the **Catch** button on each rod tile of the session screen.
 
 - Header "Catch · Rod N" with the rod name, spot and bait; "Other rod" switches between visible rods
 - Species chips from the mode favourites plus "Other…" (text prompt, any species). Preselected: species of the latest catch in the session, else the latest in the mode, else the first favourite
@@ -36,7 +22,7 @@ Bottom sheet `CatchSheetComponent` (`features/catches/catch-sheet/`), opened wit
 - Create: `/sessions/:id/catches/new` — extended fields (hook, line, depth, rod, session spot, etc.)
 - Edit: `/sessions/:id/catches/:catchId/edit` — same form; clears `detailsPending` on save; does **not** overwrite frozen `weather`, `caughtAt`, or GPS
 
-Custom dropdown options via `option-combobox` and `UserOptionService` (mode-scoped). Query params `rodId` and `sessionSpotId` preselect from rod cards.
+Custom dropdown options via `option-combobox` and `UserOptionService` (mode-scoped). Query params `rodId` and `sessionSpotId` preselect the rod (catch sheet **All details…**).
 
 Catches store optional `rodId` and `sessionSpotId` links.
 
@@ -46,7 +32,7 @@ On every create, weather is copied from `session.weather` (or nearby cache) via 
 
 ## Validation
 
-Quick Catch / full form require species. Instant catch does not. Duplicate submission prevented with `saving` signals.
+The catch sheet and the full form require a species. Duplicate submission prevented with `saving` signals.
 
 ## Persistence
 
@@ -57,7 +43,7 @@ Quick Catch / full form require species. Instant catch does not. Duplicate submi
 
 ## Catch visibility
 
-Session detail and active session subscribe to `catchService.watchBySession(sessionId)` using Dexie `liveQuery`. Lists update immediately after insert without page refresh. Rows with `detailsPending` show a badge; tapping a row opens the edit form.
+The session screen subscribes to `catchService.watchBySession(sessionId)` using Dexie `liveQuery`. Lists update immediately after insert without page refresh. Rows with `detailsPending` show a badge; tapping a row opens the edit form.
 
 `getById` only returns catches for the active fishing mode.
 

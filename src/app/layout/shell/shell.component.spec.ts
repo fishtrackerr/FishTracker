@@ -169,4 +169,26 @@ describe('ShellComponent', () => {
     expect(labels).toContain('nav.current');
     expect(labels).toContain('nav.assistant');
   });
+
+  it('links the current-session tab straight to the session screen', () => {
+    const fixture = TestBed.createComponent(ShellComponent);
+    activeSession$.next({
+      id: 'active-1',
+      name: 'Morning Session',
+      status: 'active',
+      startDate: '2026-07-23T07:00:00.000Z',
+      photoIds: [],
+      catchCount: 0,
+      totalCatchWeightKg: 0,
+      createdAt: '2026-07-23T07:00:00.000Z',
+      updatedAt: '2026-07-23T07:00:00.000Z',
+    } as FishingSession);
+    fixture.detectChanges();
+
+    const anchors = Array.from(
+      fixture.nativeElement.querySelectorAll('.bottom-nav a') as NodeListOf<HTMLAnchorElement>,
+    );
+    const current = anchors.find((a) => a.textContent?.includes('nav.current'));
+    expect(current?.getAttribute('href')).toBe('/sessions/active-1');
+  });
 });

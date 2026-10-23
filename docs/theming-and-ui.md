@@ -26,7 +26,7 @@ Defined in `src/styles/tokens.css`: backgrounds, primary, text, borders, spacing
 - `--heading-color`, `--font-display`, `--font-label`, `--label-transform`, `--label-spacing`
 - `--camo-base`, `--camo-1` … `--camo-4`, `--header-text`, `--header-chip-bg`
 - `--nav-bg`, `--nav-text`, `--nav-active`
-- `--rod-1` … `--rod-6`, `--rod-glow`, `--rod-marker-text` (rod-card marker)
+- `--rod-1` … `--rod-6`, `--rod-glow`, `--rod-marker-text` (rod marker on rod tiles and the rod sheet)
 
 ## Angular Material
 
@@ -90,3 +90,9 @@ Material Icons via `@angular/material/icon` only; no emoji in buttons or labels 
 - `mat-icon-button` stays circular (do not apply `--radius-button`)
 - PIN unlock update check: small `mat-icon-button` with `refresh` icon in the top-right corner
 - Shape is set globally in `material-overrides.css`; feature CSS should not hardcode button `border-radius`
+
+## Session screen
+
+- Rod tiles: big **Bite +1** (outline `--primary`) and **Catch** (filled `--cta`) buttons, 64px high, for wet or cold hands; markers use `--rod-N` + `--rod-glow`; inactive rods are greyed (`--background-raised`, no glow)
+- Live action bar: fixed just above the bottom nav (`bottom: 64px + safe-area`), plain token-styled buttons ≥ 56px (Photo, Note, Recast, End = `--cta` fill); the page adds bottom padding so content is not hidden behind it
+- Weather-alert banner and details-pending badge use `color-mix` on `--warning` / `--danger` (no hardcoded colours)

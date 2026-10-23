@@ -37,11 +37,11 @@ A homepage image picked from a file is stored as `type: cover` (never shown in t
 
 ## Session images
 
-Session detail shows a gallery of session photos (`type: session` / `photoIds`) and catch photos (`type: catch` / `photoId`) for that session. Photos can be added via the image picker; deleting from the gallery prunes stale refs on the session and catches.
+The session screen (`/sessions/:id`) shows a gallery of session photos (`type: session` / `photoIds`) and catch photos (`type: catch` / `photoId`) for that session. Photos can be added via the image picker; deleting from the gallery prunes stale refs on the session and catches.
 
-Active session shows a compact horizontal photo strip of the same images (tap to open fullscreen viewer).
+In live mode the action bar **Photo** button adds a camera or gallery photo directly.
 
-Both load through `ImageService.getSessionImages(sessionId, linkedIds)` (indexed `parentId` query + `bulkGet` of linked ids) and only reload when the set of photo ids changes, not on every session write (bites, weather).
+It loads through `ImageService.getSessionImages(sessionId, linkedIds)` (indexed `parentId` query + `bulkGet` of linked ids) and only reload when the set of photo ids changes, not on every session write (bites, weather).
 
 ## Deletion
 
