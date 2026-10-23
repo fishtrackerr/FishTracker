@@ -615,7 +615,21 @@
     "spotted": "Gezien",
     "addCatch": "Vangst toevoegen",
     "deactivate": "Deactiveren",
-    "activate": "Activeren"
+    "activate": "Activeren",
+    "sheetTitle": "Hengel {{n}}",
+    "sheetStats": "{{bites}} bijten · {{spotted}} gezien",
+    "sheetCast": " · ingeworpen {{time}}",
+    "recastNow": "Nu opnieuw inwerpen",
+    "biteMinusOne": "Bijt −1",
+    "takeOut": "Hengel binnenhalen",
+    "putBack": "Hengel terugzetten",
+    "newSpot": "+ Nieuwe stek…",
+    "newSpotTitle": "Nieuwe stek",
+    "newSpotName": "Naam van de stek",
+    "newSpotSuffix": "(nieuw)",
+    "spottedRegistered": "Vis gezien geregistreerd",
+    "sheetSaved": "Hengel opgeslagen",
+    "sheetFailed": "Hengel bijwerken mislukt"
   },
   "options": {
     "category": {

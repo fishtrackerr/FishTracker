@@ -62,11 +62,21 @@ session.rods ??= [];
 
 Catches with legacy `spotId` get `sessionSpotId` snapshots where possible. Active sessions without rods show a non-blocking setup prompt. Completed sessions are not auto-assigned rods.
 
+## Rod sheet
+
+`RodSheetComponent` (`shared/components/rod-sheet`) is a themed bottom sheet for one rod, opened with `openRodSheet(bottomSheet, theme, { session, rodId })`. It resolves to the latest `FishingSession` when anything was written (also after a backdrop dismiss), otherwise `undefined`.
+
+- Header: rod marker (number, `--rod-N` colour), "Rod N", "x bites · y spotted · cast HH:mm".
+- Quick actions: **Recast now** (`RodService.recast` with the current spot), **Fish spotted** (`FishSpottedEventService`), **Bite −1** (`BiteEventService.removeBite`, disabled at 0 bites). They write immediately.
+- Edit fields: spot select (visible session spots, unassigned, **+ New spot…**), bait and rig (`option-combobox`), name, notes.
+- **+ New spot…** asks a name with `promptForText`; the spot is created on **Save** via `RodService.addSessionSpot` (one `sessionRepo.modify` transaction; a visible spot with the same name is reused) and then assigned with `assignSpot`, so `RodSpotHistory` is kept and cancelling leaves no orphan spot.
+- Footer: **Take rod out / Put rod back** (toggles `isActive` immediately) and **Save** (`updateRod` with only the changed fields; a spot change goes through `assignSpot`).
+
 ## Services
 
 | Service | Role |
 |---------|------|
-| `RodService` | Rod CRUD, spot assignment, recast, count resize |
+| `RodService` | Rod CRUD, spot assignment, recast, count resize, add session spot |
 | `BiteEventService` | Add/remove bites |
 | `FishSpottedEventService` | Register spotted fish |
 | `SessionEventService` | Timeline events |

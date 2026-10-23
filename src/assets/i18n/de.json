@@ -615,7 +615,21 @@
     "spotted": "Gesichtet",
     "addCatch": "Fang hinzufügen",
     "deactivate": "Deaktivieren",
-    "activate": "Aktivieren"
+    "activate": "Aktivieren",
+    "sheetTitle": "Rute {{n}}",
+    "sheetStats": "{{bites}} Bisse · {{spotted}} gesichtet",
+    "sheetCast": " · ausgeworfen {{time}}",
+    "recastNow": "Jetzt neu auswerfen",
+    "biteMinusOne": "Biss −1",
+    "takeOut": "Rute einholen",
+    "putBack": "Rute zurücklegen",
+    "newSpot": "+ Neuer Platz…",
+    "newSpotTitle": "Neuer Platz",
+    "newSpotName": "Name des Platzes",
+    "newSpotSuffix": "(neu)",
+    "spottedRegistered": "Gesehener Fisch registriert",
+    "sheetSaved": "Rute gespeichert",
+    "sheetFailed": "Rute konnte nicht aktualisiert werden"
   },
   "options": {
     "category": {
