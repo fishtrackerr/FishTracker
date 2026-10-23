@@ -22,7 +22,9 @@
     "retry": "Try again",
     "loading": "Loading...",
     "errorGeneric": "Something went wrong",
-    "back": "Back"
+    "back": "Back",
+    "expandSection": "Expand {{label}}",
+    "collapseSection": "Collapse {{label}}"
   },
   "connectivity": {
     "offlineBanner": "You're offline — catches and sessions still work",
@@ -108,6 +110,7 @@
     "clearAiKey": "Clear API key",
     "openAssistant": "Open assistant",
     "aiKeyCleared": "API key cleared",
+    "aiKeyNeedsPin": "After a reload the API key can't be changed. Lock the app and unlock it with your PIN to change it.",
     "customPrompts": "Custom prompts",
     "customPromptsHint": "Add your own starter questions for Ask your data. Custom prompts need online AI when answered.",
     "addPrompt": "Add prompt",
@@ -180,6 +183,7 @@
     "exporting": "Exporting...",
     "exportJson": "Export JSON Backup",
     "importJson": "Import JSON Backup",
+    "backupBeforeSession": "Save a backup before each new session",
     "generateDemo": "Generate demo fishing data",
     "generatingDemo": "Generating…",
     "generateDemoDesc": "Adds sample lakes, sessions (with rods), catches, bites, and fish-spotted events for the current fishing mode — useful for testing the assistant. Press again to add another batch; existing data is kept.",
@@ -262,6 +266,8 @@
     "pinIncorrect": "Current PIN incorrect",
     "backupExported": "Backup exported",
     "exportFailed": "Export failed",
+    "exportCancelled": "Export cancelled",
+    "fullResetExportFailed": "Full reset stopped: the backup was not saved.",
     "backupRestored": "Backup restored successfully",
     "importFailed": "Import failed — invalid backup file",
     "weatherCacheCleared": "Weather cache cleared",
@@ -339,6 +345,8 @@
     "backupSaved": "Backup saved to your device",
     "backupFailedTitle": "Backup failed",
     "backupFailedMessage": "Could not save a backup to this device. Start the session without a backup? You can still restore from Settings → Import if you have an earlier file.",
+    "backupSkippedTitle": "Backup not saved",
+    "backupSkippedMessage": "The share sheet was closed, so no backup was saved. Start the session without a backup?",
     "startWithoutBackup": "Start without backup"
   },
   "sessionDetail": {
@@ -434,7 +442,8 @@
   },
   "quickCatch": {
     "title": "Quick Add Catch",
-    "moreDetails": "More details"
+    "moreDetails": "More details",
+    "otherSpecies": "Other"
   },
   "lakes": {
     "title": "Lakes",
@@ -496,7 +505,9 @@
     "profileSaved": "Profile saved",
     "saveFailed": "Failed to save profile",
     "pictureUpdated": "Profile picture updated",
-    "pictureRemoved": "Profile picture removed"
+    "pictureRemoved": "Profile picture removed",
+    "removePhotoTitle": "Remove profile picture?",
+    "removePhotoMessage": "Your profile picture will be deleted. This cannot be undone."
   },
   "profileDocs": {
     "title": "Profile Documents",
@@ -740,9 +751,9 @@
   },
   "privacyWelcome": {
     "title": "Your data stays here",
-    "lead": "Nothing you enter in Fish Tracker is shared.",
-    "body": "Sessions, catches, photos, and notes stay on this device only. There are no accounts and no cloud logbook for your fishing data.",
-    "note": "Optional features like weather may use the network, but your catch history is never uploaded.",
+    "lead": "Your fishing log stays on this device by default.",
+    "body": "There are no accounts and no cloud logbook. Sessions, catches, photos, and notes are stored locally unless you export a backup or use an optional online feature.",
+    "note": "Weather, place lookup, and optional AI may use the network. AI sends a stats summary (not photos) only if you enable it. See Privacy & data for details.",
     "gotIt": "Got it"
   },
   "privacy": {
@@ -831,6 +842,18 @@
       "offline": "You are offline. Insight prompts still work without AI.",
       "unauthorized": "API key rejected. Check Settings.",
       "generic": "Could not reach the AI provider."
+    }
+  },
+  "maps": {
+    "openInMaps": "Open {{label}} in Maps",
+    "directionsTo": "Directions to {{label}}",
+    "getDirectionsTo": "Get directions to {{label}}",
+    "label": {
+      "location": "location",
+      "currentSession": "current session",
+      "sessionLocation": "session location",
+      "catchLocation": "catch location",
+      "session": "session"
     }
   }
 }

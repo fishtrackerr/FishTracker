@@ -1,0 +1,1 @@
+import{Cn as de}from"./chunk-D0X60q4r.js";import{h as p}from"./chunk-ZBANLYTH.js";var r=class e{async getReleaseNotes(){try{let t=await p(`assets/release-notes.json`);return t.ok?await t.json():null}catch{return null}}static ɵfac=function(o){return new(o||e)};static ɵprov=de({token:e,factory:e.ɵfac,providedIn:`root`})};export{r as t};

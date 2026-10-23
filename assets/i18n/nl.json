@@ -22,7 +22,9 @@
     "retry": "Opnieuw proberen",
     "loading": "Laden...",
     "errorGeneric": "Er is iets misgegaan",
-    "back": "Terug"
+    "back": "Terug",
+    "expandSection": "{{label}} uitklappen",
+    "collapseSection": "{{label}} inklappen"
   },
   "connectivity": {
     "offlineBanner": "Je bent offline — vangsten en sessies blijven werken",
@@ -108,6 +110,7 @@
     "clearAiKey": "API-sleutel wissen",
     "openAssistant": "Assistent openen",
     "aiKeyCleared": "API-sleutel gewist",
+    "aiKeyNeedsPin": "Na herladen kan de API-sleutel niet worden gewijzigd. Vergrendel de app en ontgrendel met je pincode om hem te wijzigen.",
     "customPrompts": "Eigen prompts",
     "customPromptsHint": "Voeg eigen startvragen toe voor Vraag je data. Eigen prompts hebben online AI nodig voor een antwoord.",
     "addPrompt": "Prompt toevoegen",
@@ -180,6 +183,7 @@
     "exporting": "Exporteren...",
     "exportJson": "JSON-back-up exporteren",
     "importJson": "JSON-back-up importeren",
+    "backupBeforeSession": "Back-up opslaan vóór elke nieuwe sessie",
     "generateDemo": "Demo-visdata genereren",
     "generatingDemo": "Bezig met genereren…",
     "generateDemoDesc": "Voegt voorbeeldmeren, sessies (met hengels), vangsten, aanbeten en gespotte vissen toe voor de huidige vismodus — handig om de assistent te testen. Opnieuw indrukken voegt een nieuwe batch toe; bestaande data blijft staan.",
@@ -262,6 +266,8 @@
     "pinIncorrect": "Huidige pincode onjuist",
     "backupExported": "Back-up geëxporteerd",
     "exportFailed": "Export mislukt",
+    "exportCancelled": "Export geannuleerd",
+    "fullResetExportFailed": "Volledige reset gestopt: de back-up is niet opgeslagen.",
     "backupRestored": "Back-up succesvol hersteld",
     "importFailed": "Import mislukt — ongeldig back-upbestand",
     "weatherCacheCleared": "Weercache gewist",
@@ -339,6 +345,8 @@
     "backupSaved": "Back-up opgeslagen op je apparaat",
     "backupFailedTitle": "Back-up mislukt",
     "backupFailedMessage": "Kon geen back-up op dit apparaat opslaan. Sessie starten zonder back-up? Je kunt later nog herstellen via Instellingen → Importeren als je een eerdere file hebt.",
+    "backupSkippedTitle": "Back-up niet opgeslagen",
+    "backupSkippedMessage": "Het deelmenu is gesloten, dus er is geen back-up opgeslagen. Sessie starten zonder back-up?",
     "startWithoutBackup": "Starten zonder back-up"
   },
   "sessionDetail": {
@@ -434,7 +442,8 @@
   },
   "quickCatch": {
     "title": "Snelle vangst toevoegen",
-    "moreDetails": "Meer details"
+    "moreDetails": "Meer details",
+    "otherSpecies": "Overig"
   },
   "lakes": {
     "title": "Meren",
@@ -496,7 +505,9 @@
     "profileSaved": "Profiel opgeslagen",
     "saveFailed": "Opslaan van profiel mislukt",
     "pictureUpdated": "Profielfoto bijgewerkt",
-    "pictureRemoved": "Profielfoto verwijderd"
+    "pictureRemoved": "Profielfoto verwijderd",
+    "removePhotoTitle": "Profielfoto verwijderen?",
+    "removePhotoMessage": "Je profielfoto wordt verwijderd. Dit kan niet ongedaan worden gemaakt."
   },
   "profileDocs": {
     "title": "Profieldocumenten",
@@ -740,9 +751,9 @@
   },
   "privacyWelcome": {
     "title": "Jouw gegevens blijven hier",
-    "lead": "Niets wat je in Fish Tracker invoert wordt gedeeld.",
-    "body": "Sessies, vangsten, foto’s en notities blijven alleen op dit apparaat. Er zijn geen accounts en geen cloud-logboek voor jouw visdata.",
-    "note": "Optionele functies zoals weer kunnen het netwerk gebruiken, maar je vangstgeschiedenis wordt nooit geüpload.",
+    "lead": "Je vislogboek blijft standaard op dit apparaat.",
+    "body": "Er zijn geen accounts en geen cloud-logboek. Sessies, vangsten, foto’s en notities worden lokaal opgeslagen, tenzij je een back-up exporteert of een optionele online functie gebruikt.",
+    "note": "Weer, plaatszoeken en optionele AI kunnen het netwerk gebruiken. AI stuurt alleen een statistieksamenvatting (geen foto’s) als jij die inschakelt. Zie Privacy & gegevens voor details.",
     "gotIt": "Begrepen"
   },
   "privacy": {
@@ -831,6 +842,18 @@
       "offline": "Je bent offline. Inzicht-prompts werken nog zonder AI.",
       "unauthorized": "API-sleutel geweigerd. Controleer Instellingen.",
       "generic": "Kon de AI-provider niet bereiken."
+    }
+  },
+  "maps": {
+    "openInMaps": "{{label}} openen in Kaarten",
+    "directionsTo": "Route naar {{label}}",
+    "getDirectionsTo": "Route plannen naar {{label}}",
+    "label": {
+      "location": "locatie",
+      "currentSession": "huidige sessie",
+      "sessionLocation": "sessielocatie",
+      "catchLocation": "vanglocatie",
+      "session": "sessie"
     }
   }
 }
