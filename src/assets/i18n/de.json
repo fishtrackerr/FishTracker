@@ -32,6 +32,10 @@
     "mapsOffline": "Karten brauchen eine Verbindung. Deine Koordinaten bleiben in der App gespeichert."
   },
   "dashboard": {
+    "liveSession": "Live-Session",
+    "liveContinue": "Weiter",
+    "liveElapsed": "Vergangen",
+    "liveCatches": "Fänge",
     "startSession": "Angelsitzung starten",
     "starting": "Wird gestartet...",
     "continueActive": "Aktive Sitzung fortsetzen — {{count}} Fänge",
@@ -285,6 +289,7 @@
   },
   "nav": {
     "home": "Start",
+    "live": "LIVE",
     "current": "Aktuell",
     "sessions": "Sitzungen",
     "lakes": "Seen",

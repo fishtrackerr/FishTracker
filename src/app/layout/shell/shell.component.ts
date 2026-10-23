@@ -92,8 +92,7 @@ export class ShellComponent implements AfterViewInit {
   isMoreRouteActive(): boolean {
     const url = this.router.url.split('?')[0];
     return (
-      url.startsWith('/gallery') ||
-      url.startsWith('/statistics') ||
+      url.startsWith('/lakes') ||
       url.startsWith('/settings') ||
       url.startsWith('/assistant') ||
       url.startsWith('/profile') ||

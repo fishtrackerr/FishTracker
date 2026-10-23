@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { LakeService } from '../../core/services/lake.service';
 import { SessionService } from '../../core/services/session.service';
 import { StatisticsService, DashboardStats } from '../../core/services/statistics.service';
 import { WeatherService } from '../../core/services/weather.service';
@@ -57,6 +58,8 @@ export class DashboardComponent implements OnInit {
   private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
   private readonly sessionStartFlow = inject(SessionStartFlowService);
+  private readonly lakeService = inject(LakeService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly sessions = toSignal(this.sessionService.watchAll(), { initialValue: [] });
   readonly activeSession = toSignal(this.sessionService.watchActive(), { initialValue: undefined });
@@ -67,6 +70,29 @@ export class DashboardComponent implements OnInit {
   readonly loading = signal(true);
   readonly homepageUrl = signal<string | null>(null);
   readonly changingHomepage = signal(false);
+
+  private readonly lakes = toSignal(this.lakeService.watchAll(), { initialValue: [] });
+  private readonly now = signal(Date.now());
+
+  readonly activeLakeName = computed(() => {
+    const id = this.activeSession()?.lakeId;
+    return id ? this.lakes().find((l) => l.id === id)?.name : undefined;
+  });
+
+  /** Elapsed time of the live session as h:mm (ticks every 30s). */
+  readonly elapsed = computed(() => {
+    const start = Date.parse(this.activeSession()?.startDate ?? '');
+    if (Number.isNaN(start)) {
+      return '0:00';
+    }
+    const minutes = Math.max(0, Math.floor((this.now() - start) / 60000));
+    return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}`;
+  });
+
+  constructor() {
+    const timer = setInterval(() => this.now.set(Date.now()), 30000);
+    this.destroyRef.onDestroy(() => clearInterval(timer));
+  }
 
   readonly recentSessions = computed(() => this.sessions().slice(0, 5));
 

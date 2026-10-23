@@ -119,6 +119,29 @@
   text-transform: uppercase;
 }
 
+/* Live chip: link to the running session; padded to a 44px touch target, visually compact */
+.camo-header a.live-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  box-sizing: border-box;
+  margin: -8px 0;
+  padding: 0 12px;
+  background: var(--cta);
+  color: var(--text-on-cta);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.camo-header a.live-chip:hover {
+  background: var(--cta-hover);
+}
+
+.camo-header a.live-chip:focus-visible {
+  outline: 2px solid var(--header-text);
+  outline-offset: 2px;
+}
+
 .content {
   flex: 1;
   min-height: 0;
@@ -260,20 +283,4 @@
   background: color-mix(in srgb, var(--primary) 12%, transparent);
   outline: none;
   color: var(--text-primary);
-}
-
-.bottom-nav.with-current > a,
-.bottom-nav.with-current .more-trigger {
-  min-width: 40px;
-  padding: 4px 4px;
-  font-size: 0.65rem;
-}
-
-@media (min-width: 769px) {
-  .bottom-nav.with-current > a,
-  .bottom-nav.with-current .more-trigger {
-    min-width: 48px;
-    padding: 4px 8px;
-    font-size: 0.75rem;
-  }
 }

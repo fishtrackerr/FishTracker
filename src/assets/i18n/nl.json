@@ -32,6 +32,10 @@
     "mapsOffline": "Kaarten hebben een verbinding nodig. Je coördinaten blijven in de app bewaard."
   },
   "dashboard": {
+    "liveSession": "Live sessie",
+    "liveContinue": "Doorgaan",
+    "liveElapsed": "Verstreken",
+    "liveCatches": "Vangsten",
     "startSession": "Start vissessie",
     "starting": "Starten...",
     "continueActive": "Ga verder met actieve sessie — {{count}} vangsten",
@@ -285,6 +289,7 @@
   },
   "nav": {
     "home": "Home",
+    "live": "LIVE",
     "current": "Actief",
     "sessions": "Sessies",
     "lakes": "Meren",

@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FishingSession } from '../../core/models';
 import { GeolocationService } from '../../core/services/geolocation.service';
+import { LakeService } from '../../core/services/lake.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ImageService } from '../../core/services/image.service';
 import { NotificationService } from '../../core/services/notification.service';
@@ -49,6 +50,10 @@ describe('DashboardComponent session buttons', () => {
           provide: ImageService,
           useValue: { getHomepageUrl: vi.fn().mockResolvedValue(null) },
         },
+        {
+          provide: LakeService,
+          useValue: { watchAll: () => new BehaviorSubject([{ id: 'l1', name: 'Mere' }]) },
+        },
         { provide: PhotoPickService, useValue: { pickImage: vi.fn() } },
         { provide: NotificationService, useValue: { success: vi.fn(), error: vi.fn() } },
         {
@@ -92,13 +97,24 @@ describe('DashboardComponent session buttons', () => {
   });
 
   it('offers Continue session instead of Start when a session is active', async () => {
-    active$.next({ id: 'a1', status: 'active', catchCount: 2 } as FishingSession);
+    active$.next({
+      id: 'a1',
+      status: 'active',
+      catchCount: 2,
+      lakeId: 'l1',
+      startDate: new Date().toISOString(),
+    } as FishingSession);
 
     const root = await render();
 
     expect(root.textContent).not.toContain('dashboard.startSession');
     const continueBtn = root.querySelector('button.continue-btn') as HTMLButtonElement;
-    expect(continueBtn.textContent).toContain('dashboard.continueActive');
+    expect(continueBtn.textContent).toContain('dashboard.liveContinue');
+    expect(root.querySelectorAll('.continue-btn').length).toBe(1);
+    const card = root.querySelector('.live-card') as HTMLElement;
+    expect(card.textContent).toContain('Mere');
+    expect(card.textContent).toContain('0:00');
+    expect(card.textContent).toContain('2');
 
     continueBtn.click();
     expect(navigate).toHaveBeenCalledWith(['/sessions/active'], { queryParams: { id: 'a1' } });

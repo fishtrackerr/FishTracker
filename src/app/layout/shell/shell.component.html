@@ -26,13 +26,19 @@
         <path class="camo-4" d="M336 4 C352 0 372 8 368 16 C364 24 340 26 332 18 C326 12 326 8 336 4Z"></path>
       </svg>
       <span class="brand">FishTracker</span>
-      <span class="mode-chip" role="status">{{ 'modeSelect.modes.' + mode | tr }}</span>
+      @if (activeSession(); as live) {
+        <a class="mode-chip live-chip" [routerLink]="['/sessions', live.id]">
+          {{ 'nav.live' | tr }} · {{ 'modeSelect.modes.' + mode | tr }}
+        </a>
+      } @else {
+        <span class="mode-chip" role="status">{{ 'modeSelect.modes.' + mode | tr }}</span>
+      }
     </header>
   }
   <main #content class="content" tabindex="-1">
     <router-outlet />
   </main>
-  <nav class="bottom-nav" [class.with-current]="!!activeSession()" aria-label="Main">
+  <nav class="bottom-nav" aria-label="Main">
     <a
       routerLink="/"
       routerLinkActive="active"
@@ -42,41 +48,29 @@
       <mat-icon>home</mat-icon>
       <span>{{ 'nav.home' | tr }}</span>
     </a>
-    @if (activeSession(); as current) {
-      <a
-        [routerLink]="['/sessions', current.id]"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        [attr.aria-current]="router.url === '/sessions/' + current.id ? 'page' : null"
-      >
-        <mat-icon>play_circle</mat-icon>
-        <span>{{ 'nav.current' | tr }}</span>
-      </a>
-      <a
-        routerLink="/assistant"
-        routerLinkActive="active"
-        [attr.aria-current]="router.url.startsWith('/assistant') ? 'page' : null"
-      >
-        <mat-icon>smart_toy</mat-icon>
-        <span>{{ 'nav.assistant' | tr }}</span>
-      </a>
-    }
     <a
       routerLink="/sessions"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
       [attr.aria-current]="router.url === '/sessions' || router.url.startsWith('/sessions?') ? 'page' : null"
     >
       <mat-icon>event</mat-icon>
       <span>{{ 'nav.sessions' | tr }}</span>
     </a>
     <a
-      routerLink="/lakes"
+      routerLink="/gallery"
       routerLinkActive="active"
-      [attr.aria-current]="router.url.startsWith('/lakes') ? 'page' : null"
+      [attr.aria-current]="router.url.startsWith('/gallery') ? 'page' : null"
     >
-      <mat-icon>water</mat-icon>
-      <span>{{ 'nav.lakes' | tr }}</span>
+      <mat-icon>photo_library</mat-icon>
+      <span>{{ 'nav.gallery' | tr }}</span>
+    </a>
+    <a
+      routerLink="/statistics"
+      routerLinkActive="active"
+      [attr.aria-current]="router.url.startsWith('/statistics') ? 'page' : null"
+    >
+      <mat-icon>bar_chart</mat-icon>
+      <span>{{ 'nav.stats' | tr }}</span>
     </a>
     <div class="more-wrap">
       <button
@@ -99,19 +93,13 @@
           role="menu"
           [attr.aria-label]="'nav.more' | tr"
         >
-          @if (!activeSession()) {
-            <a role="menuitem" routerLink="/assistant" (click)="closeMoreMenu()">
-              <mat-icon>smart_toy</mat-icon>
-              <span>{{ 'nav.assistant' | tr }}</span>
-            </a>
-          }
-          <a role="menuitem" routerLink="/gallery" (click)="closeMoreMenu()">
-            <mat-icon>photo_library</mat-icon>
-            <span>{{ 'nav.gallery' | tr }}</span>
+          <a role="menuitem" routerLink="/lakes" (click)="closeMoreMenu()">
+            <mat-icon>water</mat-icon>
+            <span>{{ 'nav.lakes' | tr }}</span>
           </a>
-          <a role="menuitem" routerLink="/statistics" (click)="closeMoreMenu()">
-            <mat-icon>bar_chart</mat-icon>
-            <span>{{ 'nav.stats' | tr }}</span>
+          <a role="menuitem" routerLink="/assistant" (click)="closeMoreMenu()">
+            <mat-icon>smart_toy</mat-icon>
+            <span>{{ 'nav.assistant' | tr }}</span>
           </a>
           <button role="menuitem" type="button" (click)="shareViaWhatsApp()">
             <mat-icon>share</mat-icon>

@@ -2,7 +2,9 @@
 
 ## Shell
 
-- Fixed bottom navigation with active states
+- Fixed bottom navigation, always five items: Home, Sessions, Gallery, Stats, More (active state via `aria-current`). **More** menu: Lakes, Assistant, WhatsApp share, Settings (Profile, release notes and privacy are reached from Settings). There are no separate Current/Assistant tabs while a session is active.
+- **Live chip**: while a session is active in the current mode the camo header's mode chip becomes a link `LIVE · <MODE>` (`--cta` / `--text-on-cta`, 44px touch target) to `/sessions/<id>`; otherwise a plain mode chip.
+- Dashboard shows a **Live session** card (lake, elapsed, catches, `--cta` Continue → `/sessions/active`) instead of the Start button while a session is active
 - **Camo header** under the offline banner (when a fishing mode is selected): inline SVG camo pattern coloured by `--camo-*` tokens, the stencil `FishTracker` wordmark and a fishing-mode chip
 - Offline connectivity banner above content (dismissible for the session; reappears when going offline again)
 - Content area scrolls; bottom padding clears the nav

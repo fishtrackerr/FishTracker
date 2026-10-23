@@ -32,6 +32,10 @@
     "mapsOffline": "Maps needs a connection. Your coordinates are still saved in the app."
   },
   "dashboard": {
+    "liveSession": "Live session",
+    "liveContinue": "Continue",
+    "liveElapsed": "Elapsed",
+    "liveCatches": "Catches",
     "startSession": "Start Fishing Session",
     "starting": "Starting...",
     "continueActive": "Continue Active Session — {{count}} catches",
@@ -285,6 +289,7 @@
   },
   "nav": {
     "home": "Home",
+    "live": "LIVE",
     "current": "Current",
     "sessions": "Sessions",
     "lakes": "Lakes",
