@@ -335,7 +335,7 @@
     "refreshWeatherGps": "Wetter und GPS aktualisieren",
     "instantCatchFailed": "Fang konnte nicht gespeichert werden",
     "instantCatchEvent": "Schneller Fang gespeichert",
-    "catchEvent": "{species} gefangen",
+    "catchEvent": "{{species}} gefangen",
     "detailsPending": "Details offen",
     "recast": "Neu auswerfen",
     "camera": "Kamera",

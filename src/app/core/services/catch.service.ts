@@ -213,7 +213,8 @@ export class CatchService {
 
   /**
    * Soft-deletes the catch photo so it leaves the session photos, unless the
-   * image is also used elsewhere (another catch, or kept on the session).
+   * image is also used elsewhere (another catch, kept on the session) or the
+   * user kept it (homepage image or favourite).
    */
   private async removeOrphanedPhoto(deleted: Catch): Promise<void> {
     const photoId = deleted.photoId;
@@ -226,7 +227,7 @@ export class CatchService {
     ]);
     const usedByOtherCatch = others.some((c) => c.id !== deleted.id && c.photoId === photoId);
     const keptOnSession = session?.photoIds?.includes(photoId) ?? false;
-    if (usedByOtherCatch || keptOnSession) {
+    if (usedByOtherCatch || keptOnSession || (await this.image.isKeptByUser(photoId))) {
       return;
     }
     await this.image.delete(photoId);

@@ -64,15 +64,17 @@ export const NEW_SPOT_VALUE = '__new__';
         </div>
 
         <div class="quick-actions">
-          <button
-            mat-stroked-button
-            type="button"
-            class="recast-btn"
-            [disabled]="busy()"
-            (click)="recastNow()"
-          >
-            {{ 'rod.recastNow' | tr }}
-          </button>
+          @if (canRecast()) {
+            <button
+              mat-stroked-button
+              type="button"
+              class="recast-btn"
+              [disabled]="busy()"
+              (click)="recastNow()"
+            >
+              {{ 'rod.recastNow' | tr }}
+            </button>
+          }
           <button
             mat-stroked-button
             type="button"
@@ -241,6 +243,8 @@ export class RodSheetComponent {
   readonly selectPanelClass = this.theme.getSelectPanelClass();
 
   readonly session = signal<FishingSession>(this.data.session);
+  /** Recasting only makes sense while fishing; a finished session keeps its last cast. */
+  readonly canRecast = computed(() => this.session().status === 'active');
   readonly busy = signal(false);
   readonly spotSelect = viewChild<MatSelect>('spotSelect');
   readonly pendingSpotName = signal('');
@@ -293,6 +297,9 @@ export class RodSheetComponent {
   }
 
   async recastNow(): Promise<void> {
+    if (!this.canRecast()) {
+      return;
+    }
     await this.run(async () => {
       const rod = this.rod();
       if (!rod) {

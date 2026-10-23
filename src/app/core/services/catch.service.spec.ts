@@ -20,6 +20,7 @@ describe('CatchService', () => {
   let lakeRepo: { getById: ReturnType<typeof vi.fn> };
   let processFile: ReturnType<typeof vi.fn>;
   let imageDelete: ReturnType<typeof vi.fn>;
+  let imageKept: ReturnType<typeof vi.fn>;
   let sessionEvents: { record: ReturnType<typeof vi.fn> };
   let i18n: { t: ReturnType<typeof vi.fn> };
 
@@ -54,6 +55,7 @@ describe('CatchService', () => {
     };
     processFile = vi.fn();
     imageDelete = vi.fn().mockResolvedValue(undefined);
+    imageKept = vi.fn().mockResolvedValue(false);
     sessionEvents = { record: vi.fn() };
     i18n = {
       t: vi.fn((key: string, params?: Record<string, string>) => {
@@ -125,7 +127,7 @@ describe('CatchService', () => {
         getCachedSnapshotFor:
           overrides?.getCachedSnapshotFor ?? vi.fn().mockReturnValue(null),
       } as never,
-      { processFile, delete: imageDelete } as never,
+      { processFile, delete: imageDelete, isKeptByUser: imageKept } as never,
       sessionEvents as never,
       i18n as never,
     );
@@ -265,6 +267,14 @@ describe('CatchService', () => {
       catchRepo.getAll.mockResolvedValue([]);
       await service.delete('c1');
       expect(imageDelete).toHaveBeenCalledWith('img-1');
+    });
+
+    it('keeps a photo the user made the homepage image or a favourite', async () => {
+      catchRepo.getById.mockResolvedValue({ ...pike('c1', 5, false), photoId: 'img-1' });
+      imageKept.mockResolvedValue(true);
+      await service.delete('c1');
+      expect(imageKept).toHaveBeenCalledWith('img-1');
+      expect(imageDelete).not.toHaveBeenCalled();
     });
 
     it('keeps a photo that another catch still uses', async () => {

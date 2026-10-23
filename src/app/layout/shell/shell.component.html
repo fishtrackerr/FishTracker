@@ -51,7 +51,7 @@
     <a
       routerLink="/sessions"
       routerLinkActive="active"
-      [attr.aria-current]="router.url === '/sessions' || router.url.startsWith('/sessions?') ? 'page' : null"
+      [attr.aria-current]="router.url === '/sessions' || router.url.startsWith('/sessions?') || router.url.startsWith('/sessions/') ? 'page' : null"
     >
       <mat-icon>event</mat-icon>
       <span>{{ 'nav.sessions' | tr }}</span>

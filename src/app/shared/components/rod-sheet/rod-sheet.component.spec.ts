@@ -80,6 +80,13 @@ describe('RodSheetComponent', () => {
     dialog = { open: vi.fn() };
   });
 
+  it('does not offer or perform a recast on a finished session', async () => {
+    const component = create({ ...makeSession(), status: 'completed' } as FishingSession).componentInstance;
+    expect(component.canRecast()).toBe(false);
+    await component.recastNow();
+    expect(rodService['recast']).not.toHaveBeenCalled();
+  });
+
   it('recasts with the current spot', async () => {
     const component = create().componentInstance;
     await component.recastNow();

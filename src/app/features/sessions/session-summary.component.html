@@ -13,7 +13,7 @@
       <p class="when">
         {{ s.startDate | date: 'medium' }}
         @if (s.endDate) {
-          – {{ s.endDate | date: 'shortTime' }}
+          – {{ s.endDate | date: (sameDay() ? 'shortTime' : 'medium') }}
         }
         · {{ duration() }}
       </p>

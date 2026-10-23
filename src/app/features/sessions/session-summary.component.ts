@@ -89,6 +89,15 @@ export class SessionSummaryComponent {
     return s ? formatDuration(this.sessionService.getDurationMs(s)) : '';
   });
 
+  /** End time alone is enough when the session ended on the day it started. */
+  readonly sameDay = computed(() => {
+    const s = this.session();
+    if (!s?.endDate) {
+      return true;
+    }
+    return new Date(s.startDate).toDateString() === new Date(s.endDate).toDateString();
+  });
+
   readonly catchCount = computed(() => this.catches().length);
   readonly biteCount = computed(() => this.rods().reduce((sum, r) => sum + r.biteCount, 0));
   readonly totalWeightKg = computed(() =>

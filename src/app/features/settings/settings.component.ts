@@ -248,7 +248,11 @@ export class SettingsComponent implements OnInit {
       return;
     }
     this.fishingMode.setMode(mode);
-    await this.userOptions.ensureDefaultsForCurrentMode();
+    try {
+      await this.userOptions.ensureDefaultsForCurrentMode();
+    } catch (error) {
+      console.error('[Settings] seeding options for the new mode failed', error);
+    }
     await this.router.navigateByUrl(await this.startup.resolveUnlockedDestination('/'));
   }
 

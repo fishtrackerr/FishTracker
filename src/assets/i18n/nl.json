@@ -335,7 +335,7 @@
     "refreshWeatherGps": "Weer en GPS verversen",
     "instantCatchFailed": "Vangst loggen mislukt",
     "instantCatchEvent": "Snelle vangst gelogd",
-    "catchEvent": "{species} gevangen",
+    "catchEvent": "{{species}} gevangen",
     "detailsPending": "Details open",
     "recast": "Opnieuw inwerpen",
     "camera": "Camera",

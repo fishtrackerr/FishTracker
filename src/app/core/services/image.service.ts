@@ -199,6 +199,18 @@ export class ImageService {
     this.fishingMode.updateActivePreferences({ homepageImageId: undefined });
   }
 
+  /**
+   * True when the user chose to keep this image visible on its own:
+   * it is the homepage image or a favourite.
+   */
+  async isKeptByUser(id: string): Promise<boolean> {
+    if (this.fishingMode.getActivePreferences().homepageImageId === id) {
+      return true;
+    }
+    const image = await this.imageRepo.getById(id);
+    return !!image && (image.isHomepageImage || image.isFavorite);
+  }
+
   async delete(id: string): Promise<void> {
     this.revokeUrl(id);
     this.revokeFullUrl(id);

@@ -26,7 +26,7 @@ Bottom sheet `CatchSheetComponent` (`features/catches/catch-sheet/`), opened wit
 
 ### Deleting a catch
 
-In edit mode the form has a **Delete catch** button (warn): `ConfirmService.confirmDelete` → `CatchService.delete` → snackbar → back to `returnUrl` (fallback `/sessions/:id`). `CatchService.delete` recomputes personal records and session stats, and soft-deletes the catch photo (`ImageService.delete`) so it leaves the session photos and the gallery, unless that image is still used by another catch or listed in the session's `photoIds`. The catch sheet's **Undo** uses the same method, so an undone catch leaves no photo behind. There is no delete action on the session screen's catch rows (open the row, then delete).
+In edit mode the form has a **Delete catch** button (warn): `ConfirmService.confirmDelete` → `CatchService.delete` → snackbar → back to `returnUrl` (fallback `/sessions/:id`). `CatchService.delete` recomputes personal records and session stats, and soft-deletes the catch photo (`ImageService.delete`) so it leaves the session photos and the gallery, unless that image is still used by another catch, listed in the session's `photoIds`, or kept by the user as homepage image or favourite (`ImageService.isKeptByUser`). The catch sheet's **Undo** uses the same method, so an undone catch leaves no photo behind. There is no delete action on the session screen's catch rows (open the row, then delete).
 
 Custom dropdown options via `option-combobox` and `UserOptionService` (mode-scoped). Query params `rodId` and `sessionSpotId` preselect the rod (catch sheet **All details…**).
 
