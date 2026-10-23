@@ -311,14 +311,6 @@ export class RodService {
     return updated ?? { ...session, rods: change(session.rods ?? []) };
   }
 
-  /** Replaces only `sessionSpots`; other session fields keep their latest stored values. */
-  async saveSessionSpots(session: FishingSession, sessionSpots: SessionSpot[]): Promise<FishingSession> {
-    const updated = await this.sessionRepo.modify(session.id, (latest) => {
-      latest.sessionSpots = sessionSpots;
-    });
-    return updated ?? { ...session, sessionSpots };
-  }
-
   getRodCatchCount(sessionId: string, rodId: string, catches: { rodId?: string }[]): number {
     return catches.filter((c) => c.rodId === rodId).length;
   }

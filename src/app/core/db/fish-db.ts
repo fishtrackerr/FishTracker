@@ -20,8 +20,8 @@ import { DEFAULT_SETTINGS } from '../models/app-settings.model';
 import { DEFAULT_FISHING_MODE } from '../models/fishing-mode.model';
 import { generateId, nowIso } from '../utils';
 import { migrateCarperToCatfish } from './migrate-carper-to-catfish';
+import { SETTINGS_KEY } from '../constants/storage-keys';
 
-const SETTINGS_KEY = 'fish-tracker-settings';
 
 export class FishDb extends Dexie {
   sessions!: Table<FishingSession, string>;

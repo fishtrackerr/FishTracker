@@ -55,4 +55,4 @@ Session-level stats (count, total weight, biggest) updated on every catch create
 
 ## Personal records
 
-`CatchService.checkPersonalRecord()` flags PR when weight exceeds prior records for species **within the current mode**.
+A catch is a personal record (PR) when it is the heaviest or the longest catch of its species **within the current mode** (ties count). `CatchService` re-evaluates the flags of the affected species after every create, edit and delete, so a deleted or edited record hands the flag to the next-best catch.

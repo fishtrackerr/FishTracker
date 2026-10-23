@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { SettingsService } from './settings.service';
 
-const AI_SESSION_KEY = 'fish-tracker-ai-session';
+import { AI_SESSION_KEY } from '../constants/storage-keys';
 
 /**
  * Holds the AI API key in memory while unlocked and persists only ciphertext

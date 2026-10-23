@@ -2,11 +2,12 @@ import type { Transaction } from 'dexie';
 import {
   FILTER_PRESETS_KEY_PREFIX,
   FISHING_MODE_KEY,
+  SETTINGS_KEY,
 } from '../constants/storage-keys';
 import type { ModePreferences } from '../models/fishing-mode.model';
 import { nowIso } from '../utils';
 
-export const SETTINGS_STORAGE_KEY = 'fish-tracker-settings';
+export const SETTINGS_STORAGE_KEY = SETTINGS_KEY;
 
 export const SOURCE_MODE = 'carper' as const;
 export const TARGET_MODE = 'catfish' as const;

@@ -26,8 +26,8 @@ import { INSIGHT_PROMPTS } from '../../core/services/local-insight.service';
 import { LlmService } from '../../core/services/llm.service';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { ASSISTANT_ACTIVE_THREAD_KEY } from '../../core/constants/storage-keys';
 
-const ACTIVE_THREAD_KEY = 'ft.assistant.activeThreadId';
 const PREVIEW_MAX_LEN = 80;
 
 export interface StarterPromptCard {
@@ -221,7 +221,7 @@ export class AssistantComponent {
   }
 
   private async resumeLastThread(): Promise<void> {
-    const stored = localStorage.getItem(ACTIVE_THREAD_KEY);
+    const stored = localStorage.getItem(ASSISTANT_ACTIVE_THREAD_KEY);
     if (!stored) {
       return;
     }
@@ -229,16 +229,16 @@ export class AssistantComponent {
     if (thread) {
       this.activeThreadId.set(thread.id);
     } else {
-      localStorage.removeItem(ACTIVE_THREAD_KEY);
+      localStorage.removeItem(ASSISTANT_ACTIVE_THREAD_KEY);
     }
   }
 
   private setActiveThread(id: string | null): void {
     this.activeThreadId.set(id);
     if (id) {
-      localStorage.setItem(ACTIVE_THREAD_KEY, id);
+      localStorage.setItem(ASSISTANT_ACTIVE_THREAD_KEY, id);
     } else {
-      localStorage.removeItem(ACTIVE_THREAD_KEY);
+      localStorage.removeItem(ASSISTANT_ACTIVE_THREAD_KEY);
     }
   }
 

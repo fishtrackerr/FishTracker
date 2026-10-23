@@ -1,3 +1,13 @@
+/** App settings JSON (localStorage). */
+export const SETTINGS_KEY = 'fish-tracker-settings';
+/** Plaintext AI key for in-tab refresh while unlocked (sessionStorage). */
+export const AI_SESSION_KEY = 'fish-tracker-ai-session';
+/** Marks that stale service workers were removed once inside the native app. */
+export const NATIVE_SW_CLEARED_KEY = 'ft.nativeSwCleared';
+/** Last opened assistant chat thread. */
+export const ASSISTANT_ACTIVE_THREAD_KEY = 'ft.assistant.activeThreadId';
+/** Expandable-section open/closed state; suffixed with the section id. */
+export const EXPAND_STATE_KEY_PREFIX = 'expand-';
 export const RETURN_URL_KEY = 'fish-tracker-return-url';
 export const LOCK_STATE_KEY = 'fish-tracker-lock-state';
 /** Set on successful PIN unlock; cleared on lock. Survives only for the browser tab session. */

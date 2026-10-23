@@ -5,7 +5,6 @@ import { AppStartupService } from './core/services/app-startup.service';
 import { ThemeService } from './core/services/theme.service';
 import { I18nService } from './core/services/i18n.service';
 import { SwUpdateService } from './core/services/sw-update.service';
-import { VersionCheckService } from './core/services/version-check.service';
 import { PwaInstallService } from './core/services/pwa-install.service';
 import { signal } from '@angular/core';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -38,10 +37,6 @@ describe('App', () => {
         {
           provide: SwUpdateService,
           useValue: { checkForUpdatesNow: vi.fn() },
-        },
-        {
-          provide: VersionCheckService,
-          useValue: {},
         },
         {
           provide: PwaInstallService,

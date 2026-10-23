@@ -232,6 +232,36 @@ describe('CatchService', () => {
     });
   });
 
+  describe('personal records', () => {
+    const pike = (id: string, weightKg: number, isPersonalRecord: boolean) =>
+      ({ id, sessionId: 'session-1', species: 'Pike', weightKg, isPersonalRecord }) as Catch;
+
+    it('moves the record flag to the next-best catch when the record is deleted', async () => {
+      const record = pike('c-big', 9, true);
+      const second = pike('c-second', 7, false);
+      catchRepo.getById.mockResolvedValue(record);
+      (catchRepo as unknown as { delete: ReturnType<typeof vi.fn> }).delete = vi.fn();
+      catchRepo.getAll.mockResolvedValue([second]);
+
+      await service.delete('c-big');
+
+      expect(catchRepo.put).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'c-second', isPersonalRecord: true }),
+      );
+    });
+
+    it('clears the flag on a former record once a bigger fish is saved', async () => {
+      const former = pike('c-old', 5, true);
+      catchRepo.getAll.mockResolvedValue([former, pike('c-new', 8, true)]);
+
+      await service.createQuick('session-1', { species: 'Pike', weightKg: 8, rodId: 'rod-1' });
+
+      expect(catchRepo.put).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'c-old', isPersonalRecord: false }),
+      );
+    });
+  });
+
   describe('update', () => {
     it('clears detailsPending and leaves weather and caughtAt intact', async () => {
       const existing: Catch = {

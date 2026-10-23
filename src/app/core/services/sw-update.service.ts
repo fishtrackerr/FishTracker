@@ -2,13 +2,13 @@ import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { SwUpdate, VersionEvent } from '@angular/service-worker';
 import { interval } from 'rxjs';
+import { NATIVE_SW_CLEARED_KEY } from '../constants/storage-keys';
 import { isNativeApp } from '../utils/platform';
 import { hardReloadApp } from './app-version.service';
 import { I18nService } from './i18n.service';
 import { NotificationService } from './notification.service';
 
 const UPDATE_PROMPT_RESHOW_MS = 10_000;
-const NATIVE_SW_CLEARED_KEY = 'ft.nativeSwCleared';
 
 @Injectable({ providedIn: 'root' })
 export class SwUpdateService {

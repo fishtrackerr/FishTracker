@@ -65,6 +65,13 @@ Do not clear site data or use Settings full reset unless you have a backup — w
 | `fish-tracker-geocode-cache` | Nominatim forward/reverse lookup cache (up to 50 entries) |
 | `fish-tracker-last-seen-version` | What’s New dialog version seed |
 | `fish-tracker-feedback-prompt-date` | Last local date the feedback prompt was shown |
+| `fish-tracker-privacy-welcome-seen` | Privacy welcome acknowledged |
+| `fish-tracker-ai-session` | sessionStorage — plaintext AI key for in-tab refresh while unlocked |
+| `ft.assistant.activeThreadId` | Last opened assistant thread |
+| `ft.nativeSwCleared` | Native app: stale service workers already removed |
+| `expand-<section id>` | Expandable section open/closed state |
+
+All keys are defined in `src/app/core/constants/storage-keys.ts`.
 
 ## Transactions
 

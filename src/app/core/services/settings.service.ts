@@ -6,8 +6,8 @@ import {
   defaultModePreferences,
   isFishingMode,
 } from '../models/fishing-mode.model';
+import { SETTINGS_KEY } from '../constants/storage-keys';
 
-const STORAGE_KEY = 'fish-tracker-settings';
 
 /** Keys allowed when hydrating settings from localStorage. */
 const SETTINGS_KEYS = Object.keys(DEFAULT_SETTINGS) as (keyof AppSettings)[];
@@ -67,12 +67,12 @@ export class SettingsService {
     if (settings.aiApiKeyEncrypted || !settings.aiApiKey) {
       delete toStore['aiApiKey'];
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(toStore));
   }
 
   private load(): AppSettings {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(SETTINGS_KEY);
       if (!raw) {
         return { ...DEFAULT_SETTINGS, modePreferences: {} };
       }

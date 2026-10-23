@@ -8,6 +8,7 @@ import {
   LOCK_STATE_KEY,
   UNLOCK_SESSION_KEY,
   WEATHER_CACHE_KEY,
+  EXPAND_STATE_KEY_PREFIX,
 } from '../constants/storage-keys';
 import { BiteEventRepository } from './bite-event.repository';
 import { AssistantPromptRepository } from './assistant-prompt.repository';
@@ -238,7 +239,7 @@ export class ResetService {
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith('expand-')) {
+      if (key?.startsWith(EXPAND_STATE_KEY_PREFIX)) {
         keysToRemove.push(key);
       }
     }

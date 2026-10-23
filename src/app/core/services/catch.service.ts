@@ -149,6 +149,7 @@ export class CatchService {
 
     catchRecord.isPersonalRecord = await this.checkPersonalRecord(catchRecord);
     await this.catchRepo.put(catchRecord);
+    await this.refreshPersonalRecords([catchRecord.species]);
     await this.updateSessionStats(sessionId);
     await this.sessionEvents.record({
       sessionId,
@@ -196,6 +197,7 @@ export class CatchService {
     }
     updated.isPersonalRecord = await this.checkPersonalRecord(updated);
     await this.catchRepo.put(updated);
+    await this.refreshPersonalRecords([existing.species, updated.species]);
     await this.updateSessionStats(existing.sessionId);
     return updated;
   }
@@ -206,6 +208,7 @@ export class CatchService {
       return;
     }
     await this.catchRepo.delete(id);
+    await this.refreshPersonalRecords([existing.species]);
     await this.updateSessionStats(existing.sessionId);
   }
 
@@ -242,11 +245,37 @@ export class CatchService {
       (max, c) => Math.max(max, c.lengthCm ?? 0),
       0,
     );
+    // Ties count as a record, matching refreshPersonalRecords.
     const weightRecord =
-      catchRecord.weightKg != null && catchRecord.weightKg > maxWeight;
+      catchRecord.weightKg != null && catchRecord.weightKg > 0 && catchRecord.weightKg >= maxWeight;
     const lengthRecord =
-      catchRecord.lengthCm != null && catchRecord.lengthCm > maxLength;
+      catchRecord.lengthCm != null && catchRecord.lengthCm > 0 && catchRecord.lengthCm >= maxLength;
     return weightRecord || lengthRecord;
+  }
+
+  /**
+   * A personal record is the current heaviest or longest catch of a species in
+   * this mode. Re-evaluated for the affected species after every write, so an
+   * edit or delete doesn't leave stale flags on other catches.
+   */
+  private async refreshPersonalRecords(species: (string | undefined)[]): Promise<void> {
+    const targets = new Set(species.filter((name): name is string => !!name));
+    if (targets.size === 0) {
+      return;
+    }
+    const all = await this.catchRepo.getAll();
+    for (const name of targets) {
+      const sameSpecies = all.filter((c) => c.species === name);
+      const maxWeight = Math.max(0, ...sameSpecies.map((c) => c.weightKg ?? 0));
+      const maxLength = Math.max(0, ...sameSpecies.map((c) => c.lengthCm ?? 0));
+      for (const c of sameSpecies) {
+        const isRecord =
+          (maxWeight > 0 && c.weightKg === maxWeight) || (maxLength > 0 && c.lengthCm === maxLength);
+        if (!!c.isPersonalRecord !== isRecord) {
+          await this.catchRepo.put({ ...c, isPersonalRecord: isRecord });
+        }
+      }
+    }
   }
 
   private async updateSessionStats(sessionId: string): Promise<void> {
