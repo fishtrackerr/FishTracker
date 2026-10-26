@@ -1,0 +1,16 @@
+# Always check out text files with LF. The service worker hashes the build
+# output (ngsw.json); CRLF sources produce CRLF assets that git normalizes to LF
+# when angular-cli-ghpages commits them, so deployed files no longer match.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.jar binary
+*.keystore binary

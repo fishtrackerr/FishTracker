@@ -21,7 +21,8 @@
     "store-assets": "node scripts/generate-store-assets.mjs",
     "release-notes": "node scripts/generate-release-notes.mjs",
     "tag-version": "node ./set-version.js --tag",
-    "deploy": "npm run set-version && npm run icons && npm run release-notes && npm run tag-version && ng deploy"
+    "check-eol": "node scripts/check-line-endings.mjs",
+    "deploy": "npm run set-version && npm run icons && npm run release-notes && npm run tag-version && npm run check-eol && ng deploy"
   },
   "private": true,
   "packageManager": "npm@11.11.0",
