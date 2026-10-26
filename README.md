@@ -78,7 +78,12 @@ Static client build (`outputMode: static`) published to **GitHub Pages** via `an
 2. Regenerate PWA icons
 3. Generate `public/assets/release-notes.json` from commits since the latest git tag
 4. Commit the release files (`chore: release v{version}`) and create annotated tag `v{version}` on that commit (so the next release’s commit range is correct)
-5. `ng deploy` — production build + push to `gh-pages`
+5. `npm run check-eol` — abort if any build input has CRLF line endings
+6. `ng deploy` — production build + push to `gh-pages`
+
+### Line endings
+
+Build inputs must be LF (`.gitattributes`: `* text=auto eol=lf`). The service worker hashes every asset into `ngsw.json`; CRLF files (e.g. `index.html`, `manifest.webmanifest`, SVGs) get normalized to LF when `angular-cli-ghpages` commits them on Windows (`core.autocrlf=true`), so the deployed files stop matching their hashes and clients fail to update (`VERSION_INSTALLATION_FAILED` → “update failed”).
 
 ### After deploy
 
