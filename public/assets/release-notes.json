@@ -1,35 +1,42 @@
 {
-  "version": "0.0.55",
-  "date": "2026-10-23",
+  "version": "0.0.56",
+  "date": "2026-10-26",
   "sections": [
     {
-      "category": "New Features",
+      "category": "Bug Fixes",
       "items": [
-        "camo redesign — Woodland camo (default) and Night bivvy themes"
-      ]
-    },
-    {
-      "category": "Maintenance",
-      "items": [
-        "regenerate mdpi launcher icons with sharp 0.35"
+        "enforce LF line endings so service worker updates install"
       ]
     }
   ],
   "releases": [
     {
+      "version": "0.0.56",
+      "date": "2026-10-26",
+      "sections": [
+        {
+          "category": "Bug Fixes",
+          "items": [
+            "enforce LF line endings so service worker updates install"
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.0.55",
       "date": "2026-10-23",
       "sections": [
         {
-          "category": "New Features",
+          "category": "Maintenance",
           "items": [
-            "camo redesign — Woodland camo (default) and Night bivvy themes"
+            "release v0.0.55",
+            "regenerate mdpi launcher icons with sharp 0.35"
           ]
         },
         {
-          "category": "Maintenance",
+          "category": "New Features",
           "items": [
-            "regenerate mdpi launcher icons with sharp 0.35"
+            "camo redesign — Woodland camo (default) and Night bivvy themes"
           ]
         }
       ]
