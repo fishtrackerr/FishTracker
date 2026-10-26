@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1792756771800,
+  "timestamp": 1793027510485,
   "index": "/FishTracker/index.html",
   "assetGroups": [
     {
@@ -199,11 +199,11 @@
     }
   ],
   "hashTable": {
-    "/FishTracker/assets/images/covers/cover-1.svg": "61aabb91ab82b49975fd18b04e3b380174a8105a",
-    "/FishTracker/assets/images/covers/cover-2.svg": "2922f0cef286431045995ab0990da6a721b4b09b",
-    "/FishTracker/assets/images/covers/cover-3.svg": "df1a4c747ce5bd96c0b667a2519d726c0d763ca6",
-    "/FishTracker/assets/images/covers/cover-4.svg": "c0f7aa73f2aa87f2e62e18a4149d186b10c815c5",
-    "/FishTracker/assets/images/img-not-found.svg": "5c998988772efd99f587fb16282eebe320c201e3",
+    "/FishTracker/assets/images/covers/cover-1.svg": "177462864365c178de08756cde67c46647be8afe",
+    "/FishTracker/assets/images/covers/cover-2.svg": "39b2b32b3b6ad83c6d539ea95d5456bf96b96933",
+    "/FishTracker/assets/images/covers/cover-3.svg": "c32f219116ce0312c50989cda37c26b59b1d5da8",
+    "/FishTracker/assets/images/covers/cover-4.svg": "d9434c5552ef9a38a169ba678bf8d4802a9e5e59",
+    "/FishTracker/assets/images/img-not-found.svg": "a4eddc51a81a98157534a30286ac1d4b76da21f1",
     "/FishTracker/chunk-5TdPz5Tu.js": "24755980f136daca7ab4ec992114149fb7f37d01",
     "/FishTracker/chunk-6WyOc5rh.js": "4b00417c113fcc6cb0adebb8e3eb58bf8bbffe17",
     "/FishTracker/chunk-8klfVWKt.js": "6b13e6585193b97dc8c648541adbea5d4fae4b9a",
@@ -285,7 +285,7 @@
     "/FishTracker/chunk-xhOHvbIc.js": "b0e9d237cf4193e1079c0c817b05cd2c16977988",
     "/FishTracker/favicon.ico": "7ad91bcf1fd0d5c21c10dac14390c52649acd70c",
     "/FishTracker/icons/apple-touch-icon.png": "0656c715eeb65dda13bfb7654bbad91b3ff63b90",
-    "/FishTracker/icons/fishtracker-logo.svg": "930726230da93018206500684593523af8c3bb46",
+    "/FishTracker/icons/fishtracker-logo.svg": "de9df918e41a303959388c2d30712697a6ef2baf",
     "/FishTracker/icons/icon-128x128.png": "6ac9d19f168536d0d5955ecf79e980a28d07f705",
     "/FishTracker/icons/icon-144x144.png": "ae9a8ef7414d6b7b7970d6ba85b6f8e7f34f60b2",
     "/FishTracker/icons/icon-152x152.png": "747c8720f8cd1a52b941d546ce8c8f36f8045cd4",
@@ -296,9 +296,9 @@
     "/FishTracker/icons/icon-96x96.png": "28d349eb587e78898183519d3b65d234e2b38f15",
     "/FishTracker/icons/icon-maskable-192x192.png": "3ac83cd9aa2609602adcff69b699f9f6b1452019",
     "/FishTracker/icons/icon-maskable-512x512.png": "25a051eed38b04423c61c6824c7b725d06a3296f",
-    "/FishTracker/index.html": "61f66a13857e85a32af6598e9e98d3ce90a1ee7e",
+    "/FishTracker/index.html": "c800fec7bc7e3bb6f51d7cb1c8c55438dce16ba7",
     "/FishTracker/main-HT7IALZL.js": "e5b078b54fea80e2223cea3518e91203cf974d14",
-    "/FishTracker/manifest.webmanifest": "85665cc429febf8456450e8391614efa8df833d1",
+    "/FishTracker/manifest.webmanifest": "749c852878b495f2a621fee56592ffdb31ac487e",
     "/FishTracker/media/barlow-condensed-latin-500-normal-JDSP35DN.woff": "f0e54ec0bd346390a9b71176805f8d968cc7a96b",
     "/FishTracker/media/barlow-condensed-latin-500-normal-MRAP444H.woff2": "fe2f6553fb5a73928c08479433a61b94c98b0276",
     "/FishTracker/media/barlow-condensed-latin-600-normal-UCXK75QA.woff": "5a5d2cf5aff932b04958c0591b330d13c00aad49",
